@@ -23,17 +23,23 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="css\app.css" />
+    <Content Include="css\HexViewer.css" />
     <Content Include="index.html" />
     <Content Include="js\app.js" />
     <Content Include="js\autorefresh.js" />
+    <Content Include="js\HexViewer.js" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="lib\ts-types\ace.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\jquery.d.ts" />
     <TypeScriptCompile Include="src\app.ts" />
+    <TypeScriptCompile Include="src\HexViewer.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="js\app.js.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="js\HexViewer.js.map" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
