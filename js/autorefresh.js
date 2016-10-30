@@ -1,11 +1,9 @@
 var lastMod = null;
 function checkModifications() {
-    $.ajax({ type: "HEAD", url: location.href, cache: false }).done(function (message, text, jqXHR) {
-        console.log('checkmod');
-        var currMod = jqXHR.getResponseHeader('Last-Modified');
-        if(lastMod !== null && currMod !== lastMod)
+    $.getJSON('/status', status => {
+        if(lastMod !== null && status.lastchange.modTime !== lastMod)
             location.reload(true);
-        lastMod = currMod;
+        lastMod = status.lastchange.modTime;
         setTimeout(checkModifications, 750);
     });
 }
