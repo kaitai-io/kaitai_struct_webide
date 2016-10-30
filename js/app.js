@@ -70,7 +70,7 @@ $(() => {
         }
         try {
             var ks = io.kaitai.struct.MainJs();
-            var r = ks.compile('javascript', src);
+            var r = ks.compile('javascript', src, true);
         }
         catch (compileErr) {
             console.log("KS compilation error: ", compileErr);
@@ -81,7 +81,26 @@ $(() => {
         console.log('recompiled');
     }
     function reparse() {
-        return Promise.all([jailReady, inputReady, formatReady]).then(() => jail.remote.reparse(res => ui.parsedDataViewer.setValue(JSON.stringify(res, null, 2))));
+        return Promise.all([jailReady, inputReady, formatReady]).then(() => jail.remote.reparse(res => {
+            var intervals = [];
+            function clearDebug(obj) {
+                if (typeof obj != "object")
+                    return;
+                var debug = obj._debug;
+                delete obj._debug;
+                Object.keys(obj).forEach(key => {
+                    if (debug)
+                        intervals.push(debug[key]);
+                    clearDebug(obj[key]);
+                });
+            }
+            clearDebug(res);
+            ui.parsedDataViewer.setValue(JSON.stringify(res, null, 2));
+            intervals.shift();
+            intervals = intervals.filter(x => x.start <= x.end);
+            console.log(intervals.map(i => `${i.start}-${i.end}`).join(' '));
+            ui.hexViewer.setIntervals(intervals);
+        }));
     }
     jail = new jailed.Plugin(baseUrl + 'js/kaitaiJail.js');
     jailReady = new Promise((resolve, reject) => {

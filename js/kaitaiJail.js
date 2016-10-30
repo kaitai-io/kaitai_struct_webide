@@ -6,6 +6,7 @@ application.setInterface({
         try {
             result.output = JSON.stringify(eval(code));
         } catch (e) {
+            console.log(e);
             result.error = e.message;
         }
 
@@ -25,9 +26,9 @@ application.setInterface({
             Object.keys(obj).forEach(key => clearMeta(obj[key]));
         }
 
-        clearMeta(parsed);
+        console.log('parsed in jail', parsed);
 
-        console.log(parsed);
+        clearMeta(parsed);
         cb(parsed);
     }
 });
