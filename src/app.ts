@@ -1,6 +1,8 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
 declare var YAML: any, io: any, jailed: any;
 
+var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
+
 var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },
     content: [{ type: 'row', content: [
@@ -95,15 +97,15 @@ $(() => {
         return Promise.all([inputReady, formatReady]).then(() => jail.remote.reparse(res => ui.parsedDataViewer.setValue(JSON.stringify(res, null, 2))));
     }
 
-    jail = new jailed.Plugin(location.origin + '/js/kaitaiJail.js');
+    jail = new jailed.Plugin(baseUrl + 'js/kaitaiJail.js');
     jailReady = new Promise((resolve, reject) => {
         jail.whenConnected(() => resolve());
         jail.whenFailed(() => reject());
     });
     jailReady.then(() => console.log('jail started'), () => console.log('jail fail'));
-    jailReady.then(() => jail._connection.importScript(location.origin + '/lib/kaitai_js_runtime/KaitaiStream.js'));
+    jailReady.then(() => jail._connection.importScript(baseUrl + 'lib/kaitai_js_runtime/KaitaiStream.js'));
 
-    var inputReady = downloadFile('/samples/sample1.zip').then(fileBuffer => {
+    var inputReady = downloadFile('samples/sample1.zip').then(fileBuffer => {
         var fileContent = new Uint8Array(fileBuffer);
         var dataProvider = {
             length: fileContent.length,
@@ -131,7 +133,7 @@ $(() => {
         return jailrun('inputBuffer = args; void(0)', fileBuffer);
     });
 
-    var formatReady = Promise.resolve($.ajax({ url: '/formats/archive/zip.ksy' })).then(ksyContent => {
+    var formatReady = Promise.resolve($.ajax({ url: 'formats/archive/zip.ksy' })).then(ksyContent => {
         ui.ksyEditor.setValue(ksyContent, -1);
         var editDelay = new Delayed(500);
         ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));

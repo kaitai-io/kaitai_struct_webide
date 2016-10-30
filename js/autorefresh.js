@@ -1,6 +1,6 @@
 var lastMod = null;
 function checkModifications() {
-    $.getJSON('/status', status => {
+    $.getJSON('status', status => {
         if(lastMod !== null && status.lastchange.modTime !== lastMod)
             location.reload(true);
         lastMod = status.lastchange.modTime;
@@ -8,4 +8,5 @@ function checkModifications() {
     });
 }
 
-checkModifications();
+if(location.hostname == '127.0.0.1')
+    checkModifications();
