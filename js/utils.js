@@ -9,4 +9,17 @@ function downloadFile(url) {
         xhr.send();
     });
 }
+class Delayed {
+    constructor(delay) {
+        this.delay = delay;
+    }
+    do(func) {
+        if (this.timeout)
+            clearTimeout(this.timeout);
+        this.timeout = setTimeout(function () {
+            this.timeout = null;
+            func();
+        }, this.delay);
+    }
+}
 //# sourceMappingURL=utils.js.map

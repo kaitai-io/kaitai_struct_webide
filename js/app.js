@@ -35,10 +35,9 @@ $(() => {
     ksyEditor.setTheme("ace/theme/monokai");
     ksyEditor.getSession().setMode("ace/mode/yaml");
     ksyEditor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
-    $.ajax({ url: '/formats/archive/zip.ksy' }).done(ksyContent => {
-        ksyEditor.setValue(ksyContent, -1);
-        recompile();
-    });
+    var editDelay = new Delayed(500);
+    ksyEditor.on('change', () => editDelay.do(() => recompile()));
+    $.ajax({ url: '/formats/archive/zip.ksy' }).done(ksyContent => ksyEditor.setValue(ksyContent, -1));
     genCodeViewer = ace.edit('genCodeViewer');
     genCodeViewer.setTheme("ace/theme/monokai");
     genCodeViewer.getSession().setMode("ace/mode/javascript");
@@ -55,7 +54,6 @@ $(() => {
             console.log("YAML parsing error: ", parseErr);
             return;
         }
-        console.log(src);
         try {
             var ks = io.kaitai.struct.MainJs();
             var r = ks.compile('javascript', src);
@@ -65,7 +63,6 @@ $(() => {
             return;
         }
         genCodeViewer.setValue(r[0], -1);
-        console.log(r);
     }
     downloadFile('/samples/sample1.zip').then(fileContent => {
         var dataProvider = {

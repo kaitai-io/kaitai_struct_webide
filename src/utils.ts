@@ -11,3 +11,19 @@
         xhr.send();
     });
 }
+
+class Delayed {
+    private timeout: number;
+
+    constructor(public delay: number) { }
+
+    public do(func) {
+        if (this.timeout)
+            clearTimeout(this.timeout);
+
+        this.timeout = setTimeout(function () {
+            this.timeout = null;
+            func();
+        }, this.delay);
+    }
+}
