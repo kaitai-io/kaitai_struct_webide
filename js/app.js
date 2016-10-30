@@ -1,41 +1,50 @@
 /// <reference path="../lib/ts-types/goldenlayout.d.ts" />
 var myLayout = new GoldenLayout({
+    settings: { showCloseIcon: false, showPopoutIcon: false },
     content: [{ type: 'row', content: [
-                { type: 'component', componentName: '.ksy editor' },
-                { type: 'column', content: [
-                        { type: 'component', componentName: 'hex viewer' },
+                { type: 'stack', content: [
+                        { type: 'component', componentName: '.ksy editor', isClosable: false },
+                    ] },
+                { type: 'stack', activeItemIndex: 1, content: [
+                        { type: 'component', componentName: 'generated JS code', isClosable: false },
+                        { type: 'component', componentName: 'hex viewer', isClosable: false },
                     ] }
             ] }]
 });
+var ksyEditor;
 myLayout.registerComponent('.ksy editor', function (container, componentState) {
     container.getElement().append($('<div id="ksyEditor"></div>'));
+    container.on('resize', () => { if (ksyEditor)
+        ksyEditor.resize(); });
+});
+var genCodeViewer;
+myLayout.registerComponent('generated JS code', function (container, componentState) {
+    container.getElement().append($('<div id="genCodeViewer"></div>'));
+    container.on('resize', () => { if (genCodeViewer)
+        genCodeViewer.resize(); });
 });
 var hexViewer;
 myLayout.registerComponent('hex viewer', function (container, componentState) {
     container.getElement().append($('<div id="hexViewer"></div>'));
-    container.on('resize', () => {
-        console.log('hex viewer resize');
-        if (hexViewer)
-            hexViewer.resize();
-    });
+    container.on('resize', () => { if (hexViewer)
+        hexViewer.resize(); });
 });
 myLayout.init();
 $(() => {
-    var ksyEditor = ace.edit('ksyEditor');
+    ksyEditor = ace.edit('ksyEditor');
     ksyEditor.setTheme("ace/theme/monokai");
     ksyEditor.getSession().setMode("ace/mode/yaml");
     ksyEditor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
     $.ajax({ url: '/formats/archive/zip.ksy' }).done(ksyContent => {
-        ksyEditor.setValue(ksyContent);
-        ksyEditor.gotoLine(0);
+        ksyEditor.setValue(ksyContent, -1);
         recompile();
     });
-    myLayout.eventHub.on('resize', () => console.log('state changed'));
-    $(window).on('resize', () => {
-        myLayout.updateSize();
-        //ksyEditor.resize();
-        console.log('resize');
-    });
+    genCodeViewer = ace.edit('genCodeViewer');
+    genCodeViewer.setTheme("ace/theme/monokai");
+    genCodeViewer.getSession().setMode("ace/mode/javascript");
+    genCodeViewer.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
+    genCodeViewer.setReadOnly(true);
+    $(window).on('resize', () => myLayout.updateSize());
     function recompile() {
         var srcYaml = ksyEditor.getValue();
         var src;
@@ -55,6 +64,7 @@ $(() => {
             console.log("KS compilation error: ", compileErr);
             return;
         }
+        genCodeViewer.setValue(r[0], -1);
         console.log(r);
     }
     downloadFile('/samples/sample1.zip').then(fileContent => {

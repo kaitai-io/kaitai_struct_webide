@@ -217,13 +217,13 @@ declare namespace GoldenLayout {
          * Specifies if the maximise icon should be displayed in the header-bar.
          * Default: true
          */
-        showMaximiseIcon: boolean;
+        showMaximiseIcon?: boolean;
 
         /**
          * Specifies if the close icon should be displayed in the header-bar.
          * Default: true
          */
-        showCloseIcon: boolean;
+        showCloseIcon?: boolean;
     }
 
     export interface Dimensions {
@@ -330,6 +330,8 @@ declare namespace GoldenLayout {
          * Default: componentName or ''
          */
         title?: string;
+
+        activeItemIndex?: number;
     }
 
     export interface ComponentConfig extends ItemConfig {

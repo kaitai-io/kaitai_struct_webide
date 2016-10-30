@@ -1,3 +1,3 @@
-﻿#ksyEditor { height: 100%; width: 100% }
-#hexViewer { height: 100%; width: 100%; background: white; }
+﻿.lm_content>div { height: 100%; width: 100% }
+#hexViewer { background: white; }
 #hexViewer .content { margin-left:8px }
