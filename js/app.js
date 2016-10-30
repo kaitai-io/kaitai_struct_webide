@@ -2,29 +2,40 @@ $(() => {
     var ksyEditor = ace.edit("ksyEditor");
     ksyEditor.setTheme("ace/theme/monokai");
     ksyEditor.getSession().setMode("ace/mode/yaml");
-    $.ajax({ url: '/formats/image/png.ksy' }).done(ksyContent => {
+    ksyEditor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
+    $.ajax({ url: '/formats/archive/zip.ksy' }).done(ksyContent => {
         ksyEditor.setValue(ksyContent);
         ksyEditor.gotoLine(0);
-        console.log('ajax done, len: ', ksyContent.length);
+        recompile();
     });
-    function downloadFile(url) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.responseType = 'arraybuffer';
-        return new Promise((resolve, reject) => {
-            xhr.onload = function (e) {
-                resolve(new Uint8Array(this.response));
-            };
-            xhr.send();
-        });
+    function recompile() {
+        var srcYaml = ksyEditor.getValue();
+        var src;
+        try {
+            src = YAML.parse(srcYaml);
+        }
+        catch (parseErr) {
+            console.log("YAML parsing error: ", parseErr);
+            return;
+        }
+        console.log(src);
+        try {
+            var ks = io.kaitai.struct.MainJs();
+            var r = ks.compile('javascript', src);
+        }
+        catch (compileErr) {
+            console.log("KS compilation error: ", compileErr);
+            return;
+        }
+        console.log(r);
     }
-    downloadFile('/samples/pnggrad8rgb.png').then(pngContent => {
+    downloadFile('/samples/sample1.zip').then(fileContent => {
         var dataProvider = {
-            length: pngContent.length,
+            length: fileContent.length,
             get(offset, length) {
                 var res = [];
                 for (var i = 0; i < length; i++)
-                    res.push(pngContent[offset + i]); // TODO: use ArrayBuffer
+                    res.push(fileContent[offset + i]); // TODO: use ArrayBuffer
                 return res;
             }
         };
