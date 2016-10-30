@@ -58,32 +58,37 @@
 }
 
 class HexViewer {
-    private intervals: any[];
+    private rowHeight = 21;
     private bytesPerLine = 16;
+
+    private intervals: any[];
     private rows = [];
     private topRow = 0;
     private maxLevel = 3;
     private rowCount: number;
+    private maxScrollHeight: number;
+    private maxRow: number;
+    private totalHeight: number;
+    private scrollbox: JQuery;
+    private heightbox: JQuery;
+    private content: JQuery;
 
     constructor(containerId: string, public dataProvider) {
-        var rowHeight = 21;
-        var scrollbox = $('#' + containerId);
-        scrollbox.addClass('hexViewer');
-        var heightbox = $('<div class="heightbox"></div>').appendTo(scrollbox);
-        var content = $('<div class="content"></div>').appendTo(scrollbox);
+        this.scrollbox = $('#' + containerId);
+        this.scrollbox.addClass('hexViewer');
+        this.heightbox = $('<div class="heightbox"></div>').appendTo(this.scrollbox);
+        this.content = $('<div class="content"></div>').appendTo(this.scrollbox);
         var totalRowCount = Math.ceil(dataProvider.length / this.bytesPerLine);
-        var totalHeight = totalRowCount * rowHeight;
-        heightbox.height(totalHeight);
-
-        var maxScrollHeight, maxRow;
+        this.totalHeight = totalRowCount * this.rowHeight;
+        this.heightbox.height(this.totalHeight);
 
         this.intervals = [];
 
-        scrollbox.on('scroll', e => {
-            var scrollTop = scrollbox.scrollTop();
-            content.css('top', scrollTop + 'px');
-            var percent = scrollTop / maxScrollHeight;
-            var newTopRow = Math.round(maxRow * percent);
+        this.scrollbox.on('scroll', e => {
+            var scrollTop = this.scrollbox.scrollTop();
+            this.content.css('top', scrollTop + 'px');
+            var percent = scrollTop / this.maxScrollHeight;
+            var newTopRow = Math.round(this.maxRow * percent);
             console.log(scrollTop, percent);
             if (this.topRow !== newTopRow) {
                 this.topRow = newTopRow;
@@ -91,24 +96,24 @@ class HexViewer {
             }
         });
 
-        var resize = () => {
-            var boxHeight = scrollbox.height();
-            content.height(boxHeight + 'px');
-            content.html('');
-            maxScrollHeight = totalHeight - boxHeight;
-            this.rowCount = Math.ceil(boxHeight / rowHeight);
-            maxRow = Math.ceil(dataProvider.length / this.bytesPerLine - this.rowCount + 1);
-            this.rows = [];
-            for (var i = 0; i < this.rowCount; i++) {
-                var row = HexViewUtils.generateRow(this.bytesPerLine, this.maxLevel);
-                this.rows[i] = row;
-                content.append(row);
-            }
-            this.refresh();
-        }
+        $(window).on('resize', () => this.resize());
+        this.resize();
+    }
 
-        $(window).on('resize', () => resize());
-        resize();
+    public resize() {
+        var boxHeight = this.scrollbox.height();
+        this.content.height(boxHeight + 'px');
+        this.content.html('');
+        this.maxScrollHeight = this.totalHeight - boxHeight;
+        this.rowCount = Math.ceil(boxHeight / this.rowHeight);
+        this.maxRow = Math.ceil(this.dataProvider.length / this.bytesPerLine - this.rowCount + 1);
+        this.rows = [];
+        for (var i = 0; i < this.rowCount; i++) {
+            var row = HexViewUtils.generateRow(this.bytesPerLine, this.maxLevel);
+            this.rows[i] = row;
+            this.content.append(row);
+        }
+        this.refresh();
     }
 
     public refresh() {

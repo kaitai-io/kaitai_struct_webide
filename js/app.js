@@ -1,5 +1,27 @@
+/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
+var myLayout = new GoldenLayout({
+    content: [{ type: 'row', content: [
+                { type: 'component', componentName: '.ksy editor' },
+                { type: 'column', content: [
+                        { type: 'component', componentName: 'hex viewer' },
+                    ] }
+            ] }]
+});
+myLayout.registerComponent('.ksy editor', function (container, componentState) {
+    container.getElement().append($('<div id="ksyEditor"></div>'));
+});
+var hexViewer;
+myLayout.registerComponent('hex viewer', function (container, componentState) {
+    container.getElement().append($('<div id="hexViewer"></div>'));
+    container.on('resize', () => {
+        console.log('hex viewer resize');
+        if (hexViewer)
+            hexViewer.resize();
+    });
+});
+myLayout.init();
 $(() => {
-    var ksyEditor = ace.edit("ksyEditor");
+    var ksyEditor = ace.edit('ksyEditor');
     ksyEditor.setTheme("ace/theme/monokai");
     ksyEditor.getSession().setMode("ace/mode/yaml");
     ksyEditor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
@@ -7,6 +29,12 @@ $(() => {
         ksyEditor.setValue(ksyContent);
         ksyEditor.gotoLine(0);
         recompile();
+    });
+    myLayout.eventHub.on('resize', () => console.log('state changed'));
+    $(window).on('resize', () => {
+        myLayout.updateSize();
+        //ksyEditor.resize();
+        console.log('resize');
     });
     function recompile() {
         var srcYaml = ksyEditor.getValue();
@@ -39,7 +67,7 @@ $(() => {
                 return res;
             }
         };
-        var hexViewer = new HexViewer("hexViewer", dataProvider);
+        hexViewer = new HexViewer("hexViewer", dataProvider);
         hexViewer.setIntervals([
             { start: 0, end: 2 },
             { start: 1, end: 2 },
