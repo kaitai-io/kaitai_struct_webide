@@ -1,5 +1,5 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
-declare var YAML: any, io: any;
+declare var YAML: any, io: any, jailed: any;
 
 var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },
@@ -34,16 +34,26 @@ myLayout.registerComponent('hex viewer', function(container, componentState) {
 
 myLayout.init();
 
+var jail: any;
+var jailReady, inputReady;
+function jailrun(code, args?, cb = null) {
+    return jailReady.then(() => {
+        jail.remote.run(code, args, result => {
+            if (cb)
+                cb(result);
+            else if (result.error)
+                console.log(`Error: ${result.error}`);
+            else if (result.output)
+                console.log("Result =", JSON.parse(result.output));
+        });
+    });
+}
+
 $(() => {
     ksyEditor = ace.edit('ksyEditor');
     ksyEditor.setTheme("ace/theme/monokai");
     ksyEditor.getSession().setMode("ace/mode/yaml");
     ksyEditor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
-
-    var editDelay = new Delayed(500);
-    ksyEditor.on('change', () => editDelay.do(() => recompile()));
-
-    $.ajax({ url: '/formats/archive/zip.ksy' }).done(ksyContent => ksyEditor.setValue(ksyContent, -1));
 
     genCodeViewer = ace.edit('genCodeViewer');
     genCodeViewer.setTheme("ace/theme/monokai");
@@ -73,9 +83,24 @@ $(() => {
         }
 
         genCodeViewer.setValue(r[0], -1);
+        jailrun(`module = { exports: true }; \r\n ${r[0]} \r\n`).then(reparse);
+        console.log('recompiled');        
     }
 
-    downloadFile('/samples/sample1.zip').then(fileContent => {
+    function reparse() {
+        return Promise.all([inputReady, formatReady]).then(() => jailrun("io = new KaitaiStream(inputBuffer, 0); parsed = new module.exports(io); console.log(parsed)"));
+    }
+
+    jail = new jailed.Plugin(location.origin + '/js/kaitaiJail.js');
+    jailReady = new Promise((resolve, reject) => {
+        jail.whenConnected(() => resolve());
+        jail.whenFailed(() => reject());
+    });
+    jailReady.then(() => console.log('jail started'), () => console.log('jail fail'));
+    jailReady.then(() => jail._connection.importScript(location.origin + '/lib/kaitai_js_runtime/KaitaiStream.js'));
+
+    var inputReady = downloadFile('/samples/sample1.zip').then(fileBuffer => {
+        var fileContent = new Uint8Array(fileBuffer);
         var dataProvider = {
             length: fileContent.length,
             get(offset, length) {
@@ -98,6 +123,15 @@ $(() => {
             { start: 16 + 2, end: 16 + 8 },
             { start: 32, end: 95 },
         ]);
+
+        return jailrun('inputBuffer = args; void(0)', fileBuffer);
+    });
+
+    var formatReady = Promise.resolve($.ajax({ url: '/formats/archive/zip.ksy' })).then(ksyContent => {
+        ksyEditor.setValue(ksyContent, -1);
+        var editDelay = new Delayed(500);
+        ksyEditor.on('change', () => editDelay.do(() => recompile()));
+        recompile();
     });
 })
 
