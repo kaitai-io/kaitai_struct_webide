@@ -54,20 +54,17 @@ class HexViewer {
         this.rows = [];
         this.topRow = 0;
         this.maxLevel = 3;
+        this.dataProvider = dataProvider;
         this.scrollbox = $('#' + containerId);
         this.scrollbox.addClass('hexViewer');
         this.heightbox = $('<div class="heightbox"></div>').appendTo(this.scrollbox);
         this.content = $('<div class="content"></div>').appendTo(this.scrollbox);
-        var totalRowCount = Math.ceil(dataProvider.length / this.bytesPerLine);
-        this.totalHeight = totalRowCount * this.rowHeight;
-        this.heightbox.height(this.totalHeight);
         this.intervals = [];
         this.scrollbox.on('scroll', e => {
             var scrollTop = this.scrollbox.scrollTop();
             this.content.css('top', scrollTop + 'px');
             var percent = scrollTop / this.maxScrollHeight;
             var newTopRow = Math.round(this.maxRow * percent);
-            console.log(scrollTop, percent);
             if (this.topRow !== newTopRow) {
                 this.topRow = newTopRow;
                 this.refresh();
@@ -77,7 +74,12 @@ class HexViewer {
         this.resize();
     }
     resize() {
-        var boxHeight = this.scrollbox.height();
+        if (!this.dataProvider)
+            return false;
+        var totalRowCount = Math.ceil(this.dataProvider.length / this.bytesPerLine);
+        this.totalHeight = totalRowCount * this.rowHeight;
+        this.heightbox.height(this.totalHeight);
+        var boxHeight = this.scrollbox.outerHeight();
         this.content.height(boxHeight + 'px');
         this.content.html('');
         this.maxScrollHeight = this.totalHeight - boxHeight;
@@ -92,6 +94,8 @@ class HexViewer {
         this.refresh();
     }
     refresh() {
+        if (!this.dataProvider)
+            return false;
         var startOffset = this.topRow * this.bytesPerLine;
         var intIdx;
         for (intIdx = 0; intIdx < this.intervals.length; intIdx++)
@@ -136,6 +140,10 @@ class HexViewer {
     setIntervals(intervals) {
         this.intervals = intervals;
         this.refresh();
+    }
+    setDataProvider(dataProvider) {
+        this.dataProvider = dataProvider;
+        this.resize();
     }
 }
 //# sourceMappingURL=HexViewer.js.map

@@ -9,7 +9,7 @@ var myLayout = new GoldenLayout({
                     ] },
                 { type: 'stack', activeItemIndex: 1, content: [
                         { type: 'component', componentName: 'genCodeViewer', title: 'generated JS code', isClosable: false },
-                        { type: 'component', componentName: 'hex viewer', isClosable: false },
+                        { type: 'component', componentName: 'hexViewer', title: 'input binary', isClosable: false },
                     ] }
             ] }]
 });
@@ -19,29 +19,29 @@ var ui = {
     parsedDataViewer: null,
     hexViewer: null
 };
-function addEditor(name, lang, isReadOnly = false) {
+function addComponent(name, generatorCallback) {
     var editor;
     myLayout.registerComponent(name, function (container, componentState) {
-        container.getElement().append($(`<div id="${name}"></div>`));
+        container.getElement().attr('id', name);
         container.on('resize', () => { if (editor)
             editor.resize(); });
-        container.on('open', () => {
-            ui[name] = editor = ace.edit(name);
-            editor.setTheme("ace/theme/monokai");
-            editor.getSession().setMode(`ace/mode/${lang}`);
-            editor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
-            editor.setReadOnly(isReadOnly);
-        });
+        container.on('open', () => { ui[name] = editor = generatorCallback(); });
+    });
+}
+function addEditor(name, lang, isReadOnly = false) {
+    addComponent(name, () => {
+        var editor = ace.edit(name);
+        editor.setTheme("ace/theme/monokai");
+        editor.getSession().setMode(`ace/mode/${lang}`);
+        editor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
+        editor.setReadOnly(isReadOnly);
+        return editor;
     });
 }
 addEditor('ksyEditor', 'yaml');
 addEditor('genCodeViewer', 'javascript', true);
 addEditor('parsedDataViewer', 'json', true);
-myLayout.registerComponent('hex viewer', function (container, componentState) {
-    container.getElement().append($('<div id="hexViewer"></div>'));
-    container.on('resize', () => { if (ui.hexViewer)
-        ui.hexViewer.resize(); });
-});
+addComponent('hexViewer', () => new HexViewer("hexViewer"));
 myLayout.init();
 var jail;
 var jailReady, inputReady;
@@ -58,7 +58,6 @@ function jailrun(code, args, cb = null) {
     });
 }
 $(() => {
-    $(window).on('resize', () => myLayout.updateSize());
     function recompile() {
         var srcYaml = ui.ksyEditor.getValue();
         var src;
@@ -102,7 +101,7 @@ $(() => {
                 return res;
             }
         };
-        ui.hexViewer = new HexViewer("hexViewer", dataProvider);
+        ui.hexViewer.setDataProvider(dataProvider);
         ui.hexViewer.setIntervals([
             { start: 0, end: 2 },
             { start: 1, end: 2 },
