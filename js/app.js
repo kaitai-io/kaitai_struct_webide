@@ -3,38 +3,39 @@ var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },
     content: [{ type: 'row', content: [
                 { type: 'column', content: [
-                        { type: 'component', componentName: '.ksy editor', isClosable: false },
-                        { type: 'component', componentName: 'parsed data', isClosable: false },
+                        { type: 'component', componentName: 'ksyEditor', title: '.ksy editor', isClosable: false },
+                        { type: 'component', componentName: 'parsedDataViewer', title: 'parsed data', isClosable: false },
                     ] },
                 { type: 'stack', activeItemIndex: 1, content: [
-                        { type: 'component', componentName: 'generated JS code', isClosable: false },
+                        { type: 'component', componentName: 'genCodeViewer', title: 'generated JS code', isClosable: false },
                         { type: 'component', componentName: 'hex viewer', isClosable: false },
                     ] }
             ] }]
 });
-var ksyEditor;
-myLayout.registerComponent('.ksy editor', function (container, componentState) {
-    container.getElement().append($('<div id="ksyEditor"></div>'));
-    container.on('resize', () => { if (ksyEditor)
-        ksyEditor.resize(); });
-});
-var genCodeViewer;
-myLayout.registerComponent('generated JS code', function (container, componentState) {
-    container.getElement().append($('<div id="genCodeViewer"></div>'));
-    container.on('resize', () => { if (genCodeViewer)
-        genCodeViewer.resize(); });
-});
+var editors = {};
+function addEditor(name, lang, isReadOnly = false) {
+    var editor;
+    myLayout.registerComponent(name, function (container, componentState) {
+        container.getElement().append($(`<div id="${name}"></div>`));
+        container.on('resize', () => { if (editor)
+            editor.resize(); });
+        container.on('open', () => {
+            editors[name] = editor = ace.edit(name);
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode(`ace/mode/${lang}`);
+            editor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
+            editor.setReadOnly(isReadOnly);
+        });
+    });
+}
+addEditor('ksyEditor', 'yaml');
+addEditor('genCodeViewer', 'javascript', true);
+addEditor('parsedDataViewer', 'json', true);
 var hexViewer;
 myLayout.registerComponent('hex viewer', function (container, componentState) {
     container.getElement().append($('<div id="hexViewer"></div>'));
     container.on('resize', () => { if (hexViewer)
         hexViewer.resize(); });
-});
-var parsedDataViewer;
-myLayout.registerComponent('parsed data', function (container, componentState) {
-    container.getElement().append($('<div id="parsedDataViewer"></div>'));
-    container.on('resize', () => { if (parsedDataViewer)
-        parsedDataViewer.resize(); });
 });
 myLayout.init();
 var jail;
@@ -52,20 +53,9 @@ function jailrun(code, args, cb = null) {
     });
 }
 $(() => {
-    ksyEditor = ace.edit('ksyEditor');
-    ksyEditor.setTheme("ace/theme/monokai");
-    ksyEditor.getSession().setMode("ace/mode/yaml");
-    ksyEditor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
-    genCodeViewer = ace.edit('genCodeViewer');
-    genCodeViewer.setTheme("ace/theme/monokai");
-    genCodeViewer.getSession().setMode("ace/mode/javascript");
-    genCodeViewer.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
-    genCodeViewer.setReadOnly(true);
-    parsedDataViewer = ace.edit('parsedDataViewer');
-    parsedDataViewer.setTheme("ace/theme/monokai");
-    parsedDataViewer.getSession().setMode("ace/mode/json");
-    parsedDataViewer.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
-    parsedDataViewer.setReadOnly(true);
+    var ksyEditor = editors['ksyEditor'];
+    var genCodeViewer = editors['genCodeViewer'];
+    var parsedDataViewer = editors['parsedDataViewer'];
     $(window).on('resize', () => myLayout.updateSize());
     function recompile() {
         var srcYaml = ksyEditor.getValue();
