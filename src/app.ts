@@ -15,7 +15,12 @@ var myLayout = new GoldenLayout({
     ]}]
 });
 
-var editors: { [s: string]: AceAjax.Editor; } = {};
+var ui = {
+    ksyEditor: <AceAjax.Editor> null,
+    genCodeViewer: <AceAjax.Editor> null,
+    parsedDataViewer: <AceAjax.Editor> null,
+    hexViewer: <HexViewer> null
+};
 
 function addEditor(name: string, lang: string, isReadOnly: boolean = false) {
     var editor;
@@ -24,7 +29,7 @@ function addEditor(name: string, lang: string, isReadOnly: boolean = false) {
         container.getElement().append($(`<div id="${name}"></div>`));
         container.on('resize', () => { if (editor) editor.resize(); });
         container.on('open', () => {
-            editors[name] = editor = ace.edit(name);
+            ui[name] = editor = ace.edit(name);
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode(`ace/mode/${lang}`);
             editor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
@@ -37,10 +42,9 @@ addEditor('ksyEditor', 'yaml');
 addEditor('genCodeViewer', 'javascript', true);
 addEditor('parsedDataViewer', 'json', true);
 
-var hexViewer: HexViewer;
 myLayout.registerComponent('hex viewer', function(container, componentState) {
     container.getElement().append($('<div id="hexViewer"></div>'));
-    container.on('resize', () => { if (hexViewer) hexViewer.resize(); });
+    container.on('resize', () => { if (ui.hexViewer) ui.hexViewer.resize(); });
 });
 
 myLayout.init();
@@ -61,14 +65,10 @@ function jailrun(code, args?, cb = null) {
 }
 
 $(() => {
-    var ksyEditor = editors['ksyEditor'];
-    var genCodeViewer = editors['genCodeViewer'];
-    var parsedDataViewer = editors['parsedDataViewer'];
-
     $(window).on('resize', () => myLayout.updateSize());
 
     function recompile() {
-        var srcYaml = ksyEditor.getValue();
+        var srcYaml = ui.ksyEditor.getValue();
 
         var src;
         try {
@@ -86,13 +86,13 @@ $(() => {
             return;
         }
 
-        genCodeViewer.setValue(r[0], -1);
+        ui.genCodeViewer.setValue(r[0], -1);
         jailrun(`module = { exports: true }; \r\n ${r[0]} \r\n`).then(reparse);
         console.log('recompiled');        
     }
 
     function reparse() {
-        return Promise.all([inputReady, formatReady]).then(() => jail.remote.reparse(res => parsedDataViewer.setValue(JSON.stringify(res, null, 2))));
+        return Promise.all([inputReady, formatReady]).then(() => jail.remote.reparse(res => ui.parsedDataViewer.setValue(JSON.stringify(res, null, 2))));
     }
 
     jail = new jailed.Plugin(location.origin + '/js/kaitaiJail.js');
@@ -115,8 +115,8 @@ $(() => {
             }
         }
 
-        hexViewer = new HexViewer("hexViewer", dataProvider);
-        hexViewer.setIntervals([
+        ui.hexViewer = new HexViewer("hexViewer", dataProvider);
+        ui.hexViewer.setIntervals([
             { start: 0, end: 2 },
             { start: 1, end: 2 },
             { start: 2, end: 2 },
@@ -132,9 +132,9 @@ $(() => {
     });
 
     var formatReady = Promise.resolve($.ajax({ url: '/formats/archive/zip.ksy' })).then(ksyContent => {
-        ksyEditor.setValue(ksyContent, -1);
+        ui.ksyEditor.setValue(ksyContent, -1);
         var editDelay = new Delayed(500);
-        ksyEditor.on('change', () => editDelay.do(() => recompile()));
+        ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
         recompile();
     });
 })
