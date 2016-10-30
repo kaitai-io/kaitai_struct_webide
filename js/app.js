@@ -2,8 +2,9 @@
 var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },
     content: [{ type: 'row', content: [
-                { type: 'stack', content: [
+                { type: 'column', content: [
                         { type: 'component', componentName: '.ksy editor', isClosable: false },
+                        { type: 'component', componentName: 'parsed data', isClosable: false },
                     ] },
                 { type: 'stack', activeItemIndex: 1, content: [
                         { type: 'component', componentName: 'generated JS code', isClosable: false },
@@ -28,6 +29,12 @@ myLayout.registerComponent('hex viewer', function (container, componentState) {
     container.getElement().append($('<div id="hexViewer"></div>'));
     container.on('resize', () => { if (hexViewer)
         hexViewer.resize(); });
+});
+var parsedDataViewer;
+myLayout.registerComponent('parsed data', function (container, componentState) {
+    container.getElement().append($('<div id="parsedDataViewer"></div>'));
+    container.on('resize', () => { if (parsedDataViewer)
+        parsedDataViewer.resize(); });
 });
 myLayout.init();
 var jail;
@@ -54,6 +61,11 @@ $(() => {
     genCodeViewer.getSession().setMode("ace/mode/javascript");
     genCodeViewer.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
     genCodeViewer.setReadOnly(true);
+    parsedDataViewer = ace.edit('parsedDataViewer');
+    parsedDataViewer.setTheme("ace/theme/monokai");
+    parsedDataViewer.getSession().setMode("ace/mode/json");
+    parsedDataViewer.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
+    parsedDataViewer.setReadOnly(true);
     $(window).on('resize', () => myLayout.updateSize());
     function recompile() {
         var srcYaml = ksyEditor.getValue();
@@ -78,7 +90,7 @@ $(() => {
         console.log('recompiled');
     }
     function reparse() {
-        return Promise.all([inputReady, formatReady]).then(() => jailrun("io = new KaitaiStream(inputBuffer, 0); parsed = new module.exports(io); console.log(parsed)"));
+        return Promise.all([inputReady, formatReady]).then(() => jail.remote.reparse(res => parsedDataViewer.setValue(JSON.stringify(res, null, 2))));
     }
     jail = new jailed.Plugin(location.origin + '/js/kaitaiJail.js');
     jailReady = new Promise((resolve, reject) => {
