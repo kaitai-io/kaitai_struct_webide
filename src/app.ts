@@ -93,16 +93,15 @@ $(() => {
     }
 
     function reparse() {
-        return Promise.all([inputReady, formatReady]).then(() => jail.remote.reparse(res => ui.parsedDataViewer.setValue(JSON.stringify(res, null, 2))));
+        return Promise.all([jailReady, inputReady, formatReady]).then(() => jail.remote.reparse(res => ui.parsedDataViewer.setValue(JSON.stringify(res, null, 2))));
     }
 
     jail = new jailed.Plugin(baseUrl + 'js/kaitaiJail.js');
     jailReady = new Promise((resolve, reject) => {
         jail.whenConnected(() => resolve());
         jail.whenFailed(() => reject());
-    });
+    }).then(() => new Promise((resolve, reject) => jail._connection.importScript(baseUrl + 'lib/kaitai_js_runtime/KaitaiStream.js', resolve, reject)));
     jailReady.then(() => console.log('jail started'), () => console.log('jail fail'));
-    jailReady.then(() => jail._connection.importScript(baseUrl + 'lib/kaitai_js_runtime/KaitaiStream.js'));
 
     var inputReady = downloadFile('samples/sample1.zip').then(fileBuffer => {
         var fileContent = new Uint8Array(fileBuffer);
