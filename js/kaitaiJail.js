@@ -22,6 +22,8 @@ application.setInterface({
             delete obj._io;
             delete obj._root;
             delete obj._parent;
+            if (obj._debug)
+                obj._debug.class = obj.constructor.name;
 
             Object.keys(obj).forEach(key => clearMeta(obj[key]));
         }

@@ -98,6 +98,8 @@ $(() => {
             var padLen = 2;
             var commentOffset = 60;
 
+            function commentPad(str) { return str.length < commentOffset ? str + ' '.repeat(commentOffset - str.length) : str; }
+
             function toJson(obj, pad = 0) {
                 if (typeof obj === "object") {
                     var objPad = " ".repeat((pad + 0) * padLen);
@@ -114,10 +116,7 @@ $(() => {
                             var lastKey = i == keys.length - 1;
                             var line = childPad + (isArray ? "" : `"${key}": `) + toJson(obj[key], pad + 1) + (lastKey ? "" : ",");
                             var lineParts = line.split('\n');
-                            var lastLine = lineParts.pop();
-                            if (lastLine.length < commentOffset)
-                                lastLine = lastLine + ' '.repeat(commentOffset - lastLine.length);
-                            lineParts.push(lastLine);
+                            lineParts.push(commentPad(lineParts.pop()));
                             line = lineParts.join('\n');
 
                             if (obj._debug) {
@@ -132,7 +131,7 @@ $(() => {
                             return line;
                         }).join('\n') + `\n${objPad}`;
 
-                        return isArray ? `[${body}]` : `{${body}}`;
+                        return isArray ? `[${body}]` : `{ // ${obj._debug.class}${body}}`;
                     }
                 }
                 else if(typeof obj === "number")
