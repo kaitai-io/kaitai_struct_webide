@@ -40,7 +40,7 @@ function addEditor(name, lang, isReadOnly = false) {
 }
 addEditor('ksyEditor', 'yaml');
 addEditor('genCodeViewer', 'javascript', true);
-addEditor('parsedDataViewer', 'json', true);
+addEditor('parsedDataViewer', 'javascript', true);
 addComponent('hexViewer', () => new HexViewer("hexViewer"));
 myLayout.init();
 var jail;
@@ -77,28 +77,56 @@ $(() => {
             return;
         }
         ui.genCodeViewer.setValue(r[0], -1);
-        jailrun(`module = { exports: true }; \r\n ${r[0]} \r\n`).then(reparse);
+        jailrun(`module = { exports: true }; \n ${r[0]} \n`).then(reparse);
         console.log('recompiled');
     }
     function reparse() {
         return Promise.all([jailReady, inputReady, formatReady]).then(() => jail.remote.reparse(res => {
             var intervals = [];
-            function clearDebug(obj) {
-                if (typeof obj != "object")
-                    return;
-                var debug = obj._debug;
-                delete obj._debug;
-                Object.keys(obj).forEach(key => {
-                    if (debug)
-                        intervals.push(debug[key]);
-                    clearDebug(obj[key]);
-                });
+            var padLen = 2;
+            var commentOffset = 60;
+            function toJson(obj, pad = 0) {
+                if (typeof obj === "object") {
+                    var objPad = " ".repeat((pad + 0) * padLen);
+                    var childPad = " ".repeat((pad + 1) * padLen);
+                    if (obj instanceof Uint8Array) {
+                        var result = "";
+                        for (var i = 0; i < obj.length; i++)
+                            result += (i == 0 ? "" : ", ") + (i != 0 && (i % 8 == 0) ? "\n" + childPad : "") + obj[i];
+                        return `[${result}]`;
+                    }
+                    else {
+                        var keys = Object.keys(obj).filter(x => x != "_debug");
+                        var isArray = Array.isArray(obj);
+                        var body = `\n` + keys.map((key, i) => {
+                            var lastKey = i == keys.length - 1;
+                            var line = childPad + (isArray ? "" : `"${key}": `) + toJson(obj[key], pad + 1) + (lastKey ? "" : ",");
+                            var lineParts = line.split('\n');
+                            var lastLine = lineParts.pop();
+                            if (lastLine.length < commentOffset)
+                                lastLine = lastLine + ' '.repeat(commentOffset - lastLine.length);
+                            lineParts.push(lastLine);
+                            line = lineParts.join('\n');
+                            if (obj._debug) {
+                                var debug = obj._debug[key];
+                                var len = debug.end - debug.start + 1;
+                                if (len > 0) {
+                                    intervals.push(debug);
+                                    line += ` // ${debug.start}-${debug.end} (l:${debug.end - debug.start + 1})`;
+                                }
+                            }
+                            return line;
+                        }).join('\n') + `\n${objPad}`;
+                        return isArray ? `[${body}]` : `{${body}}`;
+                    }
+                }
+                else if (typeof obj === "number")
+                    return `${obj}`;
+                else
+                    return `"${obj}"`;
             }
-            clearDebug(res);
-            ui.parsedDataViewer.setValue(JSON.stringify(res, null, 2));
-            intervals.shift();
-            intervals = intervals.filter(x => x.start <= x.end);
-            console.log(intervals.map(i => `${i.start}-${i.end}`).join(' '));
+            var json = toJson(res);
+            ui.parsedDataViewer.setValue(json);
             ui.hexViewer.setIntervals(intervals);
         }));
     }
