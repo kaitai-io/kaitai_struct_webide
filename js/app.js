@@ -86,7 +86,9 @@ $(() => {
         console.log('recompiled');
     }
     function reparse() {
-        return Promise.all([jailReady, inputReady, formatReady]).then(() => jail.remote.reparse(res => {
+        return Promise.all([jailReady, inputReady, formatReady]).then(() => jail.remote.reparse((res, error) => {
+            if (error)
+                console.log('parse error', error);
             var intervals = [];
             var padLen = 2;
             var commentOffset = 60;

@@ -14,9 +14,16 @@ application.setInterface({
     },
     reparse: function (cb) {
         io = new KaitaiStream(inputBuffer, 0);
-        parsed = new module.exports(io);
+        parsed = {};
+        parseError = null;
+        try {
+            module.exports.call(parsed, io);
+        } catch (e) {
+            parseError = e;
+        }
+        
 
-        function clearMeta(obj) {
+        function prepareForExport(obj) {
             if(typeof obj != "object") return;
 
             delete obj._io;
@@ -25,12 +32,12 @@ application.setInterface({
             if (obj._debug)
                 obj._debug.class = obj.constructor.name;
 
-            Object.keys(obj).forEach(key => clearMeta(obj[key]));
+            Object.keys(obj).forEach(key => prepareForExport(obj[key]));
         }
 
         console.log('parsed in jail', parsed);
 
-        clearMeta(parsed);
-        cb(parsed);
+        prepareForExport(parsed);
+        cb(parsed, parseError);
     }
 });
