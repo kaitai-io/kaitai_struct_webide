@@ -11,7 +11,8 @@ var myLayout = new GoldenLayout({
             { type: 'component', componentName: 'parsedDataViewer', title: 'parsed data', isClosable: false },
         ]},
         { type: 'stack', activeItemIndex: 1, content: [
-            { type: 'component', componentName: 'genCodeViewer', title: 'generated JS code', isClosable: false },
+            { type: 'component', componentName: 'genCodeViewer', title: 'JS code', isClosable: false },
+            { type: 'component', componentName: 'genCodeDebugViewer', title: 'JS code (debug)', isClosable: false },
             { type: 'component', componentName: 'hexViewer', title: 'input binary', isClosable: false },
         ]}
     ]}]
@@ -19,7 +20,8 @@ var myLayout = new GoldenLayout({
 
 var ui = {
     ksyEditor: <AceAjax.Editor> null,
-    genCodeViewer: <AceAjax.Editor> null,
+    genCodeViewer: <AceAjax.Editor>null,
+    genCodeDebugViewer: <AceAjax.Editor>null,
     parsedDataViewer: <AceAjax.Editor> null,
     hexViewer: <HexViewer> null
 };
@@ -47,6 +49,7 @@ function addEditor(name: string, lang: string, isReadOnly: boolean = false) {
 
 addEditor('ksyEditor', 'yaml');
 addEditor('genCodeViewer', 'javascript', true);
+addEditor('genCodeDebugViewer', 'javascript', true);
 addEditor('parsedDataViewer', 'javascript', true);
 addComponent('hexViewer', () => new HexViewer("hexViewer"));
 
@@ -81,14 +84,16 @@ $(() => {
 
         try {
             var ks = io.kaitai.struct.MainJs();
-            var r = ks.compile('javascript', src, true);
+            var r = ks.compile('javascript', src, false);
+            var rDebug = ks.compile('javascript', src, true);
         } catch (compileErr) {
             console.log("KS compilation error: ", compileErr);
             return;
         }
 
         ui.genCodeViewer.setValue(r[0], -1);
-        jailrun(`module = { exports: true }; \n ${r[0]} \n`).then(reparse);
+        ui.genCodeDebugViewer.setValue(rDebug[0], -1);
+        jailrun(`module = { exports: true }; \n ${rDebug[0]} \n`).then(reparse);
         console.log('recompiled');        
     }
 
