@@ -14,10 +14,10 @@ application.setInterface({
     },
     reparse: function (cb) {
         io = new KaitaiStream(inputBuffer, 0);
-        parsed = {};
         parseError = null;
         try {
-            module.exports.call(parsed, io);
+            parsed = new module.exports(io);
+            parsed._read();
         } catch (e) {
             parseError = e;
         }
