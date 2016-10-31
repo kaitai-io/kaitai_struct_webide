@@ -7,7 +7,7 @@ var myLayout = new GoldenLayout({
                         { type: 'component', componentName: 'ksyEditor', title: '.ksy editor', isClosable: false },
                         { type: 'component', componentName: 'parsedDataViewer', title: 'parsed data', isClosable: false },
                     ] },
-                { type: 'stack', activeItemIndex: 1, content: [
+                { type: 'stack', activeItemIndex: 2, content: [
                         { type: 'component', componentName: 'genCodeViewer', title: 'JS code', isClosable: false },
                         { type: 'component', componentName: 'genCodeDebugViewer', title: 'JS code (debug)', isClosable: false },
                         { type: 'component', componentName: 'hexViewer', title: 'input binary', isClosable: false },
