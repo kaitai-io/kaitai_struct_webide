@@ -3,7 +3,7 @@ import SocketServer, SimpleHTTPServer, json, glob, os, sys, threading, time, sub
 PORT = 8000
 watchDirs = ['index.html', 'js/*', 'css/*']
 compileDirs = ['src/*.ts', 'lib/ts-types/*.ts']
-compileCmd = r'tsc --outDir js\ --sourcemap --target ES6 --noEmitOnError %s'
+compileCmd = r'tsc --outDir js/ --sourcemap --target ES6 --noEmitOnError %s'
 
 compileInProgress = False
 
