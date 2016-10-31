@@ -3,7 +3,7 @@ import SocketServer, SimpleHTTPServer, json, glob, os, sys, threading, time, sub
 PORT = 8000
 watchDirs = ['index.html', 'js/*', 'css/*']
 compileDirs = ['src/*.ts', 'lib/ts-types/*.ts']
-compileCmd = r'"C:\Program Files (x86)\Microsoft SDKs\TypeScript\2.0\tsc.exe" --outDir js\ --sourcemap --target ES6 --noEmitOnError %s'
+compileCmd = r'tsc --outDir js\ --sourcemap --target ES6 --noEmitOnError %s'
 
 compileInProgress = False
 
@@ -37,7 +37,7 @@ def compileThread():
             try:
                 compileInProgress = True
                 cmd = compileCmd % ' '.join(['"' + x + '"' for x in getFiles(compileDirs)])
-                subprocess.check_output(cmd).strip()
+                subprocess.check_output(cmd, shell=True).strip()
                 print "Compile success"
             except subprocess.CalledProcessError as e:
                 print "Compile errors:%s" % ('\n' + e.output.strip()).replace('\n', '\n -  ')
