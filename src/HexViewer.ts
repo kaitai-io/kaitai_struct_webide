@@ -74,6 +74,8 @@ class HexViewer {
     private maxScrollHeight: number;
     private maxRow: number;
     private totalHeight: number;
+    private visibleOffsetStart: number;
+    private visibleOffsetEnd: number;
     private scrollbox: JQuery;
     private heightbox: JQuery;
     private content: JQuery;
@@ -152,10 +154,11 @@ class HexViewer {
         this.totalHeight = totalRowCount * this.rowHeight;
         this.heightbox.height(this.totalHeight + 16);
 
-        var boxHeight = this.contentOuter.innerHeight();
+        var boxHeight = this.contentOuter.innerHeight() - 16;
         this.content.html('');
         this.maxScrollHeight = this.totalHeight - boxHeight;
         this.rowCount = Math.ceil(boxHeight / this.rowHeight);
+        console.log('boxHeight', boxHeight, 'rowCount', this.rowCount);
         this.maxRow = Math.ceil(this.dataProvider.length / this.bytesPerLine - this.rowCount + 1);
 
         this.rows = [];
@@ -171,22 +174,23 @@ class HexViewer {
     public refresh() {
         if (!this.dataProvider) return false;
 
-        var startOffset = this.topRow * this.bytesPerLine;
+        this.visibleOffsetStart = this.topRow * this.bytesPerLine;
+        this.visibleOffsetEnd = (this.topRow + this.rowCount - 1) * this.bytesPerLine - 1;
 
         var intIdx;
         for (intIdx = 0; intIdx < this.intervals.length; intIdx++)
-            if (this.intervals[intIdx].start <= startOffset && startOffset <= this.intervals[intIdx].end)
+            if (this.intervals[intIdx].start <= this.visibleOffsetStart && this.visibleOffsetStart <= this.intervals[intIdx].end)
                 break;
 
-        var viewData = this.dataProvider.get(startOffset, Math.min(this.rowCount * this.bytesPerLine, this.dataProvider.length - startOffset));
+        var viewData = this.dataProvider.get(this.visibleOffsetStart, Math.min(this.rowCount * this.bytesPerLine, this.dataProvider.length - this.visibleOffsetStart));
         for (var iRow = 0; iRow < this.rowCount; iRow++) {
             var rowOffset = iRow * this.bytesPerLine;
             var row = this.rows[iRow];
-            row.addrPart.innerText = rowOffset < viewData.length ? HexViewUtils.addrHex(startOffset + rowOffset) : '';
+            row.addrPart.innerText = rowOffset < viewData.length ? HexViewUtils.addrHex(this.visibleOffsetStart + rowOffset) : '';
 
             for (var iCell = 0; iCell < this.bytesPerLine; iCell++) {
                 var viewDataOffset = rowOffset + iCell;
-                var dataOffset = startOffset + viewDataOffset;
+                var dataOffset = this.visibleOffsetStart + viewDataOffset;
                 var hexCh, ch;
                 if (viewDataOffset < viewData.length) {
                     var b = viewData[rowOffset + iCell];
@@ -227,7 +231,15 @@ class HexViewer {
     }
 
     public setIntervals(intervals) {
-        this.intervals = intervals;
+        //this.intervals = intervals.sort((a, b) => a.start != b.start ? a.start - b.start : a.end - b.end);
+        this.intervals = [];
+        for (var i = 0; i < intervals.length; i++) {
+            var int = intervals[i];
+            if (i == 0 || !(int.start == intervals[i - 1].start && int.end == intervals[i - 1].end))
+                this.intervals.push(int);
+        }
+            
+        console.log('setIntervals', this.intervals.map(i => `${i.start}-${i.end}`).join(' '));
         this.refresh();
     }
 
@@ -247,6 +259,13 @@ class HexViewer {
         if (this.selectionStart != oldStart || this.selectionEnd != oldEnd) {
             if (this.onSelectionChanged)
                 this.onSelectionChanged();
+
+            if (this.selectionStart != -1) {
+                if (this.selectionEnd > this.visibleOffsetEnd)
+                    this.topRow = Math.max(Math.floor(this.selectionEnd / this.bytesPerLine) - this.rowCount + 2, 0);
+                else if (this.selectionStart < this.visibleOffsetStart)
+                    this.topRow = Math.floor(this.selectionStart / this.bytesPerLine);
+            }
 
             this.refresh();
         }
