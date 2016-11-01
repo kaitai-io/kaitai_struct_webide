@@ -3,20 +3,24 @@
 .hexViewer .contentOuter {position: relative;height:100%; overflow: hidden; min-width:560px }
 .hexViewer .content { margin-left: 8px; }
 
-.hexViewer .header { font-weight: bold;margin-top: 3px; background:#eee }
+.hexViewer { user-select: none; cursor: default }
+.hexViewer .header { font-weight: bold;padding-top: 3px; background:#eee }
 .hexViewer .header .hex { margin-left: 70px }
 .hexViewer .header .ascii { margin-left: 8px }
 .hexViewer .header .hex span { margin: 0 7.5px }
 .hexViewer .header .hex .c8 { margin-left: 17px }
+.hexViewer .selected { background:#0076e0; color:white }
 
 .hexViewer .addrPart { color: #ccc; }
 .hexViewer .hexPart { margin-left: 8px; }
 .hexViewer .asciiPart { margin-left: 8px; }
-.hexViewer .hexcell.cell8 { margin-left: 8px; }
+.hexViewer .hexcell.cell8 { margin-left: 4px; }
+.hexViewer .hexcell.cell7 { margin-right: 4px; }
 
 .hexViewer span { display: inline-block; }
 .hexViewer .hexcell { width: 14px; height:15px }
 .hexViewer .l0, .hexViewer .l1, .hexViewer .l2 { margin-top: 1px; margin-bottom: 1px }
+.hexViewer .m0 { margin-top: 0px; margin-bottom: 0px; border-width:1px 0; border-style:solid; border-color:white }
 .hexViewer .start { margin-left:1px }
 .hexViewer .end { margin-right:1px }
 

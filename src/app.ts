@@ -15,7 +15,10 @@ var myLayout = new GoldenLayout({
                 { type: 'stack', activeItemIndex: 2, content: [
                     { type: 'component', componentName: 'genCodeViewer', title: 'JS code', isClosable: false },
                     { type: 'component', componentName: 'genCodeDebugViewer', title: 'JS code (debug)', isClosable: false },
-                    { type: 'component', componentName: 'hexViewer', title: 'input binary', isClosable: false },
+                    { type: 'column', isClosable: false, content: [
+                        { type: 'component', componentName: 'hexViewer', title: 'input binary', isClosable: false },
+                        { type: 'component', componentName: 'infoPanel', title: 'info panel', isClosable: false, height:30 },
+                    ]}
                 ] }
             ] },
         ] }
@@ -28,7 +31,8 @@ var ui = {
     genCodeDebugViewer: <AceAjax.Editor> null,
     parsedDataViewer: <AceAjax.Editor> null,
     hexViewer: <HexViewer> null,
-    errorWindow: <GoldenLayout.Container> null
+    errorWindow: <GoldenLayout.Container> null,
+    infoPanel: <GoldenLayout.Container> null,
 };
 
 function addComponent(name: string, generatorCallback?) {
@@ -61,6 +65,7 @@ addEditor('genCodeDebugViewer', 'javascript', true);
 addEditor('parsedDataViewer', 'javascript', true);
 addComponent('hexViewer', () => new HexViewer("hexViewer"));
 addComponent('errorWindow', cont => { cont.getElement().append($("<div />")); return cont; });
+addComponent('infoPanel', cont => { cont.getElement().append($("#infoPanel")); return cont; });
 
 myLayout.init();
 
@@ -101,6 +106,9 @@ function hideErrors() {
 }
 
 $(() => {
+    ui.hexViewer.onSelectionChanged = () => {
+    };
+
     function recompile() {
         var srcYaml = ui.ksyEditor.getValue();
 
@@ -206,17 +214,6 @@ $(() => {
         }
 
         ui.hexViewer.setDataProvider(dataProvider);
-        ui.hexViewer.setIntervals([
-            { start: 0, end: 2 },
-            { start: 1, end: 2 },
-            { start: 2, end: 2 },
-            { start: 3, end: 6 },
-            { start: 7, end: 10 },
-            { start: 16 + 0, end: 16 + 8 },
-            { start: 16 + 1, end: 16 + 8 },
-            { start: 16 + 2, end: 16 + 8 },
-            { start: 32, end: 95 },
-        ]);
 
         return jailrun('inputBuffer = args; void(0)', fileBuffer);
     });

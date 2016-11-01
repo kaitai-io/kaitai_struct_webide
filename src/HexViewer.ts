@@ -79,6 +79,57 @@ class HexViewer {
     private content: JQuery;
     private contentOuter: JQuery;
 
+    private selectionStart: number;
+    private selectionEnd: number;
+    private deselectOffset: number;
+
+    public onSelectionChanged;
+
+    private cellMouseAction(e) {
+        if (e.type == "mouseup")
+            this.content.unbind('mousemove');
+
+        var cell = e.target;
+        if (!('dataOffset' in cell)) {
+            var cells = $(cell).find('.hexcell, .asciicell');
+            if (cells.length == 1)
+                cell = cells.get(0);
+        }
+
+        console.log(cell.dataOffset);
+        if ('dataOffset' in cell) {
+            var needRefresh = false;
+            if (e.type == "mousedown") {
+                this.deselectOffset = this.selectionStart == this.selectionEnd ? this.selectionStart : -1;
+                this.selectionStart = this.selectionEnd = cell.dataOffset;
+                this.content.on('mousemove', e => this.cellMouseAction(e));
+                needRefresh = true;
+            }
+            else if (e.type == "mousemove") {
+                needRefresh = this.selectionEnd != cell.dataOffset;
+                this.selectionEnd = Math.min(cell.dataOffset, this.dataProvider.length - 1);
+                this.deselectOffset = -1;
+            }
+            else if (e.type == "mouseup") {
+                if (this.deselectOffset == this.selectionStart) {
+                    this.selectionEnd = this.selectionStart = -1;
+                    needRefresh = true;
+                }
+            }
+
+            if (needRefresh)
+                this.doSelectionChanged();
+
+            e.preventDefault();
+        }
+    }
+
+    private doSelectionChanged() {
+        if (this.onSelectionChanged)
+            this.onSelectionChanged();
+        this.refresh();
+    }
+
     constructor(containerId: string, public dataProvider?: IDataProvider) {
         this.dataProvider = dataProvider;
 
@@ -89,7 +140,8 @@ class HexViewer {
         var charSpans = "0123456789ABCDEF".split('').map((x, i) => `<span class="c${i}">${x}</span>`).join('');
         this.contentOuter.append($(`<div class="header"><span class="hex">${charSpans}</span><span class="ascii">${charSpans}</span></div>`));
 
-        this.content = $('<div class="content"></div>').appendTo(this.contentOuter);
+        this.content = $('<div class="content"></div>').appendTo(this.contentOuter).on('mousedown', e => this.cellMouseAction(e));
+        $(document).mouseup(e => this.cellMouseAction(e));
 
         this.intervals = [];
 
@@ -141,18 +193,18 @@ class HexViewer {
             if (this.intervals[intIdx].start <= startOffset && startOffset <= this.intervals[intIdx].end)
                 break;
 
-        var data = this.dataProvider.get(startOffset, Math.min(this.rowCount * this.bytesPerLine, this.dataProvider.length - startOffset));
+        var viewData = this.dataProvider.get(startOffset, Math.min(this.rowCount * this.bytesPerLine, this.dataProvider.length - startOffset));
         for (var iRow = 0; iRow < this.rowCount; iRow++) {
             var rowOffset = iRow * this.bytesPerLine;
             var row = this.rows[iRow];
-            row.addrPart.innerText = rowOffset < data.length ? HexViewUtils.addrHex(startOffset + rowOffset) : '';
+            row.addrPart.innerText = rowOffset < viewData.length ? HexViewUtils.addrHex(startOffset + rowOffset) : '';
 
             for (var iCell = 0; iCell < this.bytesPerLine; iCell++) {
-                var dataOffset = rowOffset + iCell;
-                var cellOffset = startOffset + dataOffset;
+                var viewDataOffset = rowOffset + iCell;
+                var dataOffset = startOffset + viewDataOffset;
                 var hexCh, ch;
-                if (dataOffset < data.length) {
-                    var b = data[rowOffset + iCell];
+                if (viewDataOffset < viewData.length) {
+                    var b = viewData[rowOffset + iCell];
                     hexCh = HexViewUtils.byteHex(b);
                     ch = HexViewUtils.byteAscii(b);
                 } else {
@@ -161,16 +213,28 @@ class HexViewer {
                 }
 
                 var hexCell = row.hexPart.childNodes[iCell];
+                var asciiCell = row.asciiPart.childNodes[iCell];
+
                 hexCell.cell.innerText = hexCh;
-                row.asciiPart.childNodes[iCell].innerText = ch;
+                asciiCell.innerText = ch;
+
+                hexCell.cell.dataOffset = asciiCell.dataOffset = dataOffset;
+
+                var selStart = Math.min(this.selectionStart, this.selectionEnd);
+                var selEnd = Math.max(this.selectionStart, this.selectionEnd);
+
+                var isSelected = selStart <= dataOffset && dataOffset <= selEnd;
+                $(hexCell.cell).toggleClass('selected', isSelected);
+                $(asciiCell).toggleClass('selected', isSelected);
+
                 var skipInt = 0;
                 for (var level = 0; level < this.maxLevel; level++) {
                     var int = this.intervals[intIdx + level];
-                    var intIn = int && int.start <= cellOffset && cellOffset <= int.end;
-                    var intStart = intIn && int.start === cellOffset;
-                    var intEnd = intIn && int.end === cellOffset;
+                    var intIn = int && int.start <= dataOffset && dataOffset <= int.end;
+                    var intStart = intIn && int.start === dataOffset;
+                    var intEnd = intIn && int.end === dataOffset;
                     hexCell.levels[level].className = `l${this.maxLevel - 1 - level}` +
-                        (intIn ? ` m${level}` : "") + (intStart ? " start" : "") + (intEnd ? " end" : "");
+                        (intIn ? ` m${level}` : "") + (intStart ? " start" : "") + (intEnd ? " end" : "") + (isSelected ? " selected" : "");
                     if (intEnd)
                         skipInt++;
                 }
