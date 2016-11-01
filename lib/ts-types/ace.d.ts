@@ -2176,7 +2176,7 @@ declare namespace AceAjax {
 
         getAllRanges(): Range[];
 
-        on(event: string, fn: (e: any) => any): void;
+        on(event: string, fn: (e: any, e2?: any) => any): void;
 
         addRange(range: Range): void;
 

@@ -112,6 +112,16 @@ $(() => {
 
     ui.hexViewer.onSelectionChanged();
 
+    var lineInfo = null;
+    ui.parsedDataViewer.getSession().selection.on('changeCursor', (e1, e2) => {
+        var lineIdx = e2.selectionLead.row;
+        var debug = lineInfo ? lineInfo.lines[lineIdx] : null;
+        if (debug && debug.start <= debug.end)
+            ui.hexViewer.setSelection(debug.start, debug.end);
+        else
+            ui.hexViewer.deselect();
+    });
+
     function recompile() {
         var srcYaml = ui.ksyEditor.getValue();
 
@@ -151,47 +161,90 @@ $(() => {
 
             function commentPad(str) { return str.length < commentOffset ? str + ' '.repeat(commentOffset - str.length) : str; }
 
-            function toJson(obj, pad = 0) {
+            lineInfo = { currLine: 0, lineStart: 0, lines: {} };
+            var json = "";
+
+            function nl() {
+                json += "\n";
+                lineInfo.currLine++;
+                lineInfo.lineStart = json.length;
+            }
+
+            function comment(str) {
+                var padLen = commentOffset - (json.length - lineInfo.lineStart);
+                if (padLen > 0)
+                    json += ' '.repeat(padLen);
+                json += ` // ${str}`;
+            }
+
+            function getLenComment(debug, addInterval = false) {
+                if (debug) {
+                    var len = debug.end - debug.start + 1;
+                    if (len > 0)
+                        intervals.push(debug);
+                    lineInfo.lines[lineInfo.currLine] = debug;
+                    return `${debug.start}-${debug.end} (l:${len})`;
+                }
+
+                return null;
+            }
+
+            function toJson(obj, debug = null, pad = 0) {
+                //debug = debug || obj._debug;
                 if (typeof obj === "object") {
                     var objPad = " ".repeat((pad + 0) * padLen);
                     var childPad = " ".repeat((pad + 1) * padLen);
                     if (obj instanceof Uint8Array) {
-                        var result = "";
-                        for (var i = 0; i < obj.length; i++)
-                            result += (i == 0 ? "" : ", ") + (i != 0 && (i % 8 == 0) ? "\n" + childPad : "") + obj[i];
-                        return `[${result}]`;
+                        json += "[";
+                        for (var i = 0; i < obj.length; i++) {
+                            json += i == 0 ? "" : ", ";
+                            if (i != 0 && (i % 8 == 0)) {
+                                nl();
+                                json += childPad;
+                            }
+                            json += obj[i];
+                        }
+                        json += "]";
                     } else {
                         var keys = Object.keys(obj).filter(x => x != "_debug");
                         var isArray = Array.isArray(obj);
-                        var body = `\n` + keys.map((key, i) => {
-                            var lastKey = i == keys.length - 1;
-                            var line = childPad + (isArray ? "" : `"${key}": `) + toJson(obj[key], pad + 1) + (lastKey ? "" : ",");
-                            var lineParts = line.split('\n');
-                            lineParts.push(commentPad(lineParts.pop()));
-                            line = lineParts.join('\n');
+                        json += isArray ? `[` : `{`;
+                        if (!isArray) {
+                            json += ` // ${obj._debug.class}`;
+                            if(debug)
+                                comment(getLenComment(debug));
+                        }
 
-                            if (obj._debug) {
-                                var debug = obj._debug[key];
-                                var len = debug.end - debug.start + 1;
-                                if (len > 0) {
-                                    intervals.push(debug);
-                                    line += ` // ${debug.start}-${debug.end} (l:${debug.end - debug.start + 1})`;
-                                }
-                            }
+                        for (var i = 0; i < keys.length; i++) {
+                            var key = keys[i];
 
-                            return line;
-                        }).join('\n') + `\n${objPad}`;
+                            nl();
+                            json += childPad + (isArray ? "" : `"${key}": `);
 
-                        return isArray ? `[${body}]` : `{ // ${obj._debug.class}${body}}`;
+                            var childDebug = isArray ? debug.arr[key] : obj._debug ? obj._debug[key] : null;
+                            var isObject = toJson(obj[key], childDebug, pad + 1);
+
+                            json += (i == keys.length - 1 ? "" : ",");
+
+                            if (!isObject)
+                                comment(' ' + getLenComment(childDebug, true));
+                        }
+
+                        nl();
+                        json += objPad + (isArray ? `]` : `}`);
+                        return true;
                     }
                 }
                 else if(typeof obj === "number")
-                    return `${obj}`;
+                    json += `${obj}`;
                 else
-                    return `"${obj}"`;
+                    json += `"${obj}"`;
+
+                return false;
             }
 
-            var json = toJson(res);
+            toJson(res);
+            console.log(lineInfo);
             ui.parsedDataViewer.setValue(json);
             ui.hexViewer.setIntervals(intervals);
         }));
