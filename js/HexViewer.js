@@ -55,14 +55,20 @@ class HexViewer {
         this.topRow = 0;
         this.maxLevel = 3;
         this.dataProvider = dataProvider;
+        //var parentBox = $('#' + containerId);
+        //parentBox.addClass('hexViewer');
+        var charSpans = "0123456789ABCDEF".split('').map((x, i) => `<span class="c${i}">${x}</span>`).join('');
         this.scrollbox = $('#' + containerId);
-        this.scrollbox.addClass('hexViewer');
+        this.scrollbox.addClass('scrollbox hexViewer');
+        //this.scrollbox = $('<div class="scrollbox"></div>').appendTo(parentBox);
         this.heightbox = $('<div class="heightbox"></div>').appendTo(this.scrollbox);
-        this.content = $('<div class="content"></div>').appendTo(this.scrollbox);
+        this.contentOuter = $('<div class="contentOuter"></div>').appendTo(this.scrollbox);
+        this.contentOuter.append($(`<div class="header"><span class="hex">${charSpans}</span><span class="ascii">${charSpans}</span></div>`));
+        this.content = $('<div class="content"></div>').appendTo(this.contentOuter);
         this.intervals = [];
         this.scrollbox.on('scroll', e => {
             var scrollTop = this.scrollbox.scrollTop();
-            this.content.css('top', scrollTop + 'px');
+            this.contentOuter.css('top', scrollTop + 'px');
             var percent = scrollTop / this.maxScrollHeight;
             var newTopRow = Math.round(this.maxRow * percent);
             if (this.topRow !== newTopRow) {
@@ -78,9 +84,10 @@ class HexViewer {
             return false;
         var totalRowCount = Math.ceil(this.dataProvider.length / this.bytesPerLine);
         this.totalHeight = totalRowCount * this.rowHeight;
-        this.heightbox.height(this.totalHeight);
-        var boxHeight = this.scrollbox.outerHeight();
-        this.content.height(boxHeight + 'px');
+        this.heightbox.height(this.totalHeight + 16);
+        var boxHeight = this.contentOuter.innerHeight();
+        //console.log('boxHeight', boxHeight);
+        //this.contentOuter.height(boxHeight + 'px');
         this.content.html('');
         this.maxScrollHeight = this.totalHeight - boxHeight;
         this.rowCount = Math.ceil(boxHeight / this.rowHeight);

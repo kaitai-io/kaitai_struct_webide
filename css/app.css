@@ -1,6 +1,4 @@
 ﻿/*.lm_content>div { height: 100%; width: 100% }*/
-#hexViewer { background: white; }
-#hexViewer .content { margin-left:8px }
 .lm_splitter.lm_horizontal .lm_drag_handle { left:-5px; width:15px }
 .lm_splitter.lm_vertical .lm_drag_handle { top:-5px; height:15px }
 #errorWindow { background: white; font-family: Courier,monospace; font-size: 12px; white-space: pre; overflow-y: scroll; }
