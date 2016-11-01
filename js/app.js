@@ -12,8 +12,8 @@ var myLayout = new GoldenLayout({
                         { type: 'stack', activeItemIndex: 2, content: [
                                 { type: 'component', componentName: 'genCodeViewer', title: 'JS code', isClosable: false },
                                 { type: 'component', componentName: 'genCodeDebugViewer', title: 'JS code (debug)', isClosable: false },
-                                { type: 'column', isClosable: false, content: [
-                                        { type: 'component', componentName: 'hexViewer', title: 'input binary', isClosable: false },
+                                { type: 'column', isClosable: false, title: 'input binary', content: [
+                                        { type: 'component', componentName: 'hexViewer', title: 'hex viewer', isClosable: false },
                                         { type: 'component', componentName: 'infoPanel', title: 'info panel', isClosable: false, height: 30 },
                                     ] }
                             ] }

@@ -88,35 +88,20 @@ class HexViewer {
                 cell = cells.get(0);
         }
         if ('dataOffset' in cell) {
-            var needRefresh = false;
             if (e.type == "mousedown") {
                 this.canDeselect = this.selectionStart == cell.dataOffset && this.selectionEnd == cell.dataOffset;
-                this.selectionStart = this.selectionEnd = this.mouseDownOffset = cell.dataOffset;
+                this.mouseDownOffset = cell.dataOffset;
                 this.content.on('mousemove', e => this.cellMouseAction(e));
-                needRefresh = true;
+                this.setSelection(cell.dataOffset, cell.dataOffset);
             }
             else if (e.type == "mousemove") {
-                needRefresh = this.selectionEnd != cell.dataOffset;
-                var selStart = this.mouseDownOffset, selEnd = Math.min(cell.dataOffset, this.dataProvider.length - 1);
-                this.selectionStart = selStart < selEnd ? selStart : selEnd;
-                this.selectionEnd = selStart < selEnd ? selEnd : selStart;
+                this.setSelection(this.mouseDownOffset, cell.dataOffset);
                 this.canDeselect = false;
             }
-            else if (e.type == "mouseup") {
-                if (this.canDeselect && this.mouseDownOffset == cell.dataOffset) {
-                    this.selectionEnd = this.selectionStart = -1;
-                    needRefresh = true;
-                }
-            }
-            if (needRefresh)
-                this.doSelectionChanged();
+            else if (e.type == "mouseup" && this.canDeselect && this.mouseDownOffset == cell.dataOffset)
+                this.deselect();
             e.preventDefault();
         }
-    }
-    doSelectionChanged() {
-        if (this.onSelectionChanged)
-            this.onSelectionChanged();
-        this.refresh();
     }
     resize() {
         if (!this.dataProvider)
@@ -193,6 +178,19 @@ class HexViewer {
     setDataProvider(dataProvider) {
         this.dataProvider = dataProvider;
         this.resize();
+    }
+    deselect() {
+        this.setSelection(-1, -1);
+    }
+    setSelection(start, end) {
+        var oldStart = this.selectionStart, oldEnd = this.selectionEnd;
+        this.selectionStart = start < end ? start : end;
+        this.selectionEnd = Math.min(start < end ? end : start, this.dataProvider.length - 1);
+        if (this.selectionStart != oldStart || this.selectionEnd != oldEnd) {
+            if (this.onSelectionChanged)
+                this.onSelectionChanged();
+            this.refresh();
+        }
     }
 }
 //# sourceMappingURL=HexViewer.js.map
