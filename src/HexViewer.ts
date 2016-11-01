@@ -82,15 +82,13 @@ class HexViewer {
     constructor(containerId: string, public dataProvider?: IDataProvider) {
         this.dataProvider = dataProvider;
 
-        //var parentBox = $('#' + containerId);
-        //parentBox.addClass('hexViewer');
-        var charSpans = "0123456789ABCDEF".split('').map((x, i) => `<span class="c${i}">${x}</span>`).join('');
-        this.scrollbox = $('#' + containerId);
-        this.scrollbox.addClass('scrollbox hexViewer');
-        //this.scrollbox = $('<div class="scrollbox"></div>').appendTo(parentBox);
+        this.scrollbox = $('#' + containerId).addClass('hexViewer');
         this.heightbox = $('<div class="heightbox"></div>').appendTo(this.scrollbox);
         this.contentOuter = $('<div class="contentOuter"></div>').appendTo(this.scrollbox);
+
+        var charSpans = "0123456789ABCDEF".split('').map((x, i) => `<span class="c${i}">${x}</span>`).join('');
         this.contentOuter.append($(`<div class="header"><span class="hex">${charSpans}</span><span class="ascii">${charSpans}</span></div>`));
+
         this.content = $('<div class="content"></div>').appendTo(this.contentOuter);
 
         this.intervals = [];
@@ -118,8 +116,6 @@ class HexViewer {
         this.heightbox.height(this.totalHeight + 16);
 
         var boxHeight = this.contentOuter.innerHeight();
-        //console.log('boxHeight', boxHeight);
-        //this.contentOuter.height(boxHeight + 'px');
         this.content.html('');
         this.maxScrollHeight = this.totalHeight - boxHeight;
         this.rowCount = Math.ceil(boxHeight / this.rowHeight);
