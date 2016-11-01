@@ -2,32 +2,41 @@
 var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },
-    content: [{ type: 'row', content: [
-                { type: 'column', content: [
-                        { type: 'component', componentName: 'ksyEditor', title: '.ksy editor', isClosable: false },
-                        { type: 'component', componentName: 'parsedDataViewer', title: 'parsed data', isClosable: false },
+    content: [
+        { type: 'column', isClosable: false, content: [
+                { type: 'row', content: [
+                        { type: 'column', content: [
+                                { type: 'component', componentName: 'ksyEditor', title: '.ksy editor', isClosable: false },
+                                { type: 'component', componentName: 'parsedDataViewer', title: 'parsed data', isClosable: false },
+                            ] },
+                        { type: 'stack', activeItemIndex: 2, content: [
+                                { type: 'component', componentName: 'genCodeViewer', title: 'JS code', isClosable: false },
+                                { type: 'component', componentName: 'genCodeDebugViewer', title: 'JS code (debug)', isClosable: false },
+                                { type: 'component', componentName: 'hexViewer', title: 'input binary', isClosable: false },
+                            ] }
                     ] },
-                { type: 'stack', activeItemIndex: 2, content: [
-                        { type: 'component', componentName: 'genCodeViewer', title: 'JS code', isClosable: false },
-                        { type: 'component', componentName: 'genCodeDebugViewer', title: 'JS code (debug)', isClosable: false },
-                        { type: 'component', componentName: 'hexViewer', title: 'input binary', isClosable: false },
-                    ] }
-            ] }]
+            ] }
+    ]
 });
 var ui = {
     ksyEditor: null,
     genCodeViewer: null,
     genCodeDebugViewer: null,
     parsedDataViewer: null,
-    hexViewer: null
+    hexViewer: null,
+    errorWindow: null
 };
 function addComponent(name, generatorCallback) {
     var editor;
     myLayout.registerComponent(name, function (container, componentState) {
         container.getElement().attr('id', name);
-        container.on('resize', () => { if (editor)
-            editor.resize(); });
-        container.on('open', () => { ui[name] = editor = generatorCallback(); });
+        if (generatorCallback) {
+            container.on('resize', () => { if (editor && editor.resize)
+                editor.resize(); });
+            container.on('open', () => { ui[name] = editor = generatorCallback(container); });
+        }
+        else
+            ui[name] = container;
     });
 }
 function addEditor(name, lang, isReadOnly = false) {
@@ -45,6 +54,7 @@ addEditor('genCodeViewer', 'javascript', true);
 addEditor('genCodeDebugViewer', 'javascript', true);
 addEditor('parsedDataViewer', 'javascript', true);
 addComponent('hexViewer', () => new HexViewer("hexViewer"));
+addComponent('errorWindow', cont => { cont.getElement().append($("<div />")); return cont; });
 myLayout.init();
 var jail;
 var jailReady, inputReady;
@@ -60,6 +70,25 @@ function jailrun(code, args, cb = null) {
         });
     });
 }
+var lastErrWndSize = 100; // 34
+function showError(...args) {
+    console.log.apply(window, args);
+    var errMsg = args.filter(x => x.toString() !== {}.toString()).join(' ');
+    var container = myLayout.root.contentItems[0];
+    if (!ui.errorWindow) {
+        container.addChild({ type: 'component', componentName: 'errorWindow', title: 'Errors' });
+        ui.errorWindow.setSize(0, lastErrWndSize);
+    }
+    ui.errorWindow.on('resize', () => lastErrWndSize = ui.errorWindow.getElement().outerHeight());
+    ui.errorWindow.on('close', () => ui.errorWindow = null);
+    ui.errorWindow.getElement().children().text(errMsg);
+}
+function hideErrors() {
+    if (ui.errorWindow) {
+        ui.errorWindow.close();
+        ui.errorWindow = null;
+    }
+}
 $(() => {
     function recompile() {
         var srcYaml = ui.ksyEditor.getValue();
@@ -68,7 +97,7 @@ $(() => {
             src = YAML.parse(srcYaml);
         }
         catch (parseErr) {
-            console.log("YAML parsing error: ", parseErr);
+            showError("YAML parsing error: ", parseErr);
             return;
         }
         try {
@@ -77,7 +106,7 @@ $(() => {
             var rDebug = ks.compile('javascript', src, true);
         }
         catch (compileErr) {
-            console.log("KS compilation error: ", compileErr);
+            showError("KS compilation error: ", compileErr);
             return;
         }
         ui.genCodeViewer.setValue(r[0], -1);
@@ -88,7 +117,9 @@ $(() => {
     function reparse() {
         return Promise.all([jailReady, inputReady, formatReady]).then(() => jail.remote.reparse((res, error) => {
             if (error)
-                console.log('parse error', error);
+                showError(`Parse error (${error.name}): ${error.message}\nCall stack: ${error.stack}`, error);
+            else
+                hideErrors();
             var intervals = [];
             var padLen = 2;
             var commentOffset = 60;
