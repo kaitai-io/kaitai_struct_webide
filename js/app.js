@@ -96,7 +96,9 @@ function hideErrors() {
 }
 $(() => {
     ui.hexViewer.onSelectionChanged = () => {
+        ui.infoPanel.getElement().text(ui.hexViewer.selectionStart == -1 ? 'no selection' : `selection: ${ui.hexViewer.selectionStart}-${ui.hexViewer.selectionEnd}`);
     };
+    ui.hexViewer.onSelectionChanged();
     function recompile() {
         var srcYaml = ui.ksyEditor.getValue();
         var src;

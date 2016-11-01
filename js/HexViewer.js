@@ -54,6 +54,8 @@ class HexViewer {
         this.rows = [];
         this.topRow = 0;
         this.maxLevel = 3;
+        this.selectionStart = -1;
+        this.selectionEnd = -1;
         this.dataProvider = dataProvider;
         this.scrollbox = $('#' + containerId).addClass('hexViewer');
         this.heightbox = $('<div class="heightbox"></div>').appendTo(this.scrollbox);
@@ -85,22 +87,23 @@ class HexViewer {
             if (cells.length == 1)
                 cell = cells.get(0);
         }
-        console.log(cell.dataOffset);
         if ('dataOffset' in cell) {
             var needRefresh = false;
             if (e.type == "mousedown") {
-                this.deselectOffset = this.selectionStart == this.selectionEnd ? this.selectionStart : -1;
-                this.selectionStart = this.selectionEnd = cell.dataOffset;
+                this.canDeselect = this.selectionStart == cell.dataOffset && this.selectionEnd == cell.dataOffset;
+                this.selectionStart = this.selectionEnd = this.mouseDownOffset = cell.dataOffset;
                 this.content.on('mousemove', e => this.cellMouseAction(e));
                 needRefresh = true;
             }
             else if (e.type == "mousemove") {
                 needRefresh = this.selectionEnd != cell.dataOffset;
-                this.selectionEnd = Math.min(cell.dataOffset, this.dataProvider.length - 1);
-                this.deselectOffset = -1;
+                var selStart = this.mouseDownOffset, selEnd = Math.min(cell.dataOffset, this.dataProvider.length - 1);
+                this.selectionStart = selStart < selEnd ? selStart : selEnd;
+                this.selectionEnd = selStart < selEnd ? selEnd : selStart;
+                this.canDeselect = false;
             }
             else if (e.type == "mouseup") {
-                if (this.deselectOffset == this.selectionStart) {
+                if (this.canDeselect && this.mouseDownOffset == cell.dataOffset) {
                     this.selectionEnd = this.selectionStart = -1;
                     needRefresh = true;
                 }
@@ -165,9 +168,7 @@ class HexViewer {
                 hexCell.cell.innerText = hexCh;
                 asciiCell.innerText = ch;
                 hexCell.cell.dataOffset = asciiCell.dataOffset = dataOffset;
-                var selStart = Math.min(this.selectionStart, this.selectionEnd);
-                var selEnd = Math.max(this.selectionStart, this.selectionEnd);
-                var isSelected = selStart <= dataOffset && dataOffset <= selEnd;
+                var isSelected = this.selectionStart <= dataOffset && dataOffset <= this.selectionEnd;
                 $(hexCell.cell).toggleClass('selected', isSelected);
                 $(asciiCell).toggleClass('selected', isSelected);
                 var skipInt = 0;

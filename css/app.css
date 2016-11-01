@@ -3,4 +3,4 @@
 .lm_splitter.lm_vertical .lm_drag_handle { top:-5px; height:15px }
 #errorWindow { background: white; font-family: Courier,monospace; font-size: 12px; white-space: pre; overflow-y: scroll; }
 #errorWindow>div { margin: 5px; }
-#infoPanel { background: white }
+#infoPanel { background: white; padding: 5px }

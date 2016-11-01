@@ -9,7 +9,9 @@
 .hexViewer .header .ascii { margin-left: 8px }
 .hexViewer .header .hex span { margin: 0 7.5px }
 .hexViewer .header .hex .c8 { margin-left: 17px }
+
 .hexViewer .selected { background:#0076e0; color:white }
+.hexViewer .asciicell { padding: 3px 0 }
 
 .hexViewer .addrPart { color: #ccc; }
 .hexViewer .hexPart { margin-left: 8px; }
