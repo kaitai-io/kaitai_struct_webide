@@ -5,7 +5,7 @@
     result._debug = obj._debug || {};
     result._debug.class = obj.constructor.name;
     var props = Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] != '_' && x != "constructor");
-    console.log('keys', Object.keys(obj), 'props', props);
+    //console.log('keys', Object.keys(obj), 'props', props);
     Object.keys(obj).filter(x => x[0] != '_').forEach(key => result[key] = toExport(obj[key], name.concat(key)));
     props.forEach(key => {
         if (!('_props' in result))
@@ -50,6 +50,7 @@ application.setInterface({
             console.log(e);
             parseError = e;
         }
+        obj = toExport(obj, path);
         cb(obj, parseError);
     }
 });

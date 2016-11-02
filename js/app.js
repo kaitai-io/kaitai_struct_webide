@@ -7,7 +7,10 @@ var myLayout = new GoldenLayout({
                 { type: 'row', content: [
                         { type: 'column', content: [
                                 { type: 'component', componentName: 'ksyEditor', title: '.ksy editor', isClosable: false },
-                                { type: 'component', componentName: 'parsedDataViewer', title: 'parsed data', isClosable: false },
+                                { type: 'stack', activeItemIndex: 1, content: [
+                                        { type: 'component', componentName: 'parsedDataViewer', title: 'parsed as JSON', isClosable: false },
+                                        { type: 'component', componentName: 'parsedDataTree', title: 'parsed as tree', isClosable: false },
+                                    ] },
                             ] },
                         { type: 'stack', activeItemIndex: 2, content: [
                                 { type: 'component', componentName: 'genCodeViewer', title: 'JS code', isClosable: false },
@@ -26,6 +29,7 @@ var ui = {
     genCodeViewer: null,
     genCodeDebugViewer: null,
     parsedDataViewer: null,
+    parsedDataTree: null,
     hexViewer: null,
     errorWindow: null,
     infoPanel: null,
@@ -37,7 +41,7 @@ function addComponent(name, generatorCallback) {
         if (generatorCallback) {
             container.on('resize', () => { if (editor && editor.resize)
                 editor.resize(); });
-            container.on('open', () => { ui[name] = editor = generatorCallback(container); });
+            container.on('open', () => { ui[name] = editor = generatorCallback(container) || container; });
         }
         else
             ui[name] = container;
@@ -58,8 +62,9 @@ addEditor('genCodeViewer', 'javascript', true);
 addEditor('genCodeDebugViewer', 'javascript', false);
 addEditor('parsedDataViewer', 'javascript', true);
 addComponent('hexViewer', () => new HexViewer("hexViewer"));
-addComponent('errorWindow', cont => { cont.getElement().append($("<div />")); return cont; });
-addComponent('infoPanel', cont => { cont.getElement().append($("#infoPanel")); return cont; });
+addComponent('errorWindow', cont => { cont.getElement().append($("<div />")); });
+addComponent('infoPanel', cont => { cont.getElement().append($("#infoPanel")); });
+addComponent('parsedDataTree');
 myLayout.init();
 var jail;
 var jailReady, inputReady;
@@ -149,85 +154,14 @@ $(() => {
                     showError(`Parse error (${error.name}): ${error.message}\nCall stack: ${error.stack}`, error);
                 else
                     hideErrors();
-                var intervals = [];
-                var padLen = 2;
-                var commentOffset = 60;
-                function commentPad(str) { return str.length < commentOffset ? str + ' '.repeat(commentOffset - str.length) : str; }
-                lineInfo = { currLine: 0, lineStart: 0, lines: {} };
-                var json = "";
-                function nl() {
-                    json += "\n";
-                    lineInfo.currLine++;
-                    lineInfo.lineStart = json.length;
-                }
-                function comment(str) {
-                    var padLen = commentOffset - (json.length - lineInfo.lineStart);
-                    if (padLen > 0)
-                        json += ' '.repeat(padLen);
-                    json += ` // ${str}`;
-                }
-                function getLenComment(debug, addInterval = false) {
-                    if (debug) {
-                        var len = debug.end - debug.start + 1;
-                        if (len > 0)
-                            intervals.push(debug);
-                        lineInfo.lines[lineInfo.currLine] = debug;
-                        return `${debug.start}-${debug.end} (l:${len})`;
-                    }
-                    return null;
-                }
-                function toJson(obj, debug = null, pad = 0) {
-                    //debug = debug || obj._debug;
-                    if (typeof obj === "object") {
-                        var objPad = " ".repeat((pad + 0) * padLen);
-                        var childPad = " ".repeat((pad + 1) * padLen);
-                        if (obj instanceof Uint8Array) {
-                            json += "[";
-                            for (var i = 0; i < obj.length; i++) {
-                                json += i == 0 ? "" : ", ";
-                                if (i != 0 && (i % 8 == 0)) {
-                                    nl();
-                                    json += childPad;
-                                }
-                                json += obj[i];
-                            }
-                            json += "]";
-                        }
-                        else {
-                            var keys = Object.keys(obj).filter(x => x[0] != "_");
-                            var isArray = Array.isArray(obj);
-                            json += isArray ? `[` : `{`;
-                            if (!isArray) {
-                                if (obj._debug)
-                                    json += ` // ${obj._debug.class}`;
-                                if (debug)
-                                    comment(getLenComment(debug));
-                            }
-                            for (var i = 0; i < keys.length; i++) {
-                                var key = keys[i];
-                                nl();
-                                json += childPad + (isArray ? "" : `"${key}": `);
-                                var childDebug = isArray ? debug.arr[key] : obj._debug ? obj._debug[key] : null;
-                                var isObject = toJson(obj[key], childDebug, pad + 1);
-                                json += (i == keys.length - 1 ? "" : ",");
-                                if (!isObject)
-                                    comment(' ' + getLenComment(childDebug, true));
-                            }
-                            nl();
-                            json += objPad + (isArray ? `]` : `}`);
-                            return true;
-                        }
-                    }
-                    else if (typeof obj === "number")
-                        json += `${obj}`;
-                    else
-                        json += `"${obj}"`;
-                    return false;
-                }
-                toJson(res);
+                ui.parsedDataTree.getElement().jstree({ core: { data: (node, cb) => {
+                            cb([{ "text": "Root", "children": true }]);
+                        } } });
+                var parsedJsonRes = parsedToJson(res);
+                lineInfo = parsedJsonRes.lineInfo;
                 console.log(lineInfo);
-                ui.parsedDataViewer.setValue(json);
-                ui.hexViewer.setIntervals(intervals);
+                ui.parsedDataViewer.setValue(parsedJsonRes.json);
+                ui.hexViewer.setIntervals(parsedJsonRes.intervals);
             });
         });
     }

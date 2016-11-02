@@ -4,3 +4,4 @@
 #errorWindow { background: white; font-family: Courier,monospace; font-size: 12px; white-space: pre; overflow-y: scroll; }
 #errorWindow>div { margin: 5px; }
 #infoPanel { background: white; padding: 5px }
+#parsedDataTree { background: white }
