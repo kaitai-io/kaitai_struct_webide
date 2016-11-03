@@ -4,4 +4,9 @@
 #errorWindow { background: white; font-family: Courier,monospace; font-size: 12px; white-space: pre; overflow-y: scroll; }
 #errorWindow>div { margin: 5px; }
 #infoPanel { background: white; padding: 5px }
-#parsedDataTree { background: white }
+#parsedDataTree { background: white; overflow: auto; font-size: 12px; font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace }
+#parsedDataTree .jstree-icon, #parsedDataTree .jstree-anchor { height: 16px; line-height: 16px }
+#parsedDataTree .jstree-node { min-height: 16px; line-height: 16px; min-width:18px; margin-left:14px }
+#parsedDataTree.jstree-default>.jstree-container-ul>.jstree-node { margin-left: 0 }
+#parsedDataTree.jstree-default .jstree-ocl { background-position-y: -8px; width:18px; }
+/*#parsedDataTree .jstree-node, #parsedDataTree .jstree-anchor { height:24px; line-height:24px }*/

@@ -154,9 +154,57 @@ $(() => {
                     showError(`Parse error (${error.name}): ${error.message}\nCall stack: ${error.stack}`, error);
                 else
                     hideErrors();
-                ui.parsedDataTree.getElement().jstree({ core: { data: (node, cb) => {
-                            cb([{ "text": "Root", "children": true }]);
-                        } } });
+                function getNodeItem(prop, value, debug) {
+                    var isByteArray = value._debug && value._debug.class === "Uint8Array";
+                    var isObject = typeof value === "object" && !isByteArray;
+                    var text;
+                    if (isObject)
+                        text = prop;
+                    else if (isByteArray) {
+                        text = `${prop} = [`;
+                        for (var i = 0; value[i]; i++) {
+                            text += (i == 0 ? '' : ', ') + value[i];
+                            if (i == 7) {
+                                text += ", ...";
+                                break;
+                            }
+                        }
+                        text += ']';
+                    }
+                    else
+                        text = `${prop} = ${value}`;
+                    return { text: text, children: isObject, data: { obj: value, debug: debug }, icon: false };
+                }
+                function getNode(node, cb) {
+                    var obj = node.id === '#' ? res : node.data.obj;
+                    if (!obj) {
+                        if (node.data.getPath)
+                            jail.remote.get(node.data.getPath, (res, error) => {
+                                console.log('remote.get', res, error);
+                                cb([getNodeItem('value', res, res._debug)]);
+                            });
+                        else
+                            cb([]);
+                    }
+                    else {
+                        console.log('getNode', obj);
+                        var childNodes = Object.keys(obj).filter(x => x[0] != '_').map(prop => getNodeItem(prop, obj[prop], obj._debug[prop]));
+                        if (obj._props) {
+                            childNodes = childNodes.concat(Object.keys(obj._props).map(key => {
+                                return { text: key, children: true, data: { getPath: obj._props[key] }, icon: false };
+                            }));
+                        }
+                        cb(childNodes);
+                    }
+                }
+                var jsTree = ui.parsedDataTree.getElement();
+                jsTree.jstree({ core: { data: (node, cb) => getNode(node, cb) } })
+                    .on('keyup.jstree', function (e) { jsTree.jstree(true).activate_node(e.target.id); })
+                    .on('select_node.jstree', function (e, node) {
+                    //console.log('select_node', node);
+                    var debug = node.node.data.debug;
+                    ui.hexViewer.setSelection(debug.start, debug.end);
+                });
                 var parsedJsonRes = parsedToJson(res);
                 lineInfo = parsedJsonRes.lineInfo;
                 console.log(lineInfo);
