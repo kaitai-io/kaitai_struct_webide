@@ -180,7 +180,7 @@ $(() => {
 
                     var text;
                     if (isObject)
-                        text = prop;
+                        text = `${prop} [${value._debug.class}]`;
                     else if (isByteArray) {
                         text = `${prop} = [`;
                         for (var i = 0; value[i]; i++) {
