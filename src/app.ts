@@ -182,7 +182,7 @@ $(() => {
                     if (isObject)
                         text = `${prop} [${value._debug.class}]`;
                     else if (isByteArray) {
-                        text = `${prop} = [`;
+                        text = (prop ? prop + ' = ' : '') + '[';
                         for (var i = 0; value[i]; i++) {
                             text += (i == 0 ? '' : ', ') + value[i];
                             if (i == 7) {
@@ -203,7 +203,7 @@ $(() => {
                         if (node.data.getPath)
                             jail.remote.get(node.data.getPath, (res, error) => {
                                 console.log('remote.get', res, error);
-                                cb([getNodeItem('value', res, res._debug)]);
+                                cb([getNodeItem(null, res, res._debug)]);
                             });
                         else
                             cb([]);
