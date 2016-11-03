@@ -228,7 +228,8 @@ $(() => {
                     .on('select_node.jstree', function (e, node) {
                         //console.log('select_node', node);
                         var debug = node.node.data.debug;
-                        ui.hexViewer.setSelection(debug.start, debug.end);
+                        if (debug)
+                            ui.hexViewer.setSelection(debug.start, debug.end);
                     });
 
                 var parsedJsonRes = parsedToJson(res);
