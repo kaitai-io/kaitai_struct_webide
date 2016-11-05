@@ -198,6 +198,7 @@ $(() => {
                     }
                 }
                 var jsTree = ui.parsedDataTree.getElement();
+                jsTree.jstree("destroy");
                 jsTree.jstree({ core: { data: (node, cb) => getNode(node, cb) } })
                     .on('keyup.jstree', function (e) { jsTree.jstree(true).activate_node(e.target.id); })
                     .on('select_node.jstree', function (e, node) {
