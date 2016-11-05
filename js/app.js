@@ -99,9 +99,15 @@ function hideErrors() {
         ui.errorWindow = null;
     }
 }
+var dataProvider;
+var itree;
 $(() => {
     ui.hexViewer.onSelectionChanged = () => {
         ui.infoPanel.getElement().text(ui.hexViewer.selectionStart == -1 ? 'no selection' : `selection: ${ui.hexViewer.selectionStart}-${ui.hexViewer.selectionEnd}`);
+        if (itree) {
+            var intervals = itree.search(ui.hexViewer.selectionStart);
+            console.log('intervals', intervals);
+        }
     };
     ui.hexViewer.onSelectionChanged();
     ui.genCodeDebugViewer.commands.addCommand({
@@ -156,16 +162,28 @@ $(() => {
             jail.remote.reparse((res, error) => {
                 window['parseRes'] = res;
                 console.log('reparse res', res);
+                itree = new IntervalTree(dataProvider.length / 2);
                 handleError(error);
-                function getNodeItem(prop, value, debug, expandObject) {
+                function getNodeItem(prop, value, debugExtra, expandObject) {
                     var isByteArray = value instanceof Uint8Array;
                     var isObject = typeof value === "object" && !isByteArray;
+                    var debug = value._debug || {};
+                    for (var key in debugExtra)
+                        debug[key] = debugExtra[key];
+                    if (debug.arr)
+                        value._debug = debug.arr;
+                    if (debug && debug.start && debug.end) {
+                        var node = itree.add(debug.start, debug.end);
+                        node.debug = debug;
+                    }
                     var text;
                     if (isObject) {
-                        if (expandObject)
+                        if (expandObject) {
+                            console.log(value);
                             return objectToNodes(value);
+                        }
                         else
-                            text = `${prop} [${value._debug.class}]`;
+                            text = `${prop} [${debug.class}]`;
                     }
                     else if (isByteArray) {
                         text = (prop ? prop + ' = ' : '') + '[';
@@ -198,7 +216,7 @@ $(() => {
                     if (!obj) {
                         if (node.data.getPath)
                             jail.remote.get(node.data.getPath, (res, debug, error) => {
-                                console.log('getNode', res);
+                                console.log('getNode', res, 'debug', debug);
                                 handleError(error);
                                 if (res && !error) {
                                     var nodeItems = getNodeItem(null, res, debug, true);
@@ -244,7 +262,7 @@ $(() => {
     var load = { input: 'sample1.wad', format: 'game/doom_wad.ksy' };
     var inputReady = downloadFile(`samples/${load.input}`).then(fileBuffer => {
         var fileContent = new Uint8Array(fileBuffer);
-        var dataProvider = {
+        dataProvider = {
             length: fileContent.length,
             get(offset, length) {
                 var res = [];

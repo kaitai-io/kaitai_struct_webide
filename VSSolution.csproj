@@ -30,6 +30,13 @@
     <Content Include="js\HexViewer.js" />
     <Content Include="js\kaitaiJail.js" />
     <Content Include="js\utils.js" />
+    <Content Include="lib\ace\ace.js" />
+    <Content Include="lib\ace\ext-searchbox.js" />
+    <Content Include="lib\ace\mode-javascript.js" />
+    <Content Include="lib\ace\mode-yaml.js" />
+    <Content Include="lib\ace\theme-monokai.js" />
+    <Content Include="lib\ace\worker-javascript.js" />
+    <Content Include="lib\interval-tree2\interval-tree.js" />
     <Content Include="lib\jailed\jailed.js" />
     <Content Include="lib\jailed\_frame.html" />
     <Content Include="lib\jailed\_frame.js" />
