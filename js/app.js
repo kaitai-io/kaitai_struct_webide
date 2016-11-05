@@ -197,11 +197,12 @@ $(() => {
                     var obj = node.id === '#' ? res : node.data.obj;
                     if (!obj) {
                         if (node.data.getPath)
-                            jail.remote.get(node.data.getPath, (res, error) => {
+                            jail.remote.get(node.data.getPath, (res, debug, error) => {
                                 console.log('getNode', res);
                                 handleError(error);
                                 if (res && !error) {
-                                    var nodeItems = getNodeItem(null, res, null, true);
+                                    var nodeItems = getNodeItem(null, res, debug, true);
+                                    node.data.debug = debug;
                                     cb(nodeItems);
                                 }
                                 else

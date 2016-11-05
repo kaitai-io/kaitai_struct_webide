@@ -1,12 +1,12 @@
 ﻿function toExport(obj, name) {
-    if (typeof obj != "object" || obj instanceof Uint8Array) return obj;
+    if (typeof obj !== "object" || obj instanceof Uint8Array) return obj;
 
     var result = {};
     result._debug = obj._debug || {};
     result._debug.class = obj.constructor.name;
-    var props = Array.isArray(obj) ? [] : Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] != '_' && x != "constructor");
+    var props = Array.isArray(obj) ? [] : Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor");
     //console.log('keys', Object.keys(obj), 'props', props);
-    Object.keys(obj).filter(x => x[0] != '_').forEach(key => result[key] = toExport(obj[key], name.concat(key)));
+    Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result[key] = toExport(obj[key], name.concat(key)));
     props.forEach(key => {
         if (!('_props' in result))
             result._props = {};
@@ -44,13 +44,18 @@ application.setInterface({
     },
     get: function (path, cb) {
         var obj = parsed;
+        var parent = null;
         try {
-            path.forEach(key => obj = obj[key]);
+            path.forEach(key => {
+                parent = obj;
+                obj = obj[key];
+            });
         } catch (e) {
             parseError = { message: e.message, stack: e.stack };
         }
+
         exported = toExport(obj, path);
         console.log('get original =', obj, ', exported =', exported);
-        cb(exported, parseError);
+        cb(exported, parent._debug['_m_' + path[path.length - 1]], parseError);
     }
 });
