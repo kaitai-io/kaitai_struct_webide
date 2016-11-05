@@ -265,6 +265,8 @@ class HexViewer {
                     this.topRow = Math.max(Math.floor(this.selectionEnd / this.bytesPerLine) - this.rowCount + 2, 0);
                 else if (this.selectionStart < this.visibleOffsetStart)
                     this.topRow = Math.floor(this.selectionStart / this.bytesPerLine);
+
+                this.scrollbox.scrollTop(Math.round(this.topRow / this.maxRow * this.maxScrollHeight));
             }
 
             this.refresh();
