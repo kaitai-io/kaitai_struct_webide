@@ -141,6 +141,12 @@ $(() => {
         ui.genCodeDebugViewer.setValue(rDebug[0], -1);
         reparse();
     }
+    function handleError(error) {
+        if (error)
+            showError('Parse error' + (error.name ? ` (${error.name})` : '') + `: ${error.message}\nCall stack: ${error.stack}`, error);
+        else
+            hideErrors();
+    }
     function reparse() {
         return Promise.all([jailReady, inputReady, formatReady]).then(() => {
             var debugCode = ui.genCodeDebugViewer.getValue();
@@ -150,19 +156,20 @@ $(() => {
             jail.remote.reparse((res, error) => {
                 window['parseRes'] = res;
                 console.log('reparse res', res);
-                if (error)
-                    showError(`Parse error (${error.name}): ${error.message}\nCall stack: ${error.stack}`, error);
-                else
-                    hideErrors();
-                function getNodeItem(prop, value, debug) {
-                    var isByteArray = value._debug && value._debug.class === "Uint8Array";
+                handleError(error);
+                function getNodeItem(prop, value, debug, expandObject) {
+                    var isByteArray = value instanceof Uint8Array;
                     var isObject = typeof value === "object" && !isByteArray;
                     var text;
-                    if (isObject)
-                        text = `${prop} [${value._debug.class}]`;
+                    if (isObject) {
+                        if (expandObject)
+                            return objectToNodes(value);
+                        else
+                            text = `${prop} [${value._debug.class}]`;
+                    }
                     else if (isByteArray) {
                         text = (prop ? prop + ' = ' : '') + '[';
-                        for (var i = 0; value[i]; i++) {
+                        for (var i = 0; i < value.length; i++) {
                             text += (i == 0 ? '' : ', ') + value[i];
                             if (i == 7) {
                                 text += ", ...";
@@ -173,28 +180,39 @@ $(() => {
                     }
                     else
                         text = `${prop} = ${value}`;
-                    return { text: text, children: isObject, data: { obj: value, debug: debug }, icon: false };
+                    var result = { text: text, children: isObject, data: { obj: value, debug: debug }, icon: false };
+                    return expandObject ? [result] : result;
+                }
+                function objectToNodes(obj) {
+                    //console.log('getNode', obj);
+                    var childNodes = Object.keys(obj).filter(x => x[0] != '_').map(prop => getNodeItem(prop, obj[prop], obj._debug ? obj._debug[prop] : null, false));
+                    if (obj._props) {
+                        childNodes = childNodes.concat(Object.keys(obj._props).map(key => {
+                            return { text: key, children: true, data: { getPath: obj._props[key] }, icon: false };
+                        }));
+                    }
+                    return childNodes;
                 }
                 function getNode(node, cb) {
                     var obj = node.id === '#' ? res : node.data.obj;
                     if (!obj) {
                         if (node.data.getPath)
                             jail.remote.get(node.data.getPath, (res, error) => {
-                                console.log('remote.get', res, error);
-                                cb([getNodeItem(null, res, res._debug)]);
+                                console.log('getNode', res);
+                                handleError(error);
+                                if (res && !error) {
+                                    var nodeItems = getNodeItem(null, res, null, true);
+                                    cb(nodeItems);
+                                }
+                                else
+                                    cb([]);
                             });
                         else
                             cb([]);
                     }
                     else {
-                        console.log('getNode', obj);
-                        var childNodes = Object.keys(obj).filter(x => x[0] != '_').map(prop => getNodeItem(prop, obj[prop], obj._debug[prop]));
-                        if (obj._props) {
-                            childNodes = childNodes.concat(Object.keys(obj._props).map(key => {
-                                return { text: key, children: true, data: { getPath: obj._props[key] }, icon: false };
-                            }));
-                        }
-                        cb(childNodes);
+                        var nodeItems = objectToNodes(obj);
+                        cb(nodeItems);
                     }
                 }
                 var jsTree = ui.parsedDataTree.getElement();
@@ -221,7 +239,9 @@ $(() => {
         jail.whenFailed(() => reject());
     }).then(() => new Promise((resolve, reject) => jail._connection.importScript(baseUrl + 'lib/kaitai_js_runtime/KaitaiStream.js', resolve, reject)));
     jailReady.then(() => console.log('jail started'), () => console.log('jail fail'));
-    var inputReady = downloadFile('samples/grad8rgb.bmp').then(fileBuffer => {
+    //var load = { input: 'grad8rgb.bmp', format: 'image/bmp.ksy' };
+    var load = { input: 'sample1.wad', format: 'game/doom_wad.ksy' };
+    var inputReady = downloadFile(`samples/${load.input}`).then(fileBuffer => {
         var fileContent = new Uint8Array(fileBuffer);
         var dataProvider = {
             length: fileContent.length,
@@ -235,7 +255,7 @@ $(() => {
         ui.hexViewer.setDataProvider(dataProvider);
         return jailrun('inputBuffer = args; void(0)', fileBuffer);
     });
-    var formatReady = Promise.resolve($.ajax({ url: 'formats/image/bmp.ksy' })).then(ksyContent => {
+    var formatReady = Promise.resolve($.ajax({ url: `formats/${load.format}` })).then(ksyContent => {
         ui.ksyEditor.setValue(ksyContent, -1);
         var editDelay = new Delayed(500);
         ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));

@@ -1,10 +1,10 @@
 ﻿function toExport(obj, name) {
-    if (typeof obj != "object") return obj;
+    if (typeof obj != "object" || obj instanceof Uint8Array) return obj;
 
     var result = {};
     result._debug = obj._debug || {};
     result._debug.class = obj.constructor.name;
-    var props = Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] != '_' && x != "constructor");
+    var props = Array.isArray(obj) ? [] : Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] != '_' && x != "constructor");
     //console.log('keys', Object.keys(obj), 'props', props);
     Object.keys(obj).filter(x => x[0] != '_').forEach(key => result[key] = toExport(obj[key], name.concat(key)));
     props.forEach(key => {
@@ -35,7 +35,7 @@ application.setInterface({
             parsed = new module.exports(io);
             parsed._read();
         } catch (e) {
-            parseError = e;
+            parseError = JSON.stringify(e);
         }
         
         exported = toExport(parsed, []);
@@ -47,10 +47,10 @@ application.setInterface({
         try {
             path.forEach(key => obj = obj[key]);
         } catch (e) {
-            console.log(e);
-            parseError = e;
+            parseError = { message: e.message, stack: e.stack };
         }
-        obj = toExport(obj, path);
-        cb(obj, parseError);
+        exported = toExport(obj, path);
+        console.log('get original =', obj, ', exported =', exported);
+        cb(exported, parseError);
     }
 });
