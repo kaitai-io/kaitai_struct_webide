@@ -71,3 +71,21 @@ if (!String.prototype.repeat) {
         return rpt;
     }
 }
+
+function arrayBufferToBase64(buffer) {
+    var bytes = new Uint8Array(buffer);
+    var len = bytes.byteLength;
+    var binary = '';
+    for (var i = 0; i < len; i++)
+        binary += String.fromCharCode(bytes[i]);
+    return window.btoa(binary);
+}
+
+function readBlob(blob, mode: "arrayBuffer" | "text" | "dataUrl", ...args) {
+    return new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function () { resolve(reader.result); };
+        reader.onerror = function (e) { reject(e); };
+        reader['readAs' + mode[0].toUpperCase() + mode.substr(1)](blob, ...args);
+    });
+}

@@ -121,6 +121,7 @@ $(() => {
         else
             reader('arrayBuffer').then(setInputBuffer).then(reparse);
     });
+    var storage = new LargeLocalStorage({ size: 5 * 1024 * 1024, name: 'fsDb' });
     var lineInfo = null;
     ui.parsedDataViewer.getSession().selection.on('changeCursor', (e1, e2) => {
         var lineIdx = e2.selectionLead.row;
@@ -266,7 +267,9 @@ $(() => {
     jailReady.then(() => console.log('jail started'), () => console.log('jail fail'));
     //var load = { input: 'grad8rgb.bmp', format: 'image/bmp.ksy' };
     var load = { input: 'sample1.wad', format: 'game/doom_wad.ksy' };
-    function setInputBuffer(fileBuffer) {
+    function setInputBuffer(fileBuffer, fromCache = false) {
+        if (!fromCache)
+            storage.setAttachment('files', 'last', fileBuffer);
         var fileContent = new Uint8Array(fileBuffer);
         dataProvider = {
             length: fileContent.length,
@@ -280,14 +283,22 @@ $(() => {
         ui.hexViewer.setDataProvider(dataProvider);
         return jailrun('inputBuffer = args; void(0)', fileBuffer);
     }
-    var inputReady = downloadFile(`samples/${load.input}`).then(setInputBuffer);
+    var inputReady = storage.initialized.then(() => storage.getAttachment('files', 'last'))
+        .then(file => {
+        console.log(file);
+        return readBlob(file, 'arrayBuffer');
+    }, () => downloadFile(`samples/${load.input}`))
+        .then(b => setInputBuffer(b, true));
     var editDelay = new Delayed(500);
     ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
-    function setKsy(ksyContent) {
+    function setKsy(ksyContent, fromCache = false) {
+        if (!fromCache)
+            localStorage.setItem('ksy', ksyContent);
         //console.log('setKsy', ksyContent);
         ui.ksyEditor.setValue(ksyContent, -1);
         recompile();
     }
-    var formatReady = Promise.resolve($.ajax({ url: `formats/${load.format}` })).then(setKsy);
+    var cachedKsy = localStorage.getItem('ksy');
+    var formatReady = Promise.resolve(cachedKsy ? cachedKsy : $.ajax({ url: `formats/${load.format}` })).then(ksy => setKsy(ksy, true));
 });
 //# sourceMappingURL=app.js.map

@@ -9,15 +9,6 @@ interface IFileDropCallback {
 };
 
 function initFileDrop(containerId, callback: IFileDropCallback) {
-    function readBlob(blob, mode: "arrayBuffer" | "text" | "dataUrl") {
-        return new Promise(function (resolve, reject) {
-            var reader = new FileReader();
-            reader.onload = function () { resolve(reader.result); };
-            reader.onerror = function (e) { reject(e); };
-            reader['readAs'+mode[0].toUpperCase()+mode.substr(1)](blob);
-        });
-    }
-
     var dragLeaveClear;
     var body = $("body");
     var fileDropShadow = $("#" + containerId);
