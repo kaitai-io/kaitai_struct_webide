@@ -67,7 +67,7 @@ $(() => {
                     state: { opened: true },
                     children: [
                         { text: 'formats', icon: 'glyphicon glyphicon-book', children: genChildNodes(fileListTree.formats, 'list-alt'), state: { opened: true } },
-                        { text: 'samples', icon: 'glyphicon glyphicon-cd', children: genChildNodes(fileListTree.samples) },
+                        { text: 'samples', icon: 'glyphicon glyphicon-cd', children: genChildNodes(fileListTree.samples), state: { opened: true } },
                     ]
                 },
                 {

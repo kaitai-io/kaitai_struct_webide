@@ -4,7 +4,7 @@ var dataProvider;
 var itree;
 $(() => {
     ui.hexViewer.onSelectionChanged = () => {
-        ui.infoPanel.getElement().text(ui.hexViewer.selectionStart == -1 ? 'no selection' : `selection: ${ui.hexViewer.selectionStart}-${ui.hexViewer.selectionEnd}`);
+        ui.infoPanel.getElement().text(ui.hexViewer.selectionStart == -1 ? 'no selection' : `selection: 0x${ui.hexViewer.selectionStart.toString(16)} - 0x${ui.hexViewer.selectionEnd.toString(16)}`);
         if (itree && ui.hexViewer.selectionStart) {
             var intervals = itree.search(ui.hexViewer.selectionStart);
             console.log('intervals', intervals);
@@ -29,9 +29,9 @@ $(() => {
         if (fn.toLowerCase().endsWith('.ksy'))
             Promise.resolve($.ajax({ url: fn })).then(ksy => setKsy(ksy));
         else
-            downloadFile(fn).then(b => setInputBuffer(b)).then(reparse);
+            loadInputFile(fn).then(reparse);
     });
-    var storage = new LargeLocalStorage({ size: 5 * 1024 * 1024, name: 'fsDb' });
+    //var storage = new LargeLocalStorage({ size: 5 * 1024 * 1024, name: 'fsDb' });
     var lineInfo = null;
     ui.parsedDataViewer.getSession().selection.on('changeCursor', (e1, e2) => {
         var lineIdx = e2.selectionLead.row;
@@ -91,10 +91,11 @@ $(() => {
         });
     }
     //var load = { input: 'grad8rgb.bmp', format: 'image/bmp.ksy' };
-    var load = { input: 'sample1.wad', format: 'game/doom_wad.ksy' };
+    var load = { input: 'sample1.zip', format: 'archive/zip.ksy' };
     function setInputBuffer(fileBuffer, fromCache = false) {
-        if (!fromCache)
-            storage.setAttachment('files', 'last', fileBuffer);
+        //if (!fromCache)
+        //    try { storage.setAttachment('files', 'last', fileBuffer); }
+        //    catch (e) { console.log('setInputBuffer > setAttachment', e); }
         dataProvider = {
             length: fileBuffer.byteLength,
             get(offset, length) { return new Uint8Array(fileBuffer, offset, length); },
@@ -102,9 +103,15 @@ $(() => {
         ui.hexViewer.setDataProvider(dataProvider);
         return jailrun('inputBuffer = args; void(0)', fileBuffer);
     }
-    var inputReady = storage.initialized.then(() => storage.getAttachment('files', 'last'))
-        .then(file => readBlob(file, 'arrayBuffer'), () => downloadFile(`samples/${load.input}`))
-        .then(b => setInputBuffer(b, true));
+    function loadInputFile(fn) {
+        localStorage.setItem('inputFn', fn);
+        return downloadFile(fn).then(b => setInputBuffer(b, true));
+    }
+    //var inputReady = storage.initialized.then(() => storage.getAttachment('files', 'last'))
+    //    .then(file => file ? readBlob(file, 'arrayBuffer') : downloadFile(`samples/${load.input}`))
+    //    .then(b => setInputBuffer(b, true));
+    var cachedInputFn = localStorage.getItem('inputFn') || `samples/${load.input}`;
+    var inputReady = loadInputFile(cachedInputFn);
     var editDelay = new Delayed(500);
     ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
     function setKsy(ksyContent, fromCache = false) {
