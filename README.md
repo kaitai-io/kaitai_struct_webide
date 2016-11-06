@@ -14,3 +14,4 @@ Online editor / visualizer for Kaitai Struct .ksy files
 ## screenshots
 
 ![Example screenshot of a .png file](docs/png_example.png)
+![Example screenshot of a .zip file](docs/zip_example.png)
