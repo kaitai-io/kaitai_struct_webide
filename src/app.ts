@@ -122,7 +122,7 @@ var itree;
 $(() => {
     ui.hexViewer.onSelectionChanged = () => {
         ui.infoPanel.getElement().text(ui.hexViewer.selectionStart == -1 ? 'no selection' : `selection: ${ui.hexViewer.selectionStart}-${ui.hexViewer.selectionEnd}`)
-        if (itree) {
+        if (itree && ui.hexViewer.selectionStart) {
             var intervals = itree.search(ui.hexViewer.selectionStart);
             console.log('intervals', intervals);
         }
@@ -134,6 +134,13 @@ $(() => {
         name: "compile",
         bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
         exec: function (editor) { reparse(); }
+    });
+
+    initFileDrop('fileDrop', (file, reader) => {
+        if (file.name.toLowerCase().endsWith('.ksy'))
+            reader('text').then(setKsy);
+        else
+            reader('arrayBuffer').then(setInputBuffer).then(reparse);
     });
 
     var lineInfo = null;
@@ -302,7 +309,7 @@ $(() => {
     //var load = { input: 'grad8rgb.bmp', format: 'image/bmp.ksy' };
     var load = { input: 'sample1.wad', format: 'game/doom_wad.ksy' };
 
-    var inputReady = downloadFile(`samples/${load.input}`).then(fileBuffer => {
+    function setInputBuffer(fileBuffer: ArrayBuffer) {
         var fileContent = new Uint8Array(fileBuffer);
         dataProvider = {
             length: fileContent.length,
@@ -317,12 +324,18 @@ $(() => {
         ui.hexViewer.setDataProvider(dataProvider);
 
         return jailrun('inputBuffer = args; void(0)', fileBuffer);
-    });
+    }
 
-    var formatReady = Promise.resolve($.ajax({ url: `formats/${load.format}` })).then(ksyContent => {
+    var inputReady = downloadFile(`samples/${load.input}`).then(setInputBuffer);
+
+    var editDelay = new Delayed(500);
+    ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
+
+    function setKsy(ksyContent: string) {
+        //console.log('setKsy', ksyContent);
         ui.ksyEditor.setValue(ksyContent, -1);
-        var editDelay = new Delayed(500);
-        ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
         recompile();
-    });
+    }
+
+    var formatReady = Promise.resolve($.ajax({ url: `formats/${load.format}` })).then(setKsy);
 })

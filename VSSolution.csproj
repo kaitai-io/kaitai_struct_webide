@@ -27,8 +27,11 @@
     <Content Include="index.html" />
     <Content Include="js\app.js" />
     <Content Include="js\autorefresh.js" />
+    <Content Include="js\FileDrop.js" />
     <Content Include="js\HexViewer.js" />
     <Content Include="js\kaitaiJail.js" />
+    <Content Include="js\parsedToJson.js" />
+    <Content Include="js\parsedToJson.js.map" />
     <Content Include="js\utils.js" />
     <Content Include="lib\ace\ace.js" />
     <Content Include="lib\ace\ext-searchbox.js" />
@@ -54,6 +57,7 @@
     <TypeScriptCompile Include="lib\ts-types\goldenlayout.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\jquery.d.ts" />
     <TypeScriptCompile Include="src\app.ts" />
+    <TypeScriptCompile Include="src\FileDrop.ts" />
     <TypeScriptCompile Include="src\parsedToJson.ts" />
     <TypeScriptCompile Include="src\utils.ts" />
     <TypeScriptCompile Include="src\HexViewer.ts" />
@@ -74,6 +78,9 @@
     <Content Include="lib\kaitai_js_runtime\.git" />
     <Content Include="lib\kaitai_js_runtime\LICENSE" />
     <Content Include="lib\kaitai_js_runtime\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="js\FileDrop.js.map" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>

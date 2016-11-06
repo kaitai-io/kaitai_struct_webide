@@ -3,9 +3,9 @@
     xhr.open('GET', url, true);
     xhr.responseType = 'arraybuffer';
 
-    return new Promise<Uint8Array>((resolve, reject) => {
+    return new Promise<ArrayBuffer>((resolve, reject) => {
         xhr.onload = function (e) {
-            resolve(new Uint8Array(this.response));
+            resolve(this.response);
         };
 
         xhr.send();
