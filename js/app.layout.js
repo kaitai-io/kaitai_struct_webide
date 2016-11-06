@@ -1,37 +1,28 @@
 var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },
     content: [
-        {
-            type: 'column', isClosable: false, content: [
-                {
-                    type: 'row', content: [
-                        {
-                            type: 'column', content: [
-                                { type: 'component', componentName: 'ksyEditor', title: '.ksy editor', isClosable: false },
-                                {
-                                    type: 'stack', activeItemIndex: 1, content: [
-                                        { type: 'component', componentName: 'parsedDataViewer', title: 'parsed as JSON', isClosable: false },
-                                        { type: 'component', componentName: 'parsedDataTree', title: 'parsed as tree', isClosable: false },
-                                    ]
-                                },
-                            ]
-                        },
-                        {
-                            type: 'stack', activeItemIndex: 2, content: [
-                                { type: 'component', componentName: 'genCodeViewer', title: 'JS code', isClosable: false },
-                                { type: 'component', componentName: 'genCodeDebugViewer', title: 'JS code (debug)', isClosable: false },
-                                {
-                                    type: 'column', isClosable: false, title: 'input binary', content: [
-                                        { type: 'component', componentName: 'hexViewer', title: 'hex viewer', isClosable: false },
-                                        { type: 'component', componentName: 'infoPanel', title: 'info panel', isClosable: false, height: 30 },
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-            ]
-        }
+        { type: 'row', content: [
+                { type: 'component', componentName: 'fileTree', title: 'files', isClosable: false, width: 12 },
+                { type: 'column', isClosable: false, content: [
+                        { type: 'row', content: [
+                                { type: 'column', content: [
+                                        { type: 'component', componentName: 'ksyEditor', title: '.ksy editor', isClosable: false },
+                                        { type: 'stack', activeItemIndex: 1, content: [
+                                                { type: 'component', componentName: 'parsedDataViewer', title: 'parsed as JSON', isClosable: false },
+                                                { type: 'component', componentName: 'parsedDataTree', title: 'parsed as tree', isClosable: false },
+                                            ] },
+                                    ] },
+                                { type: 'stack', activeItemIndex: 2, content: [
+                                        { type: 'component', componentName: 'genCodeViewer', title: 'JS code', isClosable: false },
+                                        { type: 'component', componentName: 'genCodeDebugViewer', title: 'JS code (debug)', isClosable: false },
+                                        { type: 'column', isClosable: false, title: 'input binary', content: [
+                                                { type: 'component', componentName: 'hexViewer', title: 'hex viewer', isClosable: false },
+                                                { type: 'component', componentName: 'infoPanel', title: 'info panel', isClosable: false, height: 30 },
+                                            ] }
+                                    ] }
+                            ] },
+                    ] }
+            ] }
     ]
 });
 var ui = {
@@ -43,6 +34,7 @@ var ui = {
     hexViewer: null,
     errorWindow: null,
     infoPanel: null,
+    fileTree: null,
 };
 function addComponent(name, generatorCallback) {
     var editor;
@@ -75,5 +67,6 @@ addComponent('hexViewer', () => new HexViewer("hexViewer"));
 addComponent('errorWindow', cont => { cont.getElement().append($("<div />")); });
 addComponent('infoPanel', cont => { cont.getElement().append($("#infoPanel")); });
 addComponent('parsedDataTree');
+addComponent('fileTree');
 myLayout.init();
 //# sourceMappingURL=app.layout.js.map

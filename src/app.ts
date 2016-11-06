@@ -31,6 +31,16 @@ $(() => {
             reader('arrayBuffer').then(setInputBuffer).then(reparse);
     });
 
+    ui.fileTree.getElement().bind("dblclick.jstree", function (event) {
+        var fn: string = (<any>$(this)).jstree().get_node(event.target).data;
+        if (!fn) return;
+
+        if(fn.toLowerCase().endsWith('.ksy'))
+            Promise.resolve($.ajax({ url: fn })).then(ksy => setKsy(ksy));
+        else
+            downloadFile(fn).then(b => setInputBuffer(b)).then(reparse);
+    });
+
     var storage = new LargeLocalStorage({ size: 5 * 1024 * 1024, name: 'fsDb' });
 
     var lineInfo = null;
@@ -91,11 +101,11 @@ $(() => {
                         ui.hexViewer.setSelection(debug.start, debug.end);
                 });
 
-                var parsedJsonRes = parsedToJson(res);
-                lineInfo = parsedJsonRes.lineInfo;
-                console.log(lineInfo);
-                ui.parsedDataViewer.setValue(parsedJsonRes.json);
-                ui.hexViewer.setIntervals(parsedJsonRes.intervals);
+                //var parsedJsonRes = parsedToJson(res);
+                //lineInfo = parsedJsonRes.lineInfo;
+                //console.log(lineInfo);
+                //ui.parsedDataViewer.setValue(parsedJsonRes.json);
+                //ui.hexViewer.setIntervals(parsedJsonRes.intervals);
             });
         });
     }
