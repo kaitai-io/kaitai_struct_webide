@@ -113,7 +113,7 @@ class HexViewer {
         this.content.html('');
         this.maxScrollHeight = this.totalHeight - boxHeight;
         this.rowCount = Math.ceil(boxHeight / this.rowHeight);
-        console.log('boxHeight', boxHeight, 'rowCount', this.rowCount);
+        //console.log('boxHeight', boxHeight, 'rowCount', this.rowCount);
         this.maxRow = Math.ceil(this.dataProvider.length / this.bytesPerLine - this.rowCount + 1);
         this.rows = [];
         for (var i = 0; i < this.rowCount; i++) {

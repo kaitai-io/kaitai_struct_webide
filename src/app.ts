@@ -139,7 +139,6 @@ $(() => {
             localStorage.setItem('ksy', ksyContent);
         //console.log('setKsy', ksyContent);
         ui.ksyEditor.setValue(ksyContent, -1);
-        recompile();
     }
 
     var cachedKsy = localStorage.getItem('ksy');

@@ -112,7 +112,6 @@ $(() => {
             localStorage.setItem('ksy', ksyContent);
         //console.log('setKsy', ksyContent);
         ui.ksyEditor.setValue(ksyContent, -1);
-        recompile();
     }
     var cachedKsy = localStorage.getItem('ksy');
     var formatReady = Promise.resolve(cachedKsy ? cachedKsy : $.ajax({ url: `formats/${load.format}` })).then(ksy => setKsy(ksy, true));

@@ -2,14 +2,14 @@
 function showError(...args) {
     console.log.apply(window, args);
     var errMsg = args.filter(x => x.toString() !== {}.toString()).join(' ');
-    var container = myLayout.root.contentItems[0];
+    var container = myLayout.root.contentItems[0].contentItems[1];
     if (!ui.errorWindow) {
         container.addChild({ type: 'component', componentName: 'errorWindow', title: 'Errors' });
         ui.errorWindow.setSize(0, lastErrWndSize);
     }
     ui.errorWindow.on('resize', () => lastErrWndSize = ui.errorWindow.getElement().outerHeight());
     ui.errorWindow.on('close', () => ui.errorWindow = null);
-    ui.errorWindow.getElement().children().text(errMsg);
+    ui.errorWindow.getElement().children().html(htmlescape(errMsg).replace(/\n|\\n/g, '<br>'));
 }
 
 function hideErrors() {

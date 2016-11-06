@@ -81,4 +81,7 @@ function readBlob(blob, mode, ...args) {
         reader['readAs' + mode[0].toUpperCase() + mode.substr(1)](blob, ...args);
     });
 }
+function htmlescape(s) {
+    return $("<div/>").text(s).html();
+}
 //# sourceMappingURL=utils.js.map
