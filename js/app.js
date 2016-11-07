@@ -17,11 +17,6 @@ $(() => {
         exec: function (editor) { reparse(); }
     });
     initFileDrop('fileDrop', (file, reader) => {
-        localforage.getItem('somekey').then(function (value) {
-            // This code runs once the value has been loaded
-            // from the offline store.
-            console.log(value);
-        });
         var isKsy = file.name.toLowerCase().endsWith('.ksy');
         (isKsy ? reader('text') : reader('arrayBuffer')).then(content => {
             if (isKsy)
@@ -31,18 +26,20 @@ $(() => {
             localFs.put(file.name, content).then(refreshFsNodes);
         });
     });
-    ui.fileTreeCont.getElement().bind("dblclick.jstree", function (event) {
-        var fsItem = $(this).jstree().get_node(event.target).data;
+    function loadFsItem(fsItem) {
         if (!fsItem || fsItem._type !== 'file')
             return;
-        fss[fsItem._fsType].get(fsItem._fn).then(content => {
+        return fss[fsItem._fsType].get(fsItem._fn).then(content => {
             if (fsItem._fn.toLowerCase().endsWith('.ksy'))
-                setKsy(content);
+                return setKsy(content);
             else {
-                localStorage.setItem('inputFn', fsItem._fn);
-                setInputBuffer(content, true);
+                localforage.setItem('inputFsItem', fsItem);
+                return setInputBuffer(content, true);
             }
         });
+    }
+    ui.fileTreeCont.getElement().bind("dblclick.jstree", function (event) {
+        loadFsItem(ui.fileTree.get_node(event.target).data);
     });
     var lineInfo = null;
     ui.parsedDataViewer.getSession().selection.on('changeCursor', (e1, e2) => {
@@ -106,9 +103,6 @@ $(() => {
     //var load = { input: 'grad8rgb.bmp', format: 'image/bmp.ksy' };
     var load = { input: 'sample1.zip', format: 'archive/zip.ksy' };
     function setInputBuffer(fileBuffer, fromCache = false) {
-        //if (!fromCache)
-        //    try { storage.setAttachment('files', 'last', fileBuffer); }
-        //    catch (e) { console.log('setInputBuffer > setAttachment', e); }
         dataProvider = {
             length: fileBuffer.byteLength,
             get(offset, length) { return new Uint8Array(fileBuffer, offset, length); },
@@ -116,21 +110,14 @@ $(() => {
         ui.hexViewer.setDataProvider(dataProvider);
         return jailrun('inputBuffer = args; void(0)', fileBuffer);
     }
-    function loadInputFile(fn) {
-        localStorage.setItem('inputFn', fn);
-        return downloadFile(fn).then(b => setInputBuffer(b, true));
-    }
-    //var inputReady = storage.initialized.then(() => storage.getAttachment('files', 'last'))
-    //    .then(file => file ? readBlob(file, 'arrayBuffer') : downloadFile(`samples/${load.input}`))
-    //    .then(b => setInputBuffer(b, true));
-    var cachedInputFn = localStorage.getItem('inputFn') || `samples/${load.input}`;
-    var inputReady = loadInputFile(cachedInputFn);
+    var inputReady = localforage.getItem('inputFsItem').then((fsItem) => {
+        return loadFsItem(fsItem || { _fsType: 'kaitai', _fn: `samples/${load.input}`, _type: 'file' });
+    });
     var editDelay = new Delayed(500);
     ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
     function setKsy(ksyContent, fromCache = false) {
         if (!fromCache)
             localStorage.setItem('ksy', ksyContent);
-        //console.log('setKsy', ksyContent);
         ui.ksyEditor.setValue(ksyContent, -1);
     }
     var cachedKsy = localStorage.getItem('ksy');

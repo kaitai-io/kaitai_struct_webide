@@ -25,12 +25,6 @@ $(() => {
     });
 
     initFileDrop('fileDrop', (file, reader) => {
-        localforage.getItem('somekey').then(function (value) {
-            // This code runs once the value has been loaded
-            // from the offline store.
-            console.log(value);
-        });
-
         var isKsy = file.name.toLowerCase().endsWith('.ksy');
         (isKsy ? reader('text') : reader('arrayBuffer')).then(content => {
             if (isKsy)
@@ -42,18 +36,21 @@ $(() => {
         });
     });
 
-    ui.fileTreeCont.getElement().bind("dblclick.jstree", function (event) {
-        var fsItem: IFsItem = (<any>$(this)).jstree().get_node(event.target).data;
+    function loadFsItem(fsItem: IFsItem) {
         if (!fsItem || fsItem._type !== 'file') return;
-        
-        fss[fsItem._fsType].get(fsItem._fn).then(content => {
+
+        return fss[fsItem._fsType].get(fsItem._fn).then(content => {
             if (fsItem._fn.toLowerCase().endsWith('.ksy'))
-                setKsy(<string>content);
+                return setKsy(<string>content);
             else {
-                localStorage.setItem('inputFn', fsItem._fn);
-                setInputBuffer(<ArrayBuffer>content, true)
+                localforage.setItem('inputFsItem', fsItem);
+                return setInputBuffer(<ArrayBuffer>content, true);
             }
         });
+    }
+
+    ui.fileTreeCont.getElement().bind("dblclick.jstree", function (event) {
+        loadFsItem(<IFsItem>ui.fileTree.get_node(event.target).data);
     });
 
     var lineInfo = null;
@@ -128,10 +125,6 @@ $(() => {
     var load = { input: 'sample1.zip', format: 'archive/zip.ksy' };
 
     function setInputBuffer(fileBuffer: ArrayBuffer, fromCache: boolean = false) {
-        //if (!fromCache)
-        //    try { storage.setAttachment('files', 'last', fileBuffer); }
-        //    catch (e) { console.log('setInputBuffer > setAttachment', e); }
-
         dataProvider = {
             length: fileBuffer.byteLength,
             get(offset, length) { return new Uint8Array(fileBuffer, offset, length) },
@@ -142,17 +135,9 @@ $(() => {
         return jailrun('inputBuffer = args; void(0)', fileBuffer);
     }
 
-    function loadInputFile(fn) {
-        localStorage.setItem('inputFn', fn);
-        return downloadFile(fn).then(b => setInputBuffer(b, true))
-    }
-
-    //var inputReady = storage.initialized.then(() => storage.getAttachment('files', 'last'))
-    //    .then(file => file ? readBlob(file, 'arrayBuffer') : downloadFile(`samples/${load.input}`))
-    //    .then(b => setInputBuffer(b, true));
-
-    var cachedInputFn = localStorage.getItem('inputFn') || `samples/${load.input}`;
-    var inputReady = loadInputFile(cachedInputFn);
+    var inputReady = localforage.getItem('inputFsItem').then((fsItem: IFsItem) => {
+        return loadFsItem(fsItem || <IFsItem>{ _fsType: 'kaitai', _fn: `samples/${load.input}`, _type: 'file' });
+    });
 
     var editDelay = new Delayed(500);
     ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
@@ -160,7 +145,7 @@ $(() => {
     function setKsy(ksyContent: string, fromCache: boolean = false) {
         if (!fromCache)
             localStorage.setItem('ksy', ksyContent);
-        //console.log('setKsy', ksyContent);
+
         ui.ksyEditor.setValue(ksyContent, -1);
     }
 
