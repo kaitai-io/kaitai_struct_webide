@@ -1,6 +1,6 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
 
-declare var YAML: any, io: any, jailed: any, IntervalTree: any, LargeLocalStorage: any;
+declare var YAML: any, io: any, jailed: any, IntervalTree: any, localforage: LocalForage;
 
 var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 
@@ -25,23 +25,36 @@ $(() => {
     });
 
     initFileDrop('fileDrop', (file, reader) => {
-        if (file.name.toLowerCase().endsWith('.ksy'))
-            reader('text').then(setKsy);
-        else
-            reader('arrayBuffer').then(setInputBuffer).then(reparse);
+        localforage.getItem('somekey').then(function (value) {
+            // This code runs once the value has been loaded
+            // from the offline store.
+            console.log(value);
+        });
+
+        var isKsy = file.name.toLowerCase().endsWith('.ksy');
+        (isKsy ? reader('text') : reader('arrayBuffer')).then(content => {
+            if (isKsy)
+                setKsy(<any>content);
+            else
+                setInputBuffer(<any>content).then(reparse);
+
+            localFs.put(file.name, content).then(refreshFsNodes);
+        });
     });
 
-    ui.fileTree.getElement().bind("dblclick.jstree", function (event) {
-        var fn: string = (<any>$(this)).jstree().get_node(event.target).data;
-        if (!fn) return;
-
-        if (fn.toLowerCase().endsWith('.ksy'))
-            Promise.resolve($.ajax({ url: fn })).then(ksy => setKsy(ksy));
-        else
-            loadInputFile(fn).then(reparse);
+    ui.fileTreeCont.getElement().bind("dblclick.jstree", function (event) {
+        var fsItem: IFsItem = (<any>$(this)).jstree().get_node(event.target).data;
+        if (!fsItem || fsItem._type !== 'file') return;
+        
+        fss[fsItem._fsType].get(fsItem._fn).then(content => {
+            if (fsItem._fn.toLowerCase().endsWith('.ksy'))
+                setKsy(<string>content);
+            else {
+                localStorage.setItem('inputFn', fsItem._fn);
+                setInputBuffer(<ArrayBuffer>content, true)
+            }
+        });
     });
-
-    //var storage = new LargeLocalStorage({ size: 5 * 1024 * 1024, name: 'fsDb' });
 
     var lineInfo = null;
     ui.parsedDataViewer.getSession().selection.on('changeCursor', (e1, e2) => {
@@ -69,6 +82,7 @@ $(() => {
             var r = ks.compile('javascript', src, false);
             var rDebug = ks.compile('javascript', src, true);
         } catch (compileErr) {
+            console.log(compileErr.s$1);
             showError("KS compilation error: ", compileErr);
             return;
         }
@@ -93,7 +107,7 @@ $(() => {
 
                 handleError(error);
 
-                var jsTree = <any>ui.parsedDataTree.getElement();
+                var jsTree = <any>ui.parsedDataTreeCont.getElement();
                 parsedToTree(jsTree, res, handleError).on('select_node.jstree', function (e, node) {
                     //console.log('select_node', node);
                     var debug = node.node.data.debug;

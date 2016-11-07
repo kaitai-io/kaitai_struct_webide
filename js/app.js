@@ -17,21 +17,33 @@ $(() => {
         exec: function (editor) { reparse(); }
     });
     initFileDrop('fileDrop', (file, reader) => {
-        if (file.name.toLowerCase().endsWith('.ksy'))
-            reader('text').then(setKsy);
-        else
-            reader('arrayBuffer').then(setInputBuffer).then(reparse);
+        localforage.getItem('somekey').then(function (value) {
+            // This code runs once the value has been loaded
+            // from the offline store.
+            console.log(value);
+        });
+        var isKsy = file.name.toLowerCase().endsWith('.ksy');
+        (isKsy ? reader('text') : reader('arrayBuffer')).then(content => {
+            if (isKsy)
+                setKsy(content);
+            else
+                setInputBuffer(content).then(reparse);
+            localFs.put(file.name, content).then(refreshFsNodes);
+        });
     });
-    ui.fileTree.getElement().bind("dblclick.jstree", function (event) {
-        var fn = $(this).jstree().get_node(event.target).data;
-        if (!fn)
+    ui.fileTreeCont.getElement().bind("dblclick.jstree", function (event) {
+        var fsItem = $(this).jstree().get_node(event.target).data;
+        if (!fsItem || fsItem._type !== 'file')
             return;
-        if (fn.toLowerCase().endsWith('.ksy'))
-            Promise.resolve($.ajax({ url: fn })).then(ksy => setKsy(ksy));
-        else
-            loadInputFile(fn).then(reparse);
+        fss[fsItem._fsType].get(fsItem._fn).then(content => {
+            if (fsItem._fn.toLowerCase().endsWith('.ksy'))
+                setKsy(content);
+            else {
+                localStorage.setItem('inputFn', fsItem._fn);
+                setInputBuffer(content, true);
+            }
+        });
     });
-    //var storage = new LargeLocalStorage({ size: 5 * 1024 * 1024, name: 'fsDb' });
     var lineInfo = null;
     ui.parsedDataViewer.getSession().selection.on('changeCursor', (e1, e2) => {
         var lineIdx = e2.selectionLead.row;
@@ -57,6 +69,7 @@ $(() => {
             var rDebug = ks.compile('javascript', src, true);
         }
         catch (compileErr) {
+            console.log(compileErr.s$1);
             showError("KS compilation error: ", compileErr);
             return;
         }
@@ -75,7 +88,7 @@ $(() => {
                 console.log('reparse res', res);
                 itree = new IntervalTree(dataProvider.length / 2);
                 handleError(error);
-                var jsTree = ui.parsedDataTree.getElement();
+                var jsTree = ui.parsedDataTreeCont.getElement();
                 parsedToTree(jsTree, res, handleError).on('select_node.jstree', function (e, node) {
                     //console.log('select_node', node);
                     var debug = node.node.data.debug;

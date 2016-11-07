@@ -31,11 +31,12 @@ var ui = {
     genCodeViewer: <AceAjax.Editor>null,
     genCodeDebugViewer: <AceAjax.Editor>null,
     parsedDataViewer: <AceAjax.Editor>null,
-    parsedDataTree: <GoldenLayout.Container>null,
+    parsedDataTreeCont: <GoldenLayout.Container>null,
     hexViewer: <HexViewer>null,
     errorWindow: <GoldenLayout.Container>null,
     infoPanel: <GoldenLayout.Container>null,
-    fileTree: <GoldenLayout.Container>null,
+    fileTreeCont: <GoldenLayout.Container>null,
+    fileTree: <JSTree>null,
 };
 
 function addComponent(name: string, generatorCallback?) {
@@ -47,7 +48,7 @@ function addComponent(name: string, generatorCallback?) {
             container.on('resize', () => { if (editor && editor.resize) editor.resize(); });
             container.on('open', () => { ui[name] = editor = generatorCallback(container) || container; });
         } else
-            ui[name] = container;
+            ui[name + 'Cont'] = container;
     });
 }
 

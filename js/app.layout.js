@@ -30,10 +30,11 @@ var ui = {
     genCodeViewer: null,
     genCodeDebugViewer: null,
     parsedDataViewer: null,
-    parsedDataTree: null,
+    parsedDataTreeCont: null,
     hexViewer: null,
     errorWindow: null,
     infoPanel: null,
+    fileTreeCont: null,
     fileTree: null,
 };
 function addComponent(name, generatorCallback) {
@@ -46,7 +47,7 @@ function addComponent(name, generatorCallback) {
             container.on('open', () => { ui[name] = editor = generatorCallback(container) || container; });
         }
         else
-            ui[name] = container;
+            ui[name + 'Cont'] = container;
     });
 }
 function addEditor(name, lang, isReadOnly = false) {

@@ -32,6 +32,7 @@
     <Content Include="js\kaitaiJail.js" />
     <Content Include="js\parsedToJson.js" />
     <Content Include="js\parsedToJson.js.map" />
+    <Content Include="js\parsedToTree.js" />
     <Content Include="js\utils.js" />
     <Content Include="lib\ace\ace.js" />
     <Content Include="lib\ace\ext-searchbox.js" />
@@ -51,14 +52,23 @@
     <Content Include="lib\kaitai\kaitai-struct-compiler-fastopt.js" />
     <Content Include="lib\kaitai\yaml.js" />
     <Content Include="lib\kaitai_js_runtime\KaitaiStream.js" />
+    <Content Include="lib\LargeLocalStorage.js" />
+    <Content Include="lib\localforage.js" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="lib\ts-types\ace.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\goldenlayout.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\jquery.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\jstree.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\localForage.d.ts" />
+    <TypeScriptCompile Include="src\app.errors.ts" />
+    <TypeScriptCompile Include="src\app.files.ts" />
+    <TypeScriptCompile Include="src\app.jail.ts" />
+    <TypeScriptCompile Include="src\app.layout.ts" />
     <TypeScriptCompile Include="src\app.ts" />
     <TypeScriptCompile Include="src\FileDrop.ts" />
     <TypeScriptCompile Include="src\parsedToJson.ts" />
+    <TypeScriptCompile Include="src\parsedToTree.ts" />
     <TypeScriptCompile Include="src\utils.ts" />
     <TypeScriptCompile Include="src\HexViewer.ts" />
   </ItemGroup>
@@ -81,6 +91,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="js\FileDrop.js.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="js\parsedToTree.js.map" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>

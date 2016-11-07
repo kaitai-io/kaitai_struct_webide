@@ -72,6 +72,12 @@ if (!String.prototype.repeat) {
     }
 }
 
+interface Array<T> { last(): T; }
+
+if (!Array.prototype.last) {
+    Array.prototype.last = function () { return this[this.length - 1]; };
+}
+
 function arrayBufferToBase64(buffer) {
     var bytes = new Uint8Array(buffer);
     var len = bytes.byteLength;

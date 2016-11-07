@@ -65,6 +65,9 @@ if (!String.prototype.repeat) {
         return rpt;
     };
 }
+if (!Array.prototype.last) {
+    Array.prototype.last = function () { return this[this.length - 1]; };
+}
 function arrayBufferToBase64(buffer) {
     var bytes = new Uint8Array(buffer);
     var len = bytes.byteLength;
