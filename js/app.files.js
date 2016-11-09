@@ -24,7 +24,12 @@ class LocalStorageFs {
     filesKey() { return `${this.prefix}_files`; }
     fileKey(fn) { return `${this.prefix}_file[${fn}]`; }
     save() { return localforage.setItem(this.filesKey(), this.root); }
-    getRootNode() { return localforage.getItem(this.filesKey()).then(x => x || { fsType: 'local' }).then(x => this.root = x); }
+    getRootNode() {
+        if (this.root)
+            return Promise.resolve(this.root);
+        this.rootPromise = localforage.getItem(this.filesKey()).then(x => x || { fsType: 'local' }).then(r => this.root = r);
+        return this.rootPromise;
+    }
     setRootNode(newRoot) {
         this.root = newRoot;
         return this.save();
@@ -103,7 +108,6 @@ function genChildNodes(obj) {
 function refreshFsNodes() {
     var localStorageNode = ui.fileTree.get_node('localStorage');
     localFs.getRootNode().then(root => {
-        console.log('root', root);
         ui.fileTree.delete_node(localStorageNode.children);
         genChildNodes(root).forEach(node => ui.fileTree.create_node(localStorageNode, node));
     });
@@ -116,7 +120,6 @@ $(() => {
                 var result = true;
                 if (operation === "move_node")
                     result = !!node.data && node.data.fsType === "local" && !!node_parent.data && node_parent.data.fsType === "local" && node_parent.data.type === "folder";
-                //console.log('arguments', arguments, node_parent.data, result);
                 return result;
             },
             themes: { name: "default-dark", dots: false, icons: true, variant: 'small' },
@@ -139,9 +142,6 @@ $(() => {
     var createFolder = $('#fileTreeContextMenu .createFolder');
     var deleteItem = $('#fileTreeContextMenu .deleteItem');
     var openItem = $('#fileTreeContextMenu .openItem');
-    function getSelectedData() {
-        return ui.fileTree.get_node(ui.fileTree.get_selected()).data;
-    }
     function convertTreeNode(treeNode) {
         var data = treeNode.data;
         data.children = {};
@@ -151,10 +151,14 @@ $(() => {
     function saveTree() {
         localFs.setRootNode(convertTreeNode(ui.fileTree.get_json()[1]));
     }
+    var contextMenuTarget = null;
+    function getSelectedData() {
+        return ui.fileTree.get_node(contextMenuTarget).data;
+    }
     ui.fileTreeCont.getElement().on('contextmenu', '.jstree-node', e => {
-        ui.fileTree.activate_node(e.target, null);
+        contextMenuTarget = e.target;
+        //ui.fileTree.activate_node(e.target, null);
         var data = getSelectedData();
-        console.log(data);
         createFolder.toggleClass('disabled', !(data.fsType === 'local' && data.type === 'folder'));
         deleteItem.toggleClass('disabled', !(data.fsType === 'local'));
         fileTreeContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
@@ -167,8 +171,7 @@ $(() => {
     createFolder.find('a').on('click', e => {
         fileTreeContextMenu.hide();
         var parentData = getSelectedData();
-        console.log('parentData', parentData);
-        ui.fileTree.create_node(ui.fileTree.get_selected(), { data: { fsType: parentData.fsType, type: 'folder' }, icon: 'glyphicon glyphicon-folder-open' }, "last", function (new_node) {
+        ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), { data: { fsType: parentData.fsType, type: 'folder' }, icon: 'glyphicon glyphicon-folder-open' }, "last", function (new_node) {
             setTimeout(function () { ui.fileTree.edit(new_node); }, 0);
         });
     });
@@ -178,11 +181,9 @@ $(() => {
     });
     openItem.find('a').on('click', e => {
         fileTreeContextMenu.hide();
-        $('#' + ui.fileTree.get_selected()[0]).trigger('dblclick');
+        $(contextMenuTarget).trigger('dblclick');
     });
     ui.fileTreeCont.getElement().on('create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree', saveTree);
-    ui.fileTreeCont.getElement().on('move_node.jstree', (e, data) => {
-        ui.fileTree.open_node(ui.fileTree.get_node(data.parent));
-    });
+    ui.fileTreeCont.getElement().on('move_node.jstree', (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
 });
 //# sourceMappingURL=app.files.js.map

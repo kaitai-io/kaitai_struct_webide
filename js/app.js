@@ -17,15 +17,19 @@ $(() => {
         bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
         exec: function (editor) { reparse(); }
     });
-    initFileDrop('fileDrop', (file, reader) => {
-        var isKsy = file.name.toLowerCase().endsWith('.ksy');
-        (isKsy ? reader('text') : reader('arrayBuffer')).then(content => {
-            if (isKsy)
-                setKsy(content);
-            else
-                setInputBuffer(content).then(reparse);
-            localFs.put(file.name, content).then(refreshFsNodes);
-        });
+    initFileDrop('fileDrop', files => {
+        Promise.all(files.map((file, i) => {
+            var isKsy = file.file.name.toLowerCase().endsWith('.ksy');
+            return (isKsy ? file.read('text') : file.read('arrayBuffer')).then(content => {
+                if (files.length == 1) {
+                    if (isKsy)
+                        setKsy(content);
+                    else
+                        setInputBuffer(content).then(reparse);
+                }
+                return localFs.put(file.file.name, content);
+            });
+        })).then(refreshFsNodes);
     });
     function loadFsItem(fsItem) {
         if (!fsItem || fsItem.type !== 'file')
@@ -40,7 +44,6 @@ $(() => {
         });
     }
     ui.fileTreeCont.getElement().bind("dblclick.jstree", function (event) {
-        console.log('dblclick', event);
         loadFsItem(ui.fileTree.get_node(event.target).data);
     });
     var lineInfo = null;

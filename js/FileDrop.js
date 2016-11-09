@@ -24,8 +24,13 @@ function initFileDrop(containerId, callback) {
         event.preventDefault();
         event.stopPropagation();
         fileDropShadow.hide();
-        var file = event.originalEvent.dataTransfer.files[0];
-        callback(file, mode => readBlob(file, mode));
+        var files = event.originalEvent.dataTransfer.files;
+        var resFiles = [];
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            resFiles.push({ file: file, read: mode => readBlob(file, mode) });
+        }
+        callback(resFiles);
     });
 }
 //# sourceMappingURL=FileDrop.js.map

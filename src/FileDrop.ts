@@ -5,7 +5,7 @@
 };
 
 interface IFileDropCallback {
-    (file: File, read: IFileDropReader);
+    (files: ({ file: File, read: IFileDropReader })[]);
 };
 
 function initFileDrop(containerId, callback: IFileDropCallback) {
@@ -35,7 +35,13 @@ function initFileDrop(containerId, callback: IFileDropCallback) {
         event.preventDefault();
         event.stopPropagation();
         fileDropShadow.hide();
-        var file = (<DragEvent>event.originalEvent).dataTransfer.files[0];
-        callback(file, mode => readBlob(file, mode));
+        var files = (<DragEvent>event.originalEvent).dataTransfer.files;
+        var resFiles = [];
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            resFiles.push({ file: file, read: mode => readBlob(file, mode) })
+        }
+            
+        callback(resFiles);
     });
 }
