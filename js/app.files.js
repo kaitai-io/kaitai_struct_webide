@@ -113,7 +113,7 @@ function refreshFsNodes() {
     });
 }
 $(() => {
-    console.log('kaitaiRoot', kaitaiRoot);
+    //console.log('kaitaiRoot', kaitaiRoot);
     ui.fileTree = ui.fileTreeCont.getElement().jstree({
         core: {
             check_callback: function (operation, node, node_parent, node_position, more) {

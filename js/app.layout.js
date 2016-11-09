@@ -7,8 +7,8 @@ var myLayout = new GoldenLayout({
                         { type: 'row', content: [
                                 { type: 'column', content: [
                                         { type: 'component', componentName: 'ksyEditor', title: '.ksy editor', isClosable: false },
-                                        { type: 'stack', activeItemIndex: 1, content: [
-                                                { type: 'component', componentName: 'parsedDataViewer', title: 'parsed as JSON', isClosable: false },
+                                        { type: 'stack', activeItemIndex: 0, content: [
+                                                //{ type: 'component', componentName: 'parsedDataViewer', title: 'parsed as JSON', isClosable: false },
                                                 { type: 'component', componentName: 'parsedDataTree', title: 'parsed as tree', isClosable: false },
                                             ] },
                                     ] },
@@ -29,7 +29,7 @@ var ui = {
     ksyEditor: null,
     genCodeViewer: null,
     genCodeDebugViewer: null,
-    parsedDataViewer: null,
+    //parsedDataViewer: <AceAjax.Editor>null,
     parsedDataTreeCont: null,
     hexViewer: null,
     errorWindow: null,
@@ -63,7 +63,7 @@ function addEditor(name, lang, isReadOnly = false) {
 addEditor('ksyEditor', 'yaml');
 addEditor('genCodeViewer', 'javascript', true);
 addEditor('genCodeDebugViewer', 'javascript', false);
-addEditor('parsedDataViewer', 'javascript', true);
+//addEditor('parsedDataViewer', 'javascript', true);
 addComponent('hexViewer', () => new HexViewer("hexViewer"));
 addComponent('errorWindow', cont => { cont.getElement().append($("<div />")); });
 addComponent('infoPanel', cont => { cont.getElement().append($("#infoPanel")); });

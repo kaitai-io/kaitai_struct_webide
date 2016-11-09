@@ -145,7 +145,7 @@ function refreshFsNodes() {
 }
 
 $(() => {
-    console.log('kaitaiRoot', kaitaiRoot);
+    //console.log('kaitaiRoot', kaitaiRoot);
 
     ui.fileTree = ui.fileTreeCont.getElement().jstree({
         core: {
