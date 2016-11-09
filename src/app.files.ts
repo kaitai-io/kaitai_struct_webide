@@ -196,7 +196,12 @@ $(() => {
 
     ui.fileTreeCont.getElement().on('contextmenu', '.jstree-node', e => {
         contextMenuTarget = e.target;
-        //ui.fileTree.activate_node(e.target, null);
+
+        var clickNodeId = ui.fileTree.get_node(contextMenuTarget).id;
+        var selectedNodeIds = ui.fileTree.get_selected();
+        if ($.inArray(clickNodeId, selectedNodeIds) === -1)
+            ui.fileTree.activate_node(contextMenuTarget, null);
+
         var data = getSelectedData();
         createFolder.toggleClass('disabled', !(data.fsType === 'local' && data.type === 'folder'));
         deleteItem.toggleClass('disabled', !(data.fsType === 'local'));
@@ -204,7 +209,8 @@ $(() => {
         return false;
     });
 
-    $(document).on('mousedown', e => {
+    $(document).on('mouseup', e => {
+        console.log('mousedown', $(e.target).parents('.dropdown-menu'));
         if($(e.target).parents('.dropdown-menu').length === 0)
             fileTreeContextMenu.hide();
     });
