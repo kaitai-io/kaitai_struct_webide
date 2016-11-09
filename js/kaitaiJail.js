@@ -29,10 +29,10 @@ application.setInterface({
         cb(result);
     },
     reparse: function (cb) {
-        io = new KaitaiStream(inputBuffer, 0);
+        ioInput = new KaitaiStream(inputBuffer, 0);
         parseError = null;
         try {
-            parsed = new module.exports(io);
+            parsed = new module.exports(ioInput);
             parsed._read();
         } catch (e) {
             parseError = JSON.stringify(e);

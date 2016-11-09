@@ -2,6 +2,27 @@
 var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 var dataProvider;
 var itree;
+function compile(srcYaml, kslang, debug) {
+    var src;
+    try {
+        src = YAML.parse(srcYaml);
+    }
+    catch (parseErr) {
+        showError("YAML parsing error: ", parseErr);
+        return;
+    }
+    try {
+        var ks = io.kaitai.struct.MainJs();
+        var rRelease = (debug === false || debug === 'both') ? ks.compile(kslang, src, false) : null;
+        var rDebug = (debug === true || debug === 'both') ? ks.compile(kslang, src, true) : null;
+        return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
+    }
+    catch (compileErr) {
+        console.log(compileErr.s$1);
+        showError("KS compilation error: ", compileErr);
+        return;
+    }
+}
 $(() => {
     ui.infoPanel.getElement().show();
     ui.hexViewer.onSelectionChanged = () => {
@@ -57,26 +78,9 @@ $(() => {
     //});
     function recompile() {
         var srcYaml = ui.ksyEditor.getValue();
-        var src;
-        try {
-            src = YAML.parse(srcYaml);
-        }
-        catch (parseErr) {
-            showError("YAML parsing error: ", parseErr);
-            return;
-        }
-        try {
-            var ks = io.kaitai.struct.MainJs();
-            var r = ks.compile('javascript', src, false);
-            var rDebug = ks.compile('javascript', src, true);
-        }
-        catch (compileErr) {
-            console.log(compileErr.s$1);
-            showError("KS compilation error: ", compileErr);
-            return;
-        }
-        ui.genCodeViewer.setValue(r[0], -1);
-        ui.genCodeDebugViewer.setValue(rDebug[0], -1);
+        var compiled = compile(srcYaml, 'javascript', 'both');
+        ui.genCodeViewer.setValue(compiled.release[0], -1);
+        ui.genCodeDebugViewer.setValue(compiled.debug[0], -1);
         reparse();
     }
     function reparse() {

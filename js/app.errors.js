@@ -2,7 +2,7 @@ var lastErrWndSize = 100; // 34
 function showError(...args) {
     console.log.apply(window, args);
     var errMsg = args.filter(x => x.toString() !== {}.toString()).join(' ');
-    var container = myLayout.root.contentItems[0].contentItems[1];
+    var container = getLayoutNodeById('mainArea');
     if (!ui.errorWindow) {
         container.addChild({ type: 'component', componentName: 'errorWindow', title: 'Errors' });
         ui.errorWindow.setSize(0, lastErrWndSize);

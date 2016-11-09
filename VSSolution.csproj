@@ -40,6 +40,10 @@
     <Content Include="lib\ace\mode-yaml.js" />
     <Content Include="lib\ace\theme-monokai.js" />
     <Content Include="lib\ace\worker-javascript.js" />
+    <Content Include="lib\bootstrap\contextmenu.css" />
+    <Content Include="lib\goldenlayout\goldenlayout-base.css" />
+    <Content Include="lib\goldenlayout\goldenlayout-dark-theme.css" />
+    <Content Include="lib\goldenlayout\goldenlayout.js" />
     <Content Include="lib\interval-tree2\interval-tree.js" />
     <Content Include="lib\jailed\jailed.js" />
     <Content Include="lib\jailed\_frame.html" />
