@@ -3,7 +3,7 @@
 .lm_splitter.lm_vertical .lm_drag_handle { top:-5px; height:15px }
 #errorWindow { background: white; font-family: Courier,monospace; font-size: 12px; white-space: pre; overflow-y: scroll; }
 #errorWindow>div { margin: 5px; }
-#infoPanel { background: white; padding: 5px }
+#infoPanel { background: white; padding: 5px; display: none }
 #parsedDataTree { background: white; overflow: auto; font-size: 12px; font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace }
 #parsedDataTree .jstree-icon, #parsedDataTree .jstree-anchor { height: 16px; line-height: 16px }
 #parsedDataTree .jstree-node { min-height: 16px; line-height: 16px; min-width:18px; margin-left:14px }
@@ -20,3 +20,9 @@ body { line-height:normal }
 #fileTree .glyphicon { font-size:12px; margin-top:-1px; color:#eee; margin-right:3px }
 #fileTree .jstree-icon { margin-left:3px; margin-right:5px }
 #fileTree .jstree-ocl { display:none }
+body { color:#333 }
+#fileTreeContextMenu { position: absolute; display:none; z-index:9999 }
+.dropdown-menu { z-index:9999 }
+#fileTreeContextMenu .dropdown-menu { font-size:13px; border-color:#375a7f; border-radius:0px }
+#fileTreeContextMenu .glyphicon { margin-right:5px; }
+#fileTreeContextMenu .dropdown-menu>li>a { padding:3px 15px }

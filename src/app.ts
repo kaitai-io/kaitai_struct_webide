@@ -8,6 +8,8 @@ var dataProvider: IDataProvider;
 var itree;
 
 $(() => {
+    ui.infoPanel.getElement().show();
+
     ui.hexViewer.onSelectionChanged = () => {
         ui.infoPanel.getElement().text(ui.hexViewer.selectionStart == -1 ? 'no selection' : `selection: 0x${ui.hexViewer.selectionStart.toString(16)} - 0x${ui.hexViewer.selectionEnd.toString(16)}`)
         if (itree && ui.hexViewer.selectionStart) {
@@ -37,10 +39,10 @@ $(() => {
     });
 
     function loadFsItem(fsItem: IFsItem) {
-        if (!fsItem || fsItem._type !== 'file') return;
+        if (!fsItem || fsItem.type !== 'file') return;
 
-        return fss[fsItem._fsType].get(fsItem._fn).then(content => {
-            if (fsItem._fn.toLowerCase().endsWith('.ksy'))
+        return fss[fsItem.fsType].get(fsItem.fn).then(content => {
+            if (fsItem.fn.toLowerCase().endsWith('.ksy'))
                 return setKsy(<string>content);
             else {
                 localforage.setItem('inputFsItem', fsItem);
@@ -50,6 +52,7 @@ $(() => {
     }
 
     ui.fileTreeCont.getElement().bind("dblclick.jstree", function (event) {
+        console.log('dblclick', event);
         loadFsItem(<IFsItem>ui.fileTree.get_node(event.target).data);
     });
 
@@ -136,7 +139,7 @@ $(() => {
     }
 
     var inputReady = localforage.getItem('inputFsItem').then((fsItem: IFsItem) => {
-        return loadFsItem(fsItem || <IFsItem>{ _fsType: 'kaitai', _fn: `samples/${load.input}`, _type: 'file' });
+        return loadFsItem(fsItem || <IFsItem>{ fsType: 'kaitai', fn: `samples/${load.input}`, type: 'file' });
     });
 
     var editDelay = new Delayed(500);

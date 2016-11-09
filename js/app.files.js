@@ -1,15 +1,39 @@
+var fsHelper = {
+    selectNode(root, fn) {
+        var currNode = root;
+        var fnParts = fn.split('/');
+        var currPath = '';
+        for (var i = 0; i < fnParts.length; i++) {
+            var fnPart = fnParts[i];
+            currPath += (currPath ? '/' : '') + fnPart;
+            if (!('children' in currNode)) {
+                currNode.children = {};
+                currNode.type = 'folder';
+            }
+            if (!(fnPart in currNode.children))
+                currNode.children[fnPart] = { fsType: root.fsType, type: 'file', fn: currPath };
+            currNode = currNode.children[fnPart];
+        }
+        return currNode;
+    }
+};
 class LocalStorageFs {
     constructor(prefix) {
         this.prefix = prefix;
     }
-    getFilesInternal() { return localforage.getItem(`${this.prefix}_files`).then(x => x || {}); }
-    getFiles() { return this.getFilesInternal().then(x => Object.keys(x).map(key => ({ _type: x[key].type, _fn: key, _fsType: 'local' }))); }
-    setFiles(files) { return localforage.setItem(`${this.prefix}_files`, files); }
-    get(fn) { return localforage.getItem(`${this.prefix}_file_${fn}`); }
+    filesKey() { return `${this.prefix}_files`; }
+    fileKey(fn) { return `${this.prefix}_file[${fn}]`; }
+    save() { return localforage.setItem(this.filesKey(), this.root); }
+    getRootNode() { return localforage.getItem(this.filesKey()).then(x => x || { fsType: 'local' }).then(x => this.root = x); }
+    setRootNode(newRoot) {
+        this.root = newRoot;
+        return this.save();
+    }
+    get(fn) { return localforage.getItem(this.fileKey(fn)); }
     put(fn, data) {
-        return this.getFilesInternal().then(files => {
-            files[fn] = { type: 'file' };
-            return Promise.all([localforage.setItem(`${this.prefix}_file_${fn}`, data), this.setFiles(files)]);
+        return this.getRootNode().then(root => {
+            var node = fsHelper.selectNode(root, fn);
+            return Promise.all([localforage.setItem(this.fileKey(fn), data), this.save()]);
         });
     }
 }
@@ -17,8 +41,7 @@ class KaitaiFs {
     constructor(files) {
         this.files = files;
     }
-    getFiles() { return Promise.resolve(this.files); }
-    setFiles(files) { return Promise.reject('KaitaiFs.setFiles is not implemented!'); }
+    getRootNode() { return Promise.resolve(this.files); }
     get(fn) {
         if (fn.toLowerCase().endsWith('.ksy'))
             return Promise.resolve($.ajax({ url: fn }));
@@ -60,23 +83,13 @@ var files = [
     'samples/sample1.wad',
     'samples/sample1.zip',
 ];
-var fileListTree = {};
-files.forEach(fn => {
-    var currObj = fileListTree;
-    var fnParts = fn.split('/');
-    for (var i = 0; i < fnParts.length; i++) {
-        var part = fnParts[i];
-        if (!currObj[part])
-            currObj[part] = i == fnParts.length - 1 ? { _type: 'file', _fn: fn, _fsType: 'kaitai' } : { _type: 'folder', _fn: fn };
-        currObj = currObj[part];
-    }
-});
-var kaitaiFs = new KaitaiFs(fileListTree);
+var kaitaiRoot = { fsType: 'kaitai' };
+files.forEach(fn => fsHelper.selectNode(kaitaiRoot, fn));
+var kaitaiFs = new KaitaiFs(kaitaiRoot);
 var localFs = new LocalStorageFs("fs");
 var fss = { local: localFs, kaitai: kaitaiFs };
-function genChildNode(obj) {
-    var isFolder = obj._type === 'folder';
-    var fn = obj._fn.split('/').last();
+function genChildNode(obj, fn) {
+    var isFolder = obj.type === 'folder';
     return {
         text: fn,
         icon: 'glyphicon glyphicon-' + (isFolder ? 'folder-open' : fn.endsWith('.ksy') ? 'list-alt' : 'file'),
@@ -85,20 +98,27 @@ function genChildNode(obj) {
     };
 }
 function genChildNodes(obj) {
-    return Object.keys(obj).filter(x => !x.startsWith('_')).map(k => genChildNode(obj[k]));
+    return Object.keys(obj.children).map(k => genChildNode(obj.children[k], k));
 }
 function refreshFsNodes() {
     var localStorageNode = ui.fileTree.get_node('localStorage');
-    localFs.getFiles().then(files => {
+    localFs.getRootNode().then(root => {
+        console.log('root', root);
         ui.fileTree.delete_node(localStorageNode.children);
-        Object.keys(files).map(fn => ui.fileTree.create_node(localStorageNode, genChildNode(files[fn])));
+        genChildNodes(root).forEach(node => ui.fileTree.create_node(localStorageNode, node));
     });
 }
 $(() => {
-    console.log(fileListTree);
+    console.log('kaitaiRoot', kaitaiRoot);
     ui.fileTree = ui.fileTreeCont.getElement().jstree({
         core: {
-            check_callback: true,
+            check_callback: function (operation, node, node_parent, node_position, more) {
+                var result = true;
+                if (operation === "move_node")
+                    result = !!node.data && node.data.fsType === "local" && !!node_parent.data && node_parent.data.fsType === "local" && node_parent.data.type === "folder";
+                //console.log('arguments', arguments, node_parent.data, result);
+                return result;
+            },
             themes: { name: "default-dark", dots: false, icons: true, variant: 'small' },
             data: [
                 {
@@ -106,13 +126,63 @@ $(() => {
                     icon: 'glyphicon glyphicon-cloud',
                     state: { opened: true },
                     children: [
-                        { text: 'formats', icon: 'glyphicon glyphicon-book', children: genChildNodes(fileListTree.formats), state: { opened: true } },
-                        { text: 'samples', icon: 'glyphicon glyphicon-cd', children: genChildNodes(fileListTree.samples), state: { opened: true } },
+                        { text: 'formats', icon: 'glyphicon glyphicon-book', children: genChildNodes(kaitaiRoot.children['formats']), state: { opened: true } },
+                        { text: 'samples', icon: 'glyphicon glyphicon-cd', children: genChildNodes(kaitaiRoot.children['samples']), state: { opened: true } },
                     ]
                 },
-                { text: 'Local storage', id: 'localStorage', icon: 'glyphicon glyphicon-hdd', state: { opened: true }, children: [] }
-            ]
-        }
+                { text: 'Local storage', id: 'localStorage', icon: 'glyphicon glyphicon-hdd', state: { opened: true }, children: [], data: { fsType: 'local', type: 'folder' } }
+            ],
+        },
+        plugins: ["wholerow", "dnd"]
     }).bind('loaded.jstree', refreshFsNodes).jstree(true);
+    var fileTreeContextMenu = $("#fileTreeContextMenu");
+    var createFolder = $('#fileTreeContextMenu .createFolder');
+    var deleteItem = $('#fileTreeContextMenu .deleteItem');
+    var openItem = $('#fileTreeContextMenu .openItem');
+    function getSelectedData() {
+        return ui.fileTree.get_node(ui.fileTree.get_selected()).data;
+    }
+    function convertTreeNode(treeNode) {
+        var data = treeNode.data;
+        data.children = {};
+        treeNode.children.forEach(child => data.children[child.text] = convertTreeNode(child));
+        return data;
+    }
+    function saveTree() {
+        localFs.setRootNode(convertTreeNode(ui.fileTree.get_json()[1]));
+    }
+    ui.fileTreeCont.getElement().on('contextmenu', '.jstree-node', e => {
+        ui.fileTree.activate_node(e.target, null);
+        var data = getSelectedData();
+        console.log(data);
+        createFolder.toggleClass('disabled', !(data.fsType === 'local' && data.type === 'folder'));
+        deleteItem.toggleClass('disabled', !(data.fsType === 'local'));
+        fileTreeContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
+        return false;
+    });
+    $(document).on('mousedown', e => {
+        if ($(e.target).parents('.dropdown-menu').length === 0)
+            fileTreeContextMenu.hide();
+    });
+    createFolder.find('a').on('click', e => {
+        fileTreeContextMenu.hide();
+        var parentData = getSelectedData();
+        console.log('parentData', parentData);
+        ui.fileTree.create_node(ui.fileTree.get_selected(), { data: { fsType: parentData.fsType, type: 'folder' }, icon: 'glyphicon glyphicon-folder-open' }, "last", function (new_node) {
+            setTimeout(function () { ui.fileTree.edit(new_node); }, 0);
+        });
+    });
+    deleteItem.find('a').on('click', e => {
+        fileTreeContextMenu.hide();
+        ui.fileTree.delete_node(ui.fileTree.get_selected());
+    });
+    openItem.find('a').on('click', e => {
+        fileTreeContextMenu.hide();
+        $('#' + ui.fileTree.get_selected()[0]).trigger('dblclick');
+    });
+    ui.fileTreeCont.getElement().on('create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree', saveTree);
+    ui.fileTreeCont.getElement().on('move_node.jstree', (e, data) => {
+        ui.fileTree.open_node(ui.fileTree.get_node(data.parent));
+    });
 });
 //# sourceMappingURL=app.files.js.map

@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8" />
     <title>TypeScript HTML App</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/darkly/bootstrap.min.css" />
+    <link rel="stylesheet" href="lib/bootstrap/contextmenu.css" />
     <!-- <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.6/css/goldenlayout-base.css" /> -->
     <link type="text/css" rel="stylesheet" href="lib/goldenlayout/goldenlayout-base.css" />
     <!-- <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.6/css/goldenlayout-dark-theme.css" /> -->
@@ -39,6 +40,24 @@
 
 <div id="infoPanel">
     hello
+</div>
+
+<div id="fileTreeContextMenu" class="dropdown clearfix">
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display:block;position:static;margin-bottom:5px;">
+        <li class="openItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-pencil"></i> Open</a></li>
+        <li class="createFolder"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-plus"></i> Create folder</a></li>
+        <li class="deleteItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
+        <!--<li><a tabindex="-1" href="#">Something else here</a></li>
+        <li class="divider"></li>
+        <li class="dropdown-submenu">
+            <a tabindex="-1" href="#">Separated link</a>
+            <ul class="dropdown-menu">
+                <li><a tabindex="-1" href="#">Action</a></li>
+                <li><a tabindex="-1" href="#">Another action</a></li>
+                <li><a tabindex="-1" href="#">Something else here</a></li>
+            </ul>
+        </li>-->
+    </ul>
 </div>
 
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js" type="text/javascript" charset="utf-8"></script> -->

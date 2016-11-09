@@ -3,6 +3,7 @@ var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/
 var dataProvider;
 var itree;
 $(() => {
+    ui.infoPanel.getElement().show();
     ui.hexViewer.onSelectionChanged = () => {
         ui.infoPanel.getElement().text(ui.hexViewer.selectionStart == -1 ? 'no selection' : `selection: 0x${ui.hexViewer.selectionStart.toString(16)} - 0x${ui.hexViewer.selectionEnd.toString(16)}`);
         if (itree && ui.hexViewer.selectionStart) {
@@ -27,10 +28,10 @@ $(() => {
         });
     });
     function loadFsItem(fsItem) {
-        if (!fsItem || fsItem._type !== 'file')
+        if (!fsItem || fsItem.type !== 'file')
             return;
-        return fss[fsItem._fsType].get(fsItem._fn).then(content => {
-            if (fsItem._fn.toLowerCase().endsWith('.ksy'))
+        return fss[fsItem.fsType].get(fsItem.fn).then(content => {
+            if (fsItem.fn.toLowerCase().endsWith('.ksy'))
                 return setKsy(content);
             else {
                 localforage.setItem('inputFsItem', fsItem);
@@ -39,6 +40,7 @@ $(() => {
         });
     }
     ui.fileTreeCont.getElement().bind("dblclick.jstree", function (event) {
+        console.log('dblclick', event);
         loadFsItem(ui.fileTree.get_node(event.target).data);
     });
     var lineInfo = null;
@@ -111,7 +113,7 @@ $(() => {
         return jailrun('inputBuffer = args; void(0)', fileBuffer);
     }
     var inputReady = localforage.getItem('inputFsItem').then((fsItem) => {
-        return loadFsItem(fsItem || { _fsType: 'kaitai', _fn: `samples/${load.input}`, _type: 'file' });
+        return loadFsItem(fsItem || { fsType: 'kaitai', fn: `samples/${load.input}`, type: 'file' });
     });
     var editDelay = new Delayed(500);
     ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
