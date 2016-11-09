@@ -19,5 +19,5 @@ $(() => {
         jail.whenConnected(() => resolve());
         jail.whenFailed(() => reject());
     }).then(() => new Promise((resolve, reject) => jail._connection.importScript(baseUrl + 'lib/kaitai_js_runtime/KaitaiStream.js', resolve, reject)));
-    jailReady.then(() => console.log('jail started'), () => console.log('jail fail'));
+    jailReady.then(() => { /*console.log('jail started');*/ }, () => console.log('jail fail'));
 });

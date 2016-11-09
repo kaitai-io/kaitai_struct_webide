@@ -115,7 +115,7 @@ $(() => {
                     //console.log('select_node', node);
                     var debug = node.node.data.debug;
                     if (debug)
-                        ui.hexViewer.setSelection(debug.start, debug.end);
+                        ui.hexViewer.setSelection(debug.start, debug.end - 1);
                 });
 
                 //var parsedJsonRes = parsedToJson(res);

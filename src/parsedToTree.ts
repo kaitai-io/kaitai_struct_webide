@@ -10,8 +10,8 @@
         if (debug.arr)
             value._debug = debug.arr;
 
-        if (debug && debug.start && debug.end && debug.start <= debug.end) {
-            var node = itree.add(debug.start, debug.end);
+        if (debug && debug.start && debug.end && debug.start < debug.end) {
+            var node = itree.add(debug.start, debug.end - 1);
             node.debug = debug;
         }
 
