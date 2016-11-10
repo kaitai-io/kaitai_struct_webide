@@ -1,8 +1,9 @@
-var application, ioInput, parsed, parseError, KaitaiStream, exported, module, inputBuffer;
+﻿var application: any, ioInput: any, parsed: any, parseError: any, KaitaiStream: any, exported: any, module: any, inputBuffer: any;
+
 function toExport(obj, name) {
-    if (typeof obj !== "object" || obj instanceof Uint8Array)
-        return obj;
-    var result = {};
+    if (typeof obj !== "object" || obj instanceof Uint8Array) return obj;
+
+    var result = <any>{};
     result._debug = obj._debug || {};
     result._debug.class = obj.constructor.name;
     var props = Array.isArray(obj) ? [] : Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor");
@@ -15,16 +16,18 @@ function toExport(obj, name) {
     });
     return result;
 }
+
 application.setInterface({
     run: function (code, args, cb) {
         var result = { input: code, output: null, error: null };
+
         try {
             result.output = JSON.stringify(eval(code));
-        }
-        catch (e) {
+        } catch (e) {
             console.log(e);
             result.error = e.message;
         }
+
         cb(result);
     },
     reparse: function (cb) {
@@ -33,10 +36,10 @@ application.setInterface({
         try {
             parsed = new module.exports(ioInput);
             parsed._read();
-        }
-        catch (e) {
+        } catch (e) {
             parseError = JSON.stringify(e);
         }
+        
         exported = toExport(parsed, []);
         console.log('[jail] parsed', parsed, 'exported', exported);
         cb(exported, parseError);
@@ -49,13 +52,12 @@ application.setInterface({
                 parent = obj;
                 obj = obj[key];
             });
-        }
-        catch (e) {
+        } catch (e) {
             parseError = { message: e.message, stack: e.stack };
         }
+
         exported = toExport(obj, path);
         console.log('get original =', obj, ', exported =', exported);
         cb(exported, parent._debug['_m_' + path[path.length - 1]], parseError);
     }
 });
-//# sourceMappingURL=kaitaiJail.js.map

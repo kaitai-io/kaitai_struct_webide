@@ -1,4 +1,5 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
+/// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 
 declare var YAML: any, io: any, jailed: any, IntervalTree: any, localforage: LocalForage;
 

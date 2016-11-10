@@ -28,6 +28,11 @@ class Delayed {
     }
 }
 
+interface String {
+    repeat(count: number): string;
+    endsWith(searchString: string, position: number): boolean;
+}
+
 if (!String.prototype.repeat) {
     String.prototype.repeat = function (count) {
         'use strict';
@@ -70,6 +75,18 @@ if (!String.prototype.repeat) {
         // return Array(count + 1).join(this);
         return rpt;
     }
+}
+
+if (!String.prototype.endsWith) {
+    String.prototype.endsWith = function (searchString, position) {
+        var subjectString = this.toString();
+        if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
+            position = subjectString.length;
+        }
+        position -= searchString.length;
+        var lastIndex = subjectString.lastIndexOf(searchString, position);
+        return lastIndex !== -1 && lastIndex === position;
+    };
 }
 
 interface Array<T> { last(): T; }
