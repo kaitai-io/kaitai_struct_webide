@@ -1,4 +1,4 @@
-var jail;
+var jail, TextDecoder;
 var jailReady, inputReady;
 function jailrun(code, args, cb = null) {
     return jailReady.then(() => {
@@ -12,12 +12,18 @@ function jailrun(code, args, cb = null) {
         });
     });
 }
+function importScript(fn) {
+    return new Promise((resolve, reject) => jail._connection.importScript(baseUrl + fn, resolve, reject));
+}
 $(() => {
     jail = new jailed.Plugin(baseUrl + 'js/kaitaiJail.js');
     jailReady = new Promise((resolve, reject) => {
         jail.whenConnected(() => resolve());
         jail.whenFailed(() => reject());
-    }).then(() => new Promise((resolve, reject) => jail._connection.importScript(baseUrl + 'lib/kaitai_js_runtime/KaitaiStream.js', resolve, reject)));
+    });
+    if (typeof TextDecoder !== "function")
+        jailReady = jailReady.then(() => importScript('lib/text-encoding/encoding.js'));
+    jailReady = jailReady.then(() => importScript('lib/kaitai_js_runtime/KaitaiStream.js'));
     jailReady.then(() => { }, () => console.log('jail fail'));
 });
 //# sourceMappingURL=app.jail.js.map
