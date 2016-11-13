@@ -26,37 +26,8 @@
     <Content Include="css\HexViewer.css" />
     <Content Include="index.html" />
     <Content Include="js\autorefresh.js" />
-    <Content Include="lib\ace\ace.js" />
-    <Content Include="lib\ace\ext-searchbox.js" />
-    <Content Include="lib\ace\mode-javascript.js" />
-    <Content Include="lib\ace\mode-yaml.js" />
-    <Content Include="lib\ace\theme-monokai.js" />
-    <Content Include="lib\ace\worker-javascript.js" />
-    <Content Include="lib\bootstrap\contextmenu.css" />
-    <Content Include="lib\goldenlayout\goldenlayout-base.css" />
-    <Content Include="lib\goldenlayout\goldenlayout-dark-theme.css" />
-    <Content Include="lib\goldenlayout\goldenlayout.js" />
-    <Content Include="lib\interval-tree2\interval-tree.js" />
-    <Content Include="lib\jailed\jailed.js" />
-    <Content Include="lib\jailed\_frame.html" />
-    <Content Include="lib\jailed\_frame.js" />
-    <Content Include="lib\jailed\_JailedSite.js" />
-    <Content Include="lib\jailed\_pluginCore.js" />
-    <Content Include="lib\jailed\_pluginNode.js" />
-    <Content Include="lib\jailed\_pluginWebIframe.js" />
-    <Content Include="lib\jailed\_pluginWebWorker.js" />
-    <Content Include="lib\kaitai\kaitai-struct-compiler-fastopt.js" />
-    <Content Include="lib\kaitai\yaml.js" />
-    <Content Include="lib\kaitai_js_runtime\KaitaiStream.js" />
-    <Content Include="lib\LargeLocalStorage.js" />
-    <Content Include="lib\localforage.js" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="lib\ts-types\ace.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\goldenlayout.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\jquery.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\jstree.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\localForage.d.ts" />
     <TypeScriptCompile Include="src\app.errors.ts" />
     <TypeScriptCompile Include="src\app.files.ts" />
     <TypeScriptCompile Include="src\app.jail.ts" />
@@ -70,12 +41,7 @@
     <TypeScriptCompile Include="src\HexViewer.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lib\kaitai\kaitai-struct-compiler-fastopt.js.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="lib\kaitai_js_runtime\.git" />
-    <Content Include="lib\kaitai_js_runtime\LICENSE" />
-    <Content Include="lib\kaitai_js_runtime\README.md" />
+    <Folder Include="lib\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>

@@ -43,7 +43,7 @@ var ui = {
 function addComponent(name, generatorCallback) {
     var editor;
     myLayout.registerComponent(name, function (container, componentState) {
-        console.log('addComponent id', name, container.getElement());
+        //console.log('addComponent id', name, container.getElement());
         container.getElement().attr('id', name);
         if (generatorCallback) {
             container.on('resize', () => { if (editor && editor.resize)

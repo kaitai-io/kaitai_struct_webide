@@ -61,7 +61,7 @@ class LocalStorageFs implements IFileSystem {
     put(fn, data) {
         return this.getRootNode().then(root => {
             var node = fsHelper.selectNode(root, fn);
-            return Promise.all([localforage.setItem(this.fileKey(fn), data), this.save()]);
+            return Promise.all([localforage.setItem(this.fileKey(fn), data), this.save()]).then(x => node);
         });
     }
 }

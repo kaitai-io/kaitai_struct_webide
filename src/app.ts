@@ -29,6 +29,8 @@ function compile(srcYaml: string, kslang: string, debug: true|false|'both') {
     }
 }
 
+function isKsyFile(fn) { return fn.toLowerCase().endsWith('.ksy'); }
+
 $(() => {
     ui.infoPanel.getElement().show();
 
@@ -50,29 +52,34 @@ $(() => {
 
     initFileDrop('fileDrop', files => {
         Promise.all(files.map((file, i) => {
-            var isKsy = file.file.name.toLowerCase().endsWith('.ksy');
-            return (isKsy ? file.read('text') : file.read('arrayBuffer')).then(content => {
-                if (files.length == 1) {
-                    if (isKsy)
-                        setKsy(<any>content);
-                    else
-                        setInputBuffer(<any>content).then(reparse);
-                }
-
-                return localFs.put(file.file.name, content);
+            return (isKsyFile(file.file.name) ? file.read('text') : file.read('arrayBuffer')).then(content => {
+                return localFs.put(file.file.name, content).then(fsItem => {
+                    return files.length == 1 ? loadFsItem(fsItem) : Promise.resolve();
+                });
             });
         })).then(refreshFsNodes);
     });
 
-    function loadFsItem(fsItem: IFsItem) {
-        if (!fsItem || fsItem.type !== 'file') return;
+    function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true) {
+        if (!fsItem || fsItem.type !== 'file')
+            return Promise.resolve();
 
         return fss[fsItem.fsType].get(fsItem.fn).then(content => {
-            if (fsItem.fn.toLowerCase().endsWith('.ksy'))
-                return setKsy(<string>content);
+            if (isKsyFile(fsItem.fn)) {
+                localforage.setItem('ksyFsItem', fsItem);
+                ui.ksyEditor.setValue(content, -1);
+                return Promise.resolve();
+            }
             else {
                 localforage.setItem('inputFsItem', fsItem);
-                return setInputBuffer(<ArrayBuffer>content, true);
+
+                dataProvider = {
+                    length: content.byteLength,
+                    get(offset, length) { return new Uint8Array(content, offset, length) },
+                };
+
+                ui.hexViewer.setDataProvider(dataProvider);
+                return jailrun('inputBuffer = args; void(0)', content).then(() => refreshGui ? reparse() : Promise.resolve());
             }
         });
     }
@@ -87,10 +94,13 @@ $(() => {
 
         ui.genCodeViewer.setValue(compiled.release[0], -1);
         ui.genCodeDebugViewer.setValue(compiled.debug[0], -1);
-        reparse();
+        return reparse();
     }
 
     function reparse() {
+        var jsTree = <any>ui.parsedDataTreeCont.getElement();
+        jsTree.jstree("destroy");
+
         return Promise.all([jailReady, inputReady, formatReady]).then(() => {
             var debugCode = ui.genCodeDebugViewer.getValue();
             return jailrun(`module = { exports: true }; \n ${debugCode} \n`);
@@ -105,7 +115,6 @@ $(() => {
 
                 handleError(error);
 
-                var jsTree = <any>ui.parsedDataTreeCont.getElement();
                 parsedToTree(jsTree, res, handleError).on('select_node.jstree', function (e, node) {
                     //console.log('select_node', node);
                     var debug = node.node.data.debug;
@@ -116,34 +125,13 @@ $(() => {
         });
     }
 
-    //var load = { input: 'grad8rgb.bmp', format: 'image/bmp.ksy' };
-    var load = { input: 'sample1.zip', format: 'archive/zip.ksy' };
-
-    function setInputBuffer(fileBuffer: ArrayBuffer, fromCache: boolean = false) {
-        dataProvider = {
-            length: fileBuffer.byteLength,
-            get(offset, length) { return new Uint8Array(fileBuffer, offset, length) },
-        };
-
-        ui.hexViewer.setDataProvider(dataProvider);
-
-        return jailrun('inputBuffer = args; void(0)', fileBuffer);
+    function loadCachedFsItem(cacheKey: string, defSample: string) {
+        return localforage.getItem(cacheKey).then((fsItem: IFsItem) => loadFsItem(fsItem || <IFsItem>{ fsType: 'kaitai', fn: `${defSample}`, type: 'file' }, false));
     }
 
-    var inputReady = localforage.getItem('inputFsItem').then((fsItem: IFsItem) => {
-        return loadFsItem(fsItem || <IFsItem>{ fsType: 'kaitai', fn: `samples/${load.input}`, type: 'file' });
-    });
+    var inputReady = loadCachedFsItem('inputFsItem', 'samples/sample1.zip');
+    var formatReady = loadCachedFsItem('ksyFsItem', 'formats/archive/zip.ksy');
 
     var editDelay = new Delayed(500);
     ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
-
-    function setKsy(ksyContent: string, fromCache: boolean = false) {
-        if (!fromCache)
-            localStorage.setItem('ksy', ksyContent);
-
-        ui.ksyEditor.setValue(ksyContent, -1);
-    }
-
-    var cachedKsy = localStorage.getItem('ksy');
-    var formatReady = Promise.resolve(cachedKsy ? cachedKsy : $.ajax({ url: `formats/${load.format}` })).then(ksy => setKsy(ksy, true));
 })
