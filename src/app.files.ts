@@ -206,7 +206,7 @@ $(() => {
         var data = getSelectedData();
         createFolder.toggleClass('disabled', !(data && data.fsType === 'local' && data.type === 'folder'));
         deleteItem.toggleClass('disabled', !(data && data.fsType === 'local'));
-        generateParser.toggleClass('disabled', !(data && data.fn.endsWith('.ksy')));
+        generateParser.toggleClass('disabled', !(data && data.fn && data.fn.endsWith('.ksy')));
         fileTreeContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
         return false;
     });
