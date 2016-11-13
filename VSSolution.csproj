@@ -25,14 +25,7 @@
     <Content Include="css\app.css" />
     <Content Include="css\HexViewer.css" />
     <Content Include="index.html" />
-    <Content Include="js\app.js" />
     <Content Include="js\autorefresh.js" />
-    <Content Include="js\FileDrop.js" />
-    <Content Include="js\HexViewer.js" />
-    <Content Include="js\parsedToJson.js" />
-    <Content Include="js\parsedToJson.js.map" />
-    <Content Include="js\parsedToTree.js" />
-    <Content Include="js\utils.js" />
     <Content Include="lib\ace\ace.js" />
     <Content Include="lib\ace\ext-searchbox.js" />
     <Content Include="lib\ace\mode-javascript.js" />
@@ -77,27 +70,12 @@
     <TypeScriptCompile Include="src\HexViewer.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="js\app.js.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="js\HexViewer.js.map" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="lib\kaitai\kaitai-struct-compiler-fastopt.js.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="js\utils.js.map" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\kaitai_js_runtime\.git" />
     <Content Include="lib\kaitai_js_runtime\LICENSE" />
     <Content Include="lib\kaitai_js_runtime\README.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="js\FileDrop.js.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="js\parsedToTree.js.map" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>

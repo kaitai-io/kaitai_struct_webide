@@ -81,16 +81,6 @@ $(() => {
         loadFsItem(<IFsItem>ui.fileTree.get_node(event.target).data);
     });
 
-    //var lineInfo = null;
-    //ui.parsedDataViewer.getSession().selection.on('changeCursor', (e1, e2) => {
-    //    var lineIdx = e2.selectionLead.row;
-    //    var debug = lineInfo ? lineInfo.lines[lineIdx] : null;
-    //    if (debug && debug.start <= debug.end)
-    //        ui.hexViewer.setSelection(debug.start, debug.end);
-    //    else
-    //        ui.hexViewer.deselect();
-    //});
-
     function recompile() {
         var srcYaml = ui.ksyEditor.getValue();
         var compiled = compile(srcYaml, 'javascript', 'both');
@@ -122,12 +112,6 @@ $(() => {
                     if (debug)
                         ui.hexViewer.setSelection(debug.start, debug.end - 1);
                 });
-
-                //var parsedJsonRes = parsedToJson(res);
-                //lineInfo = parsedJsonRes.lineInfo;
-                //console.log(lineInfo);
-                //ui.parsedDataViewer.setValue(parsedJsonRes.json);
-                //ui.hexViewer.setIntervals(parsedJsonRes.intervals);
             });
         });
     }

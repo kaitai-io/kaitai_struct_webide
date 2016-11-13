@@ -91,3 +91,21 @@
     toJson(parsed);
     return { json, intervals, lineInfo };
 }
+
+// REMOVED CODE
+
+    //var lineInfo = null;
+    //ui.parsedDataViewer.getSession().selection.on('changeCursor', (e1, e2) => {
+    //    var lineIdx = e2.selectionLead.row;
+    //    var debug = lineInfo ? lineInfo.lines[lineIdx] : null;
+    //    if (debug && debug.start <= debug.end)
+    //        ui.hexViewer.setSelection(debug.start, debug.end);
+    //    else
+    //        ui.hexViewer.deselect();
+    //});
+
+                //var parsedJsonRes = parsedToJson(res);
+                //lineInfo = parsedJsonRes.lineInfo;
+                //console.log(lineInfo);
+                //ui.parsedDataViewer.setValue(parsedJsonRes.json);
+                //ui.hexViewer.setIntervals(parsedJsonRes.intervals);
