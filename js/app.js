@@ -25,6 +25,68 @@ function compile(srcYaml, kslang, debug) {
     }
 }
 function isKsyFile(fn) { return fn.toLowerCase().endsWith('.ksy'); }
+function recompile() {
+    return localforage.getItem('ksyFsItem').then(ksyFsItem => {
+        var srcYaml = ui.ksyEditor.getValue();
+        var changed = lastKsyContent !== srcYaml;
+        var copyPromise = changed && ksyFsItem.fsType === 'kaitai' ?
+            fss.local.put(ksyFsItem.fn.split('/').last().replace('.ksy', '_modified.ksy'), srcYaml).then(fsItem => {
+                ksyFsItem = fsItem;
+                return localforage.setItem('ksyFsItem', fsItem);
+            }).then(refreshFsNodes) : Promise.resolve();
+        return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
+            var compiled = compile(srcYaml, 'javascript', 'both');
+            ui.genCodeViewer.setValue(compiled.release[0], -1);
+            ui.genCodeDebugViewer.setValue(compiled.debug[0], -1);
+            return reparse();
+        });
+    });
+}
+var formatReady;
+function reparse() {
+    var jsTree = ui.parsedDataTreeCont.getElement();
+    jsTree.jstree("destroy");
+    return Promise.all([jailReady, inputReady, formatReady]).then(() => {
+        var debugCode = ui.genCodeDebugViewer.getValue();
+        return jailrun(`module = { exports: true }; \n ${debugCode} \n`);
+    }).then(() => {
+        console.log('recompiled');
+        jail.remote.reparse((res, error) => {
+            window['parseRes'] = res;
+            console.log('reparse res', res);
+            itree = new IntervalTree(dataProvider.length / 2);
+            handleError(error);
+            parsedToTree(jsTree, res, handleError).on('select_node.jstree', function (e, node) {
+                //console.log('select_node', node);
+                var debug = node.node.data.debug;
+                if (debug)
+                    ui.hexViewer.setSelection(debug.start, debug.end - 1);
+            });
+        });
+    });
+}
+var lastKsyContent;
+function loadFsItem(fsItem, refreshGui = true) {
+    if (!fsItem || fsItem.type !== 'file')
+        return Promise.resolve();
+    return fss[fsItem.fsType].get(fsItem.fn).then(content => {
+        if (isKsyFile(fsItem.fn)) {
+            localforage.setItem('ksyFsItem', fsItem);
+            lastKsyContent = content;
+            ui.ksyEditor.setValue(content, -1);
+            return Promise.resolve();
+        }
+        else {
+            localforage.setItem('inputFsItem', fsItem);
+            dataProvider = {
+                length: content.byteLength,
+                get(offset, length) { return new Uint8Array(content, offset, length); },
+            };
+            ui.hexViewer.setDataProvider(dataProvider);
+            return jailrun('inputBuffer = args; void(0)', content).then(() => refreshGui ? reparse() : Promise.resolve());
+        }
+    });
+}
 $(() => {
     ui.infoPanel.getElement().show();
     ui.hexViewer.onSelectionChanged = () => {
@@ -49,70 +111,9 @@ $(() => {
             });
         })).then(refreshFsNodes);
     });
-    var lastKsyContent;
-    function loadFsItem(fsItem, refreshGui = true) {
-        if (!fsItem || fsItem.type !== 'file')
-            return Promise.resolve();
-        return fss[fsItem.fsType].get(fsItem.fn).then(content => {
-            if (isKsyFile(fsItem.fn)) {
-                localforage.setItem('ksyFsItem', fsItem);
-                lastKsyContent = content;
-                ui.ksyEditor.setValue(content, -1);
-                return Promise.resolve();
-            }
-            else {
-                localforage.setItem('inputFsItem', fsItem);
-                dataProvider = {
-                    length: content.byteLength,
-                    get(offset, length) { return new Uint8Array(content, offset, length); },
-                };
-                ui.hexViewer.setDataProvider(dataProvider);
-                return jailrun('inputBuffer = args; void(0)', content).then(() => refreshGui ? reparse() : Promise.resolve());
-            }
-        });
-    }
     ui.fileTreeCont.getElement().bind("dblclick.jstree", function (event) {
         loadFsItem(ui.fileTree.get_node(event.target).data);
     });
-    function recompile() {
-        return localforage.getItem('ksyFsItem').then(ksyFsItem => {
-            var srcYaml = ui.ksyEditor.getValue();
-            var changed = lastKsyContent !== srcYaml;
-            var copyPromise = changed && ksyFsItem.fsType === 'kaitai' ?
-                fss.local.put(ksyFsItem.fn.split('/').last().replace('.ksy', '_modified.ksy'), srcYaml).then(fsItem => {
-                    ksyFsItem = fsItem;
-                    return localforage.setItem('ksyFsItem', fsItem);
-                }).then(refreshFsNodes) : Promise.resolve();
-            return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
-                var compiled = compile(srcYaml, 'javascript', 'both');
-                ui.genCodeViewer.setValue(compiled.release[0], -1);
-                ui.genCodeDebugViewer.setValue(compiled.debug[0], -1);
-                return reparse();
-            });
-        });
-    }
-    function reparse() {
-        var jsTree = ui.parsedDataTreeCont.getElement();
-        jsTree.jstree("destroy");
-        return Promise.all([jailReady, inputReady, formatReady]).then(() => {
-            var debugCode = ui.genCodeDebugViewer.getValue();
-            return jailrun(`module = { exports: true }; \n ${debugCode} \n`);
-        }).then(() => {
-            console.log('recompiled');
-            jail.remote.reparse((res, error) => {
-                window['parseRes'] = res;
-                console.log('reparse res', res);
-                itree = new IntervalTree(dataProvider.length / 2);
-                handleError(error);
-                parsedToTree(jsTree, res, handleError).on('select_node.jstree', function (e, node) {
-                    //console.log('select_node', node);
-                    var debug = node.node.data.debug;
-                    if (debug)
-                        ui.hexViewer.setSelection(debug.start, debug.end - 1);
-                });
-            });
-        });
-    }
     function loadCachedFsItem(cacheKey, defSample) {
         return localforage.getItem(cacheKey).then((fsItem) => loadFsItem(fsItem || { fsType: 'kaitai', fn: `${defSample}`, type: 'file' }, false));
     }

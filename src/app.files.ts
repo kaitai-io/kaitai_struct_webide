@@ -174,6 +174,7 @@ $(() => {
 
     var fileTreeContextMenu = $("#fileTreeContextMenu");
     var createFolder = $('#fileTreeContextMenu .createFolder');
+    var createKsyFile = $('#fileTreeContextMenu .createKsyFile');
     var deleteItem = $('#fileTreeContextMenu .deleteItem');
     var openItem = $('#fileTreeContextMenu .openItem');
     var generateParser = $('#fileTreeContextMenu .generateParser');
@@ -204,7 +205,9 @@ $(() => {
             ui.fileTree.activate_node(contextMenuTarget, null);
 
         var data = getSelectedData();
-        createFolder.toggleClass('disabled', !(data && data.fsType === 'local' && data.type === 'folder'));
+        var canCreateItem = !(data && data.fsType === 'local' && data.type === 'folder');
+        createFolder.toggleClass('disabled', canCreateItem);
+        createKsyFile.toggleClass('disabled', canCreateItem);
         deleteItem.toggleClass('disabled', !(data && data.fsType === 'local'));
         generateParser.toggleClass('disabled', !(data && data.fn && data.fn.endsWith('.ksy')));
         fileTreeContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
@@ -254,4 +257,22 @@ $(() => {
 
     ui.fileTreeCont.getElement().on('create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree', saveTree);
     ui.fileTreeCont.getElement().on('move_node.jstree', (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
+
+    createKsyFile.find('a').on('click', e => {
+        fileTreeContextMenu.hide();
+        (<any>$('#newKsyModal')).modal();
+    });
+
+    $('#newKsyModal').on('shown.bs.modal', () => $('#newKsyModal input').focus());
+    $('#newKsyModal form').submit(function (event) {
+        event.preventDefault();
+        (<any>$('#newKsyModal')).modal('hide');
+
+        var ksyName = $('#newKsyName').val();
+        var parentData = getSelectedData();
+        fss[parentData.fsType].put((parentData.fn ? `${parentData.fn}/` : '') + `${ksyName}.ksy`, `meta:\n  id: ${ksyName}\n  file-extension: ${ksyName}\n`).then(fsItem => {
+            ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), { text: `${ksyName}.ksy`, data: fsItem, icon: 'glyphicon glyphicon-list-alt' }, "last");
+            return loadFsItem(fsItem);
+        });
+    });
 })

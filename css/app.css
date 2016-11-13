@@ -25,4 +25,10 @@ body { color:#333 }
 .dropdown-menu { z-index:9999 }
 #fileTreeContextMenu .dropdown-menu { font-size:13px; border-color:#375a7f; border-radius:0px }
 #fileTreeContextMenu .glyphicon { margin-right:5px; }
+#fileTreeContextMenu .glyphicon-folder-open { margin-left:-1px; margin-right:6px }
 #fileTreeContextMenu .dropdown-menu>li>a { padding:3px 15px }
+.btn { padding: 5px 10px; }
+.modal { color: white; }
+.control-label { margin-bottom:8px }
+.form-control { padding: 6px 12px; height:34px }
+.modal-footer, .modal-body { padding: 15px }

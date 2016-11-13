@@ -28,6 +28,11 @@
     <Content Include="js\autorefresh.js" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="lib\ts-types\ace.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\goldenlayout.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\jquery.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\jstree.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\localForage.d.ts" />
     <TypeScriptCompile Include="src\app.errors.ts" />
     <TypeScriptCompile Include="src\app.files.ts" />
     <TypeScriptCompile Include="src\app.jail.ts" />
@@ -40,9 +45,7 @@
     <TypeScriptCompile Include="src\utils.ts" />
     <TypeScriptCompile Include="src\HexViewer.ts" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="lib\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>
