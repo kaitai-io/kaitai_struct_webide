@@ -12,7 +12,7 @@
 .hexViewer .header .hex .c8 { margin-left: 17px }
 
 .hexViewer .selected { background:#0076e0; color:white }
-.hexViewer .asciicell { padding: 3px 0 }
+.hexViewer .asciicell { padding: 2px 0 }
 
 .hexViewer .addrPart { color: #ccc; }
 .hexViewer .hexPart { margin-left: 8px; }
@@ -24,6 +24,7 @@
 .hexViewer .hexcell { width: 14px; height:15px }
 .hexViewer .l0, .hexViewer .l1, .hexViewer .l2 { margin-top: 1px; margin-bottom: 1px }
 .hexViewer .m0 { margin-top: 0px; margin-bottom: 0px; border-width:1px 0; border-style:solid; border-color:white }
+.hexViewer .hexPart>span { margin-top: 0px; margin-bottom: 0px; }
 .hexViewer .start { margin-left:1px }
 .hexViewer .end { margin-right:1px }
 

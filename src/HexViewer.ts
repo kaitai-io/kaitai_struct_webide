@@ -63,7 +63,7 @@ interface IDataProvider {
 }
 
 class HexViewer {
-    private rowHeight = 21;
+    private rowHeight = 19;
     private bytesPerLine = 16;
 
     private intervals: any[];
@@ -245,6 +245,8 @@ class HexViewer {
 
     public setDataProvider(dataProvider: IDataProvider) {
         this.dataProvider = dataProvider;
+        this.topRow = 0;
+        this.deselect();
         this.resize();
     }
 
