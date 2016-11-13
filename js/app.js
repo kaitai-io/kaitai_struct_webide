@@ -49,12 +49,14 @@ $(() => {
             });
         })).then(refreshFsNodes);
     });
+    var lastKsyContent;
     function loadFsItem(fsItem, refreshGui = true) {
         if (!fsItem || fsItem.type !== 'file')
             return Promise.resolve();
         return fss[fsItem.fsType].get(fsItem.fn).then(content => {
             if (isKsyFile(fsItem.fn)) {
                 localforage.setItem('ksyFsItem', fsItem);
+                lastKsyContent = content;
                 ui.ksyEditor.setValue(content, -1);
                 return Promise.resolve();
             }
@@ -73,11 +75,21 @@ $(() => {
         loadFsItem(ui.fileTree.get_node(event.target).data);
     });
     function recompile() {
-        var srcYaml = ui.ksyEditor.getValue();
-        var compiled = compile(srcYaml, 'javascript', 'both');
-        ui.genCodeViewer.setValue(compiled.release[0], -1);
-        ui.genCodeDebugViewer.setValue(compiled.debug[0], -1);
-        return reparse();
+        return localforage.getItem('ksyFsItem').then(ksyFsItem => {
+            var srcYaml = ui.ksyEditor.getValue();
+            var changed = lastKsyContent !== srcYaml;
+            var copyPromise = changed && ksyFsItem.fsType === 'kaitai' ?
+                fss.local.put(ksyFsItem.fn.split('/').last().replace('.ksy', '_modified.ksy'), srcYaml).then(fsItem => {
+                    ksyFsItem = fsItem;
+                    return localforage.setItem('ksyFsItem', fsItem);
+                }).then(refreshFsNodes) : Promise.resolve();
+            return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
+                var compiled = compile(srcYaml, 'javascript', 'both');
+                ui.genCodeViewer.setValue(compiled.release[0], -1);
+                ui.genCodeDebugViewer.setValue(compiled.debug[0], -1);
+                return reparse();
+            });
+        });
     }
     function reparse() {
         var jsTree = ui.parsedDataTreeCont.getElement();
