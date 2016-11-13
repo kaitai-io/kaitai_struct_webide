@@ -23,6 +23,7 @@ $(() => {
     });
     if (typeof TextDecoder !== "function")
         jailReady = jailReady.then(() => importScript('lib/text-encoding/encoding.js'));
+    jailReady = jailReady.then(() => importScript('js/entities.js'));
     jailReady = jailReady.then(() => importScript('lib/kaitai_js_runtime/KaitaiStream.js'));
     jailReady.then(() => { }, () => console.log('jail fail'));
 });

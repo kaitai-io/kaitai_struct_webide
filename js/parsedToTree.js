@@ -1,76 +1,66 @@
-function parsedToTree(jsTree, res, handleError) {
-    function getNodeItem(prop, value, debugExtra, expandObject) {
-        var isByteArray = value instanceof Uint8Array;
-        var isObject = typeof value === "object" && !isByteArray;
-        var debug = value._debug || {};
-        for (var key in debugExtra)
-            debug[key] = debugExtra[key];
-        if (debug.arr)
-            value._debug = debug.arr;
-        if (debug && debug.start && debug.end && debug.start < debug.end) {
-            var node = itree.add(debug.start, debug.end - 1);
-            node.debug = debug;
-        }
-        var text;
-        if (isObject) {
-            if (expandObject) {
-                console.log(value);
-                return objectToNodes(value);
-            }
-            else
-                text = `${prop} [${debug.class}]`;
-        }
-        else if (isByteArray) {
-            text = (prop ? prop + ' = ' : '') + '[';
-            for (var i = 0; i < value.length; i++) {
-                text += (i == 0 ? '' : ', ') + value[i];
+;
+;
+function parsedToTree(jsTree, exportedRoot, handleError) {
+    function primitiveToText(exported) {
+        if (exported.type === ObjectType.Primitive)
+            return exported.primitiveValue;
+        else if (exported.type === ObjectType.TypedArray) {
+            var text = '[';
+            for (var i = 0; i < exported.bytes.byteLength; i++) {
+                text += (i == 0 ? '' : ', ') + exported.bytes[i];
                 if (i == 7) {
                     text += ", ...";
                     break;
                 }
             }
             text += ']';
+            return text;
         }
         else
-            text = `${prop} = ${value}`;
-        var result = { text: text, children: isObject, data: { obj: value, debug: debug }, icon: false };
-        return expandObject ? [result] : result;
+            throw new Error("primitiveToText: object is not primitive!");
     }
-    function objectToNodes(obj) {
-        //console.log('getNode', obj);
-        var childNodes = Object.keys(obj).filter(x => x[0] != '_').map(prop => getNodeItem(prop, obj[prop], obj._debug ? obj._debug[prop] : null, false));
-        if (obj._props) {
-            childNodes = childNodes.concat(Object.keys(obj._props).map(key => {
-                return { text: key, children: true, data: { getPath: obj._props[key] }, icon: false };
-            }));
+    function childItemToNode(item, showProp) {
+        var propName = item.path.last();
+        var isObject = item.type === ObjectType.Object;
+        var isArray = item.type === ObjectType.Array;
+        var text = (isArray ? `${propName}` : isObject ? `${propName} [${item.object.class}]` : (showProp ? `${propName} = ` : '') + primitiveToText(item));
+        return { text: text, children: isObject || isArray, data: { exported: item } };
+    }
+    function exportedToNodes(exported, showProp) {
+        if (exported.type === ObjectType.Undefined)
+            return [];
+        if (exported.type === ObjectType.Primitive || exported.type === ObjectType.TypedArray)
+            return [childItemToNode(exported, showProp)];
+        else if (exported.type === ObjectType.Array)
+            return exported.arrayItems.map((item, i) => childItemToNode(item, true));
+        else {
+            var obj = exported.object;
+            return Object.keys(obj.fields).map(fieldName => childItemToNode(obj.fields[fieldName], true)).concat(Object.keys(obj.propPaths).map(propName => ({ text: propName, children: true, data: { propPath: obj.propPaths[propName] } })));
         }
-        return childNodes;
+    }
+    function getProp(path) {
+        return new Promise((resolve, reject) => {
+            jail.remote.get(path, (expProp, error) => {
+                if (expProp && !error)
+                    resolve(expProp);
+                else
+                    reject(error);
+            });
+        });
     }
     function getNode(node, cb) {
-        var obj = node.id === '#' ? res : node.data.obj;
-        if (!obj) {
-            if (node.data.getPath)
-                jail.remote.get(node.data.getPath, (res, debug, error) => {
-                    console.log('getNode', res, 'debug', debug);
-                    handleError(error);
-                    if (res && !error) {
-                        var nodeItems = getNodeItem(null, res, debug, true);
-                        node.data.debug = debug;
-                        cb(nodeItems);
-                    }
-                    else
-                        cb([]);
-                });
-            else
-                cb([]);
-        }
-        else {
-            var nodeItems = objectToNodes(obj);
-            cb(nodeItems);
-        }
+        var expNode = node.id === '#' ? exportedRoot : node.data.exported;
+        var valuePromise = expNode ? Promise.resolve(expNode) : getProp(node.data.propPath).then(exp => node.data.exported = exp);
+        valuePromise.then(exp => {
+            cb(exportedToNodes(exp, !!expNode));
+            handleError(null);
+        }).catch(err => {
+            cb([]);
+            handleError(err);
+        });
     }
     jsTree.jstree("destroy");
-    return jsTree.jstree({ core: { data: (node, cb) => getNode(node, cb) } })
+    return jsTree.jstree({ core: { data: (node, cb) => getNode(node, cb), themes: { icons: false } } })
         .on('keyup.jstree', function (e) { jsTree.jstree(true).activate_node(e.target.id); });
 }
 //# sourceMappingURL=parsedToTree.js.map

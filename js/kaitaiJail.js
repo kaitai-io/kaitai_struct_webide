@@ -1,18 +1,29 @@
 var application, ioInput, parsed, parseError, KaitaiStream, exported, module, inputBuffer;
-function toExport(obj, name) {
-    if (typeof obj !== "object" || obj instanceof Uint8Array)
-        return obj;
-    var result = {};
-    result._debug = obj._debug || {};
-    result._debug.class = obj.constructor.name;
-    var props = Array.isArray(obj) ? [] : Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor");
-    //console.log('keys', Object.keys(obj), 'props', props);
-    Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result[key] = toExport(obj[key], name.concat(key)));
-    props.forEach(key => {
-        if (!('_props' in result))
-            result._props = {};
-        result._props[key] = name.concat(key);
-    });
+class IDebugInfo {
+}
+function isUndef(obj) { return typeof obj === "undefined"; }
+function exportValue(obj, debug, path) {
+    if (!debug)
+        debugger;
+    var result = { start: debug.start, end: debug.end, path: path };
+    if (obj instanceof Uint8Array) {
+        result.type = ObjectType.TypedArray;
+        result.bytes = obj;
+    }
+    else if (typeof obj !== "object") {
+        result.type = isUndef(obj) ? ObjectType.Undefined : ObjectType.Primitive;
+        result.primitiveValue = obj;
+    }
+    else if (Array.isArray(obj)) {
+        result.type = ObjectType.Array;
+        result.arrayItems = obj.map((item, i) => exportValue(item, debug.arr[i], path.concat(i.toString())));
+    }
+    else {
+        result.type = ObjectType.Object;
+        result.object = { class: obj.constructor.name, propPaths: {}, fields: {} };
+        Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor").forEach(propName => result.object.propPaths[propName] = path.concat(propName));
+        Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key)));
+    }
     return result;
 }
 application.setInterface({
@@ -37,8 +48,8 @@ application.setInterface({
         catch (e) {
             parseError = JSON.stringify(e);
         }
-        exported = toExport(parsed, []);
-        console.log('[jail] parsed', parsed, 'exported', exported);
+        exported = exportValue(parsed, { start: 0, end: inputBuffer.byteLength }, []);
+        //console.log('[jail] parsed', parsed, 'exported', exported);
         cb(exported, parseError);
     },
     get: function (path, cb) {
@@ -53,9 +64,9 @@ application.setInterface({
         catch (e) {
             parseError = { message: e.message, stack: e.stack };
         }
-        exported = toExport(obj, path);
-        console.log('get original =', obj, ', exported =', exported);
-        cb(exported, parent._debug['_m_' + path[path.length - 1]], parseError);
+        exported = exportValue(obj, parent._debug['_m_' + path[path.length - 1]], path);
+        //console.log('get original =', obj, ', exported =', exported);
+        cb(exported, parseError);
     }
 });
 //# sourceMappingURL=kaitaiJail.js.map

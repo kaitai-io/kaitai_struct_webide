@@ -51,16 +51,16 @@ function reparse() {
         return jailrun(`module = { exports: true }; \n ${debugCode} \n`);
     }).then(() => {
         console.log('recompiled');
-        jail.remote.reparse((res, error) => {
-            window['parseRes'] = res;
-            console.log('reparse res', res);
+        jail.remote.reparse((exportedRoot, error) => {
+            //console.log('reparse exportedRoot', exportedRoot);
             itree = new IntervalTree(dataProvider.length / 2);
             handleError(error);
-            parsedToTree(jsTree, res, handleError).on('select_node.jstree', function (e, node) {
-                //console.log('select_node', node);
-                var debug = node.node.data.debug;
-                if (debug)
-                    ui.hexViewer.setSelection(debug.start, debug.end - 1);
+            parsedToTree(jsTree, exportedRoot, handleError).on('select_node.jstree', function (e, selectNodeArgs) {
+                var node = selectNodeArgs.node;
+                //console.log('node', node);
+                var exp = node.data.exported;
+                if (exp)
+                    ui.hexViewer.setSelection(exp.start, exp.end - 1);
             });
         });
     });
