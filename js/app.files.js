@@ -176,24 +176,24 @@ $(() => {
         if ($(e.target).parents('.dropdown-menu').length === 0)
             fileTreeContextMenu.hide();
     });
-    createFolder.find('a').on('click', e => {
-        fileTreeContextMenu.hide();
+    function ctxAction(obj, callback) {
+        obj.find('a').on('click', e => {
+            if (!obj.hasClass('disabled')) {
+                fileTreeContextMenu.hide();
+                callback(e);
+            }
+        });
+    }
+    ctxAction(createFolder, e => {
         var parentData = getSelectedData();
         ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), { data: { fsType: parentData.fsType, type: 'folder' }, icon: 'glyphicon glyphicon-folder-open' }, "last", function (new_node) {
             setTimeout(function () { ui.fileTree.edit(new_node); }, 0);
         });
     });
-    deleteItem.find('a').on('click', e => {
-        fileTreeContextMenu.hide();
-        ui.fileTree.delete_node(ui.fileTree.get_selected());
-    });
-    openItem.find('a').on('click', e => {
-        fileTreeContextMenu.hide();
-        $(contextMenuTarget).trigger('dblclick');
-    });
+    ctxAction(deleteItem, e => ui.fileTree.delete_node(ui.fileTree.get_selected()));
+    ctxAction(openItem, e => $(contextMenuTarget).trigger('dblclick'));
     var dynCodeId = 1;
-    generateParser.find('a').on('click', e => {
-        fileTreeContextMenu.hide();
+    ctxAction(generateParser, e => {
         var fsItem = getSelectedData();
         var linkData = $(e.target).data();
         console.log(fsItem, linkData);
@@ -209,10 +209,7 @@ $(() => {
     });
     ui.fileTreeCont.getElement().on('create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree', saveTree);
     ui.fileTreeCont.getElement().on('move_node.jstree', (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
-    createKsyFile.find('a').on('click', e => {
-        fileTreeContextMenu.hide();
-        $('#newKsyModal').modal();
-    });
+    ctxAction(createKsyFile, e => $('#newKsyModal').modal());
     $('#newKsyModal').on('shown.bs.modal', () => $('#newKsyModal input').focus());
     $('#newKsyModal form').submit(function (event) {
         event.preventDefault();
