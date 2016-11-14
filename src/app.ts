@@ -74,7 +74,7 @@ function reparse() {
             handleError(error);
 
             parsedToTree(jsTree, exportedRoot, handleError).on('select_node.jstree', function (e, selectNodeArgs) {
-                var node = <JSTreeNode>selectNodeArgs.node;
+                var node = <ParsedTreeNode>selectNodeArgs.node;
                 //console.log('node', node);
                 var exp = node.data.exported;
                 if (exp && !autoExpandNodes && exp.start < exp.end) {

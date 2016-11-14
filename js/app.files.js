@@ -143,15 +143,17 @@ $(() => {
         },
         plugins: ["wholerow", "dnd"]
     }).bind('loaded.jstree', refreshFsNodes).jstree(true);
-    var fileTreeContextMenu = $("#fileTreeContextMenu");
-    var createFolder = $('#fileTreeContextMenu .createFolder');
-    var createKsyFile = $('#fileTreeContextMenu .createKsyFile');
-    var deleteItem = $('#fileTreeContextMenu .deleteItem');
-    var openItem = $('#fileTreeContextMenu .openItem');
-    var generateParser = $('#fileTreeContextMenu .generateParser');
-    var createLocalKsyFile = $('#createLocalKsyFile');
-    var uploadFile = $('#uploadFile');
-    var downloadFile = $('#downloadFile');
+    var uiFiles = {
+        fileTreeContextMenu: $("#fileTreeContextMenu"),
+        createFolder: $('#fileTreeContextMenu .createFolder'),
+        createKsyFile: $('#fileTreeContextMenu .createKsyFile'),
+        deleteItem: $('#fileTreeContextMenu .deleteItem'),
+        openItem: $('#fileTreeContextMenu .openItem'),
+        generateParser: $('#fileTreeContextMenu .generateParser'),
+        createLocalKsyFile: $('#createLocalKsyFile'),
+        uploadFile: $('#uploadFile'),
+        downloadFile: $('#downloadFile'),
+    };
     function convertTreeNode(treeNode) {
         var data = treeNode.data;
         data.children = {};
@@ -163,7 +165,8 @@ $(() => {
     }
     var contextMenuTarget = null;
     function getSelectedData() {
-        return ui.fileTree.get_node(contextMenuTarget).data;
+        var selected = ui.fileTree.get_selected();
+        return selected.length === 1 ? ui.fileTree.get_node(selected[0]).data : null;
     }
     fileTreeCont.on('contextmenu', '.jstree-node', e => {
         contextMenuTarget = e.target;
@@ -173,36 +176,36 @@ $(() => {
             ui.fileTree.activate_node(contextMenuTarget, null);
         var data = getSelectedData();
         var canCreateItem = !(data && data.fsType === 'local' && data.type === 'folder');
-        createFolder.toggleClass('disabled', canCreateItem);
-        createKsyFile.toggleClass('disabled', canCreateItem);
-        deleteItem.toggleClass('disabled', !(data && data.fsType === 'local'));
-        generateParser.toggleClass('disabled', !(data && data.fn && data.fn.endsWith('.ksy')));
-        fileTreeContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
+        uiFiles.createFolder.toggleClass('disabled', canCreateItem);
+        uiFiles.createKsyFile.toggleClass('disabled', canCreateItem);
+        uiFiles.deleteItem.toggleClass('disabled', !(data && data.fsType === 'local'));
+        uiFiles.generateParser.toggleClass('disabled', !(data && data.fn && data.fn.endsWith('.ksy')));
+        uiFiles.fileTreeContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
         return false;
     });
     $(document).on('mouseup', e => {
         if ($(e.target).parents('.dropdown-menu').length === 0)
-            fileTreeContextMenu.hide();
+            uiFiles.fileTreeContextMenu.hide();
     });
     function ctxAction(obj, callback) {
         obj.find('a').on('click', e => {
             if (!obj.hasClass('disabled')) {
-                fileTreeContextMenu.hide();
+                uiFiles.fileTreeContextMenu.hide();
                 callback(e);
             }
         });
     }
-    ctxAction(createFolder, e => {
+    ctxAction(uiFiles.createFolder, e => {
         var parentData = getSelectedData();
         ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), { data: { fsType: parentData.fsType, type: 'folder' }, icon: 'glyphicon glyphicon-folder-open' }, "last", node => {
             ui.fileTree.activate_node(node, null);
             setTimeout(function () { ui.fileTree.edit(node); }, 0);
         });
     });
-    ctxAction(deleteItem, e => ui.fileTree.delete_node(ui.fileTree.get_selected()));
-    ctxAction(openItem, e => $(contextMenuTarget).trigger('dblclick'));
+    ctxAction(uiFiles.deleteItem, e => ui.fileTree.delete_node(ui.fileTree.get_selected()));
+    ctxAction(uiFiles.openItem, e => $(contextMenuTarget).trigger('dblclick'));
     var dynCodeId = 1;
-    ctxAction(generateParser, e => {
+    ctxAction(uiFiles.generateParser, e => {
         var fsItem = getSelectedData();
         var linkData = $(e.target).data();
         console.log(fsItem, linkData);
@@ -218,14 +221,24 @@ $(() => {
     });
     fileTreeCont.on('create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree', saveTree);
     fileTreeCont.on('move_node.jstree', (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
+    fileTreeCont.on('select_node.jstree', (e, selectNodeArgs) => {
+        var fsItem = selectNodeArgs.node.data;
+        $('#downloadFile').toggleClass('disabled', !(fsItem && fsItem.type === 'file'));
+    });
     var ksyParent;
     function showKsyModal(parent) {
         ksyParent = parent;
         $('#newKsyName').val('');
         $('#newKsyModal').modal();
     }
-    ctxAction(createKsyFile, () => showKsyModal(contextMenuTarget));
-    createLocalKsyFile.on('click', () => showKsyModal('localStorage'));
+    ctxAction(uiFiles.createKsyFile, () => showKsyModal(contextMenuTarget));
+    uiFiles.createLocalKsyFile.on('click', () => showKsyModal('localStorage'));
+    uiFiles.downloadFile.on('click', () => {
+        ui.fileTree.get_selected().forEach(nodeId => {
+            var fsItem = ui.fileTree.get_node(nodeId).data;
+            fss[fsItem.fsType].get(fsItem.fn).then(content => saveFile(content, fsItem.fn.split('/').last()));
+        });
+    });
     $('#newKsyModal').on('shown.bs.modal', () => { $('#newKsyModal input').focus(); });
     $('#newKsyModal form').submit(function (event) {
         event.preventDefault();

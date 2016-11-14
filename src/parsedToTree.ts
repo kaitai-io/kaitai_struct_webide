@@ -1,5 +1,6 @@
-﻿interface JSTreeNodeData { exported?: IExportedValue, propPath?: string[] };
-interface JSTreeNode { id?: string, text?: string, icon?: string, children?: JSTreeNode[] | boolean, data?: JSTreeNodeData };
+﻿interface ParsedTreeNodeData { exported?: IExportedValue, propPath?: string[] };
+interface JSTreeNode<TData> { id?: string, text?: string, icon?: string, children?: JSTreeNode<TData>[] | boolean, data?: TData };
+interface ParsedTreeNode extends JSTreeNode<ParsedTreeNodeData> { }
 
 var autoExpandNodes = null;
 
@@ -28,10 +29,10 @@ function parsedToTree(jsTree, exportedRoot: IExportedValue, handleError) {
         var isObject = item.type === ObjectType.Object;
         var isArray = item.type === ObjectType.Array;
         var text = (isArray ? `${propName}` : isObject ? `${propName} [${item.object.class}]` : (showProp ? `${propName} = ` : '') + primitiveToText(item));
-        return <JSTreeNode>{ text: text, children: isObject || isArray, data: { exported: item } };
+        return <ParsedTreeNode>{ text: text, children: isObject || isArray, data: { exported: item } };
     }
 
-    function exportedToNodes(exported: IExportedValue, showProp: boolean): JSTreeNode[] {
+    function exportedToNodes(exported: IExportedValue, showProp: boolean): ParsedTreeNode[] {
         if (exported.type === ObjectType.Undefined)
             return [];
         if (exported.type === ObjectType.Primitive || exported.type === ObjectType.TypedArray)
@@ -41,7 +42,7 @@ function parsedToTree(jsTree, exportedRoot: IExportedValue, handleError) {
         else {
             var obj = exported.object;
             return Object.keys(obj.fields).map(fieldName => childItemToNode(obj.fields[fieldName], true)).concat(
-                Object.keys(obj.propPaths).map(propName => <JSTreeNode>{ text: propName, children: true, data: { propPath: obj.propPaths[propName] } }));
+                Object.keys(obj.propPaths).map(propName => <ParsedTreeNode>{ text: propName, children: true, data: { propPath: obj.propPaths[propName] } }));
         }
     }
 
@@ -82,7 +83,7 @@ function parsedToTree(jsTree, exportedRoot: IExportedValue, handleError) {
         }
     }
 
-    function getNode(node: JSTreeNode, cb: (items: JSTreeNode[]) => void) {
+    function getNode(node: ParsedTreeNode, cb: (items: ParsedTreeNode[]) => void) {
         var isRoot = node.id === '#';
         var expNode = isRoot ? exportedRoot : node.data.exported;
 

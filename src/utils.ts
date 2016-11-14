@@ -12,6 +12,18 @@
     });
 }
 
+function saveFile(data: ArrayBuffer | Uint8Array, filename: string) {
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    (<any>a).style = "display:none";
+    var blob = new Blob([data], { type: "octet/stream" });
+    var url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
 class Delayed {
     private timeout: number;
 
