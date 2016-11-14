@@ -52,7 +52,7 @@ function recompile() {
     });
 }
 
-var formatReady;
+var formatReady, selectedInTree;
 function reparse() {
     var jsTree = <any>ui.parsedDataTreeCont.getElement();
     jsTree.jstree("destroy");
@@ -75,7 +75,9 @@ function reparse() {
                 //console.log('node', node);
                 var exp = node.data.exported;
                 if (exp && !autoExpandNodes) {
-                    ui.hexViewer.setSelection(exp.start, exp.end - 1, false);
+                    selectedInTree = true;
+                    ui.hexViewer.setSelection(exp.start, exp.end - 1);
+                    selectedInTree = false;
                 }
             });
         });
@@ -131,7 +133,7 @@ $(() => {
     ui.hexViewer.onSelectionChanged = () => {
         var hasSelection = ui.hexViewer.selectionStart !== -1;
         ui.infoPanel.getElement().text(hasSelection ? `selection: 0x${ui.hexViewer.selectionStart.toString(16)} - 0x${ui.hexViewer.selectionEnd.toString(16)}` : 'no selection')
-        if (itree && hasSelection) {
+        if (itree && hasSelection && !selectedInTree) {
             var intervals = itree.search(ui.hexViewer.mouseDownOffset);
             if (intervals.length > 0) {
                 console.log('selected node', intervals[0].id);
