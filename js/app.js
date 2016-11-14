@@ -58,6 +58,8 @@ function reparse() {
             //console.log('reparse exportedRoot', exportedRoot);
             itree = new IntervalTree(dataProvider.length / 2);
             handleError(error);
+            if (error)
+                return;
             parsedToTree(jsTree, exportedRoot, handleError).on('select_node.jstree', function (e, selectNodeArgs) {
                 var node = selectNodeArgs.node;
                 //console.log('node', node);
