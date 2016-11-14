@@ -148,10 +148,14 @@ function addKsyFile(parent, name, fsItem) {
     ui.fileTree.create_node(ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: 'glyphicon glyphicon-list-alt' }, "last", node => ui.fileTree.activate_node(node, null));
 }
 
+var fileTreeCont;
+
 $(() => {
     //console.log('kaitaiRoot', kaitaiRoot);
 
-    ui.fileTree = ui.fileTreeCont.getElement().jstree({
+    fileTreeCont = ui.fileTreeCont.find('.fileTree');
+
+    ui.fileTree = fileTreeCont.jstree({
         core: {
             check_callback: function (operation, node, node_parent, node_position, more) {
                 var result = true;
@@ -183,6 +187,10 @@ $(() => {
     var openItem = $('#fileTreeContextMenu .openItem');
     var generateParser = $('#fileTreeContextMenu .generateParser');
 
+    var createLocalKsyFile = $('#createLocalKsyFile');
+    var uploadFile = $('#uploadFile');
+    var downloadFile = $('#downloadFile');
+
     function convertTreeNode(treeNode) {
         var data = treeNode.data;
         data.children = {};
@@ -200,7 +208,7 @@ $(() => {
         return <IFsItem>ui.fileTree.get_node(contextMenuTarget).data;
     }
 
-    ui.fileTreeCont.getElement().on('contextmenu', '.jstree-node', e => {
+    fileTreeCont.on('contextmenu', '.jstree-node', e => {
         contextMenuTarget = e.target;
 
         var clickNodeId = ui.fileTree.get_node(contextMenuTarget).id;
@@ -260,20 +268,29 @@ $(() => {
         });
     });
 
-    ui.fileTreeCont.getElement().on('create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree', saveTree);
-    ui.fileTreeCont.getElement().on('move_node.jstree', (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
+    fileTreeCont.on('create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree', saveTree);
+    fileTreeCont.on('move_node.jstree', (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
 
-    ctxAction(createKsyFile, e => (<any>$('#newKsyModal')).modal());
+    var ksyParent;
+    function showKsyModal(parent) {
+        ksyParent = parent;
+        $('#newKsyName').val('');
+        (<any>$('#newKsyModal')).modal();
+    }
 
-    $('#newKsyModal').on('shown.bs.modal', () => $('#newKsyModal input').focus());
+    ctxAction(createKsyFile, () => showKsyModal(contextMenuTarget));
+    createLocalKsyFile.on('click', () => showKsyModal('localStorage'));
+
+    $('#newKsyModal').on('shown.bs.modal', () => { $('#newKsyModal input').focus(); });
     $('#newKsyModal form').submit(function (event) {
         event.preventDefault();
         (<any>$('#newKsyModal')).modal('hide');
 
         var ksyName = $('#newKsyName').val();
-        var parentData = getSelectedData();
+        var parentData = ui.fileTree.get_node(ksyParent).data;
+
         fss[parentData.fsType].put((parentData.fn ? `${parentData.fn}/` : '') + `${ksyName}.ksy`, `meta:\n  id: ${ksyName}\n  file-extension: ${ksyName}\n`).then(fsItem => {
-            addKsyFile(contextMenuTarget, `${ksyName}.ksy`, fsItem);
+            addKsyFile(ksyParent, `${ksyName}.ksy`, fsItem);
             return loadFsItem(fsItem);
         });
     });

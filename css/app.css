@@ -13,13 +13,15 @@
 #fileDrop>div { border:2px dashed white; border-radius:25px; width:500px; margin-left:-250px; height:180px; margin-top:-100px; position:fixed; top:50%; left:50%; color:white; text-align:center; font-size:22px; padding-top:65px }
 #fileTree { font-family:Arial; font-size:12px }
 body { line-height:normal }
-#fileTree { overflow: auto }
+#fileTree { position:absolute; top:0; bottom:28px; width:100%; height:100%; overflow: auto; }
 #fileTree .jstree-node { margin-left: 14px }
 #fileTree .jstree-container-ul>.jstree-node { margin-left:0 }
 #fileTree .jstree-clicked { background:initial }
 #fileTree .glyphicon { font-size:12px; margin-top:-1px; color:#eee; margin-right:3px }
 #fileTree .jstree-icon { margin-left:3px; margin-right:5px }
 #fileTree .jstree-ocl { display:none }
+#fileTreeCont .footer { position:absolute; bottom:0; width:100%; padding-left:2px }
+#fileTreeCont .footer .btn { width:33.3%; border-radius:0px; font-size:13px; padding:3px 10px }
 body { color:#333 }
 #fileTreeContextMenu { position: absolute; display:none; z-index:9999 }
 .dropdown-menu { z-index:9999 }

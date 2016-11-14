@@ -2,7 +2,7 @@ var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },
     content: [
         { type: 'row', content: [
-                { type: 'component', componentName: 'fileTree', title: 'files', isClosable: false, width: 12 },
+                { type: 'component', componentName: 'fileTreeCont', title: 'files', isClosable: false, width: 12 },
                 { type: 'column', id: 'mainArea', isClosable: false, content: [
                         { type: 'row', content: [
                                 { type: 'column', content: [
@@ -74,6 +74,6 @@ addComponent('hexViewer', () => new HexViewer("hexViewer"));
 addComponent('errorWindow', cont => { cont.getElement().append($("<div />")); });
 addComponent('infoPanel', cont => { cont.getElement().append($("#infoPanel")); });
 addComponent('parsedDataTree');
-addComponent('fileTree');
+addComponent('fileTreeCont', cont => cont.getElement().append($("#fileTreeCont").children()));
 myLayout.init();
 //# sourceMappingURL=app.layout.js.map

@@ -43,6 +43,17 @@
     hello
 </div>
 
+<div id="fileTreeCont">
+    <div id="fileTree" class="fileTree">
+
+    </div>
+    <div class="footer btn-group" role="group">
+        <button id="createLocalKsyFile" type="button" class="btn btn-default"><i class="glyphicon glyphicon-file"></i></button>
+        <button id="uploadFile" type="button" class="btn btn-default"><i class="glyphicon glyphicon-cloud-upload"></i></button>
+        <button id="downloadFile" type="button" class="btn btn-default"><i class="glyphicon glyphicon-cloud-download"></i></button>
+    </div>
+</div>
+
 <div id="fileTreeContextMenu" class="dropdown clearfix">
     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display:block;position:static;margin-bottom:5px;">
         <li class="openItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-pencil"></i> Open</a></li>
@@ -87,8 +98,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
                 </div>
             </form>
         </div>

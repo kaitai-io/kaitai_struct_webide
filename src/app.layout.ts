@@ -2,7 +2,7 @@
     settings: { showCloseIcon: false, showPopoutIcon: false },
     content: [
         { type: 'row', content: [
-            { type: 'component', componentName: 'fileTree', title: 'files', isClosable: false, width:12 },
+            { type: 'component', componentName: 'fileTreeCont', title: 'files', isClosable: false, width:12 },
             { type: 'column', id: 'mainArea', isClosable: false, content: [
                 { type: 'row', content: [
                     { type: 'column', content: [
@@ -39,7 +39,7 @@ var ui = {
     hexViewer: <HexViewer>null,
     errorWindow: <GoldenLayout.Container>null,
     infoPanel: <GoldenLayout.Container>null,
-    fileTreeCont: <GoldenLayout.Container>null,
+    fileTreeCont: <JQuery>null,
     fileTree: <JSTree>null,
 };
 
@@ -78,6 +78,6 @@ addComponent('hexViewer', () => new HexViewer("hexViewer"));
 addComponent('errorWindow', cont => { cont.getElement().append($("<div />")); });
 addComponent('infoPanel', cont => { cont.getElement().append($("#infoPanel")); });
 addComponent('parsedDataTree');
-addComponent('fileTree');
+addComponent('fileTreeCont', cont => cont.getElement().append($("#fileTreeCont").children()));
 
 myLayout.init();

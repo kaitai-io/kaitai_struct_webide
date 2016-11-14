@@ -172,7 +172,7 @@ $(() => {
         })).then(refreshFsNodes);
     });
 
-    ui.fileTreeCont.getElement().bind("dblclick.jstree", function (event) {
+    fileTreeCont.bind("dblclick.jstree", function (event) {
         loadFsItem(<IFsItem>ui.fileTree.get_node(event.target).data);
     });
 
