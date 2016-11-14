@@ -62,7 +62,7 @@ function reparse() {
                 var node = selectNodeArgs.node;
                 //console.log('node', node);
                 var exp = node.data.exported;
-                if (exp && !autoExpandNodes) {
+                if (exp && !autoExpandNodes && exp.start < exp.end) {
                     selectedInTree = true;
                     ui.hexViewer.setSelection(exp.start, exp.end - 1);
                     selectedInTree = false;

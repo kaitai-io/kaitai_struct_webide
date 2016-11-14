@@ -10,11 +10,11 @@ function parsedToTree(jsTree, exportedRoot: IExportedValue, handleError) {
         else if (exported.type === ObjectType.TypedArray) {
             var text = '[';
             for (var i = 0; i < exported.bytes.byteLength; i++) {
-                text += (i == 0 ? '' : ', ') + exported.bytes[i];
-                if (i == 7) {
+                if (i == 8) {
                     text += ", ...";
                     break;
                 }
+                text += (i == 0 ? '' : ', ') + exported.bytes[i];
             }
             text += ']';
 
