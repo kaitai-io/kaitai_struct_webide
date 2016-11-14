@@ -59,8 +59,9 @@ function reparse() {
                 var node = selectNodeArgs.node;
                 //console.log('node', node);
                 var exp = node.data.exported;
-                if (exp)
-                    ui.hexViewer.setSelection(exp.start, exp.end - 1);
+                if (exp && !autoExpandNodes) {
+                    ui.hexViewer.setSelection(exp.start, exp.end - 1, false);
+                }
             });
         });
     });
@@ -87,13 +88,41 @@ function loadFsItem(fsItem, refreshGui = true) {
         }
     });
 }
+function openNodesIfCan() {
+    if (!autoExpandNodes)
+        return;
+    var jsTree = ui.parsedDataTreeCont.getElement().jstree(true);
+    autoExpandNodes.forEach((pathStr, i) => {
+        var node = jsTree.get_node(pathStr);
+        if (!node)
+            return false;
+        if (i === autoExpandNodes.length - 1) {
+            jsTree.activate_node(node, null);
+            $(`#${node.id}`).get(0).scrollIntoView();
+            autoExpandNodes = null;
+        }
+        else
+            jsTree.open_node(node);
+    });
+}
 $(() => {
     ui.infoPanel.getElement().show();
     ui.hexViewer.onSelectionChanged = () => {
-        ui.infoPanel.getElement().text(ui.hexViewer.selectionStart == -1 ? 'no selection' : `selection: 0x${ui.hexViewer.selectionStart.toString(16)} - 0x${ui.hexViewer.selectionEnd.toString(16)}`);
-        if (itree && ui.hexViewer.selectionStart) {
-            var intervals = itree.search(ui.hexViewer.selectionStart);
-            console.log('intervals', intervals);
+        var hasSelection = ui.hexViewer.selectionStart !== -1;
+        ui.infoPanel.getElement().text(hasSelection ? `selection: 0x${ui.hexViewer.selectionStart.toString(16)} - 0x${ui.hexViewer.selectionEnd.toString(16)}` : 'no selection');
+        if (itree && hasSelection) {
+            var intervals = itree.search(ui.hexViewer.mouseDownOffset);
+            if (intervals.length > 0) {
+                console.log('selected node', intervals[0].id);
+                var path = intervals[0].id.split('/');
+                var pathStr = 'inputField';
+                autoExpandNodes = [];
+                for (var i = 0; i < path.length; i++) {
+                    pathStr += '_' + path[i];
+                    autoExpandNodes.push(pathStr);
+                }
+                openNodesIfCan();
+            }
         }
     };
     ui.hexViewer.onSelectionChanged();

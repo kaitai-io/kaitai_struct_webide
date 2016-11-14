@@ -1,6 +1,8 @@
 ﻿interface JSTreeNodeData { exported?: IExportedValue, propPath?: string[] };
 interface JSTreeNode { id?: string, text?: string, icon?: string, children?: JSTreeNode[] | boolean, data?: JSTreeNodeData };
 
+var autoExpandNodes = null;
+
 function parsedToTree(jsTree, exportedRoot: IExportedValue, handleError) {
     function primitiveToText(exported: IExportedValue): string {
         if (exported.type === ObjectType.Primitive)
@@ -54,12 +56,46 @@ function parsedToTree(jsTree, exportedRoot: IExportedValue, handleError) {
         })
     }
 
-    function getNode(node: JSTreeNode, cb: (items: JSTreeNode[]) => void) {
-        var expNode = node.id === '#' ? exportedRoot : node.data.exported;
+    function fixOffsets(exp: IExportedValue, offset: number) {
+        exp.start += offset;
+        exp.end += offset;
 
-        var valuePromise = expNode ? Promise.resolve(expNode) : getProp(node.data.propPath).then(exp => node.data.exported = exp);
+        if (exp.type === ObjectType.Object) {
+            var fieldNames = Object.keys(exp.object.fields);
+            if (fieldNames.length > 0) {
+                var objOffset = exp.object.fields[fieldNames[0]].start === 0 ? exp.start : 0;
+                fieldNames.forEach(fieldName => fixOffsets(exp.object.fields[fieldName], objOffset));
+            }
+        } 
+        else if (exp.type === ObjectType.Array)
+            exp.arrayItems.forEach(item => fixOffsets(item, 0));
+    }
+
+    function fillIntervals(exp: IExportedValue) {
+        if (exp.type === ObjectType.Object) {
+            Object.keys(exp.object.fields).forEach(fieldName => fillIntervals(exp.object.fields[fieldName]));
+        } else if (exp.type === ObjectType.Array)
+            exp.arrayItems.forEach(item => fillIntervals(item));
+        else if (exp.start < exp.end) {
+            //console.log(`${exp.start} - ${exp.end}`);
+            itree.add(exp.start, exp.end - 1, exp.path.join('/'));
+        }
+    }
+
+    function getNode(node: JSTreeNode, cb: (items: JSTreeNode[]) => void) {
+        var isRoot = node.id === '#';
+        var expNode = isRoot ? exportedRoot : node.data.exported;
+
+        var isInstance = !expNode;
+        var valuePromise = isInstance ? getProp(node.data.propPath).then(exp => node.data.exported = exp) : Promise.resolve(expNode);
         valuePromise.then(exp => {
-            cb(exportedToNodes(exp, !!expNode));
+            if (isRoot || isInstance) {
+                fixOffsets(exp, 0);
+                fillIntervals(exp);
+            }
+            var nodes = exportedToNodes(exp, !isInstance);
+            nodes.forEach(node => { if (node.data.exported) node.id = 'inputField_' + node.data.exported.path.join('_'); });
+            cb(nodes);
             handleError(null);
         }).catch(err => {
             cb([]);
@@ -69,5 +105,6 @@ function parsedToTree(jsTree, exportedRoot: IExportedValue, handleError) {
 
     jsTree.jstree("destroy");
     return jsTree.jstree({ core: { data: (node, cb) => getNode(node, cb), themes: { icons: false } } })
-        .on('keyup.jstree', function (e) { jsTree.jstree(true).activate_node(e.target.id) });
+        .on('keyup.jstree', function (e) { jsTree.jstree(true).activate_node(e.target.id) })
+        .on('open_node.jstree', () => openNodesIfCan());
 }

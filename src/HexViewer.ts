@@ -81,7 +81,7 @@ class HexViewer {
     private content: JQuery;
     private contentOuter: JQuery;
 
-    private mouseDownOffset: number;
+    public mouseDownOffset: number;
     private canDeselect: boolean;
 
     public selectionStart: number = -1;
@@ -254,12 +254,12 @@ class HexViewer {
         this.setSelection(-1, -1);
     }
 
-    public setSelection(start: number, end: number) {
+    public setSelection(start: number, end: number, fireEvent: boolean = true) {
         var oldStart = this.selectionStart, oldEnd = this.selectionEnd;
         this.selectionStart = start < end ? start : end;
         this.selectionEnd = Math.min(start < end ? end : start, this.dataProvider.length - 1);
         if (this.selectionStart != oldStart || this.selectionEnd != oldEnd) {
-            if (this.onSelectionChanged)
+            if (this.onSelectionChanged && fireEvent)
                 this.onSelectionChanged();
 
             if (this.selectionStart != -1) {

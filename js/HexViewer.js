@@ -193,12 +193,12 @@ class HexViewer {
     deselect() {
         this.setSelection(-1, -1);
     }
-    setSelection(start, end) {
+    setSelection(start, end, fireEvent = true) {
         var oldStart = this.selectionStart, oldEnd = this.selectionEnd;
         this.selectionStart = start < end ? start : end;
         this.selectionEnd = Math.min(start < end ? end : start, this.dataProvider.length - 1);
         if (this.selectionStart != oldStart || this.selectionEnd != oldEnd) {
-            if (this.onSelectionChanged)
+            if (this.onSelectionChanged && fireEvent)
                 this.onSelectionChanged();
             if (this.selectionStart != -1) {
                 if (this.selectionEnd > this.visibleOffsetEnd)
