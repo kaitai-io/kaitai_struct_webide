@@ -128,3 +128,34 @@ function readBlob(blob, mode: "arrayBuffer" | "text" | "dataUrl", ...args) {
 function htmlescape(s) {
     return $("<div/>").text(s).html();
 }
+
+interface IFileReader {
+    (mode: "arrayBuffer"): Promise<ArrayBuffer>;
+    (mode: "text"): Promise<string>;
+    (mode: "dataUrl"): Promise<string>;
+};
+
+interface IFileProcessItem {
+    file: File;
+    read: IFileReader;
+}
+
+interface IFileProcessCallback {
+    (files: IFileProcessItem[]);
+};
+
+function processFiles(files) {
+    var resFiles = <IFileProcessItem[]>[];
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        resFiles.push({ file: file, read: function (mode) { return readBlob(this.file, mode); } })
+    }
+    return resFiles;
+}
+
+function openFilesWithDialog(callback: IFileProcessCallback) {
+    $('<input type="file" multiple />').on('change', e => {
+        var files = processFiles((<any>e.target).files);
+        callback(files);
+    }).click();
+}

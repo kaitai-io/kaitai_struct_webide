@@ -130,6 +130,16 @@ function openNodesIfCan() {
     });
 }
 
+function addNewFiles(files: IFileProcessItem[]) {
+    return Promise.all(files.map(file => {
+        return (isKsyFile(file.file.name) ? file.read('text') : file.read('arrayBuffer')).then(content => {
+            return localFs.put(file.file.name, content).then(fsItem => {
+                return files.length == 1 ? loadFsItem(fsItem) : Promise.resolve();
+            });
+        });
+    })).then(refreshFsNodes);
+}
+
 $(() => {
     ui.infoPanel.getElement().show();
 
@@ -162,15 +172,7 @@ $(() => {
         exec: function (editor) { reparse(); }
     });
 
-    initFileDrop('fileDrop', files => {
-        Promise.all(files.map((file, i) => {
-            return (isKsyFile(file.file.name) ? file.read('text') : file.read('arrayBuffer')).then(content => {
-                return localFs.put(file.file.name, content).then(fsItem => {
-                    return files.length == 1 ? loadFsItem(fsItem) : Promise.resolve();
-                });
-            });
-        })).then(refreshFsNodes);
-    });
+    initFileDrop('fileDrop', addNewFiles);
 
     fileTreeCont.bind("dblclick.jstree", function (event) {
         loadFsItem(<IFsItem>ui.fileTree.get_node(event.target).data);

@@ -109,7 +109,8 @@ function refreshFsNodes() {
     var localStorageNode = ui.fileTree.get_node('localStorage');
     localFs.getRootNode().then(root => {
         ui.fileTree.delete_node(localStorageNode.children);
-        genChildNodes(root).forEach(node => ui.fileTree.create_node(localStorageNode, node));
+        if (root)
+            genChildNodes(root).forEach(node => ui.fileTree.create_node(localStorageNode, node));
     });
 }
 function addKsyFile(parent, name, fsItem) {
@@ -167,7 +168,7 @@ $(() => {
     var contextMenuTarget = null;
     function getSelectedData() {
         var selected = ui.fileTree.get_selected();
-        return selected.length === 1 ? ui.fileTree.get_node(selected[0]).data : null;
+        return selected.length >= 1 ? ui.fileTree.get_node(selected[0]).data : null;
     }
     fileTreeCont.on('contextmenu', '.jstree-node', e => {
         contextMenuTarget = e.target;
@@ -242,6 +243,7 @@ $(() => {
     }
     ctxAction(uiFiles.downloadItem, () => downloadFiles());
     uiFiles.downloadFile.on('click', () => downloadFiles());
+    uiFiles.uploadFile.on('click', () => openFilesWithDialog(addNewFiles));
     $('#newKsyModal').on('shown.bs.modal', () => { $('#newKsyModal input').focus(); });
     $('#newKsyModal form').submit(function (event) {
         event.preventDefault();

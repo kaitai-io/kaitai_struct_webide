@@ -1,14 +1,4 @@
-﻿interface IFileDropReader {
-    (mode: "arrayBuffer"): Promise<ArrayBuffer>;
-    (mode: "text"): Promise<string>;
-    (mode: "dataUrl"): Promise<string>;
-};
-
-interface IFileDropCallback {
-    (files: ({ file: File, read: IFileDropReader })[]);
-};
-
-function initFileDrop(containerId, callback: IFileDropCallback) {
+﻿function initFileDrop(containerId, callback: IFileProcessCallback) {
     var dragLeaveClear;
     var body = $("body");
     var fileDropShadow = $("#" + containerId);
@@ -36,12 +26,7 @@ function initFileDrop(containerId, callback: IFileDropCallback) {
         event.stopPropagation();
         fileDropShadow.hide();
         var files = (<DragEvent>event.originalEvent).dataTransfer.files;
-        var resFiles = [];
-        for (var i = 0; i < files.length; i++) {
-            var file = files[i];
-            resFiles.push({ file: file, read: mode => readBlob(file, mode) })
-        }
-            
+        var resFiles = processFiles(files);            
         callback(resFiles);
     });
 }

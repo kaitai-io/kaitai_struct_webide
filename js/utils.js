@@ -109,4 +109,20 @@ function readBlob(blob, mode, ...args) {
 function htmlescape(s) {
     return $("<div/>").text(s).html();
 }
+;
+;
+function processFiles(files) {
+    var resFiles = [];
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        resFiles.push({ file: file, read: function (mode) { return readBlob(this.file, mode); } });
+    }
+    return resFiles;
+}
+function openFilesWithDialog(callback) {
+    $('<input type="file" multiple />').on('change', e => {
+        var files = processFiles(e.target.files);
+        callback(files);
+    }).click();
+}
 //# sourceMappingURL=utils.js.map

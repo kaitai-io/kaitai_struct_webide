@@ -1,5 +1,3 @@
-;
-;
 function initFileDrop(containerId, callback) {
     var dragLeaveClear;
     var body = $("body");
@@ -25,11 +23,7 @@ function initFileDrop(containerId, callback) {
         event.stopPropagation();
         fileDropShadow.hide();
         var files = event.originalEvent.dataTransfer.files;
-        var resFiles = [];
-        for (var i = 0; i < files.length; i++) {
-            var file = files[i];
-            resFiles.push({ file: file, read: mode => readBlob(file, mode) });
-        }
+        var resFiles = processFiles(files);
         callback(resFiles);
     });
 }
