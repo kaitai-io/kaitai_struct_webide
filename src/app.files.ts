@@ -182,11 +182,12 @@ $(() => {
 
     var uiFiles = {
         fileTreeContextMenu: $("#fileTreeContextMenu"),
+        openItem: $('#fileTreeContextMenu .openItem'),
         createFolder: $('#fileTreeContextMenu .createFolder'),
         createKsyFile: $('#fileTreeContextMenu .createKsyFile'),
-        deleteItem: $('#fileTreeContextMenu .deleteItem'),
-        openItem: $('#fileTreeContextMenu .openItem'),
         generateParser: $('#fileTreeContextMenu .generateParser'),
+        downloadItem: $('#fileTreeContextMenu .downloadItem'),
+        deleteItem: $('#fileTreeContextMenu .deleteItem'),
         createLocalKsyFile: $('#createLocalKsyFile'),
         uploadFile: $('#uploadFile'),
         downloadFile: $('#downloadFile'),
@@ -274,7 +275,7 @@ $(() => {
     fileTreeCont.on('move_node.jstree', (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
     fileTreeCont.on('select_node.jstree', (e, selectNodeArgs) => {
         var fsItem = (<JSTreeNode<IFsItem>>selectNodeArgs.node).data;
-        $('#downloadFile').toggleClass('disabled', !(fsItem && fsItem.type === 'file'));
+        [uiFiles.downloadFile, uiFiles.downloadItem].forEach(i => i.toggleClass('disabled', !(fsItem && fsItem.type === 'file')));
     });
 
     var ksyParent;
@@ -286,12 +287,16 @@ $(() => {
 
     ctxAction(uiFiles.createKsyFile, () => showKsyModal(contextMenuTarget));
     uiFiles.createLocalKsyFile.on('click', () => showKsyModal('localStorage'));
-    uiFiles.downloadFile.on('click', () => {
+
+    function downloadFiles() {
         ui.fileTree.get_selected().forEach(nodeId => {
             var fsItem = <IFsItem>ui.fileTree.get_node(nodeId).data;
             fss[fsItem.fsType].get(fsItem.fn).then(content => saveFile(content, fsItem.fn.split('/').last()));
         });
-    });
+    }
+
+    ctxAction(uiFiles.downloadItem, () => downloadFiles());
+    uiFiles.downloadFile.on('click', () => downloadFiles());
 
     $('#newKsyModal').on('shown.bs.modal', () => { $('#newKsyModal input').focus(); });
     $('#newKsyModal form').submit(function (event) {
