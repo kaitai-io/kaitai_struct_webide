@@ -112,6 +112,9 @@ function refreshFsNodes() {
         genChildNodes(root).forEach(node => ui.fileTree.create_node(localStorageNode, node));
     });
 }
+function addKsyFile(parent, name, fsItem) {
+    ui.fileTree.create_node(ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: 'glyphicon glyphicon-list-alt' }, "last", node => ui.fileTree.activate_node(node, null));
+}
 $(() => {
     //console.log('kaitaiRoot', kaitaiRoot);
     ui.fileTree = ui.fileTreeCont.getElement().jstree({
@@ -186,8 +189,9 @@ $(() => {
     }
     ctxAction(createFolder, e => {
         var parentData = getSelectedData();
-        ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), { data: { fsType: parentData.fsType, type: 'folder' }, icon: 'glyphicon glyphicon-folder-open' }, "last", function (new_node) {
-            setTimeout(function () { ui.fileTree.edit(new_node); }, 0);
+        ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), { data: { fsType: parentData.fsType, type: 'folder' }, icon: 'glyphicon glyphicon-folder-open' }, "last", node => {
+            ui.fileTree.activate_node(node, null);
+            setTimeout(function () { ui.fileTree.edit(node); }, 0);
         });
     });
     ctxAction(deleteItem, e => ui.fileTree.delete_node(ui.fileTree.get_selected()));
@@ -217,7 +221,7 @@ $(() => {
         var ksyName = $('#newKsyName').val();
         var parentData = getSelectedData();
         fss[parentData.fsType].put((parentData.fn ? `${parentData.fn}/` : '') + `${ksyName}.ksy`, `meta:\n  id: ${ksyName}\n  file-extension: ${ksyName}\n`).then(fsItem => {
-            ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), { text: `${ksyName}.ksy`, data: fsItem, icon: 'glyphicon glyphicon-list-alt' }, "last");
+            addKsyFile(contextMenuTarget, `${ksyName}.ksy`, fsItem);
             return loadFsItem(fsItem);
         });
     });

@@ -36,11 +36,14 @@ function recompile() {
         var srcYaml = ui.ksyEditor.getValue();
         var changed = lastKsyContent !== srcYaml;
 
-        var copyPromise = changed && ksyFsItem.fsType === 'kaitai' ?
-            fss.local.put(ksyFsItem.fn.split('/').last().replace('.ksy', '_modified.ksy'), srcYaml).then(fsItem => {
+        var copyPromise = Promise.resolve();
+        if (changed && ksyFsItem.fsType === 'kaitai') {
+            var newFn = ksyFsItem.fn.split('/').last().replace('.ksy', '_modified.ksy');
+            copyPromise = fss.local.put(newFn, srcYaml).then(fsItem => {
                 ksyFsItem = fsItem;
                 return localforage.setItem('ksyFsItem', fsItem);
-            }).then(refreshFsNodes) : Promise.resolve();
+            }).then(() => addKsyFile('localStorage', newFn, ksyFsItem));
+        }
 
         return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
             var compiled = compile(srcYaml, 'javascript', 'both');
