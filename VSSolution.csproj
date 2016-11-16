@@ -38,6 +38,7 @@
     <TypeScriptCompile Include="src\app.jail.ts" />
     <TypeScriptCompile Include="src\app.layout.ts" />
     <TypeScriptCompile Include="src\app.ts" />
+    <TypeScriptCompile Include="src\entities.ts" />
     <TypeScriptCompile Include="src\FileDrop.ts" />
     <TypeScriptCompile Include="src\kaitaiJail.ts" />
     <TypeScriptCompile Include="src\parsedToJson.ts" />
