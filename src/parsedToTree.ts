@@ -67,9 +67,11 @@ function parsedToTree(jsTree, exportedRoot: IExportedValue, handleError) {
                 var objOffset = exp.object.fields[fieldNames[0]].start === 0 ? exp.start : 0;
                 fieldNames.forEach(fieldName => fixOffsets(exp.object.fields[fieldName], objOffset));
             }
-        } 
-        else if (exp.type === ObjectType.Array)
-            exp.arrayItems.forEach(item => fixOffsets(item, 0));
+        }
+        else if (exp.type === ObjectType.Array && exp.arrayItems.length > 0) {
+            var objOffset = exp.arrayItems[0].start === 0 ? exp.start : 0;
+            exp.arrayItems.forEach(item => fixOffsets(item, objOffset));
+        }
     }
 
     function fillIntervals(exp: IExportedValue) {
@@ -78,7 +80,6 @@ function parsedToTree(jsTree, exportedRoot: IExportedValue, handleError) {
         } else if (exp.type === ObjectType.Array)
             exp.arrayItems.forEach(item => fillIntervals(item));
         else if (exp.start < exp.end) {
-            //console.log(`${exp.start} - ${exp.end}`);
             itree.add(exp.start, exp.end - 1, exp.path.join('/'));
         }
     }
