@@ -194,12 +194,16 @@ class HexViewer {
         this.setSelection(-1, -1);
     }
     setSelection(start, end) {
+        if (this.isRecursive)
+            return;
         var oldStart = this.selectionStart, oldEnd = this.selectionEnd;
         this.selectionStart = start < end ? start : end;
         this.selectionEnd = Math.min(start < end ? end : start, this.dataProvider.length - 1);
         if (this.selectionStart != oldStart || this.selectionEnd != oldEnd) {
+            this.isRecursive = true;
             if (this.onSelectionChanged)
                 this.onSelectionChanged();
+            this.isRecursive = false;
             if (this.selectionStart != -1) {
                 if (this.selectionEnd > this.visibleOffsetEnd)
                     this.topRow = Math.max(Math.floor(this.selectionEnd / this.bytesPerLine) - this.rowCount + 2, 0);

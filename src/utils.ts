@@ -159,3 +159,14 @@ function openFilesWithDialog(callback: IFileProcessCallback) {
         callback(files);
     }).click();
 }
+
+function getAllNodes(tree) {
+    function collectNodes(node, result) {
+        result.push(node);
+        node.children.forEach(child => collectNodes(child, result));
+    }
+
+    var allNodes = [];
+    var json = tree.get_json().forEach(item => collectNodes(item, allNodes));
+    return allNodes;
+}

@@ -36,6 +36,7 @@ var ui = {
     genCodeDebugViewer: <AceAjax.Editor>null,
     //parsedDataViewer: <AceAjax.Editor>null,
     parsedDataTreeCont: <GoldenLayout.Container>null,
+    parsedDataTree: <JSTree>null,
     hexViewer: <HexViewer>null,
     errorWindow: <GoldenLayout.Container>null,
     infoPanel: <GoldenLayout.Container>null,

@@ -88,6 +88,8 @@ class HexViewer {
     public selectionEnd: number = -1;
     public onSelectionChanged;
 
+    private isRecursive: boolean;
+
     private cellMouseAction(e) {
         if (e.type == "mouseup")
             this.content.unbind('mousemove');
@@ -255,12 +257,16 @@ class HexViewer {
     }
 
     public setSelection(start: number, end: number) {
+        if (this.isRecursive) return;
+
         var oldStart = this.selectionStart, oldEnd = this.selectionEnd;
         this.selectionStart = start < end ? start : end;
         this.selectionEnd = Math.min(start < end ? end : start, this.dataProvider.length - 1);
         if (this.selectionStart != oldStart || this.selectionEnd != oldEnd) {
+            this.isRecursive = true;
             if (this.onSelectionChanged)
                 this.onSelectionChanged();
+            this.isRecursive = false;
 
             if (this.selectionStart != -1) {
                 if (this.selectionEnd > this.visibleOffsetEnd)

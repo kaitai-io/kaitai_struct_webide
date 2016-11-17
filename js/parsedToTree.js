@@ -1,7 +1,6 @@
 ;
 ;
-var autoExpandNodes = null;
-function parsedToTree(jsTree, exportedRoot, handleError) {
+function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
     function primitiveToText(exported) {
         if (exported.type === ObjectType.Primitive)
             return exported.primitiveValue;
@@ -85,8 +84,11 @@ function parsedToTree(jsTree, exportedRoot, handleError) {
                 fillIntervals(exp);
             }
             var nodes = exportedToNodes(exp, !isInstance);
-            nodes.forEach(node => { if (node.data.exported)
-                node.id = 'inputField_' + node.data.exported.path.join('_'); });
+            nodes.forEach(node => {
+                if (node.data.exported) {
+                    node.id = 'inputField_' + node.data.exported.path.join('_');
+                }
+            });
             cb(nodes);
             handleError(null);
         }).catch(err => {
@@ -94,9 +96,86 @@ function parsedToTree(jsTree, exportedRoot, handleError) {
             handleError(err);
         });
     }
-    jsTree.jstree("destroy");
-    return jsTree.jstree({ core: { data: (node, cb) => getNode(node, cb), themes: { icons: false } } })
-        .on('keyup.jstree', function (e) { jsTree.jstree(true).activate_node(e.target.id); })
-        .on('open_node.jstree', () => openNodesIfCan());
+    var parsedTreeOpenedNodes = {};
+    var saveOpenedNodesDisabled = false;
+    localStorage.getItem('parsedTreeOpenedNodes').split(',').forEach(x => parsedTreeOpenedNodes[x] = true);
+    function saveOpenedNodes() {
+        if (saveOpenedNodesDisabled)
+            return;
+        parsedTreeOpenedNodes = {};
+        getAllNodes(ui.parsedDataTree).filter(x => x.state.opened).forEach(x => parsedTreeOpenedNodes[x.id] = true);
+        localStorage.setItem('parsedTreeOpenedNodes', Object.keys(parsedTreeOpenedNodes).join(','));
+    }
+    jsTreeElement.jstree("destroy");
+    var jstree = jsTreeElement.jstree({ core: { data: (node, cb) => getNode(node, cb), themes: { icons: false }, multiple: false } }).jstree(true);
+    jstree.on = (...args) => jstree.element.on(...args);
+    jstree.off = (...args) => jstree.element.off(...args);
+    jstree.on('keyup.jstree', e => jstree.activate_node(e.target.id));
+    jstree.on('ready.jstree', e => {
+        jstree.openNodes(Object.keys(parsedTreeOpenedNodes), () => {
+            jstree.on('open_node.jstree', () => { saveOpenedNodes(); }).on('close_node.jstree', () => saveOpenedNodes());
+            cb();
+        });
+    });
+    jstree.openNodes = (nodesToOpen, cb) => {
+        if (!nodesToOpen || nodesToOpen.length === 0)
+            return true;
+        saveOpenedNodesDisabled = true;
+        var origAnim = jstree.settings.core.animation;
+        jstree.settings.core.animation = 0;
+        //console.log('saveOpenedNodesDisabled = true');
+        var openCallCounter = 1;
+        function openRound(e) {
+            openCallCounter--;
+            //console.log('openRound', openCallCounter, nodesToOpen);
+            var newNodesToOpen = [];
+            var existingNodes = [];
+            nodesToOpen.forEach(nodeId => {
+                var node = jstree.get_node(nodeId);
+                if (node) {
+                    if (!node.state.opened)
+                        existingNodes.push(node);
+                }
+                else
+                    newNodesToOpen.push(nodeId);
+            });
+            nodesToOpen = newNodesToOpen;
+            if (existingNodes.length > 0)
+                existingNodes.forEach(node => {
+                    openCallCounter++;
+                    //console.log(`open_node called on ${node.id}`)
+                    jstree.open_node(node);
+                });
+            else if (openCallCounter === 0) {
+                //console.log('saveOpenedNodesDisabled = false');
+                saveOpenedNodesDisabled = false;
+                e && jstree.off(e);
+                jstree.settings.core.animation = origAnim;
+                saveOpenedNodes();
+                cb && cb(nodesToOpen.length === 0);
+            }
+        }
+        jstree.on('open_node.jstree', e => openRound(e));
+        openRound(null);
+    };
+    jstree.activatePath = (path, cb) => {
+        var path = path.split('/');
+        var expandNodes = [];
+        var pathStr = 'inputField';
+        for (var i = 0; i < path.length; i++) {
+            pathStr += '_' + path[i];
+            expandNodes.push(pathStr);
+        }
+        var activateId = expandNodes.pop();
+        jstree.openNodes(expandNodes, foundAll => {
+            console.log('activatePath', foundAll, activateId);
+            if (foundAll) {
+                jstree.activate_node(activateId, null);
+                $(`#${activateId}`).get(0).scrollIntoView();
+            }
+            cb && cb(foundAll);
+        });
+    };
+    return jstree;
 }
 //# sourceMappingURL=parsedToTree.js.map

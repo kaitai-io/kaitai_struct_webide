@@ -45,7 +45,7 @@ function recompile() {
         });
     });
 }
-var formatReady, selectedInTree;
+var formatReady, selectedInTree = false, blockRecursive = false;
 function reparse() {
     var jsTree = ui.parsedDataTreeCont.getElement();
     jsTree.jstree("destroy");
@@ -60,11 +60,14 @@ function reparse() {
             handleError(error);
             if (error)
                 return;
-            parsedToTree(jsTree, exportedRoot, handleError).on('select_node.jstree', function (e, selectNodeArgs) {
+            ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, handleError, () => {
+                ui.hexViewer.onSelectionChanged();
+            });
+            ui.parsedDataTree.on('select_node.jstree', function (e, selectNodeArgs) {
                 var node = selectNodeArgs.node;
                 //console.log('node', node);
                 var exp = node.data.exported;
-                if (exp && !autoExpandNodes && exp.start < exp.end) {
+                if (!blockRecursive && exp && exp.start < exp.end) {
                     selectedInTree = true;
                     ui.hexViewer.setSelection(exp.start, exp.end - 1);
                     selectedInTree = false;
@@ -95,23 +98,6 @@ function loadFsItem(fsItem, refreshGui = true) {
         }
     });
 }
-function openNodesIfCan() {
-    if (!autoExpandNodes)
-        return;
-    var jsTree = ui.parsedDataTreeCont.getElement().jstree(true);
-    autoExpandNodes.forEach((pathStr, i) => {
-        var node = jsTree.get_node(pathStr);
-        if (!node)
-            return false;
-        if (i === autoExpandNodes.length - 1) {
-            jsTree.activate_node(node, null);
-            $(`#${node.id}`).get(0).scrollIntoView();
-            autoExpandNodes = null;
-        }
-        else
-            jsTree.open_node(node);
-    });
-}
 function addNewFiles(files) {
     return Promise.all(files.map(file => {
         return (isKsyFile(file.file.name) ? file.read('text') : file.read('arrayBuffer')).then(content => {
@@ -124,24 +110,20 @@ function addNewFiles(files) {
 $(() => {
     ui.infoPanel.getElement().show();
     ui.hexViewer.onSelectionChanged = () => {
+        console.log('setSelection', ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
+        localStorage.setItem('selection', JSON.stringify({ start: ui.hexViewer.selectionStart, end: ui.hexViewer.selectionEnd }));
         var hasSelection = ui.hexViewer.selectionStart !== -1;
         ui.infoPanel.getElement().text(hasSelection ? `selection: 0x${ui.hexViewer.selectionStart.toString(16)} - 0x${ui.hexViewer.selectionEnd.toString(16)}` : 'no selection');
         if (itree && hasSelection && !selectedInTree) {
-            var intervals = itree.search(ui.hexViewer.mouseDownOffset);
+            var intervals = itree.search(ui.hexViewer.mouseDownOffset || ui.hexViewer.selectionStart);
             if (intervals.length > 0) {
                 console.log('selected node', intervals[0].id);
-                var path = intervals[0].id.split('/');
-                var pathStr = 'inputField';
-                autoExpandNodes = [];
-                for (var i = 0; i < path.length; i++) {
-                    pathStr += '_' + path[i];
-                    autoExpandNodes.push(pathStr);
-                }
-                openNodesIfCan();
+                blockRecursive = true;
+                ui.parsedDataTree.activatePath(intervals[0].id, () => blockRecursive = false);
             }
         }
     };
-    ui.hexViewer.onSelectionChanged();
+    //ui.hexViewer.onSelectionChanged();
     ui.genCodeDebugViewer.commands.addCommand({
         name: "compile",
         bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
@@ -156,6 +138,11 @@ $(() => {
     }
     var inputReady = loadCachedFsItem('inputFsItem', 'samples/sample1.zip');
     var formatReady = loadCachedFsItem('ksyFsItem', 'formats/archive/zip.ksy');
+    inputReady.then(() => {
+        var storedSelection = JSON.parse(localStorage.getItem('selection'));
+        if (storedSelection)
+            ui.hexViewer.setSelection(storedSelection.start, storedSelection.end);
+    });
     var editDelay = new Delayed(500);
     ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
 });
