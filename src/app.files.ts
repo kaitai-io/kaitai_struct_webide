@@ -82,6 +82,7 @@ class KaitaiFs implements IFileSystem {
 }
 
 var files = [
+    'formats/archive/lzh.ksy',
     'formats/archive/zip.ksy',
     'formats/executable/dos_mz.ksy',
     'formats/executable/java_class.ksy',
@@ -100,7 +101,12 @@ var files = [
     'formats/image/jpeg.ksy',
     'formats/image/pcx.ksy',
     'formats/image/png.ksy',
+    'formats/image/psx_tim.ksy',
     'formats/image/wmf.ksy',
+    'formats/image/xwd.ksy',
+    'formats/media/blender_blend.ksy',
+    'formats/media/id3v1_1.ksy',
+    'formats/media/quicktime_mov.ksy',
     'formats/media/standard_midi_file.ksy',
     'formats/network/ethernet_frame.ksy',
     'formats/network/icmp_packet.ksy',
@@ -108,12 +114,13 @@ var files = [
     'formats/network/pcap.ksy',
     'formats/network/tcp_segment.ksy',
     'formats/network/udp_datagram.ksy',
+    'formats/serialization/asn1/asn1_der.ksy',
     'samples/grad8rgb.bmp',
     'samples/pnggrad8rgb.png',
     'samples/sample1.iso',
     'samples/sample1.wad',
     'samples/sample1.zip',
-];
+];                                                   
 
 var kaitaiRoot = <IFsItem>{ fsType: 'kaitai' };
 files.forEach(fn => fsHelper.selectNode(kaitaiRoot, fn));
