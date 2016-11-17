@@ -185,10 +185,6 @@ $(() => {
         uiFiles.fileTreeContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
         return false;
     });
-    $(document).on('mouseup', e => {
-        if ($(e.target).parents('.dropdown-menu').length === 0)
-            uiFiles.fileTreeContextMenu.hide();
-    });
     function ctxAction(obj, callback) {
         obj.find('a').on('click', e => {
             if (!obj.hasClass('disabled')) {

@@ -23,12 +23,12 @@ body { line-height:normal }
 #fileTreeCont .footer { position:absolute; bottom:0; width:100%; padding-left:2px }
 #fileTreeCont .footer .btn { width:33.3%; border-radius:0px; font-size:13px; padding:3px 10px }
 body { color:#333 }
-#fileTreeContextMenu { position: absolute; display:none; z-index:9999 }
+.dropdown { position: absolute; display:none; z-index:9999 }
 .dropdown-menu { z-index:9999 }
-#fileTreeContextMenu .dropdown-menu { font-size:13px; border-color:#375a7f; border-radius:0px }
-#fileTreeContextMenu .glyphicon { margin-right:5px; }
-#fileTreeContextMenu .glyphicon-folder-open { margin-left:-1px; margin-right:6px }
-#fileTreeContextMenu .dropdown-menu>li>a { padding:3px 15px }
+.dropdown .dropdown-menu { font-size:13px; border-color:#375a7f; border-radius:0px }
+.dropdown .glyphicon { margin-right:5px; }
+.dropdown .glyphicon-folder-open { margin-left:-1px; margin-right:6px }
+.dropdown .dropdown-menu>li>a { padding:3px 15px }
 .btn { padding: 5px 10px; }
 .modal { color: white; }
 .control-label { margin-bottom:8px }

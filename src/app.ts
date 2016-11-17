@@ -91,7 +91,7 @@ function reparse() {
     });
 }
 
-var lastKsyContent;
+var lastKsyContent, inputContent: ArrayBuffer, inputFsItem: IFsItem;
 function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true) {
     if (!fsItem || fsItem.type !== 'file')
         return Promise.resolve();
@@ -104,6 +104,9 @@ function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true) {
             return Promise.resolve();
         }
         else {
+            inputFsItem = fsItem;
+            inputContent = content;
+
             localforage.setItem('inputFsItem', fsItem);
 
             dataProvider = {
@@ -175,4 +178,34 @@ $(() => {
 
     var editDelay = new Delayed(500);
     ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
+
+    var inputContextMenu = $('#inputContextMenu');
+    var downloadInput = $('#inputContextMenu .downloadItem');
+    $("#hexViewer").on('contextmenu', e => {
+        downloadInput.toggleClass('disabled', ui.hexViewer.selectionStart === -1);
+        inputContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
+        return false;
+    });
+
+    function ctxAction(obj, callback) {
+        obj.find('a').on('click', e => {
+            if (!obj.hasClass('disabled')) {
+                inputContextMenu.hide();
+                callback(e);
+            }
+        });
+    }
+
+    $(document).on('mouseup', e => {
+        if ($(e.target).parents('.dropdown-menu').length === 0)
+            $('.dropdown').hide();
+    });
+
+    ctxAction(downloadInput, e => {
+        var start = ui.hexViewer.selectionStart, end = ui.hexViewer.selectionEnd;
+        //var fnParts = /^(.*?)(\.[^.]+)?$/.exec(inputFsItem.fn.split('/').last());
+        //var newFn = `${fnParts[1]}_0x${start.toString(16)}-0x${end.toString(16)}${fnParts[2] || ""}`;
+        var newFn = `${inputFsItem.fn.split('/').last()}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
+        saveFile(new Uint8Array(inputContent, start, end - start + 1), newFn);
+    });
 })

@@ -79,6 +79,8 @@ class HexViewer {
         this.resize();
     }
     cellMouseAction(e) {
+        if (e.which !== 1)
+            return; // only handle left mouse button actions
         if (e.type == "mouseup")
             this.content.unbind('mousemove');
         var cell = e.target;

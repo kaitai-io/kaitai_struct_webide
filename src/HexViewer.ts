@@ -91,6 +91,8 @@ class HexViewer {
     private isRecursive: boolean;
 
     private cellMouseAction(e) {
+        if (e.which !== 1) return; // only handle left mouse button actions
+
         if (e.type == "mouseup")
             this.content.unbind('mousemove');
 
