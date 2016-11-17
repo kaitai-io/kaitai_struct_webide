@@ -103,6 +103,7 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
             return;
         //parsedTreeOpenedNodes = {};
         //getAllNodes(ui.parsedDataTree).filter(x => x.state.opened).forEach(x => parsedTreeOpenedNodes[x.id] = true);
+        //console.log('saveOpenedNodes');
         localStorage.setItem('parsedTreeOpenedNodes', Object.keys(parsedTreeOpenedNodes).join(','));
     }
     jsTreeElement.jstree("destroy");
@@ -125,8 +126,6 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
         });
     });
     jstree.openNodes = (nodesToOpen, cb) => {
-        if (!nodesToOpen || nodesToOpen.length === 0)
-            return true;
         saveOpenedNodesDisabled = true;
         var origAnim = jstree.settings.core.animation;
         jstree.settings.core.animation = 0;
