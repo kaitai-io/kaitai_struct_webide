@@ -98,10 +98,10 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
                 fixOffsets(exp, 0);
                 fillIntervals(exp);
             }
+
             var nodes = exportedToNodes(exp, !isInstance);
-            nodes.forEach(node => {
-                if (node.data.exported) { node.id = 'inputField_' + node.data.exported.path.join('_'); }
-            });
+            nodes.forEach(node => node.id = getNodeId(node));
+
             cb(nodes);
             handleError(null);
         }).catch(err => {
@@ -110,14 +110,19 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
         });
     }
 
+    function getNodeId(node: ParsedTreeNode) { return 'inputField_' + (node.data.exported ? node.data.exported.path : node.data.propPath).join('_'); }
+
     var parsedTreeOpenedNodes = {};
+    var parsedTreeOpenedNodesStr = localStorage.getItem('parsedTreeOpenedNodes')
+    if (parsedTreeOpenedNodesStr)
+        parsedTreeOpenedNodesStr.split(',').forEach(x => parsedTreeOpenedNodes[x] = true);
+
     var saveOpenedNodesDisabled = false;
-    localStorage.getItem('parsedTreeOpenedNodes').split(',').forEach(x => parsedTreeOpenedNodes[x] = true);
     function saveOpenedNodes() {
         if (saveOpenedNodesDisabled) return;
 
-        parsedTreeOpenedNodes = {};
-        getAllNodes(ui.parsedDataTree).filter(x => x.state.opened).forEach(x => parsedTreeOpenedNodes[x.id] = true);
+        //parsedTreeOpenedNodes = {};
+        //getAllNodes(ui.parsedDataTree).filter(x => x.state.opened).forEach(x => parsedTreeOpenedNodes[x.id] = true);
         localStorage.setItem('parsedTreeOpenedNodes', Object.keys(parsedTreeOpenedNodes).join(','));
     }
 
@@ -128,7 +133,16 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
     jstree.on('keyup.jstree', e => jstree.activate_node(e.target.id));
     jstree.on('ready.jstree', e => {
         jstree.openNodes(Object.keys(parsedTreeOpenedNodes), () => {
-            jstree.on('open_node.jstree', () => { saveOpenedNodes(); }).on('close_node.jstree', () => saveOpenedNodes());
+            jstree.on('open_node.jstree', (e, te) => {
+                var node = <ParsedTreeNode>te.node;
+                parsedTreeOpenedNodes[getNodeId(node)] = true;
+                saveOpenedNodes();
+            }).on('close_node.jstree', (e, te) => {
+                var node = <ParsedTreeNode>te.node;
+                delete parsedTreeOpenedNodes[getNodeId(node)];
+                saveOpenedNodes();
+            });
+                
             cb();
         });
     });
@@ -158,6 +172,8 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
                     newNodesToOpen.push(nodeId);
             });
             nodesToOpen = newNodesToOpen;
+
+            //console.log('existingNodes', existingNodes, 'openCallCounter', openCallCounter);
 
             if (existingNodes.length > 0)
                 existingNodes.forEach(node => {
@@ -191,11 +207,9 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
         var activateId = expandNodes.pop();
 
         jstree.openNodes(expandNodes, foundAll => {
-            console.log('activatePath', foundAll, activateId);
-            if (foundAll) {
-                jstree.activate_node(activateId, null);
-                $(`#${activateId}`).get(0).scrollIntoView();
-            }
+            //console.log('activatePath', foundAll, activateId);
+            jstree.activate_node(activateId, null);
+            $(`#${activateId}`).get(0).scrollIntoView();
 
             cb && cb(foundAll);
         })
