@@ -37,7 +37,9 @@
     <TypeScriptCompile Include="src\app.files.ts" />
     <TypeScriptCompile Include="src\app.jail.ts" />
     <TypeScriptCompile Include="src\app.layout.ts" />
+    <TypeScriptCompile Include="src\app.selectionInput.ts" />
     <TypeScriptCompile Include="src\app.ts" />
+    <TypeScriptCompile Include="src\app.unsupportedBrowser.ts" />
     <TypeScriptCompile Include="src\entities.ts" />
     <TypeScriptCompile Include="src\FileDrop.ts" />
     <TypeScriptCompile Include="src\kaitaiJail.ts" />
