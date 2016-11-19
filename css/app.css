@@ -44,3 +44,5 @@ body { color:#333 }
 #noscript, #unsupportedBrowser { background: #ffee00; z-index:999; position:fixed; left:0; right:0; padding:10px; text-align:center }
 #noscript a, #unsupportedBrowser a { color: black; text-decoration: underline }
 #unsupportedBrowser .closeBtn { float:right; margin-top: 1px; cursor: pointer }
+#converterPanel { overflow-y: auto; height: 100% }
+#converterPanel table { font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace; }

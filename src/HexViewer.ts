@@ -266,20 +266,23 @@ class HexViewer {
         this.selectionEnd = Math.min(start < end ? end : start, this.dataProvider.length - 1);
         if (this.selectionStart != oldStart || this.selectionEnd != oldEnd) {
             this.isRecursive = true;
-            if (this.onSelectionChanged)
-                this.onSelectionChanged();
-            this.isRecursive = false;
+            try {
+                if (this.onSelectionChanged)
+                    this.onSelectionChanged();
+            } finally {
+                this.isRecursive = false;
 
-            if (this.selectionStart != -1) {
-                if (this.selectionEnd > this.visibleOffsetEnd)
-                    this.topRow = Math.max(Math.floor(this.selectionEnd / this.bytesPerLine) - this.rowCount + 2, 0);
-                else if (this.selectionStart < this.visibleOffsetStart)
-                    this.topRow = Math.floor(this.selectionStart / this.bytesPerLine);
+                if (this.selectionStart != -1) {
+                    if (this.selectionEnd > this.visibleOffsetEnd)
+                        this.topRow = Math.max(Math.floor(this.selectionEnd / this.bytesPerLine) - this.rowCount + 2, 0);
+                    else if (this.selectionStart < this.visibleOffsetStart)
+                        this.topRow = Math.floor(this.selectionStart / this.bytesPerLine);
 
-                this.scrollbox.scrollTop(Math.round(this.topRow / this.maxRow * this.maxScrollHeight));
+                    this.scrollbox.scrollTop(Math.round(this.topRow / this.maxRow * this.maxScrollHeight));
+                }
+
+                this.refresh();
             }
-
-            this.refresh();
         }
     }
 }

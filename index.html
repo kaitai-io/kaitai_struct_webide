@@ -62,18 +62,24 @@
 <div id="converterPanel">
     <table>
         <thead><tr><th>Type</th><th>Value</th></tr></thead>
-        <tr><td>u8</td>    <td class=".u8"></td></tr>
-        <tr><td>s8</td>    <td class=".s8"></td></tr>
-        <tr><td>u16</td>   <td class=".u16"></td></tr>
-        <tr><td>s16</td>   <td class=".s16"></td></tr>
-        <tr><td>u32</td>   <td class=".u32"></td></tr>
-        <tr><td>s32</td>   <td class=".s32"></td></tr>
-        <tr><td>u64</td>   <td class=".u64"></td></tr>
-        <tr><td>s64</td>   <td class=".s64"></td></tr>
-        <tr><td>float</td> <td class=".float"></td></tr>
-        <tr><td>double</td><td class=".double"></td></tr>
-        <tr><td>utf8</td>  <td class=".utf8"></td></tr>
-        <tr><td>utf16</td> <td class=".utf16"></td></tr>
+        <tr class="u8    int"> <td>u8</td>    <td class="val"></td></tr>
+        <tr class="s8    int"> <td>s8</td>    <td class="val"></td></tr>
+        <tr class="u16le int"> <td>u16le</td> <td class="val"></td></tr>
+        <tr class="s16le int"> <td>s16le</td> <td class="val"></td></tr>
+        <tr class="u16be int"> <td>u16be</td> <td class="val"></td></tr>
+        <tr class="s16be int"> <td>s16be</td> <td class="val"></td></tr>
+        <tr class="u32le int"> <td>u32le</td> <td class="val"></td></tr>
+        <tr class="s32le int"> <td>s32le</td> <td class="val"></td></tr>
+        <tr class="u32be int"> <td>u32be</td> <td class="val"></td></tr>
+        <tr class="s32be int"> <td>s32be</td> <td class="val"></td></tr>
+        <tr class="u64le int"> <td>u64le</td> <td class="val"></td></tr>
+        <tr class="s64le int"> <td>s64le</td> <td class="val"></td></tr>
+        <tr class="u64be int"> <td>u64be</td> <td class="val"></td></tr>
+        <tr class="s64be int"> <td>s64be</td> <td class="val"></td></tr>
+        <tr class="float">     <td>float</td> <td class="val"></td></tr>
+        <tr class="double">    <td>double</td><td class="val"></td></tr>
+        <tr class="utf8">      <td>utf8</td>  <td class="val"></td></tr>
+        <tr class="utf16">     <td>utf16</td> <td class="val"></td></tr>
     </table>
 </div>
 
@@ -157,5 +163,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/q.js/1.4.1/q.js"></script>
 <script src="lib/localforage.js"></script>
 <script src="js/parsedToTree.js"></script>
+<script src="lib/biginteger.js"></script>
 </body>
 </html>

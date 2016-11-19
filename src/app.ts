@@ -1,7 +1,7 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
 /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 
-declare var YAML: any, io: any, jailed: any, IntervalTree: any, localforage: LocalForage;
+declare var YAML: any, io: any, jailed: any, IntervalTree: any, localforage: LocalForage, bigInt: any;
 
 var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 
@@ -148,6 +148,37 @@ $(() => {
                 blockRecursive = true;
                 ui.parsedDataTree.activatePath(intervals[0].id, () => blockRecursive = false);
             }
+        }
+
+        if (dataProvider) {
+            var data = dataProvider.get(start, Math.min(dataProvider.length - start, 8));
+
+            function numConv(len, signed, bigEndian) {
+                if (len > data.length) return '';
+
+                var arr = data.subarray(0, len);
+
+                var num = bigInt(0);
+                if (bigEndian)
+                    for (var i = 0; i < arr.length; i++)
+                        num = num.multiply(256).add(arr[i]);
+                else
+                    for (var i = arr.length - 1; i >= 0; i--)
+                        num = num.multiply(256).add(arr[i]);
+
+                if (signed) {
+                    var maxVal = bigInt(256).pow(len);
+                    if (num.greaterOrEquals(maxVal.divide(2)))
+                        num = maxVal.minus(num).negate();
+                }
+
+                //console.log('numConv', arr, len, signed ? 'signed' : 'unsigned', bigEndian ? 'big-endian' : 'little-endian', num, typeof num);
+                return num.toString();
+            }
+
+            [1, 2, 4, 8].forEach(len => [false, true].forEach(signed => [false, true].forEach(bigEndian => {
+                $(`.${signed ? 's' : 'u'}${len * 8}${len == 1 ? '' : bigEndian ? 'be' : 'le'} .val`).text(numConv(len, signed, bigEndian));
+            })));
         }
     };
 
