@@ -110,7 +110,6 @@ function addNewFiles(files) {
     })).then(refreshFsNodes);
 }
 $(() => {
-    ui.infoPanel.getElement().show();
     var inputSizeElement = $("<span />").css({ display: 'none' }).appendTo(document.body);
     function resetInputWidth(target) {
         var value = $(target).val();
@@ -157,6 +156,8 @@ $(() => {
         resetInputWidth($selStart);
         resetInputWidth($selEnd);
     };
+    resetInputWidth($selStart);
+    resetInputWidth($selEnd);
     //ui.hexViewer.onSelectionChanged();
     ui.genCodeDebugViewer.commands.addCommand({
         name: "compile",

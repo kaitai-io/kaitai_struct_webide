@@ -131,8 +131,6 @@ function addNewFiles(files: IFileProcessItem[]) {
 }
 
 $(() => {
-    ui.infoPanel.getElement().show();
-
     var inputSizeElement = $("<span />").css({ display: 'none' }).appendTo(document.body);
 
     function resetInputWidth(target) {
@@ -190,6 +188,9 @@ $(() => {
         resetInputWidth($selStart);
         resetInputWidth($selEnd);
     };
+
+    resetInputWidth($selStart);
+    resetInputWidth($selEnd);
 
     //ui.hexViewer.onSelectionChanged();
 

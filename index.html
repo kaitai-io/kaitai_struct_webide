@@ -33,6 +33,18 @@
 </head>
 <body>
 
+<noscript>
+    <div id="noscript">This site requires Javascript to work. <a href="http://enable-javascript.com/" target="_blank">Learn how to enable Javascript.</a></div>
+</noscript>
+
+<div id="unsupportedBrowser">
+    Your browser is not supported. Features may or may not working. <a href="http://outdatedbrowser.com/" target="_blank">Please use the latest Chrome or Firefox.</a>
+    <i class="closeBtn glyphicon glyphicon-remove"></i>
+</div>
+
+<script src="lib/bowser.js"></script>
+<script src="js/app.unsupportedBrowser.js"></script>
+
 <div id="fileDrop">
     <div>
         Drag &amp; drop a file here<br />to upload
@@ -44,6 +56,24 @@
     <span class="selGroup input-group">
         <input type="text" class="selStart form-control"><span class="input-group-addon">-</span><input type="text" class="selEnd form-control">
     </span>
+</div>
+
+<div id="converterPanel">
+    <table>
+        <thead><tr><th>Type</th><th>Value</th></tr></thead>
+        <tr><td>u8</td>    <td class=".u8"></td></tr>
+        <tr><td>s8</td>    <td class=".s8"></td></tr>
+        <tr><td>u16</td>   <td class=".u16"></td></tr>
+        <tr><td>s16</td>   <td class=".s16"></td></tr>
+        <tr><td>u32</td>   <td class=".u32"></td></tr>
+        <tr><td>s32</td>   <td class=".s32"></td></tr>
+        <tr><td>u64</td>   <td class=".u64"></td></tr>
+        <tr><td>s64</td>   <td class=".s64"></td></tr>
+        <tr><td>float</td> <td class=".float"></td></tr>
+        <tr><td>double</td><td class=".double"></td></tr>
+        <tr><td>utf8</td>  <td class=".utf8"></td></tr>
+        <tr><td>utf16</td> <td class=".utf16"></td></tr>
+    </table>
 </div>
 
 <div id="fileTreeCont">

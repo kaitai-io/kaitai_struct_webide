@@ -17,7 +17,10 @@
                         { type: 'component', componentName: 'genCodeDebugViewer', title: 'JS code (debug)', isClosable: false },
                         { type: 'column', isClosable: false, title: 'input binary', content: [
                             { type: 'component', componentName: 'hexViewer', title: 'hex viewer', isClosable: false },
-                            { type: 'component', componentName: 'infoPanel', title: 'info panel', isClosable: false, height: 30 },
+                            { type: 'row', isClosable: false, content: [
+                                { type: 'component', componentName: 'infoPanel', title: 'info panel', isClosable: false, height: 30 },
+                                { type: 'component', componentName: 'converterPanel', title: 'converter', isClosable: false },
+                            ]}
                         ]}
                     ]}
                 ]},
@@ -42,6 +45,7 @@ var ui = {
     infoPanel: <GoldenLayout.Container>null,
     fileTreeCont: <JQuery>null,
     fileTree: <JSTree>null,
+    converterPanel: <GoldenLayout.Container>null,
 };
 
 function addComponent(name: string, generatorCallback?) {
@@ -55,6 +59,13 @@ function addComponent(name: string, generatorCallback?) {
             container.on('open', () => { ui[name] = editor = generatorCallback(container) || container; });
         } else
             ui[name + 'Cont'] = container;
+    });
+}
+
+function addExistingDiv(name: string) {
+    myLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState) {
+        ui[name] = $(`#${name}`).appendTo(container.getElement());
+        $(() => ui[name].show());
     });
 }
 
@@ -79,8 +90,9 @@ addEditor('genCodeDebugViewer', 'javascript', false);
 //addEditor('parsedDataViewer', 'javascript', true);
 addComponent('hexViewer', () => new HexViewer("hexViewer"));
 addComponent('errorWindow', cont => { cont.getElement().append($("<div />")); });
-addComponent('infoPanel', cont => { cont.getElement().append($("#infoPanel").children()); });
 addComponent('parsedDataTree');
 addComponent('fileTreeCont', cont => cont.getElement().append($("#fileTreeCont").children()));
+addExistingDiv('infoPanel');
+addExistingDiv('converterPanel');
 
 myLayout.init();
