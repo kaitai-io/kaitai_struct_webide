@@ -42,5 +42,5 @@ body { color:#333 }
 #infoPanel .selEnd { padding-left:6px }
 #infoPanel, #converterPanel { color: #eee; display:none; padding: 10px }
 #noscript, #unsupportedBrowser { background: #ffee00; z-index:999; position:fixed; left:0; right:0; padding:10px; text-align:center }
-#noscript, #unsupportedBrowser a { color: black; text-decoration: underline }
+#noscript a, #unsupportedBrowser a { color: black; text-decoration: underline }
 #unsupportedBrowser .closeBtn { float:right; margin-top: 1px; cursor: pointer }
