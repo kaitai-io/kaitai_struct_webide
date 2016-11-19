@@ -3,7 +3,7 @@
 .lm_splitter.lm_vertical .lm_drag_handle { top:-5px; height:15px }
 #errorWindow { background: white; font-family: Courier,monospace; font-size: 12px; white-space: pre; overflow-y: scroll; }
 #errorWindow>div { margin: 5px; }
-#infoPanel { background: white; padding: 5px; display: none }
+#infoPanel { background: white; padding: 5px; display: none; background: #222222; color: #eee; }
 #parsedDataTree { background: white; overflow: auto; font-size: 12px; font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace }
 #parsedDataTree .jstree-icon, #parsedDataTree .jstree-anchor { height: 16px; line-height: 16px }
 #parsedDataTree .jstree-node { min-height: 16px; line-height: 16px; min-width:18px; margin-left:14px }
@@ -34,3 +34,9 @@ body { color:#333 }
 .control-label { margin-bottom:8px }
 .form-control { padding: 6px 12px; height:34px }
 .modal-footer, .modal-body { padding: 15px }
+.input-group-addon { padding: 8px 8px }
+#infoPanel .form-control { color: #eee; background-color: #464545; display:initial; width: initial; float:initial; height: 30px }
+#infoPanel .input-group { display:initial; margin-left:6px }
+#infoPanel .input-group-addon { display:initial; position:relative; top:-2px; padding:5px 0px }
+#infoPanel .selStart { padding-right:4px }
+#infoPanel .selEnd { padding-left:6px }

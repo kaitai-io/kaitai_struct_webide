@@ -133,20 +133,62 @@ function addNewFiles(files: IFileProcessItem[]) {
 $(() => {
     ui.infoPanel.getElement().show();
 
+    var inputSizeElement = $("<span />").css({ display: 'none' }).appendTo(document.body);
+
+    function resetInputWidth(target) {
+        var value = $(target).val();
+        inputSizeElement.text(value);
+        var width = inputSizeElement.width();
+        $(target).width(width + 2 + 'px');
+        //console.log('resetInputWidth', $(target).val(), width);
+    }
+
+    var $selStart = $('#infoPanel .selStart');
+    var $selEnd = $('#infoPanel .selEnd');
+    var userChange = false;
+    var useHexAddr = true;
+    [$selStart, $selEnd].forEach(item => item.on('input', e => {
+        resetInputWidth(e.target);
+
+        useHexAddr = !$(e.target).val() || $(e.target).val().startsWith('0x');
+
+        var start = parseInt($selStart.val()), end = parseInt($selEnd.val());
+        if (!isNaN(start)) {
+            userChange = true;
+            ui.hexViewer.setSelection(start, isNaN(end) || end < start ? start : end);
+            userChange = false;
+        }
+    }));
+
+    function setAddrInput(input, value) {
+        input.val(value === null ? '' : useHexAddr ? `0x${value.toString(16)}` : value);
+    }
+
     ui.hexViewer.onSelectionChanged = () => {
         console.log('setSelection', ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
         localStorage.setItem('selection', JSON.stringify({ start: ui.hexViewer.selectionStart, end: ui.hexViewer.selectionEnd }));
 
-        var hasSelection = ui.hexViewer.selectionStart !== -1;
-        ui.infoPanel.getElement().text(hasSelection ? `selection: 0x${ui.hexViewer.selectionStart.toString(16)} - 0x${ui.hexViewer.selectionEnd.toString(16)}` : 'no selection')
+        var start = ui.hexViewer.selectionStart, end = ui.hexViewer.selectionEnd;
+        var hasSelection = start !== -1;
+        $('#infoPanel .selectionText').text(hasSelection ? `selection:` : 'no selection');
+
+        if (!(userChange && $selStart.is(':focus')))
+            setAddrInput($selStart, hasSelection ? start : null);
+
+        if (!(userChange && $selEnd.is(':focus')))
+            setAddrInput($selEnd, hasSelection && start !== end ? end : null);
+
         if (itree && hasSelection && !selectedInTree) {
-            var intervals = itree.search(ui.hexViewer.mouseDownOffset || ui.hexViewer.selectionStart);
+            var intervals = itree.search(ui.hexViewer.mouseDownOffset || start);
             if (intervals.length > 0) {
                 console.log('selected node', intervals[0].id);
                 blockRecursive = true;
                 ui.parsedDataTree.activatePath(intervals[0].id, () => blockRecursive = false);
             }
         }
+
+        resetInputWidth($selStart);
+        resetInputWidth($selEnd);
     };
 
     //ui.hexViewer.onSelectionChanged();

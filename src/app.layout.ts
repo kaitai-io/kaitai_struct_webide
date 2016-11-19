@@ -79,7 +79,7 @@ addEditor('genCodeDebugViewer', 'javascript', false);
 //addEditor('parsedDataViewer', 'javascript', true);
 addComponent('hexViewer', () => new HexViewer("hexViewer"));
 addComponent('errorWindow', cont => { cont.getElement().append($("<div />")); });
-addComponent('infoPanel', cont => { cont.getElement().append($("#infoPanel")); });
+addComponent('infoPanel', cont => { cont.getElement().append($("#infoPanel").children()); });
 addComponent('parsedDataTree');
 addComponent('fileTreeCont', cont => cont.getElement().append($("#fileTreeCont").children()));
 
