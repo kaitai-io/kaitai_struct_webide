@@ -125,50 +125,7 @@ $(() => {
                 ui.parsedDataTree.activatePath(intervals[0].id, () => blockRecursive = false);
             }
         }
-        if (dataProvider && hasSelection) {
-            var data = dataProvider.get(start, Math.min(dataProvider.length - start, 64)).slice(0);
-            function numConv(len, signed, bigEndian) {
-                if (len > data.length)
-                    return '';
-                var arr = data.subarray(0, len);
-                var num = bigInt(0);
-                if (bigEndian)
-                    for (var i = 0; i < arr.length; i++)
-                        num = num.multiply(256).add(arr[i]);
-                else
-                    for (var i = arr.length - 1; i >= 0; i--)
-                        num = num.multiply(256).add(arr[i]);
-                if (signed) {
-                    var maxVal = bigInt(256).pow(len);
-                    if (num.greaterOrEquals(maxVal.divide(2)))
-                        num = maxVal.minus(num).negate();
-                }
-                //console.log('numConv', arr, len, signed ? 'signed' : 'unsigned', bigEndian ? 'big-endian' : 'little-endian', num, typeof num);
-                return num;
-            }
-            [1, 2, 4, 8].forEach(len => [false, true].forEach(signed => [false, true].forEach(bigEndian => $(`.i${len * 8}${len == 1 ? '' : bigEndian ? 'be' : 'le'} .${signed ? 'signed' : 'unsigned'}`).text(numConv(len, signed, bigEndian).toString()))));
-            var u32le = numConv(4, false, false);
-            var unixtsDate = new Date(u32le * 1000);
-            $(`.float .val`).text(data.length >= 4 ? new Float32Array(data.buffer.slice(0, 4))[0] : '');
-            $(`.double .val`).text(data.length >= 8 ? new Float64Array(data.buffer.slice(0, 8))[0] : '');
-            $(`.unixts .val`).text(unixtsDate.format('Y-m-d H:i:s'));
-            function strDecode(enc) {
-                var str = new TextDecoder(enc).decode(data);
-                for (var i = 0; i < str.length; i++)
-                    if (str[i] === '\0')
-                        return str.substring(0, i);
-                return str + "...";
-            }
-            try {
-                $(`.ascii   .val div`).text(strDecode('ascii'));
-                $(`.utf8    .val div`).text(strDecode('utf-8'));
-                $(`.utf16le .val div`).text(strDecode('utf-16le'));
-                $(`.utf16be .val div`).text(strDecode('utf-16be'));
-            }
-            catch (e) { }
-        }
-        else
-            $('#converterPanel .val').text('');
+        refreshConverterPanel(ui.converterPanel, dataProvider, start);
     };
     refreshSelectionInput();
     ui.genCodeDebugViewer.commands.addCommand({

@@ -45,7 +45,7 @@ var ui = {
     infoPanel: <GoldenLayout.Container>null,
     fileTreeCont: <JQuery>null,
     fileTree: <JSTree>null,
-    converterPanel: <GoldenLayout.Container>null,
+    converterPanel: <JQuery>null,
 };
 
 function addComponent(name: string, generatorCallback?) {
