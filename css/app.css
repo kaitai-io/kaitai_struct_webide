@@ -48,5 +48,5 @@ body { color:#333 }
 #converterPanel table { font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace; }
 #converterPanel table th { padding-bottom:3px }
 #converterPanel .typeCol { min-width:54px }
-#converterPanel .typeValue { width:155px }
+#converterPanel .typeValue { min-width:155px }
 #converterPanel .str .val div { overflow:hidden; line-height:16px; height:16px; display:block }
