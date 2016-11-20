@@ -125,7 +125,7 @@ $(() => {
                 ui.parsedDataTree.activatePath(intervals[0].id, () => blockRecursive = false);
             }
         }
-        if (dataProvider) {
+        if (dataProvider && hasSelection) {
             var data = dataProvider.get(start, Math.min(dataProvider.length - start, 64)).slice(0);
             function numConv(len, signed, bigEndian) {
                 if (len > data.length)
@@ -149,8 +149,8 @@ $(() => {
             [1, 2, 4, 8].forEach(len => [false, true].forEach(signed => [false, true].forEach(bigEndian => $(`.i${len * 8}${len == 1 ? '' : bigEndian ? 'be' : 'le'} .${signed ? 'signed' : 'unsigned'}`).text(numConv(len, signed, bigEndian).toString()))));
             var u32le = numConv(4, false, false);
             var unixtsDate = new Date(u32le * 1000);
-            $(`.float .val`).text(new Float32Array(data.buffer)[0]);
-            $(`.double .val`).text(new Float64Array(data.buffer)[0]);
+            $(`.float .val`).text(data.length >= 4 ? new Float32Array(data.buffer.slice(0, 4))[0] : '');
+            $(`.double .val`).text(data.length >= 8 ? new Float64Array(data.buffer.slice(0, 8))[0] : '');
             $(`.unixts .val`).text(unixtsDate.format('Y-m-d H:i:s'));
             function strDecode(enc) {
                 var str = new TextDecoder(enc).decode(data);
@@ -167,6 +167,8 @@ $(() => {
             }
             catch (e) { }
         }
+        else
+            $('#converterPanel .val').text('');
     };
     refreshSelectionInput();
     ui.genCodeDebugViewer.commands.addCommand({

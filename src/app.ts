@@ -150,7 +150,7 @@ $(() => {
             }
         }
 
-        if (dataProvider) {
+        if (dataProvider && hasSelection) {
             var data = dataProvider.get(start, Math.min(dataProvider.length - start, 64)).slice(0);
 
             function numConv(len, signed, bigEndian) {
@@ -182,8 +182,8 @@ $(() => {
             var u32le = numConv(4, false, false);
             var unixtsDate = new Date(u32le * 1000);
 
-            $(`.float .val`).text(new Float32Array(data.buffer)[0]);
-            $(`.double .val`).text(new Float64Array(data.buffer)[0]);
+            $(`.float .val`).text(data.length >= 4 ? new Float32Array(data.buffer.slice(0, 4))[0] : '');
+            $(`.double .val`).text(data.length >= 8 ? new Float64Array(data.buffer.slice(0, 8))[0] : '');
             $(`.unixts .val`).text(unixtsDate.format('Y-m-d H:i:s'));
 
             function strDecode(enc) {
@@ -199,8 +199,10 @@ $(() => {
                 $(`.utf8    .val div`).text(strDecode('utf-8'));
                 $(`.utf16le .val div`).text(strDecode('utf-16le'));
                 $(`.utf16be .val div`).text(strDecode('utf-16be'));
-            } catch(e) { }
+            } catch (e) { }
         }
+        else
+            $('#converterPanel .val').text('');
     };
 
     refreshSelectionInput();

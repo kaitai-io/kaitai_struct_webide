@@ -117,6 +117,7 @@ class HexViewer {
             else if (e.type == "mouseup" && this.canDeselect && this.mouseDownOffset == cell.dataOffset)
                 this.deselect();
 
+            this.contentOuter.focus();
             e.preventDefault();
         }
     }
@@ -126,7 +127,7 @@ class HexViewer {
 
         this.scrollbox = $('#' + containerId).addClass('hexViewer');
         this.heightbox = $('<div class="heightbox"></div>').appendTo(this.scrollbox);
-        this.contentOuter = $('<div class="contentOuter"></div>').appendTo(this.scrollbox);
+        this.contentOuter = $('<div class="contentOuter" tabindex="1"></div>').appendTo(this.scrollbox);
 
         var charSpans = "0123456789ABCDEF".split('').map((x, i) => `<span class="c${i}">${x}</span>`).join('');
         this.contentOuter.append($(`<div class="header"><span class="hex">${charSpans}</span><span class="ascii">${charSpans}</span></div>`));
@@ -149,6 +150,22 @@ class HexViewer {
 
         $(window).on('resize', () => this.resize());
         this.resize();
+
+        this.contentOuter.on('keydown', e => {
+            var bytesPerPage = this.bytesPerLine * (this.rowCount - 2);
+            var selDiff = e.key === "ArrowDown" ? this.bytesPerLine : e.key === "ArrowUp" ? -this.bytesPerLine :
+                e.key === "PageDown" ? bytesPerPage : e.key === "PageUp" ? -bytesPerPage :
+                e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : null;
+
+            if (selDiff === null) return;
+
+            var newSel = this.selectionStart + selDiff;
+            if (newSel < 0) newSel = 0;
+            else if (newSel >= this.dataProvider.length) newSel = this.dataProvider.length - 1;
+
+            this.setSelection(newSel);
+            return false;
+        });
     }
 
     public resize() {
@@ -258,8 +275,9 @@ class HexViewer {
         this.setSelection(-1, -1);
     }
 
-    public setSelection(start: number, end: number) {
+    public setSelection(start: number, end?: number) {
         if (this.isRecursive) return;
+        end = end || start;
 
         var oldStart = this.selectionStart, oldEnd = this.selectionEnd;
         this.selectionStart = start < end ? start : end;
