@@ -126,7 +126,7 @@ $(() => {
             }
         }
         if (dataProvider) {
-            var data = dataProvider.get(start, Math.min(dataProvider.length - start, 8));
+            var data = dataProvider.get(start, Math.min(dataProvider.length - start, 64)).slice(0);
             function numConv(len, signed, bigEndian) {
                 if (len > data.length)
                     return '';
@@ -144,11 +144,28 @@ $(() => {
                         num = maxVal.minus(num).negate();
                 }
                 //console.log('numConv', arr, len, signed ? 'signed' : 'unsigned', bigEndian ? 'big-endian' : 'little-endian', num, typeof num);
-                return num.toString();
+                return num;
             }
-            [1, 2, 4, 8].forEach(len => [false, true].forEach(signed => [false, true].forEach(bigEndian => {
-                $(`.${signed ? 's' : 'u'}${len * 8}${len == 1 ? '' : bigEndian ? 'be' : 'le'} .val`).text(numConv(len, signed, bigEndian));
-            })));
+            [1, 2, 4, 8].forEach(len => [false, true].forEach(signed => [false, true].forEach(bigEndian => $(`.i${len * 8}${len == 1 ? '' : bigEndian ? 'be' : 'le'} .${signed ? 'signed' : 'unsigned'}`).text(numConv(len, signed, bigEndian).toString()))));
+            var u32le = numConv(4, false, false);
+            var unixtsDate = new Date(u32le * 1000);
+            $(`.float .val`).text(new Float32Array(data.buffer)[0]);
+            $(`.double .val`).text(new Float64Array(data.buffer)[0]);
+            $(`.unixts .val`).text(unixtsDate.format('Y-m-d H:i:s'));
+            function strDecode(enc) {
+                var str = new TextDecoder(enc).decode(data);
+                for (var i = 0; i < str.length; i++)
+                    if (str[i] === '\0')
+                        return str.substring(0, i);
+                return str + "...";
+            }
+            try {
+                $(`.ascii   .val div`).text(strDecode('ascii'));
+                $(`.utf8    .val div`).text(strDecode('utf-8'));
+                $(`.utf16le .val div`).text(strDecode('utf-16le'));
+                $(`.utf16be .val div`).text(strDecode('utf-16be'));
+            }
+            catch (e) { }
         }
     };
     refreshSelectionInput();

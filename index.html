@@ -61,25 +61,21 @@
 
 <div id="converterPanel">
     <table>
-        <thead><tr><th>Type</th><th>Value</th></tr></thead>
-        <tr class="u8    int"> <td>u8</td>    <td class="val"></td></tr>
-        <tr class="s8    int"> <td>s8</td>    <td class="val"></td></tr>
-        <tr class="u16le int"> <td>u16le</td> <td class="val"></td></tr>
-        <tr class="s16le int"> <td>s16le</td> <td class="val"></td></tr>
-        <tr class="u16be int"> <td>u16be</td> <td class="val"></td></tr>
-        <tr class="s16be int"> <td>s16be</td> <td class="val"></td></tr>
-        <tr class="u32le int"> <td>u32le</td> <td class="val"></td></tr>
-        <tr class="s32le int"> <td>s32le</td> <td class="val"></td></tr>
-        <tr class="u32be int"> <td>u32be</td> <td class="val"></td></tr>
-        <tr class="s32be int"> <td>s32be</td> <td class="val"></td></tr>
-        <tr class="u64le int"> <td>u64le</td> <td class="val"></td></tr>
-        <tr class="s64le int"> <td>s64le</td> <td class="val"></td></tr>
-        <tr class="u64be int"> <td>u64be</td> <td class="val"></td></tr>
-        <tr class="s64be int"> <td>s64be</td> <td class="val"></td></tr>
-        <tr class="float">     <td>float</td> <td class="val"></td></tr>
-        <tr class="double">    <td>double</td><td class="val"></td></tr>
-        <tr class="utf8">      <td>utf8</td>  <td class="val"></td></tr>
-        <tr class="utf16">     <td>utf16</td> <td class="val"></td></tr>
+        <thead><tr><th class="typeCol">Type</th><th class="typeValue">Value (unsigned)</th><th>(signed)</th></tr></thead>
+        <tr class="i8      int"> <td>i8</td>      <td class="val unsigned"></td><td class="val signed"></td></tr>
+        <tr class="i16le   int"> <td>i16le</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
+        <tr class="i32le   int"> <td>i32le</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
+        <tr class="i64le   int"> <td>i64le</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
+        <tr class="i16be   int"> <td>i16be</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
+        <tr class="i32be   int"> <td>i32be</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
+        <tr class="i64be   int"> <td>i64be</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
+        <tr class="float">       <td>float</td>   <td class="val" colspan="2"></td></tr>
+        <tr class="double">      <td>double</td>  <td class="val" colspan="2"></td></tr>
+        <tr class="unixts">      <td>unixts</td>  <td class="val" colspan="2"></td></tr>
+        <tr class="ascii   str"> <td>ascii</td>   <td class="val" colspan="2"><div></div></td></tr>
+        <tr class="utf8    str"> <td>utf8</td>    <td class="val" colspan="2"><div></div></td></tr>
+        <tr class="utf16le str"> <td>utf16le</td> <td class="val" colspan="2"><div></div></td></tr>
+        <tr class="utf16be str"> <td>utf16be</td> <td class="val" colspan="2"><div></div></td></tr>
     </table>
 </div>
 
@@ -164,5 +160,6 @@
 <script src="lib/localforage.js"></script>
 <script src="js/parsedToTree.js"></script>
 <script src="lib/biginteger.js"></script>
+<script src="lib/date.format.js"></script>
 </body>
 </html>

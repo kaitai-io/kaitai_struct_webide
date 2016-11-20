@@ -170,3 +170,8 @@ function getAllNodes(tree) {
     var json = tree.get_json().forEach(item => collectNodes(item, allNodes));
     return allNodes;
 }
+
+interface Date {
+    format(format: string): string;
+}
+
