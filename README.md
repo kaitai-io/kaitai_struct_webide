@@ -1,6 +1,14 @@
 # kaitai_struct_webide
 Online editor / visualizer for Kaitai Struct .ksy files
 
+## features
+
+[See the Features wiki page](https://github.com/koczkatamas/kaitai_struct_webide/wiki/Features)
+
+## community
+
+[Visit us on Gitter](https://gitter.im/kaitai_struct/Lobby)
+
 ## demo
 
 [https://kt.pe/kaitai_struct_webide/](https://kt.pe/kaitai_struct_webide/)
