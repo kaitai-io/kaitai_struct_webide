@@ -43,12 +43,16 @@
             return str + "...";
         }
 
+        console.log('refreshConverterPanel data', data);
+
         try {
-            panel.find(`.ascii   .val div`).text(strDecode('ascii'));
-            panel.find(`.utf8    .val div`).text(strDecode('utf-8'));
-            panel.find(`.utf16le .val div`).text(strDecode('utf-16le'));
-            panel.find(`.utf16be .val div`).text(strDecode('utf-16be'));
-        } catch (e) { }
+            panel.find(`.ascii   .val`).text(strDecode('ascii'));
+            panel.find(`.utf8    .val`).text(strDecode('utf-8'));
+            panel.find(`.utf16le .val`).text(strDecode('utf-16le'));
+            panel.find(`.utf16be .val`).text(strDecode('utf-16be'));
+        } catch (e) {
+            console.log('refreshConverterPanel str', e);
+        }
     }
     else
         panel.find('.val').text('');

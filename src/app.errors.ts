@@ -14,7 +14,7 @@ function showError(...args) {
 
 function hideErrors() {
     if (ui.errorWindow) {
-        ui.errorWindow.close();
+        try { ui.errorWindow.close(); } catch(e){ }
         ui.errorWindow = null;
     }
 }
