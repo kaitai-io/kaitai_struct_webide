@@ -1,4 +1,4 @@
-# kaitai_struct_webide
+# Kaitai Struct WebIDE
 Online editor / visualizer for Kaitai Struct .ksy files
 
 ## features
