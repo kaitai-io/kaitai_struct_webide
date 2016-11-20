@@ -23,3 +23,5 @@ Online editor / visualizer for Kaitai Struct .ksy files
 
 ![Example screenshot of a .zip file](docs/zip_example.png)
 ![Example screenshot of a .png file](docs/png_example.png)
+
+For more screenshots [visit the Features wiki page](https://github.com/koczkatamas/kaitai_struct_webide/wiki/Features)
