@@ -110,6 +110,9 @@ function addNewFiles(files) {
     })).then(refreshFsNodes);
 }
 $(() => {
+    $('#welcomeDoNotShowAgain').click(() => localStorage.setItem('doNotShowWelcome', 'true'));
+    if (localStorage.getItem('doNotShowWelcome') !== 'true')
+        $('#welcomeModal').modal();
     ui.hexViewer.onSelectionChanged = () => {
         console.log('setSelection', ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
         localStorage.setItem('selection', JSON.stringify({ start: ui.hexViewer.selectionStart, end: ui.hexViewer.selectionEnd }));

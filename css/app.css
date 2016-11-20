@@ -50,3 +50,4 @@ body { color:#333 }
 #converterPanel .typeCol { min-width:54px }
 #converterPanel .typeValue { min-width:155px }
 #converterPanel .str .val div { overflow:hidden; line-height:16px; height:16px; display:block }
+#welcomeModalLabel { text-align:center }

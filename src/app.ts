@@ -131,6 +131,10 @@ function addNewFiles(files: IFileProcessItem[]) {
 }
 
 $(() => {
+    $('#welcomeDoNotShowAgain').click(() => localStorage.setItem('doNotShowWelcome', 'true'));
+    if (localStorage.getItem('doNotShowWelcome') !== 'true')
+        (<any>$('#welcomeModal')).modal();
+
     ui.hexViewer.onSelectionChanged = () => {
         console.log('setSelection', ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
         localStorage.setItem('selection', JSON.stringify({ start: ui.hexViewer.selectionStart, end: ui.hexViewer.selectionEnd }));
