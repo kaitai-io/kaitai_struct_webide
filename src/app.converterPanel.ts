@@ -43,7 +43,7 @@
             return str + "...";
         }
 
-        console.log('refreshConverterPanel data', data);
+        //console.log('refreshConverterPanel data', data);
 
         try {
             panel.find(`.ascii   .val`).text(strDecode('ascii'));

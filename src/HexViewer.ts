@@ -260,7 +260,7 @@ class HexViewer {
                 this.intervals.push(int);
         }
             
-        console.log('setIntervals', this.intervals.map(i => `${i.start}-${i.end}`).join(' '));
+        //console.log('setIntervals', this.intervals.map(i => `${i.start}-${i.end}`).join(' '));
         this.refresh();
     }
 

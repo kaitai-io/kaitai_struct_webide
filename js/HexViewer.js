@@ -199,7 +199,7 @@ class HexViewer {
             if (i == 0 || !(int.start == intervals[i - 1].start && int.end == intervals[i - 1].end))
                 this.intervals.push(int);
         }
-        console.log('setIntervals', this.intervals.map(i => `${i.start}-${i.end}`).join(' '));
+        //console.log('setIntervals', this.intervals.map(i => `${i.start}-${i.end}`).join(' '));
         this.refresh();
     }
     setDataProvider(dataProvider) {

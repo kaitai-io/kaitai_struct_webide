@@ -64,7 +64,7 @@ function reparse() {
         var debugCode = ui.genCodeDebugViewer.getValue();
         return jailrun(`module = { exports: true }; \n ${debugCode} \n`);
     }).then(() => {
-        console.log('recompiled');
+        //console.log('recompiled');
 
         jail.remote.reparse((exportedRoot: IExportedValue, error) => {
             //console.log('reparse exportedRoot', exportedRoot);
@@ -130,13 +130,16 @@ function addNewFiles(files: IFileProcessItem[]) {
     })).then(refreshFsNodes);
 }
 
+localStorage.setItem('lastVersion', '0.1');
+
 $(() => {
     $('#welcomeDoNotShowAgain').click(() => localStorage.setItem('doNotShowWelcome', 'true'));
     if (localStorage.getItem('doNotShowWelcome') !== 'true')
         (<any>$('#welcomeModal')).modal();
+    $('#aboutWebIde').on('click', () => (<any>$('#welcomeModal')).modal());
 
     ui.hexViewer.onSelectionChanged = () => {
-        console.log('setSelection', ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
+        //console.log('setSelection', ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
         localStorage.setItem('selection', JSON.stringify({ start: ui.hexViewer.selectionStart, end: ui.hexViewer.selectionEnd }));
 
         var start = ui.hexViewer.selectionStart, end = ui.hexViewer.selectionEnd;
@@ -148,7 +151,7 @@ $(() => {
         if (itree && hasSelection && !selectedInTree) {
             var intervals = itree.search(ui.hexViewer.mouseDownOffset || start);
             if (intervals.length > 0) {
-                console.log('selected node', intervals[0].id);
+                //console.log('selected node', intervals[0].id);
                 blockRecursive = true;
                 ui.parsedDataTree.activatePath(intervals[0].id, () => blockRecursive = false);
             }

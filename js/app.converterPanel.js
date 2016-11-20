@@ -33,7 +33,7 @@ function refreshConverterPanel(panel, dataProvider, offset) {
                     return str.substring(0, i);
             return str + "...";
         }
-        console.log('refreshConverterPanel data', data);
+        //console.log('refreshConverterPanel data', data);
         try {
             panel.find(`.ascii   .val`).text(strDecode('ascii'));
             panel.find(`.utf8    .val`).text(strDecode('utf-8'));

@@ -213,7 +213,7 @@ $(() => {
     ctxAction(uiFiles.generateParser, e => {
         var fsItem = getSelectedData();
         var linkData = $(e.target).data();
-        console.log(fsItem, linkData);
+        //console.log(fsItem, linkData);
         fss[fsItem.fsType].get(fsItem.fn).then(content => {
             var compiled = compile(content, linkData.kslang, !!linkData.ksdebug);
             compiled.forEach((compItem, i) => {
