@@ -92,13 +92,15 @@ function reparse() {
 }
 
 var lastKsyContent, inputContent: ArrayBuffer, inputFsItem: IFsItem;
-function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true) {
+function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
     if (!fsItem || fsItem.type !== 'file')
         return Promise.resolve();
 
     return fss[fsItem.fsType].get(fsItem.fn).then(content => {
         if (isKsyFile(fsItem.fn)) {
-            localforage.setItem('ksyFsItem', fsItem);
+            if (!isPracticeMode)
+                localforage.setItem('ksyFsItem', fsItem);
+
             lastKsyContent = content;
             ui.ksyEditor.setValue(content, -1);
             return Promise.resolve();
@@ -107,7 +109,8 @@ function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true) {
             inputFsItem = fsItem;
             inputContent = content;
 
-            localforage.setItem('inputFsItem', fsItem);
+            if (!isPracticeMode)
+                localforage.setItem('inputFsItem', fsItem);
 
             dataProvider = {
                 length: content.byteLength,
@@ -168,18 +171,20 @@ $(() => {
         exec: function (editor) { reparse(); }
     });
 
-    initFileDrop('fileDrop', addNewFiles);
-
-    fileTreeCont.bind("dblclick.jstree", function (event) {
-        loadFsItem(<IFsItem>ui.fileTree.get_node(event.target).data);
-    });
+    if (!isPracticeMode)
+        initFileDrop('fileDrop', addNewFiles);
 
     function loadCachedFsItem(cacheKey: string, defSample: string) {
         return localforage.getItem(cacheKey).then((fsItem: IFsItem) => loadFsItem(fsItem || <IFsItem>{ fsType: 'kaitai', fn: `${defSample}`, type: 'file' }, false));
     }
 
-    var inputReady = loadCachedFsItem('inputFsItem', 'samples/sample1.zip');
-    var formatReady = loadCachedFsItem('ksyFsItem', 'formats/archive/zip.ksy');
+    if (isPracticeMode) {
+        var inputReady = loadFsItem(<IFsItem>{ fsType: 'kaitai', fn: practiceChall.inputFn, type: 'file' });
+        var formatReady = loadFsItem(<IFsItem>{ fsType: 'kaitai', fn: practiceChall.starterKsyFn, type: 'file' });
+    } else {
+        var inputReady = loadCachedFsItem('inputFsItem', 'samples/sample1.zip');
+        var formatReady = loadCachedFsItem('ksyFsItem', 'formats/archive/zip.ksy');
+    }
 
     inputReady.then(() => {
         var storedSelection = JSON.parse(localStorage.getItem('selection'));

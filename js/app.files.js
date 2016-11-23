@@ -125,7 +125,8 @@ function addKsyFile(parent, name, fsItem) {
 }
 var fileTreeCont;
 $(() => {
-    //console.log('kaitaiRoot', kaitaiRoot);
+    if (!ui.fileTreeCont)
+        return;
     fileTreeCont = ui.fileTreeCont.find('.fileTree');
     ui.fileTree = fileTreeCont.jstree({
         core: {
@@ -257,6 +258,9 @@ $(() => {
             addKsyFile(ksyParent, `${ksyName}.ksy`, fsItem);
             return loadFsItem(fsItem);
         });
+    });
+    fileTreeCont.bind("dblclick.jstree", function (event) {
+        loadFsItem(ui.fileTree.get_node(event.target).data);
     });
 });
 //# sourceMappingURL=app.files.js.map

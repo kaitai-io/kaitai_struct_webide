@@ -159,7 +159,7 @@ function addKsyFile(parent, name, fsItem) {
 var fileTreeCont;
 
 $(() => {
-    //console.log('kaitaiRoot', kaitaiRoot);
+    if (!ui.fileTreeCont) return;
 
     fileTreeCont = ui.fileTreeCont.find('.fileTree');
 
@@ -315,5 +315,9 @@ $(() => {
             addKsyFile(ksyParent, `${ksyName}.ksy`, fsItem);
             return loadFsItem(fsItem);
         });
+    });
+
+    fileTreeCont.bind("dblclick.jstree", function (event) {
+        loadFsItem(<IFsItem>ui.fileTree.get_node(event.target).data);
     });
 })

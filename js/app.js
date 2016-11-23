@@ -82,7 +82,8 @@ function loadFsItem(fsItem, refreshGui = true) {
         return Promise.resolve();
     return fss[fsItem.fsType].get(fsItem.fn).then(content => {
         if (isKsyFile(fsItem.fn)) {
-            localforage.setItem('ksyFsItem', fsItem);
+            if (!isPracticeMode)
+                localforage.setItem('ksyFsItem', fsItem);
             lastKsyContent = content;
             ui.ksyEditor.setValue(content, -1);
             return Promise.resolve();
@@ -90,7 +91,8 @@ function loadFsItem(fsItem, refreshGui = true) {
         else {
             inputFsItem = fsItem;
             inputContent = content;
-            localforage.setItem('inputFsItem', fsItem);
+            if (!isPracticeMode)
+                localforage.setItem('inputFsItem', fsItem);
             dataProvider = {
                 length: content.byteLength,
                 get(offset, length) { return new Uint8Array(content, offset, length); },
@@ -138,15 +140,19 @@ $(() => {
         bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
         exec: function (editor) { reparse(); }
     });
-    initFileDrop('fileDrop', addNewFiles);
-    fileTreeCont.bind("dblclick.jstree", function (event) {
-        loadFsItem(ui.fileTree.get_node(event.target).data);
-    });
+    if (!isPracticeMode)
+        initFileDrop('fileDrop', addNewFiles);
     function loadCachedFsItem(cacheKey, defSample) {
         return localforage.getItem(cacheKey).then((fsItem) => loadFsItem(fsItem || { fsType: 'kaitai', fn: `${defSample}`, type: 'file' }, false));
     }
-    var inputReady = loadCachedFsItem('inputFsItem', 'samples/sample1.zip');
-    var formatReady = loadCachedFsItem('ksyFsItem', 'formats/archive/zip.ksy');
+    if (isPracticeMode) {
+        var inputReady = loadFsItem({ fsType: 'kaitai', fn: practiceChall.inputFn, type: 'file' });
+        var formatReady = loadFsItem({ fsType: 'kaitai', fn: practiceChall.starterKsyFn, type: 'file' });
+    }
+    else {
+        var inputReady = loadCachedFsItem('inputFsItem', 'samples/sample1.zip');
+        var formatReady = loadCachedFsItem('ksyFsItem', 'formats/archive/zip.ksy');
+    }
     inputReady.then(() => {
         var storedSelection = JSON.parse(localStorage.getItem('selection'));
         if (storedSelection)
