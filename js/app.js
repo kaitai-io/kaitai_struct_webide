@@ -25,8 +25,9 @@ function compile(srcYaml, kslang, debug) {
     }
 }
 function isKsyFile(fn) { return fn.toLowerCase().endsWith('.ksy'); }
+var ksyFsItemName = isPracticeMode ? `ksyFsItem_practice_${practiceChallName}` : 'ksyFsItem';
 function recompile() {
-    return localforage.getItem('ksyFsItem').then(ksyFsItem => {
+    return localforage.getItem(ksyFsItemName).then(ksyFsItem => {
         var srcYaml = ui.ksyEditor.getValue();
         var changed = lastKsyContent !== srcYaml;
         var copyPromise = Promise.resolve();
@@ -34,7 +35,7 @@ function recompile() {
             var newFn = ksyFsItem.fn.split('/').last().replace('.ksy', '_modified.ksy');
             copyPromise = fss.local.put(newFn, srcYaml).then(fsItem => {
                 ksyFsItem = fsItem;
-                return localforage.setItem('ksyFsItem', fsItem);
+                return localforage.setItem(ksyFsItemName, fsItem);
             }).then(() => addKsyFile('localStorage', newFn, ksyFsItem));
         }
         return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
@@ -69,6 +70,8 @@ function reparse() {
                     selectedInTree = false;
                 }
             });
+            if (isPracticeMode)
+                practiceExportedChanged(exportedRoot);
         });
     });
 }
@@ -78,8 +81,7 @@ function loadFsItem(fsItem, refreshGui = true) {
         return Promise.resolve();
     return fss[fsItem.fsType].get(fsItem.fn).then(content => {
         if (isKsyFile(fsItem.fn)) {
-            if (!isPracticeMode)
-                localforage.setItem('ksyFsItem', fsItem);
+            localforage.setItem(ksyFsItemName, fsItem);
             lastKsyContent = content;
             ui.ksyEditor.setValue(content, -1);
             return Promise.resolve();
@@ -108,6 +110,8 @@ function addNewFiles(files) {
     })).then(refreshFsNodes);
 }
 localStorage.setItem('lastVersion', '0.1');
+if (isPracticeMode)
+    $.getScript('js/app.practiceMode.js');
 $(() => {
     $('#welcomeDoNotShowAgain').click(() => localStorage.setItem('doNotShowWelcome', 'true'));
     if (localStorage.getItem('doNotShowWelcome') !== 'true')
@@ -141,13 +145,14 @@ $(() => {
     function loadCachedFsItem(cacheKey, defSample) {
         return localforage.getItem(cacheKey).then((fsItem) => loadFsItem(fsItem || { fsType: 'kaitai', fn: `${defSample}`, type: 'file' }, false));
     }
+    var formatReady, inputReady;
     if (isPracticeMode) {
-        var inputReady = loadFsItem({ fsType: 'kaitai', fn: practiceChall.inputFn, type: 'file' });
-        var formatReady = loadFsItem({ fsType: 'kaitai', fn: practiceChall.starterKsyFn, type: 'file' });
+        inputReady = loadFsItem({ fsType: 'kaitai', fn: practiceChall.inputFn, type: 'file' });
+        formatReady = loadCachedFsItem(ksyFsItemName, practiceChall.starterKsyFn);
     }
     else {
-        var inputReady = loadCachedFsItem('inputFsItem', 'samples/sample1.zip');
-        var formatReady = loadCachedFsItem('ksyFsItem', 'formats/archive/zip.ksy');
+        inputReady = loadCachedFsItem('inputFsItem', 'samples/sample1.zip');
+        formatReady = loadCachedFsItem(ksyFsItemName, 'formats/archive/zip.ksy');
     }
     inputReady.then(() => {
         var storedSelection = JSON.parse(localStorage.getItem('selection'));

@@ -1,5 +1,6 @@
-var practiceChallName = /practice=([a-z0-9]+)/.exec(location.href);
-var practiceChall = practiceMode && practiceChallName && practiceMode.challs[practiceChallName ? practiceChallName[1] : practiceMode.chall];
+var practiceChallNameMatch = /practice=([a-z0-9]+)/.exec(location.href);
+var practiceChallName = practiceChallNameMatch ? practiceChallNameMatch[1] : practiceMode.chall;
+var practiceChall = practiceMode && practiceChallName && practiceMode.challs[practiceChallName];
 var isPracticeMode = !!practiceChall;
 var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },

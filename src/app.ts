@@ -31,8 +31,10 @@ function compile(srcYaml: string, kslang: string, debug: true|false|'both') {
 
 function isKsyFile(fn) { return fn.toLowerCase().endsWith('.ksy'); }
 
+var ksyFsItemName = isPracticeMode ? `ksyFsItem_practice_${practiceChallName}` : 'ksyFsItem';
+
 function recompile() {
-    return localforage.getItem<IFsItem>('ksyFsItem').then(ksyFsItem => {
+    return localforage.getItem<IFsItem>(ksyFsItemName).then(ksyFsItem => {
         var srcYaml = ui.ksyEditor.getValue();
         var changed = lastKsyContent !== srcYaml;
 
@@ -41,7 +43,7 @@ function recompile() {
             var newFn = ksyFsItem.fn.split('/').last().replace('.ksy', '_modified.ksy');
             copyPromise = fss.local.put(newFn, srcYaml).then(fsItem => {
                 ksyFsItem = fsItem;
-                return localforage.setItem('ksyFsItem', fsItem);
+                return localforage.setItem(ksyFsItemName, fsItem);
             }).then(() => addKsyFile('localStorage', newFn, ksyFsItem));
         }
 
@@ -84,6 +86,9 @@ function reparse() {
                     selectedInTree = false;
                 }
             });
+
+            if (isPracticeMode)
+                practiceExportedChanged(exportedRoot);
         });
     });
 }
@@ -95,9 +100,7 @@ function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
 
     return fss[fsItem.fsType].get(fsItem.fn).then(content => {
         if (isKsyFile(fsItem.fn)) {
-            if (!isPracticeMode)
-                localforage.setItem('ksyFsItem', fsItem);
-
+            localforage.setItem(ksyFsItemName, fsItem);
             lastKsyContent = content;
             ui.ksyEditor.setValue(content, -1);
             return Promise.resolve();
@@ -131,6 +134,9 @@ function addNewFiles(files: IFileProcessItem[]) {
 }
 
 localStorage.setItem('lastVersion', '0.1');
+
+if (isPracticeMode)
+    $.getScript('js/app.practiceMode.js');
 
 $(() => {
     $('#welcomeDoNotShowAgain').click(() => localStorage.setItem('doNotShowWelcome', 'true'));
@@ -175,12 +181,13 @@ $(() => {
         return localforage.getItem(cacheKey).then((fsItem: IFsItem) => loadFsItem(fsItem || <IFsItem>{ fsType: 'kaitai', fn: `${defSample}`, type: 'file' }, false));
     }
 
+    var formatReady, inputReady;
     if (isPracticeMode) {
-        var inputReady = loadFsItem(<IFsItem>{ fsType: 'kaitai', fn: practiceChall.inputFn, type: 'file' });
-        var formatReady = loadFsItem(<IFsItem>{ fsType: 'kaitai', fn: practiceChall.starterKsyFn, type: 'file' });
+        inputReady = loadFsItem(<IFsItem>{ fsType: 'kaitai', fn: practiceChall.inputFn, type: 'file' });
+        formatReady = loadCachedFsItem(ksyFsItemName, practiceChall.starterKsyFn);
     } else {
-        var inputReady = loadCachedFsItem('inputFsItem', 'samples/sample1.zip');
-        var formatReady = loadCachedFsItem('ksyFsItem', 'formats/archive/zip.ksy');
+        inputReady = loadCachedFsItem('inputFsItem', 'samples/sample1.zip');
+        formatReady = loadCachedFsItem(ksyFsItemName, 'formats/archive/zip.ksy');
     }
 
     inputReady.then(() => {
