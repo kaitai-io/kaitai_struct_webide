@@ -58,11 +58,7 @@ function reparse() {
             //console.log('reparse exportedRoot', exportedRoot);
             itree = new IntervalTree(dataProvider.length / 2);
             handleError(error);
-            if (error)
-                return;
-            ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, handleError, () => {
-                ui.hexViewer.onSelectionChanged();
-            });
+            ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, e => handleError(error || e), () => ui.hexViewer.onSelectionChanged());
             ui.parsedDataTree.on('select_node.jstree', function (e, selectNodeArgs) {
                 var node = selectNodeArgs.node;
                 //console.log('node', node);
@@ -109,7 +105,7 @@ function addNewFiles(files) {
         });
     })).then(refreshFsNodes);
 }
-localStorage.setItem('lastVersion', '0.1.0.1');
+localStorage.setItem('lastVersion', '0.1.0.2');
 $(() => {
     $('#welcomeDoNotShowAgain').click(() => localStorage.setItem('doNotShowWelcome', 'true'));
     if (localStorage.getItem('doNotShowWelcome') !== 'true')
