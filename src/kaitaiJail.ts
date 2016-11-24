@@ -53,7 +53,7 @@ application.setInterface({
             parsed = new module.exports(ioInput);
             parsed._read();
         } catch (e) {
-            parseError = JSON.stringify(e);
+            parseError = { message: e.message, stack: e.stack };
         }
 
         exported = exportValue(parsed, <IDebugInfo>{ start: 0, end: inputBuffer.byteLength }, []);
