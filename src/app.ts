@@ -130,7 +130,7 @@ function addNewFiles(files: IFileProcessItem[]) {
     })).then(refreshFsNodes);
 }
 
-localStorage.setItem('lastVersion', '0.1');
+localStorage.setItem('lastVersion', '0.1.0.1');
 
 $(() => {
     $('#welcomeDoNotShowAgain').click(() => localStorage.setItem('doNotShowWelcome', 'true'));
