@@ -38,6 +38,7 @@
     <TypeScriptCompile Include="src\app.files.ts" />
     <TypeScriptCompile Include="src\app.jail.ts" />
     <TypeScriptCompile Include="src\app.layout.ts" />
+    <TypeScriptCompile Include="src\app.practiceMode.ts" />
     <TypeScriptCompile Include="src\app.selectionInput.ts" />
     <TypeScriptCompile Include="src\app.ts" />
     <TypeScriptCompile Include="src\app.unsupportedBrowser.ts" />
@@ -46,6 +47,7 @@
     <TypeScriptCompile Include="src\kaitaiJail.ts" />
     <TypeScriptCompile Include="src\parsedToJson.ts" />
     <TypeScriptCompile Include="src\parsedToTree.ts" />
+    <TypeScriptCompile Include="src\practiceMode.ts" />
     <TypeScriptCompile Include="src\utils.ts" />
     <TypeScriptCompile Include="src\HexViewer.ts" />
   </ItemGroup>
