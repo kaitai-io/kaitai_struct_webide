@@ -1,93 +1,117 @@
-var practiceDiff;
+var practiceDiff, Range, markers = [];
 function practiceExportedChanged(exportedRoot) {
-    function exportedToJson(exported) {
-        var padLen = 2;
-        var commentOffset = 60;
-        function commentPad(str) { return str.length < commentOffset ? str + ' '.repeat(commentOffset - str.length) : str; }
-        var lineInfo = { currLine: 0, lineStart: 0, lines: {} };
-        var json = "";
-        function nl() {
-            json += "\n";
-            lineInfo.currLine++;
-            lineInfo.lineStart = json.length;
-        }
-        function comment(str) {
-            var padLen = commentOffset - (json.length - lineInfo.lineStart);
-            if (padLen > 0)
-                json += ' '.repeat(padLen);
-            json += ` // ${str}`;
-        }
-        function getLenComment(obj) {
-            var len = obj.end - obj.start + 1;
-            lineInfo.lines[lineInfo.currLine] = obj;
-            return `${obj.start}-${obj.end} (l:${len})`;
-        }
-        function numConv(num) {
-            return num % 1 > 10e-9 ? Math.round(num * 1000000) / 1000000 : num;
-        }
-        function toJson(obj, pad = 0) {
-            //debug = debug || obj._debug;
-            var objPad = " ".repeat((pad + 0) * padLen);
-            var childPad = " ".repeat((pad + 1) * padLen);
-            var isArray = obj.type === ObjectType.Array;
-            var isObject = obj.type === ObjectType.Object;
-            if (obj.type === ObjectType.TypedArray) {
-                json += "[";
-                for (var i = 0; i < obj.bytes.byteOffset; i++) {
-                    json += i == 0 ? "" : ", ";
-                    if (i != 0 && (i % 8 == 0)) {
-                        nl();
-                        json += childPad;
-                    }
-                    json += obj.bytes[i];
-                }
-                json += "]";
-            }
-            else if (obj.type === ObjectType.Object) {
-                json += `{`;
-                //json += ` // ${obj.object.class}`;
-                //comment(getLenComment(obj));
-                var keys = Object.keys(obj.object.fields);
-                keys.forEach((fieldName, i) => {
-                    nl();
-                    json += childPad + `"${fieldName}": `;
-                    var isObject = toJson(obj.object.fields[fieldName], pad + 1);
-                    json += (i == keys.length - 1 ? "" : ",");
-                });
-                nl();
-                json += objPad + '}';
-                return true;
-            }
-            else if (obj.type === ObjectType.Array) {
-                json += `[`;
-                obj.arrayItems.forEach((item, i) => {
-                    nl();
-                    json += childPad;
-                    var isObject = toJson(item, pad + 1);
-                    json += (i == obj.arrayItems.length - 1 ? "" : ",");
-                    //comment(' ' + getLenComment(item));
-                });
-                nl();
-                json += objPad + ']';
-                return true;
-            }
-            else if (obj.type === ObjectType.Primitive) {
-                if (typeof obj.primitiveValue === "number")
-                    json += numConv(obj.primitiveValue);
-                else
-                    json += `"${obj.primitiveValue}"`;
-            }
-            return false;
-        }
-        toJson(exported);
-        return { json, lineInfo };
+    function numConv(num) {
+        return num % 1 > 10e-9 ? Math.round(num * 1000000) / 1000000 : num;
     }
-    practiceDiff.setValue(exportedToJson(exportedRoot).json, -1);
+    function isUndef(obj) { return typeof obj === "undefined"; }
+    function getObjectType(obj) {
+        if (obj instanceof Uint8Array)
+            return ObjectType.TypedArray;
+        else if (typeof obj !== "object")
+            return isUndef(obj) ? ObjectType.Undefined : ObjectType.Primitive;
+        else if (Array.isArray(obj))
+            return ObjectType.Array;
+        else
+            return ObjectType.Object;
+    }
+    var padLen = 2;
+    var json = "";
+    var lines = [];
+    var currLine = { start: 0 };
+    function nl() {
+        currLine.idx = lines.length;
+        currLine.end = json.length;
+        lines.push(currLine);
+        currLine = { start: json.length + 1 };
+        return '\n';
+    }
+    function reprPrimitive(obj) {
+        var type = getObjectType(obj);
+        if (type === ObjectType.TypedArray) {
+            var result = "[";
+            for (var i = 0; i < obj.byteLength; i++)
+                result += (i == 0 ? "" : ", ") + obj[i];
+            return result + "],";
+        }
+        else if (type === ObjectType.Primitive)
+            return typeof obj === "number" ? numConv(obj) : `"${obj}"`;
+        else if (type === ObjectType.Undefined)
+            return null;
+    }
+    function union(a, b) { return [...new Set([...a, ...b])]; }
+    function toJson(obj, solObj, fieldName = null, pad = 0) {
+        var objPad = " ".repeat((pad + 0) * padLen);
+        var childPad = " ".repeat((pad + 1) * padLen);
+        var objType = getObjectType(obj);
+        var solType = getObjectType(solObj);
+        var type = objType || solType;
+        var prefix = objPad + (fieldName ? `"${fieldName}": ` : '');
+        var isArray = type === ObjectType.Array;
+        if (type === ObjectType.Object || isArray) {
+            json += prefix + (isArray ? '[' : '{') + nl();
+            var keys = union(Object.keys(solObj), Object.keys(obj));
+            keys.forEach((fieldName, i) => {
+                toJson(obj[fieldName], solObj[fieldName], isArray ? null : fieldName, pad + 1);
+                json += (i == keys.length - 1 ? "" : ",");
+                json += nl();
+            });
+            json += objPad + (isArray ? ']' : '}');
+            return true;
+        }
+        else {
+            var objRepr = reprPrimitive(obj);
+            var solRepr = reprPrimitive(solObj);
+            if (objRepr === solRepr) {
+                currLine.match = 'match';
+                json += prefix + objRepr;
+            }
+            else {
+                if (objRepr !== null) {
+                    currLine.match = 'user';
+                    json += prefix + objRepr;
+                }
+                if (objRepr !== null && solRepr !== null)
+                    json += nl();
+                if (solRepr !== null) {
+                    currLine.match = 'solution';
+                    json += prefix + solRepr;
+                }
+            }
+        }
+        return false;
+    }
+    function exportedToNative(exp) {
+        if (exp.type === ObjectType.Primitive)
+            return exp.primitiveValue;
+        else if (exp.type === ObjectType.TypedArray)
+            return exp.bytes;
+        else if (exp.type === ObjectType.Array)
+            return exp.arrayItems.map(x => exportedToNative(x));
+        else if (exp.type === ObjectType.Object) {
+            var result = {};
+            Object.keys(exp.object.fields).forEach(fieldName => { result[fieldName] = exportedToNative(exp.object.fields[fieldName]); });
+            return result;
+        }
+        else
+            console.log(`Unknown object type: ${exp.type}`);
+    }
+    var native = exportedToNative(exportedRoot);
+    toJson(native, practiceChall.solution);
+    nl();
+    practiceDiff.setValue(json, -1);
+    console.log(markers, lines);
+    markers.forEach(marker => practiceDiff.session.removeMarker(marker));
+    markers = [];
+    lines.forEach(line => {
+        markers.push(practiceDiff.session.addMarker(new Range(line.idx, 0, line.idx, 1), `marker_${line.match}`, "fullLine", false));
+    });
 }
 $(() => {
+    Range = ace.require('ace/range').Range;
     practiceDiff = ace.edit('practiceDiff');
     practiceDiff.setTheme("ace/theme/monokai");
     practiceDiff.getSession().setMode(`ace/mode/javascript`);
+    practiceDiff.getSession().setUseWorker(false);
     practiceDiff.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
     practiceDiff.setReadOnly(true);
 });

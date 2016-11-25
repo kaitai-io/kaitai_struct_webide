@@ -8,27 +8,34 @@ class IDebugInfo {
 
 function isUndef(obj) { return typeof obj === "undefined"; }
 
+function getObjectType(obj) {
+    if (obj instanceof Uint8Array)
+        return ObjectType.TypedArray;
+    else if (typeof obj !== "object")
+        return isUndef(obj) ? ObjectType.Undefined : ObjectType.Primitive;
+    else if (Array.isArray(obj))
+        return ObjectType.Array;
+    else
+        return ObjectType.Object;
+}
+
 function exportValue(obj, debug: IDebugInfo, path: string[]): IExportedValue {
     if (!debug) debugger;
-    var result = <IExportedValue>{ start: debug.start, end: debug.end, path: path };
+    var result = <IExportedValue>{ start: debug.start, end: debug.end, path: path, type: getObjectType(obj) };
 
-    if (obj instanceof Uint8Array) {
-        result.type = ObjectType.TypedArray;
+    if (result.type === ObjectType.TypedArray)
         result.bytes = obj;
-    }
-    else if (typeof obj !== "object") {
-        result.type = isUndef(obj) ? ObjectType.Undefined : ObjectType.Primitive;
+    else if (result.type === ObjectType.Primitive || obj.type === ObjectType.Undefined)
         result.primitiveValue = obj;
-    }
-    else if (Array.isArray(obj)) {
-        result.type = ObjectType.Array;
+    else if (result.type === ObjectType.Array)
         result.arrayItems = obj.map((item, i) => exportValue(item, debug.arr[i], path.concat(i.toString())));
-    } else {
-        result.type = ObjectType.Object;
+    else if (result.type === ObjectType.Object) {
         result.object = { class: obj.constructor.name, propPaths: {}, fields: {} };
         Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor").forEach(propName => result.object.propPaths[propName] = path.concat(propName));
         Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key)));
     }
+    else
+        console.log(`Unknown object type: ${result.type}`);
 
     return result;
 }

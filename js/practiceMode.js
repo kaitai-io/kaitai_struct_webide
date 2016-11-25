@@ -9,7 +9,7 @@ var practiceMode = {
                 "iLikeNegativeNumbers": -1337,
                 "halfLife3Confirmed": 3.33,
                 "onlyOne": 1,
-                "message": "★★★ Congratulations! You've successfully solved this challenge! :) ★★★",
+                "message": "★★★ Congratulations! ★★★",
                 "trailer": "EOFEOF"
             }
         }

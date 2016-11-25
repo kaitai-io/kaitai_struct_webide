@@ -23,8 +23,8 @@ var myLayout = new GoldenLayout({
                             { type: 'component', componentName: 'genCodeDebugViewer', title: 'JS code (debug)', isClosable: false },
                             { type: 'column', isClosable: false, title: 'input binary', content: [
                                 { type: 'component', componentName: 'hexViewer', title: 'hex viewer', isClosable: false },
-                                { type: 'row', isClosable: false, content: [
-                                    { type: 'component', componentName: 'infoPanel', title: 'info panel', isClosable: false, height: 30 },
+                                { type: 'row', isClosable: false, height: 35, content: [
+                                    { type: 'component', componentName: 'infoPanel', title: 'info panel', isClosable: false, width: 40 },
                                     { type: 'component', componentName: 'converterPanel', title: 'converter', isClosable: false },
                                 ]}
                             ]}
