@@ -49,11 +49,12 @@ seq:
             inputFn: 'practice/chall2/input.bin',
             starterKsy: `
 meta:
-  id: chall1
-  endian: le
+  id: chall2
+  endian: be
 seq:
-  - id: my_first_byte
-    type: u1`,
+  - id: magic
+    contents: "C"
+`,
             solution: {
                 "magic": [67, 82, 89, 80, 84, 82, 79, 76, 79],
                 "files": [
@@ -88,20 +89,27 @@ seq:
                 ]
             },
             description: `
-<div style="font-size:20px; text-align:center; margin-bottom:18px; margin-top:3px">Practice: round #2</div>
+<div style="font-size:20px; text-align:center; margin-bottom:18px; margin-top:3px">Practice: types, sequences</div>
 <p align="justify">
     Have you seen my <a href="https://platform.avatao.com/paths/d2176244-bd8b-48d1-b3e1-b63da2de4690/challenges/706bbbc9-bca4-49b2-9437-0b7ac3339b5c" target="_blank">Cryptrololololo challenge</a> on Avatao?
 </p>
 <p align="justify">Let's parse its file format!</p>
 <p align="justify">Recommended readings:</p>
 <ul style="font-size:14px">
-    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Attribute-description" target="_blank">Attributes (repeat)</a><br/></li>
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Attribute-description" target="_blank">Attributes (contents, repeat)</a><br/></li>
     <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Type-description" target="_blank">Type description</a></li>
     <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Expressions" target="_blank">Expressions (size)</a></li>
-    <li><a href="https://platform.avatao.com/blob/706bbbc9-bca4-49b2-9437-0b7ac3339b5c/Cryptrololololo.zip" target="_blank">Source of Cryptrololololo (see encryptor.py)</a></li>
 
 </ul>
-<p align="justify">Integers are 4-byte longs and use big-endian encoding.</p>
+<p align="justify">
+File format information:
+<ul style="font-size:14px">
+    <li><a href="https://platform.avatao.com/blob/706bbbc9-bca4-49b2-9437-0b7ac3339b5c/Cryptrololololo.zip" target="_blank">Source (see the encryptor.py)</a></li>
+    <li>file starts with the "CRYPTROLO" magic string</li>
+    <li>integers are 4-byte longs and use big-endian encoding</li>
+    <li>the size of MD5 hash in hex is 32 bytes</li>
+</ul>
+</p>
 <p align="justify">Here is the expected output:</p>
 `
         }
