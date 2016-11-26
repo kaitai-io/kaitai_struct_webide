@@ -7,6 +7,7 @@ var myLayout = new GoldenLayout({
     content: [
         { type: 'row', content: []
                 .concat(isPracticeMode ? [] : { type: 'component', componentName: 'fileTreeCont', title: 'files', isClosable: false, width: 12 })
+                .concat(isPracticeMode ? { type: 'component', componentName: 'practicePanel', title: 'practice mode', isClosable: false, width: 25 } : [])
                 .concat({ type: 'column', id: 'mainArea', isClosable: false, content: [
                     { type: 'row', content: [
                             { type: 'column', content: [
@@ -28,8 +29,9 @@ var myLayout = new GoldenLayout({
                                         ] }
                                 ] }
                         ] },
-                ] })
-                .concat(isPracticeMode ? { type: 'component', componentName: 'practicePanel', title: 'practice mode', isClosable: false, width: 25 } : []) }
+                ]
+            })
+        }
     ]
 });
 function getLayoutNodeById(id) {
@@ -66,7 +68,7 @@ function addComponent(name, generatorCallback) {
 function addExistingDiv(name) {
     myLayout.registerComponent(name, function (container, componentState) {
         ui[name] = $(`#${name}`).appendTo(container.getElement());
-        $(() => ui[name].show());
+        $(() => ui[name].show().css({ visibility: 'visible' }));
     });
 }
 function addEditor(name, lang, isReadOnly = false, callback = null) {

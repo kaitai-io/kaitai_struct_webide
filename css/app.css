@@ -52,7 +52,9 @@ body { color:#333 }
 #converterPanel .str .val { overflow:hidden; line-height:16px; height:16px; display:block }
 #welcomeModalLabel { text-align:center }
 #aboutWebIde { position:absolute; bottom:10px; right:10px; font-size:12px }
-#practicePanel { color:#eee; padding:10px; display:none }
-#practiceDiff { height:500px }
+#practicePanel { color:#eee; padding:10px; display:flex; height:100%; visibility:hidden; flex-flow: column; }
+#practicePanel .description { flex: 0 1 auto }
+#practiceDiff { flex: 1 1 auto }
 .marker_solution { background:rgba(255, 80, 80, 0.3); }
-.marker_user { background:rgba(80, 255, 80, 0.3); }
+.marker_user { background:rgba(80, 255, 80, 0.30); }
+/*.marker_match { background:rgba(80, 255, 80, 0.30); }*/

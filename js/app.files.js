@@ -55,6 +55,14 @@ class KaitaiFs {
     }
     put(fn, data) { return Promise.reject('KaitaiFs.put is not implemented!'); }
 }
+class StaticFs {
+    constructor() {
+        this.files = {};
+    }
+    getRootNode() { return Promise.resolve(Object.keys(this.files).map(fn => ({ fsType: 'static', type: 'file', fn }))); }
+    get(fn) { return Promise.resolve(this.files[fn]); }
+    put(fn, data) { this.files[fn] = data; return Promise.resolve(); }
+}
 var files = [
     'formats/archive/lzh.ksy',
     'formats/archive/zip.ksy',
@@ -98,8 +106,9 @@ var files = [
 var kaitaiRoot = { fsType: 'kaitai' };
 files.forEach(fn => fsHelper.selectNode(kaitaiRoot, fn));
 var kaitaiFs = new KaitaiFs(kaitaiRoot);
+var staticFs = new StaticFs();
 var localFs = new LocalStorageFs("fs");
-var fss = { local: localFs, kaitai: kaitaiFs };
+var fss = { local: localFs, kaitai: kaitaiFs, static: staticFs };
 function genChildNode(obj, fn) {
     var isFolder = obj.type === 'folder';
     return {

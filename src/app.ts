@@ -39,7 +39,7 @@ function recompile() {
         var changed = lastKsyContent !== srcYaml;
 
         var copyPromise = Promise.resolve();
-        if (changed && ksyFsItem.fsType === 'kaitai') {
+        if (changed && (ksyFsItem.fsType === 'kaitai' || ksyFsItem.fsType === 'static')) {
             var newFn = ksyFsItem.fn.split('/').last().replace('.ksy', '_modified.ksy');
             copyPromise = fss.local.put(newFn, srcYaml).then(fsItem => {
                 ksyFsItem = fsItem;
@@ -177,17 +177,19 @@ $(() => {
     if (!isPracticeMode)
         initFileDrop('fileDrop', addNewFiles);
 
-    function loadCachedFsItem(cacheKey: string, defSample: string) {
-        return localforage.getItem(cacheKey).then((fsItem: IFsItem) => loadFsItem(fsItem || <IFsItem>{ fsType: 'kaitai', fn: `${defSample}`, type: 'file' }, false));
+    function loadCachedFsItem(cacheKey: string, defFsType: string, defSample: string) {
+        return localforage.getItem(cacheKey).then((fsItem: IFsItem) => loadFsItem(fsItem || <IFsItem>{ fsType: defFsType, fn: defSample, type: 'file' }, false));
     }
 
     var formatReady, inputReady;
     if (isPracticeMode) {
         inputReady = loadFsItem(<IFsItem>{ fsType: 'kaitai', fn: practiceChall.inputFn, type: 'file' });
-        formatReady = loadCachedFsItem(ksyFsItemName, practiceChall.starterKsyFn);
+        var startKsyFn = `practice_${practiceChallName}.ksy`;
+        staticFs.put(startKsyFn, practiceChall.starterKsy.trim());
+        formatReady = loadCachedFsItem(ksyFsItemName, 'static', startKsyFn);
     } else {
-        inputReady = loadCachedFsItem('inputFsItem', 'samples/sample1.zip');
-        formatReady = loadCachedFsItem(ksyFsItemName, 'formats/archive/zip.ksy');
+        inputReady = loadCachedFsItem('inputFsItem', 'kaitai', 'samples/sample1.zip');
+        formatReady = loadCachedFsItem(ksyFsItemName, 'kaitai', 'formats/archive/zip.ksy');
     }
 
     inputReady.then(() => {

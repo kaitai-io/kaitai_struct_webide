@@ -48,13 +48,16 @@ function practiceExportedChanged(exportedRoot) {
         var prefix = objPad + (fieldName ? `"${fieldName}": ` : '');
         var isArray = type === ObjectType.Array;
         if (type === ObjectType.Object || isArray) {
-            json += prefix + (isArray ? '[' : '{') + nl();
+            currLine.match = 'match';
+            json += prefix + (isArray ? '[' : '{');
+            json += nl();
             var keys = union(Object.keys(solObj), Object.keys(obj));
             keys.forEach((fieldName, i) => {
                 toJson(obj[fieldName], solObj[fieldName], isArray ? null : fieldName, pad + 1);
                 json += (i == keys.length - 1 ? "" : ",");
                 json += nl();
             });
+            currLine.match = 'match';
             json += objPad + (isArray ? ']' : '}');
             return true;
         }
@@ -114,5 +117,6 @@ $(() => {
     practiceDiff.getSession().setUseWorker(false);
     practiceDiff.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
     practiceDiff.setReadOnly(true);
+    $('#practicePanel .description').html(practiceChall.description);
 });
 //# sourceMappingURL=app.practiceMode.js.map
