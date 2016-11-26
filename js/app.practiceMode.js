@@ -51,7 +51,7 @@ function practiceExportedChanged(exportedRoot) {
         var childPad = " ".repeat((pad + 1) * padLen);
         var objType = getObjectType(obj);
         var solType = getObjectType(solObj);
-        var type = objType || solType;
+        var type = solType || objType;
         //console.log('toJson', objType, solType, fieldName, pad, obj, solObj);
         var objMatch = objType === solType ? 'match' : solObj ? 'solution' : 'user';
         var prefix = objPad + (fieldName ? `"${fieldName}": ` : '');
@@ -60,7 +60,7 @@ function practiceExportedChanged(exportedRoot) {
             currLine.match = objMatch;
             json += prefix + (isArray ? '[' : '{');
             json += nl();
-            var keys = union(solObj ? Object.keys(solObj) : [], obj ? Object.keys(obj) : []);
+            var keys = union(solObj ? Object.keys(solObj) : [], obj && objType === type ? Object.keys(obj) : []);
             keys.forEach((fieldName, i) => {
                 toJson(obj ? obj[fieldName] : null, solObj ? solObj[fieldName] : null, isArray ? null : fieldName, pad + 1);
                 json += (i == keys.length - 1 ? "" : ",");

@@ -28,10 +28,10 @@ seq:
 <p align="justify">Recommended readings:</p>
 <ul style="font-size:14px">
     <li>
-        <a href="https://github.com/kaitai-io/kaitai_struct/wiki/Attribute-description" target="_blank">Attributes (id, type, size)</a><br/>
+        <a href="https://github.com/kaitai-io/kaitai_struct/wiki/Attribute-description" target="_blank">Wiki: Attributes (id, type, size)</a><br/>
         (valid encodings: 'ascii', 'utf-8', etc)
     </li>
-    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Primitive-data-types" target="_blank">Primitive data types</a></li>
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Primitive-data-types" target="_blank">Wiki: Primitive data types</a></li>
 </ul>
 <p align="justify">Parse the fields as described here:</p>
 <ul style="font-size:14px">
@@ -96,9 +96,9 @@ seq:
 <p align="justify">Let's parse its file format!</p>
 <p align="justify">Recommended readings:</p>
 <ul style="font-size:14px">
-    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Attribute-description" target="_blank">Attributes (contents, repeat)</a><br/></li>
-    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Type-description" target="_blank">Type description</a></li>
-    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Expressions" target="_blank">Expressions (size)</a></li>
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Attribute-description" target="_blank">Wiki: Attributes (contents, repeat)</a><br/></li>
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Type-description" target="_blank">Wiki: Type description</a></li>
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Expressions" target="_blank">Wiki: Expressions (size)</a></li>
 
 </ul>
 <p align="justify">
@@ -110,6 +110,87 @@ File format information:
     <li>the size of MD5 hash in hex is 32 bytes</li>
 </ul>
 </p>
+<p align="justify">Here is the expected output:</p>
+`
+        },
+        'chall3': {
+            inputFn: 'practice/chall3/input.bin',
+            starterKsy: `
+meta:
+  id: chall3
+  endian: le
+seq:
+  - id: records
+    type: record
+    repeat: eos
+types:
+  record:
+    seq:
+      - id: type
+        type: u4be
+        enum: record_type
+      - id: size
+        type: u4
+      - id: body
+        type:
+          switch-on: type
+          cases:
+            record_type::rol: rol_encrypted_record
+        size: size
+  rol_encrypted_record:
+    seq:
+      - id: shift_value
+        type: u1
+      - id: content_len
+        type: u4
+      - id: decrypted_content
+        size: content_len
+        process: rol(shift_value)
+enums:
+  record_type:
+    0x524f4c5f: rol
+`,
+            solution: {
+                "records": [
+                    {
+                        "type": 1380928607,
+                        "body": {
+                            "shiftValue": 4,
+                            "contentLen": 33,
+                            "decryptedContent": [106, 117, 115, 116, 32, 114, 111, 108, 108, 105, 110, 103, 44, 32, 114, 111, 108, 108, 105, 110, 103, 32, 97, 110, 100, 32, 114, 111, 108, 108, 105, 110, 103]
+                        },
+                        "size": 38
+                    },
+                    {
+                        "type": 1313820767,
+                        "body": {
+                            "contentLen": 19,
+                            "content": "unencrypted content"
+                        },
+                        "size": 23
+                    },
+                    {
+                        "type": 1481593439,
+                        "body": {
+                            "xorKeyLen": 14,
+                            "xorKey": [53, 85, 112, 51, 114, 115, 51, 99, 82, 51, 116, 75, 51, 121],
+                            "contentLen": 37,
+                            "decryptedContent": [120, 111, 114, 45, 101, 110, 99, 114, 121, 112, 116, 105, 111, 110, 32, 105, 115, 32, 116, 104, 101, 32, 98, 101, 115, 116, 32, 101, 110, 99, 114, 121, 112, 116, 105, 111, 110]
+                        },
+                        "size": 59
+                    }
+                ]
+            },
+            description: `
+<div style="font-size:20px; text-align:center; margin-bottom:18px; margin-top:3px">Practice: process, type switch, enum</div>
+<p align="justify">This file format supports multiple 'encryption' algorithms. We've implemented one of them.</p>
+<p align="justify">Please use the input binary and expected output below to understand the other parts of the file format and extend the format descriptor.</p>
+<p align="justify">Recommended readings:</p>
+<ul style="font-size:14px">
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Processing-binary-data" target="_blank">Wiki: Processing binary data</a><br/></li>
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Enum-description" target="_blank">Wiki: Enum description</a></li>
+
+</ul>
 <p align="justify">Here is the expected output:</p>
 `
         }
