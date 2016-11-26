@@ -54,6 +54,7 @@ var ui = {
     fileTreeCont: <JQuery>null,
     fileTree: <JSTree>null,
     converterPanel: <JQuery>null,
+    practicePanelCont: <GoldenLayout.Container>null,
 };
 
 function addComponent(name: string, generatorCallback?) {
@@ -72,6 +73,7 @@ function addComponent(name: string, generatorCallback?) {
 
 function addExistingDiv(name: string) {
     myLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState) {
+        ui[name + 'Cont'] = container;
         ui[name] = $(`#${name}`).appendTo(container.getElement());
         $(() => ui[name].show());
     });

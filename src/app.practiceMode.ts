@@ -161,6 +161,8 @@ $(() => {
     practiceDiff.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
     practiceDiff.setReadOnly(true);
 
+    ui.practicePanelCont.on('resize', () => practiceDiff.resize());
+
     $('#practicePanel').css({ display: 'flex' });
     $('#practicePanel .description').html(practiceChall.description);
 });

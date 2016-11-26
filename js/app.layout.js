@@ -50,6 +50,7 @@ var ui = {
     fileTreeCont: null,
     fileTree: null,
     converterPanel: null,
+    practicePanelCont: null,
 };
 function addComponent(name, generatorCallback) {
     var editor;
@@ -67,6 +68,7 @@ function addComponent(name, generatorCallback) {
 }
 function addExistingDiv(name) {
     myLayout.registerComponent(name, function (container, componentState) {
+        ui[name + 'Cont'] = container;
         ui[name] = $(`#${name}`).appendTo(container.getElement());
         $(() => ui[name].show());
     });
