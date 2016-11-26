@@ -68,7 +68,7 @@ function addComponent(name, generatorCallback) {
 function addExistingDiv(name) {
     myLayout.registerComponent(name, function (container, componentState) {
         ui[name] = $(`#${name}`).appendTo(container.getElement());
-        $(() => ui[name].show().css({ visibility: 'visible' }));
+        $(() => ui[name].show());
     });
 }
 function addEditor(name, lang, isReadOnly = false, callback = null) {

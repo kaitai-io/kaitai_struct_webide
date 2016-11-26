@@ -73,7 +73,7 @@ function addComponent(name: string, generatorCallback?) {
 function addExistingDiv(name: string) {
     myLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState) {
         ui[name] = $(`#${name}`).appendTo(container.getElement());
-        $(() => ui[name].show().css({ visibility: 'visible' }));
+        $(() => ui[name].show());
     });
 }
 
