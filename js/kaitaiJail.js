@@ -18,7 +18,7 @@ function exportValue(obj, debug, path) {
     var result = { start: debug.start, end: debug.end, path: path, type: getObjectType(obj) };
     if (result.type === ObjectType.TypedArray)
         result.bytes = obj;
-    else if (result.type === ObjectType.Primitive || obj.type === ObjectType.Undefined)
+    else if (result.type === ObjectType.Primitive || result.type === ObjectType.Undefined)
         result.primitiveValue = obj;
     else if (result.type === ObjectType.Array)
         result.arrayItems = obj.map((item, i) => exportValue(item, debug.arr[i], path.concat(i.toString())));

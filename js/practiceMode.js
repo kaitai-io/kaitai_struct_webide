@@ -44,6 +44,66 @@ seq:
 </ul>
 <p align="justify">Here is the expected output:</p>
 `
+        },
+        'chall2': {
+            inputFn: 'practice/chall2/input.bin',
+            starterKsy: `
+meta:
+  id: chall1
+  endian: le
+seq:
+  - id: my_first_byte
+    type: u1`,
+            solution: {
+                "magic": [67, 82, 89, 80, 84, 82, 79, 76, 79],
+                "files": [
+                    {
+                        "filenameLen": 14,
+                        "filename": "helloworld.txt",
+                        "md5HashHex": [102, 99, 51, 102, 102, 57, 56, 101, 56, 99, 54, 97, 48, 100, 51, 48, 56, 55, 100, 53, 49, 53, 99, 48, 52, 55, 51, 102, 56, 54, 55, 55],
+                        "contentLen": 12,
+                        "content": [168, 213, 242, 253, 112, 32, 182, 141, 212, 117, 15, 38]
+                    },
+                    {
+                        "filenameLen": 12,
+                        "filename": "password.txt",
+                        "md5HashHex": [98, 101, 99, 57, 50, 51, 57, 55, 54, 52, 54, 101, 56, 102, 101, 98, 57, 51, 54, 54, 55, 97, 101, 50, 101, 54, 98, 99, 57, 51, 49, 98],
+                        "contentLen": 8,
+                        "content": [45, 25, 181, 47, 135, 108, 249, 127]
+                    },
+                    {
+                        "filenameLen": 4,
+                        "filename": "flag",
+                        "md5HashHex": [52, 97, 49, 50, 54, 102, 100, 98, 54, 55, 51, 52, 50, 56, 55, 49, 98, 50, 55, 101, 49, 102, 97, 102, 48, 102, 48, 100, 56, 49, 99, 102],
+                        "contentLen": 20,
+                        "content": [175, 85, 97, 230, 68, 68, 187, 144, 47, 231, 95, 101, 72, 188, 49, 89, 180, 65, 128, 227]
+                    },
+                    {
+                        "filenameLen": 10,
+                        "filename": "secret.txt",
+                        "md5HashHex": [54, 53, 101, 53, 49, 102, 50, 102, 54, 99, 53, 50, 57, 51, 55, 49, 54, 100, 50, 53, 99, 55, 53, 50, 48, 101, 50, 100, 49, 98, 98, 54],
+                        "contentLen": 24,
+                        "content": [215, 206, 216, 68, 231, 112, 114, 139, 75, 95, 146, 236, 255, 50, 187, 226, 40, 224, 248, 168, 225, 221, 133, 111]
+                    }
+                ]
+            },
+            description: `
+<div style="font-size:20px; text-align:center; margin-bottom:18px; margin-top:3px">Practice: round #2</div>
+<p align="justify">
+    Have you seen my <a href="https://platform.avatao.com/paths/d2176244-bd8b-48d1-b3e1-b63da2de4690/challenges/706bbbc9-bca4-49b2-9437-0b7ac3339b5c" target="_blank">Cryptrololololo challenge</a> on Avatao?
+</p>
+<p align="justify">Let's parse its file format!</p>
+<p align="justify">Recommended readings:</p>
+<ul style="font-size:14px">
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Attribute-description" target="_blank">Attributes (repeat)</a><br/></li>
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Type-description" target="_blank">Type description</a></li>
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Expressions" target="_blank">Expressions (size)</a></li>
+    <li><a href="https://platform.avatao.com/blob/706bbbc9-bca4-49b2-9437-0b7ac3339b5c/Cryptrololololo.zip" target="_blank">Source of Cryptrololololo (see encryptor.py)</a></li>
+
+</ul>
+<p align="justify">Integers are 4-byte longs and use big-endian encoding.</p>
+<p align="justify">Here is the expected output:</p>
+`
         }
     }
 };

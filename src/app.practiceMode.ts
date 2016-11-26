@@ -10,14 +10,22 @@ function practiceExportedChanged(exportedRoot: IExportedValue) {
     function isUndef(obj) { return typeof obj === "undefined"; }
 
     function getObjectType(obj) {
+        var objType;
         if (obj instanceof Uint8Array)
-            return ObjectType.TypedArray;
+            objType = ObjectType.TypedArray;
         else if (typeof obj !== "object")
-            return isUndef(obj) ? ObjectType.Undefined : ObjectType.Primitive;
+            objType = isUndef(obj) ? null : ObjectType.Primitive;
         else if (Array.isArray(obj))
-            return ObjectType.Array;
+            objType = ObjectType.Array;
+        else if (obj === null)
+            objType = null;
         else
-            return ObjectType.Object;
+            objType = ObjectType.Object;
+
+        if (objType === ObjectType.Array && obj.length > 0 && typeof obj[0] === "number")
+            return ObjectType.TypedArray;
+
+        return objType;
     }
 
     var padLen = 2;
@@ -37,9 +45,9 @@ function practiceExportedChanged(exportedRoot: IExportedValue) {
         var type = getObjectType(obj);
         if (type === ObjectType.TypedArray) {
             var result = "[";
-            for (var i = 0; i < obj.byteLength; i++)
+            for (var i = 0; i < (obj.byteLength || obj.length); i++)
                 result += (i == 0 ? "" : ", ") + obj[i];
-            return result + "],";
+            return result + "]";
         } else if (type === ObjectType.Primitive)
             return typeof obj === "number" ? numConv(obj) : `"${obj}"`;
         else if (type === ObjectType.Undefined)
@@ -48,6 +56,7 @@ function practiceExportedChanged(exportedRoot: IExportedValue) {
 
     function union(a, b) { return [...new Set([...a, ...b])]; }
 
+    var allMatch = true;
     function toJson(obj, solObj, fieldName = null, pad = 0) {
         var objPad = " ".repeat((pad + 0) * padLen);
         var childPad = " ".repeat((pad + 1) * padLen);
@@ -55,23 +64,28 @@ function practiceExportedChanged(exportedRoot: IExportedValue) {
         var solType = getObjectType(solObj);
         var type = objType || solType;
 
+        //console.log('toJson', objType, solType, fieldName, pad, obj, solObj);
+
+        var objMatch = objType === solType ? 'match' : solObj ? 'solution' : 'user';
+
         var prefix = objPad + (fieldName ? `"${fieldName}": ` : '');
 
         var isArray = type === ObjectType.Array;
 
         if (type === ObjectType.Object || isArray) {
-            currLine.match = 'match';
+            currLine.match = objMatch;
             json += prefix + (isArray ? '[' : '{');
             json += nl();
 
-            var keys = union(Object.keys(solObj), Object.keys(obj));
+            var keys = union(solObj ? Object.keys(solObj) : [], obj ? Object.keys(obj) : []);
+
             keys.forEach((fieldName, i) => {
-                toJson(obj[fieldName], solObj[fieldName], isArray ? null : fieldName, pad + 1);
+                toJson(obj ? obj[fieldName] : null, solObj ? solObj[fieldName] : null, isArray ? null : fieldName, pad + 1);
                 json += (i == keys.length - 1 ? "" : ",");
                 json += nl();
             });
 
-            currLine.match = 'match';
+            currLine.match = objMatch;
             json += objPad + (isArray ? ']' : '}');
             return true;
         }
@@ -79,21 +93,23 @@ function practiceExportedChanged(exportedRoot: IExportedValue) {
             var objRepr = reprPrimitive(obj);
             var solRepr = reprPrimitive(solObj);
 
+            allMatch = allMatch && objRepr === solRepr;
+
             if (objRepr === solRepr) {
                 currLine.match = 'match';
                 json += prefix + objRepr;
             }
             else
             {
-                if (objRepr !== null) {
+                if (objRepr) {
                     currLine.match = 'user';
                     json += prefix + objRepr;
                 }
 
-                if (objRepr !== null && solRepr !== null)
+                if (objRepr && solRepr)
                     json += nl();
 
-                if (solRepr !== null) {
+                if (solRepr) {
                     currLine.match = 'solution';
                     json += prefix + solRepr;
                 }
@@ -118,17 +134,21 @@ function practiceExportedChanged(exportedRoot: IExportedValue) {
             console.log(`Unknown object type: ${exp.type}`);
     }
 
+    //console.log('exportedRoot', exportedRoot);
     var native = exportedToNative(exportedRoot);
+    //console.log('native', native, 'practiceChall.solution', practiceChall.solution);
     toJson(native, practiceChall.solution);
     nl();
 
     practiceDiff.setValue(json, -1);
-    console.log(markers, lines);
+    //console.log(markers, lines);
     markers.forEach(marker => practiceDiff.session.removeMarker(marker));
     markers = [];
     lines.forEach(line => {
         markers.push(practiceDiff.session.addMarker(new Range(line.idx, 0, line.idx, 1), `marker_${line.match}`, "fullLine", false));
     });
+
+    console.log('win?', allMatch);
 }
 
 $(() => {
