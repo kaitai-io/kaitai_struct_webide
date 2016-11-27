@@ -133,7 +133,7 @@ function addNewFiles(files: IFileProcessItem[]) {
     })).then(refreshFsNodes);
 }
 
-localStorage.setItem('lastVersion', '0.1.0.2');
+localStorage.setItem('lastVersion', '0.1.0.3');
 
 if (isPracticeMode)
     $.getScript('js/app.practiceMode.js');
