@@ -148,6 +148,12 @@ function practiceExportedChanged(exportedRoot: IExportedValue) {
         markers.push(practiceDiff.session.addMarker(new Range(line.idx, 0, line.idx, 1), `marker_${line.match}`, "fullLine", false));
     });
 
+    if (allMatch && practiceMode.serverCheckUrl) {
+        var postData = { chall: practiceChallName, yaml: ui.ksyEditor.getValue() };
+        $.ajax({ type: 'POST', url: practiceMode.serverCheckUrl, contentType: "application/json", dataType: 'json', data: JSON.stringify(postData),
+            success: function (data) { console.log('server response', data); } });
+    }
+
     console.log('win?', allMatch);
 }
 
