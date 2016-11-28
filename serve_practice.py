@@ -31,7 +31,7 @@ class CheckerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 print e
                 resp(400, {'status': 'exception'});
         else:
-            return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+            return SimpleHTTPServer.SimpleHTTPRequestHandler.do_POST(self)
             
 
 if __name__ == "__main__":
