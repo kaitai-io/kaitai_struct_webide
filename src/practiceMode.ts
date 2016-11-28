@@ -1,6 +1,6 @@
 ﻿var practiceMode = {
     chall: 'url',
-    serverCheckUrl: 'http://localhost:8001/check',
+    serverCheckUrl: '/check',
     challs: {
         'chall1': {
             inputFn: 'practice/chall1/input.bin',
