@@ -45,7 +45,7 @@ function practiceExportedChanged(exportedRoot) {
             return null;
     }
     function union(a, b) { return [...new Set([...a, ...b])]; }
-    var allMatch = true;
+    var win = true;
     function toJson(obj, solObj, fieldName = null, pad = 0) {
         var objPad = " ".repeat((pad + 0) * padLen);
         var childPad = " ".repeat((pad + 1) * padLen);
@@ -73,7 +73,7 @@ function practiceExportedChanged(exportedRoot) {
         else {
             var objRepr = reprPrimitive(obj);
             var solRepr = reprPrimitive(solObj);
-            allMatch = allMatch && objRepr === solRepr;
+            win = win && objRepr === solRepr;
             if (objRepr === solRepr) {
                 currLine.match = 'match';
                 json += prefix + objRepr;
@@ -120,12 +120,21 @@ function practiceExportedChanged(exportedRoot) {
     lines.forEach(line => {
         markers.push(practiceDiff.session.addMarker(new Range(line.idx, 0, line.idx, 1), `marker_${line.match}`, "fullLine", false));
     });
-    if (allMatch && practiceMode.serverCheckUrl) {
+    console.log('win?', win);
+    $('#practiceStatus .inProgress').toggleClass('inactive', win);
+    $('#practiceStatus .success').toggleClass('inactive', !win);
+    $('#practiceStatus .acceptedByServer, #practiceStatus .declinedByServer').hide();
+    if (win && practiceMode.serverCheckUrl) {
         var postData = { chall: practiceChallName, yaml: ui.ksyEditor.getValue() };
         $.ajax({ type: 'POST', url: practiceMode.serverCheckUrl, contentType: "application/json", dataType: 'json', data: JSON.stringify(postData),
-            success: function (data) { console.log('server response', data); } });
+            success: function (data) {
+                console.log('server response', data);
+                var serverWin = data && data.check_res && data.check_res.success === true;
+                $('#practiceStatus .acceptedByServer').toggle(serverWin);
+                $('#practiceStatus .declinedByServer').toggle(!serverWin);
+            }
+        });
     }
-    console.log('win?', allMatch);
 }
 $(() => {
     Range = ace.require('ace/range').Range;

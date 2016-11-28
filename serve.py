@@ -9,6 +9,7 @@ import sys
 import threading
 import time
 import subprocess
+import re
 
 PORT = 8000
 watchDirs = ['index.html', 'js/*', 'css/*']
@@ -38,6 +39,29 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         else:
             return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
+    def do_POST(self):
+        def resp(statusCode, result):
+            self.send_response(statusCode)
+            self.end_headers()
+            self.wfile.write(json.dumps(result))
+    
+        if self.path == '/check':
+            try:
+                input = json.loads(self.rfile.read(int(self.headers.getheader('content-length'))))
+                challName = input['chall']
+                if not re.match('^[a-zA-Z0-9_]+$', challName):
+                    resp(400, {'status': 'error', 'error': 'badChallName'});
+                    return
+                    
+                with open('user.ksy', 'wt') as f: f.write(input['yaml'])
+                checkRes = json.loads(subprocess.check_output('node checker.js user.ksy practice\%s\input.bin practice\%s\check.json' % (challName, challName)));
+                    
+                resp(200, {'status': 'ok', 'check_res': checkRes});
+            except Exception as e:
+                print e
+                resp(400, {'status': 'exception'});
+        else:
+            return SimpleHTTPServer.SimpleHTTPRequestHandler.do_POST(self) 
 
 def compileThread():
     lastModTime = 0

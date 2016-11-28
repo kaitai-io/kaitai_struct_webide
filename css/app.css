@@ -57,4 +57,7 @@ body { color:#333 }
 #practiceDiff { flex: 1 1 auto }
 .marker_solution { background:rgba(255, 80, 80, 0.3); }
 .marker_user { background:rgba(80, 255, 80, 0.30); }
+#practiceStatus { margin-top:5px }
+#practiceStatus .inactive { opacity:0.5; color:#fff }
+#practiceStatus .acceptedByServer, #practiceStatus .declinedByServer { display:none }
 /*.marker_match { background:rgba(80, 255, 80, 0.30); }*/
