@@ -53,7 +53,7 @@ module.exports = function convert(userObj, solObj) {
             return result + "]";
         } else if (type === ObjectType.Primitive)
             return typeof obj === "number" ? numConv(obj) : `"${obj}"`;
-        else if (type === ObjectType.Undefined)
+        else
             return null;
     }
 
@@ -83,7 +83,7 @@ module.exports = function convert(userObj, solObj) {
             var keys = union(solObj ? Object.keys(solObj) : [], obj && objType === type ? Object.keys(obj).filter(x => x[0] != '_') : []);
 
             keys.forEach((fieldName, i) => {
-                toJson(obj ? obj[fieldName] : null, solObj ? solObj[fieldName] : null, isArray ? null : fieldName, pad + 1);
+                toJson(obj && fieldName in obj ? obj[fieldName] : null, solObj && fieldName in solObj ? solObj[fieldName] : null, isArray ? null : fieldName, pad + 1);
                 json += (i == keys.length - 1 ? "" : ",");
                 json += nl();
             });
@@ -106,15 +106,15 @@ module.exports = function convert(userObj, solObj) {
             }
             else
             {
-                if (objRepr) {
+                if (objRepr !== null) {
                     currLine.match = 'user';
                     json += prefix + objRepr;
                 }
 
-                if (objRepr && solRepr)
+                if (objRepr !== null && solRepr !== null)
                     json += nl();
 
-                if (solRepr) {
+                if (solRepr !== null) {
                     currLine.match = 'solution';
                     json += prefix + solRepr;
                 }
