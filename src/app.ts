@@ -89,7 +89,7 @@ function reparse() {
 
             if (isPracticeMode)
                 practiceExportedChanged(exportedRoot);
-        });
+        }, isPracticeMode);
     });
 }
 
