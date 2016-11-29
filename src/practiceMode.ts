@@ -445,13 +445,15 @@ meta:
                 }
             },
             description: `
-<div style="font-size:20px; text-align:center; margin-bottom:18px; margin-top:3px">Practice: process, type switch, enum</div>
-<p align="justify">This file format supports multiple 'encryption' algorithms. We've implemented one of them.</p>
-<p align="justify">Please use the input binary and expected output below to understand the other parts of the file format and extend the format descriptor.</p>
+<div style="font-size:20px; text-align:center; margin-bottom:18px; margin-top:3px">Challenge: WIM</div>
+<p align="justify">
+    This task gives you some real challenge: parse a binary of an inadequately documented file format, 
+    the <a href="https://en.wikipedia.org/wiki/Windows_Imaging_Format" target="_blank">Windows Imaging Format</a>.</p>
+<p align="justify">Have fun solving this challenge :)</p>
 <p align="justify">Recommended readings:</p>
 <ul style="font-size:14px">
-    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Processing-binary-data" target="_blank">Wiki: Processing binary data</a><br/></li>
-    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Enum-description" target="_blank">Wiki: Enum description</a></li>
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Instance-description" target="_blank">Wiki: Instances</a><br/></li>
+    <li><a href="https://www.microsoft.com/en-us/download/details.aspx?id=13096" target="_blank">MSDN: Windows Imaging File Format (WIM)</a></li>
 
 </ul>
 <p align="justify">Here is the expected output:</p>
