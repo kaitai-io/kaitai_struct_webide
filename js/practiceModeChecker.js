@@ -56,7 +56,7 @@ module.exports = function convert(userObj, solObj) {
                 return numConv(obj);
             else {
                 var strRepr = `${obj}`;
-                if(strRepr.length > 0 && strRepr.charCodeAt(0) === 65279)
+                if(strRepr.length > 0 && strRepr.charCodeAt(0) === 0xFEFF) // removes BOM
                     strRepr = strRepr.substr(1);
                 return `"${strRepr}"`;
             }
