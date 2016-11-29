@@ -51,8 +51,16 @@ module.exports = function convert(userObj, solObj) {
             for (var i = 0; i < (obj.byteLength || obj.length); i++)
                 result += (i == 0 ? "" : ", ") + obj[i];
             return result + "]";
-        } else if (type === ObjectType.Primitive)
-            return typeof obj === "number" ? numConv(obj) : `"${obj}"`;
+        } else if (type === ObjectType.Primitive){
+            if(typeof obj === "number")
+                return numConv(obj);
+            else {
+                var strRepr = `${obj}`;
+                if(strRepr.length > 0 && strRepr.charCodeAt(0) === 65279)
+                    strRepr = strRepr.substr(1);
+                return `"${strRepr}"`;
+            }
+        }
         else
             return null;
     }
