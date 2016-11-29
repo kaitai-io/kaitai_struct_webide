@@ -66,9 +66,9 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
 
         if (exp.type === ObjectType.Object) {
             var fieldNames = Object.keys(exp.object.fields);
+            var objOffset = exp.object.fields[fieldNames[0]].start === 0 ? exp.start - offset : 0;
             if (fieldNames.length > 0) {
-                var objOffset = exp.object.fields[fieldNames[0]].start === 0 ? exp.start : 0;
-                fieldNames.forEach(fieldName => fixOffsets(exp.object.fields[fieldName], objOffset));
+                fieldNames.forEach(fieldName => fixOffsets(exp.object.fields[fieldName], offset + objOffset));
             }
         }
         else if (exp.type === ObjectType.Array && exp.arrayItems.length > 0) {
