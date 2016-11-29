@@ -12,20 +12,25 @@ function getObjectType(obj) {
     else
         return ObjectType.Object;
 }
-function exportValue(obj, debug, path) {
-    if (!debug)
-        debugger;
-    var result = { start: debug.start, end: debug.end, path: path, type: getObjectType(obj) };
+function exportValue(obj, debug, path, noLazy) {
+    //if (!debug) debugger;
+    var result = { start: debug && debug.start, end: debug && debug.end, path: path, type: getObjectType(obj) };
     if (result.type === ObjectType.TypedArray)
         result.bytes = obj;
     else if (result.type === ObjectType.Primitive || result.type === ObjectType.Undefined)
         result.primitiveValue = obj;
     else if (result.type === ObjectType.Array)
-        result.arrayItems = obj.map((item, i) => exportValue(item, debug.arr[i], path.concat(i.toString())));
+        result.arrayItems = obj.map((item, i) => exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy));
     else if (result.type === ObjectType.Object) {
         result.object = { class: obj.constructor.name, propPaths: {}, fields: {} };
-        Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor").forEach(propName => result.object.propPaths[propName] = path.concat(propName));
-        Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key)));
+        Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor").forEach(propName => {
+            result.object.propPaths[propName] = path.concat(propName);
+            if (noLazy) {
+                console.log('noLazy', propName, obj[propName]);
+                result.object.fields[propName] = exportValue(obj[propName], obj._debug[propName], path.concat(propName), noLazy);
+            }
+        });
+        Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key), noLazy));
     }
     else
         console.log(`Unknown object type: ${result.type}`);
@@ -43,7 +48,7 @@ application.setInterface({
         }
         cb(result);
     },
-    reparse: function (cb) {
+    reparse: function (cb, noLazy) {
         ioInput = new KaitaiStream(inputBuffer, 0);
         parseError = null;
         try {
@@ -53,7 +58,7 @@ application.setInterface({
         catch (e) {
             parseError = { message: e.message, stack: e.stack };
         }
-        exported = exportValue(parsed, { start: 0, end: inputBuffer.byteLength }, []);
+        exported = exportValue(parsed, { start: 0, end: inputBuffer.byteLength }, [], noLazy);
         //console.log('[jail] parsed', parsed, 'exported', exported);
         cb(exported, parseError);
     },

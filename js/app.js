@@ -72,7 +72,7 @@ function reparse() {
             });
             if (isPracticeMode)
                 practiceExportedChanged(exportedRoot);
-        });
+        }, isPracticeMode);
     });
 }
 var lastKsyContent, inputContent, inputFsItem;
