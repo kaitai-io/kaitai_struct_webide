@@ -194,6 +194,268 @@ enums:
 </ul>
 <p align="justify">Here is the expected output:</p>
 `
+        },
+        'chall4': {
+            inputFn: 'practice/chall4/input.bin',
+            starterKsy: `
+meta:
+  id: chall4
+  endian: le
+`,
+            solution: {
+                "xmlData": "<WIM><TOTALBYTES>916</TOTALBYTES><IMAGE INDEX=\"1\"><NAME>1</NAME><DIRCOUNT>1</DIRCOUNT><FILECOUNT>2</FILECOUNT><TOTALBYTES>30</TOTALBYTES><CREATIONTIME><HIGHPART>0x01D249D6</HIGHPART><LOWPART>0x8D89A85F</LOWPART></CREATIONTIME><LASTMODIFICATIONTIME><HIGHPART>0x01D249D6</HIGHPART><LOWPART>0x8D89A85F</LOWPART></LASTMODIFICATIONTIME></IMAGE></WIM>",
+                "lookupTable": {
+                    "items": [
+                        {
+                            "metadataResource": null,
+                            "hdr": {
+                                "short": {
+                                    "base": {
+                                        "isFree": "false",
+                                        "isSolid": "false",
+                                        "isMetadata": "false",
+                                        "isCompressed": "true",
+                                        "isSpanned": "true",
+                                        "flags": 12,
+                                        "sizeBytes": [0, 0, 0, 0, 0, 0, 0],
+                                        "offset": 208
+                                    },
+                                    "originalSize": 12
+                                },
+                                "partNumber": 1,
+                                "refCount": 1,
+                                "hash": [135, 117, 136, 113, 245, 152, 225, 163, 180, 103, 153, 83, 88, 154, 226, 245, 122, 11, 180, 60]
+                            }
+                        },
+                        {
+                            "metadataResource": null,
+                            "hdr": {
+                                "short": {
+                                    "base": {
+                                        "isFree": "false",
+                                        "isSolid": "true",
+                                        "isMetadata": "true",
+                                        "isCompressed": "false",
+                                        "isSpanned": "false",
+                                        "flags": 18,
+                                        "sizeBytes": [0, 0, 0, 0, 0, 0, 0],
+                                        "offset": 220
+                                    },
+                                    "originalSize": 18
+                                },
+                                "partNumber": 1,
+                                "refCount": 1,
+                                "hash": [157, 36, 85, 224, 117, 128, 141, 175, 214, 107, 218, 108, 47, 147, 206, 205, 207, 6, 235, 2]
+                            }
+                        },
+                        {
+                            "metadataResource": {
+                                "securityData": {
+                                    "totalLength": 8,
+                                    "numEntries": 0
+                                },
+                                "directoryData": {
+                                    "length": 104,
+                                    "body": {
+                                        "subDirectories": [
+                                            {
+                                                "length": 128,
+                                                "body": {
+                                                    "subDirectories": null,
+                                                    "attributes": 32,
+                                                    "securityId": 4294967295,
+                                                    "subdirOffset": 0,
+                                                    "unused1": 0,
+                                                    "unused2": 0,
+                                                    "creationTime": 131248419946505280,
+                                                    "lastAccessTime": 131248419946505280,
+                                                    "lastWriteTime": 131222975960000000,
+                                                    "hash": [135, 117, 136, 113, 245, 152, 225, 163, 180, 103, 153, 83, 88, 154, 226, 245, 122, 11, 180, 60],
+                                                    "reparseTag": 0,
+                                                    "reparseReserved": 0,
+                                                    "hardLink": 0,
+                                                    "streams": 0,
+                                                    "shortNameLength": 0,
+                                                    "fileNameLength": 16,
+                                                    "fileName": "file.txt",
+                                                    "alignment": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                }
+                                            },
+                                            {
+                                                "length": 120,
+                                                "body": {
+                                                    "subDirectories": [
+                                                        {
+                                                            "length": 144,
+                                                            "body": {
+                                                                "subDirectories": null,
+                                                                "attributes": 32,
+                                                                "securityId": 4294967295,
+                                                                "subdirOffset": 0,
+                                                                "unused1": 0,
+                                                                "unused2": 0,
+                                                                "creationTime": 131248419946500300,
+                                                                "lastAccessTime": 131248419946500300,
+                                                                "lastWriteTime": 131248424789819280,
+                                                                "hash": [157, 36, 85, 224, 117, 128, 141, 175, 214, 107, 218, 108, 47, 147, 206, 205, 207, 6, 235, 2],
+                                                                "reparseTag": 0,
+                                                                "reparseReserved": 0,
+                                                                "hardLink": 0,
+                                                                "streams": 0,
+                                                                "shortNameLength": 0,
+                                                                "fileNameLength": 32,
+                                                                "fileName": "fileInFolder.txt",
+                                                                "alignment": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                            }
+                                                        },
+                                                        {
+                                                            "length": 0
+                                                        }
+                                                    ],
+                                                    "attributes": 16,
+                                                    "securityId": 4294967295,
+                                                    "subdirOffset": 376,
+                                                    "unused1": 0,
+                                                    "unused2": 0,
+                                                    "creationTime": 131248419946485280,
+                                                    "lastAccessTime": 131248419946500300,
+                                                    "lastWriteTime": 131248419946500300,
+                                                    "hash": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                    "reparseTag": 0,
+                                                    "reparseReserved": 0,
+                                                    "hardLink": 0,
+                                                    "streams": 0,
+                                                    "shortNameLength": 0,
+                                                    "fileNameLength": 12,
+                                                    "fileName": "folder",
+                                                    "alignment": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                }
+                                            }
+                                        ],
+                                        "attributes": 16,
+                                        "securityId": 4294967295,
+                                        "subdirOffset": 120,
+                                        "unused1": 0,
+                                        "unused2": 0,
+                                        "creationTime": 131248419897260750,
+                                        "lastAccessTime": 131248509745277090,
+                                        "lastWriteTime": 131248509745277090,
+                                        "hash": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                        "reparseTag": 0,
+                                        "reparseReserved": 0,
+                                        "hardLink": 0,
+                                        "streams": 0,
+                                        "shortNameLength": 0,
+                                        "fileNameLength": 0,
+                                        "fileName": "",
+                                        "alignment": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                    }
+                                }
+                            },
+                            "hdr": {
+                                "short": {
+                                    "base": {
+                                        "isFree": "false",
+                                        "isSolid": "true",
+                                        "isMetadata": "false",
+                                        "isCompressed": "false",
+                                        "isSpanned": "false",
+                                        "flags": 16,
+                                        "sizeBytes": [2, 0, 0, 0, 0, 0, 2],
+                                        "offset": 238
+                                    },
+                                    "originalSize": 528
+                                },
+                                "partNumber": 1,
+                                "refCount": 1,
+                                "hash": [100, 175, 230, 150, 4, 252, 152, 46, 150, 150, 123, 142, 112, 189, 61, 25, 208, 153, 140, 9]
+                            }
+                        }
+                    ]
+                },
+                "header": {
+                    "imageTag": "MSWIM\x00\x00\x00",
+                    "size": 208,
+                    "version": 68864,
+                    "flags": 128,
+                    "compressionSize": 0,
+                    "wimGuid": {
+                        "data1": 1194815359,
+                        "data2": 51355,
+                        "data3": 53624,
+                        "data4": [227, 246, 78, 187, 220, 36, 17, 72]
+                    },
+                    "partNumber": 1,
+                    "totalParts": 1,
+                    "imageCount": 1,
+                    "offsetTableHdr": {
+                        "base": {
+                            "isFree": "false",
+                            "isSolid": "true",
+                            "isMetadata": "true",
+                            "isCompressed": "true",
+                            "isSpanned": "false",
+                            "flags": 150,
+                            "sizeBytes": [0, 0, 0, 0, 0, 0, 2],
+                            "offset": 766
+                        },
+                        "originalSize": 150
+                    },
+                    "xmlDataHdr": {
+                        "base": {
+                            "isFree": "false",
+                            "isSolid": "true",
+                            "isMetadata": "false",
+                            "isCompressed": "true",
+                            "isSpanned": "false",
+                            "flags": 180,
+                            "sizeBytes": [2, 0, 0, 0, 0, 0, 2],
+                            "offset": 916
+                        },
+                        "originalSize": 692
+                    },
+                    "bootMetadataHdr": {
+                        "base": {
+                            "isFree": "false",
+                            "isSolid": "false",
+                            "isMetadata": "false",
+                            "isCompressed": "false",
+                            "isSpanned": "false",
+                            "flags": 0,
+                            "sizeBytes": [0, 0, 0, 0, 0, 0, 0],
+                            "offset": 0
+                        },
+                        "originalSize": 0
+                    },
+                    "bootIndex": 0,
+                    "integrityHdr": {
+                        "base": {
+                            "isFree": "false",
+                            "isSolid": "false",
+                            "isMetadata": "false",
+                            "isCompressed": "false",
+                            "isSpanned": "false",
+                            "flags": 0,
+                            "sizeBytes": [0, 0, 0, 0, 0, 0, 0],
+                            "offset": 0
+                        },
+                        "originalSize": 0
+                    },
+                    "unused": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            },
+            description: `
+<div style="font-size:20px; text-align:center; margin-bottom:18px; margin-top:3px">Practice: process, type switch, enum</div>
+<p align="justify">This file format supports multiple 'encryption' algorithms. We've implemented one of them.</p>
+<p align="justify">Please use the input binary and expected output below to understand the other parts of the file format and extend the format descriptor.</p>
+<p align="justify">Recommended readings:</p>
+<ul style="font-size:14px">
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Processing-binary-data" target="_blank">Wiki: Processing binary data</a><br/></li>
+    <li><a href="https://github.com/kaitai-io/kaitai_struct/wiki/Enum-description" target="_blank">Wiki: Enum description</a></li>
+
+</ul>
+<p align="justify">Here is the expected output:</p>
+`
         }
     }
 };
