@@ -41,7 +41,7 @@ function practiceExportedChanged(exportedRoot) {
         }
         else if (type === ObjectType.Primitive)
             return typeof obj === "number" ? numConv(obj) : `"${obj}"`;
-        else if (type === ObjectType.Undefined)
+        else
             return null;
     }
     function union(a, b) { return [...new Set([...a, ...b])]; }
@@ -62,7 +62,7 @@ function practiceExportedChanged(exportedRoot) {
             json += nl();
             var keys = union(solObj ? Object.keys(solObj) : [], obj && objType === type ? Object.keys(obj) : []);
             keys.forEach((fieldName, i) => {
-                toJson(obj ? obj[fieldName] : null, solObj ? solObj[fieldName] : null, isArray ? null : fieldName, pad + 1);
+                toJson(obj && fieldName in obj ? obj[fieldName] : null, solObj && fieldName in solObj ? solObj[fieldName] : null, isArray ? null : fieldName, pad + 1);
                 json += (i == keys.length - 1 ? "" : ",");
                 json += nl();
             });
@@ -79,13 +79,13 @@ function practiceExportedChanged(exportedRoot) {
                 json += prefix + objRepr;
             }
             else {
-                if (objRepr) {
+                if (objRepr !== null) {
                     currLine.match = 'user';
                     json += prefix + objRepr;
                 }
-                if (objRepr && solRepr)
+                if (objRepr !== null && solRepr !== null)
                     json += nl();
-                if (solRepr) {
+                if (solRepr !== null) {
                     currLine.match = 'solution';
                     json += prefix + solRepr;
                 }
@@ -103,15 +103,18 @@ function practiceExportedChanged(exportedRoot) {
         else if (exp.type === ObjectType.Object) {
             var result = {};
             Object.keys(exp.object.fields).forEach(fieldName => { result[fieldName] = exportedToNative(exp.object.fields[fieldName]); });
+            Object.keys(exp.object.propPaths).forEach(fieldName => {
+                result[fieldName] = exportedToNative(exp.object.fields[fieldName]);
+            });
             return result;
         }
         else
             console.log(`Unknown object type: ${exp.type}`);
     }
-    //console.log('exportedRoot', exportedRoot);
+    console.log('exportedRoot', exportedRoot);
     var native = exportedToNative(exportedRoot);
     //console.log('native', native, 'practiceChall.solution', practiceChall.solution);
-    toJson(native, practiceChall.solution);
+    toJson(native || null, practiceChall.solution || null);
     nl();
     practiceDiff.setValue(json, -1);
     //console.log(markers, lines);
