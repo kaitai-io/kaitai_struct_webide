@@ -24,9 +24,9 @@ class CheckerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                     return
                     
                 with open('user.ksy', 'wt') as f: f.write(input['yaml'])
-                checkRes = json.loads(subprocess.check_output('node checker.js user.ksy practice\%s\input.bin practice\%s\check.json' % (challName, challName)));
-                    
-                resp(200, {'status': 'ok', 'check_res': checkRes});
+                checkRes = subprocess.check_output('node checker.js user.ksy practice\%s\input.bin practice\%s\check.json' % (challName, challName));
+                print 'checkRes %r', checkRes
+                resp(200, {'status': 'ok', 'check_res': json.loads(checkRes)});
             except Exception as e:
                 print e
                 resp(400, {'status': 'exception'});

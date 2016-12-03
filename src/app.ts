@@ -1,7 +1,7 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
 /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 
-declare var YAML: any, io: any, jailed: any, IntervalTree: any, localforage: LocalForage, bigInt: any;
+declare var YAML: any, io: any, jailed: any, IntervalTree: any, localforage: LocalForage, bigInt: any, kaitaiIde: any;
 
 var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 
@@ -133,7 +133,7 @@ function addNewFiles(files: IFileProcessItem[]) {
     })).then(refreshFsNodes);
 }
 
-localStorage.setItem('lastVersion', '0.1.0.4');
+localStorage.setItem('lastVersion', kaitaiIde.version);
 
 if (isPracticeMode)
     $.getScript('js/app.practiceMode.js');

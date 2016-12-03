@@ -109,7 +109,7 @@ function addNewFiles(files) {
         });
     })).then(refreshFsNodes);
 }
-localStorage.setItem('lastVersion', '0.1.0.4');
+localStorage.setItem('lastVersion', kaitaiIde.version);
 if (isPracticeMode)
     $.getScript('js/app.practiceMode.js');
 $(() => {
