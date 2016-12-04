@@ -11,7 +11,7 @@ var fs = require("fs");
 require('./lib/kaitai/kaitai-struct-compiler-fastopt.js');
 var YAML = require('./lib/kaitai/yaml_practice.js');
 var KaitaiStream = require('./lib/kaitai_js_runtime/KaitaiStream.js');
-var requireFromString = require('./lib/require-from-string.js');
+var requireFromString = require('./lib/require-from-string/require-from-string.js');
 var practiceModeChecker = require('./js/practiceModeChecker.js');
 
 var ks = io.kaitai.struct.MainJs();
