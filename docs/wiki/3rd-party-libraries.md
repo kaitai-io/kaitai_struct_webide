@@ -1,4 +1,4 @@
-# 3rd-party licenses
+# 3rd-party libraries
 
 ## Ace
 Website: https://ace.c9.io/

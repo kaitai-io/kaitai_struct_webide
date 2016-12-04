@@ -5,7 +5,7 @@ import yaml
 with open('license-3rd-party.yaml') as f: licData = yaml.safe_load(f)
 
 licResult = ''
-wikiResult = '# 3rd-party licenses\n\n'
+wikiResult = '# 3rd-party libraries\n\n'
 for libName in sorted(licData):
     libData = licData[libName]
     licFns = glob.glob('./lib/%s/license*' % libData['libDir'])
@@ -38,4 +38,4 @@ for libName in sorted(licData):
     licResult += '='*80 + '\n\n'
 
 open('LICENSE-3RD-PARTY.txt', 'wt').write(licResult.strip())
-open('docs/wiki/3rd-party-licences.md', 'wt').write(wikiResult.strip())
+open('docs/wiki/3rd-party-libraries.md', 'wt').write(wikiResult.strip())
