@@ -118,7 +118,7 @@ function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
             };
 
             ui.hexViewer.setDataProvider(dataProvider);
-            return jailrun('inputBuffer = args; void(0)', content).then(() => refreshGui ? reparse() : Promise.resolve());
+            return jailrun('inputBuffer = args; void(0)', content).then(() => refreshGui ? reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
         }
     });
 }

@@ -173,7 +173,10 @@ class HexViewer {
 
         var totalRowCount = Math.ceil(this.dataProvider.length / this.bytesPerLine);
         this.totalHeight = totalRowCount * this.rowHeight;
+        if (totalRowCount > 1 * 1024 * 1024)
+            this.totalHeight = totalRowCount;
         this.heightbox.height(this.totalHeight + 16);
+        console.log('totalRowCount', totalRowCount, 'heightbox.height', this.heightbox.height(), 'totalHeight', this.totalHeight);
 
         var boxHeight = this.contentOuter.innerHeight() - 16;
         this.content.html('');
