@@ -139,6 +139,9 @@ if (isPracticeMode)
     $.getScript('js/app.practiceMode.js');
 
 $(() => {
+    $('#webIdeVersion').text(kaitaiIde.version);
+    $('#compilerVersion').text(io.kaitai.struct.MainJs().version + " (" + io.kaitai.struct.MainJs().buildDate + ")");
+
     $('#welcomeDoNotShowAgain').click(() => localStorage.setItem('doNotShowWelcome', 'true'));
     if (localStorage.getItem('doNotShowWelcome') !== 'true')
         (<any>$('#welcomeModal')).modal();
