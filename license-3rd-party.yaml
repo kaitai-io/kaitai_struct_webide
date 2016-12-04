@@ -67,8 +67,13 @@ Kaitai Struct JS Runtime:
 localForage:
     libDir: localForage
     source: https://github.com/localForage/localForage
-    licenseName: Apache
-    licenseUrl: .0 (https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
+    licenseName: Apache-2.0
+    licenseUrl: https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
+malihu custom scrollbar plugin:
+    libDir: malihu-custom-scrollbar
+    source: https://github.com/malihu/malihu-custom-scrollbar-plugin
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/malihu/malihu-custom-scrollbar-plugin/master/LICENSE.txt
 require-from-string:
     libDir: require-from-string
     source: https://github.com/floatdrop/require-from-string

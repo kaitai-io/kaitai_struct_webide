@@ -80,7 +80,12 @@ License: MIT (https://raw.githubusercontent.com/vakata/jstree/master/LICENSE-MIT
 ## localForage
 Source: https://github.com/localForage/localForage
 
-License: Apache (.0 (https://raw.githubusercontent.com/localForage/localForage/master/LICENSE)
+License: Apache-2.0 (https://raw.githubusercontent.com/localForage/localForage/master/LICENSE)
+
+## malihu custom scrollbar plugin
+Source: https://github.com/malihu/malihu-custom-scrollbar-plugin
+
+License: MIT (https://raw.githubusercontent.com/malihu/malihu-custom-scrollbar-plugin/master/LICENSE.txt)
 
 ## require-from-string
 Source: https://github.com/floatdrop/require-from-string
