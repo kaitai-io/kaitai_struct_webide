@@ -67,8 +67,8 @@ Kaitai Struct JS Runtime:
 localForage:
     libDir: localForage
     source: https://github.com/localForage/localForage
-    licenseName: Apache
-    licenseUrl: .0 (https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
+    licenseName: Apache-2.0
+    licenseUrl: https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
 require-from-string:
     libDir: require-from-string
     source: https://github.com/floatdrop/require-from-string

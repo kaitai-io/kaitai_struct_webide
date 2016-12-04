@@ -1281,8 +1281,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 ================================================================================
                                   localForage
 
-License name: Apache
-  License URL: .0 (https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
+License name: Apache-2.0
+  License URL: https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
   License applies to files under the folder lib/localForage/
 
 Source: https://github.com/localForage/localForage
