@@ -4,6 +4,7 @@ var kaitaiFsFiles = [
     'formats/executable/dos_mz.ksy',
     'formats/executable/elf.ksy',
     'formats/executable/java_class.ksy',
+    'formats/executable/mach_o.ksy',
     'formats/executable/microsoft_pe.ksy',
     'formats/executable/swf.ksy',
     'formats/filesystem/ext2.ksy',
