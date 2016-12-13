@@ -163,6 +163,7 @@ $(() => {
         openItem: $('#fileTreeContextMenu .openItem'),
         createFolder: $('#fileTreeContextMenu .createFolder'),
         createKsyFile: $('#fileTreeContextMenu .createKsyFile'),
+        cloneKsyFile: $('#fileTreeContextMenu .cloneKsyFile'),
         generateParser: $('#fileTreeContextMenu .generateParser'),
         downloadItem: $('#fileTreeContextMenu .downloadItem'),
         deleteItem: $('#fileTreeContextMenu .deleteItem'),
@@ -198,11 +199,17 @@ $(() => {
             ui.fileTree.activate_node(contextMenuTarget, null);
 
         var data = getSelectedData();
-        var canCreateItem = !(data && data.fsType === 'local' && data.type === 'folder');
-        uiFiles.createFolder.toggleClass('disabled', canCreateItem);
-        uiFiles.createKsyFile.toggleClass('disabled', canCreateItem);
-        uiFiles.deleteItem.toggleClass('disabled', !(data && data.fsType === 'local'));
-        uiFiles.generateParser.toggleClass('disabled', !(data && data.fn && data.fn.endsWith('.ksy')));
+        var isFolder = data && data.type === 'folder';
+        var isLocal = data && data.fsType === 'local';
+        var isKsy = data && data.fn.endsWith('.ksy') && !isFolder;
+
+        function setEnabled(item, isEnabled) { item.toggleClass('disabled', !isEnabled); }
+
+        setEnabled(uiFiles.createFolder, isLocal && isFolder);
+        setEnabled(uiFiles.createKsyFile, isLocal && isFolder);
+        setEnabled(uiFiles.cloneKsyFile, isLocal && isKsy);
+        setEnabled(uiFiles.deleteItem, isLocal);
+        setEnabled(uiFiles.generateParser, isKsy);
         uiFiles.fileTreeContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
         return false;
     });
@@ -289,5 +296,15 @@ $(() => {
 
     fileTreeCont.bind("dblclick.jstree", function (event) {
         loadFsItem(<IFsItem>ui.fileTree.get_node(event.target).data);
+    });
+
+    ctxAction(uiFiles.cloneKsyFile, e => {
+        var fsItem = getSelectedData();
+        var newFn = fsItem.fn.replace('.ksy', '_' + new Date().format('Ymd_His') + '.ksy');
+        console.log('newFn', newFn);
+
+        fss[fsItem.fsType].get(fsItem.fn).then(content =>
+            fss[fsItem.fsType].put(newFn, content).then(fsItem =>
+                addKsyFile('localStorage', newFn.split('/').last(), fsItem)));
     });
 })

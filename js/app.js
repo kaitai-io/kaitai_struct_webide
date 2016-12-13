@@ -40,6 +40,8 @@ function recompile() {
         }
         return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
             var compiled = compile(srcYaml, 'javascript', 'both');
+            if (!compiled)
+                return;
             ui.genCodeViewer.setValue(compiled.release[0], -1);
             ui.genCodeDebugViewer.setValue(compiled.debug[0], -1);
             return reparse();
