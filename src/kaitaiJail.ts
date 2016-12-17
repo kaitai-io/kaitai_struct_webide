@@ -82,7 +82,7 @@ application.setInterface({
         }
 
         exported = exportValue(root, <IDebugInfo>{ start: 0, end: inputBuffer.byteLength }, [], noLazy);
-        console.log('[jail] root', root, 'exported', exported);
+        //console.log('[jail] root', root, 'exported', exported);
         cb(exported, parseError);
     },
     get: function (path, cb) {
