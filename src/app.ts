@@ -5,6 +5,8 @@ declare var YAML: any, io: any, jailed: any, IntervalTree: any, localforage: Loc
 
 var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 
+$.jstree.defaults.core.force_text = true;
+
 var dataProvider: IDataProvider;
 var itree;
 
