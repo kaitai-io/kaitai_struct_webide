@@ -9,8 +9,12 @@ interface JSTree {
 
 function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, cb) {
     function primitiveToText(exported: IExportedValue): string {
-        if (exported.type === ObjectType.Primitive)
-            return exported.primitiveValue;
+        if (exported.type === ObjectType.Primitive) {
+            var strValue = Number.isInteger(exported.primitiveValue) ? `0x${exported.primitiveValue.toString(16).toUpperCase()}` : exported.primitiveValue.toString();
+            if (exported.enumStringValue)
+                strValue = `${exported.enumStringValue} (${strValue})`;
+            return strValue;
+        }
         else if (exported.type === ObjectType.TypedArray) {
             var text = '[';
             for (var i = 0; i < exported.bytes.byteLength; i++) {

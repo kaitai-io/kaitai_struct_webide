@@ -22,4 +22,7 @@ interface IExportedValue {
     arrayItems?: IExportedValue[];
     bytes?: Uint8Array;
     object?: IExportedObject;
+
+    enumName?: string;
+    enumStringValue?: string;
 }

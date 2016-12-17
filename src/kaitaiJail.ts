@@ -1,9 +1,10 @@
-﻿var application: any, ioInput: any, parsed: any, parseError: any, KaitaiStream: any, exported: any, module: any, inputBuffer: any;
+﻿var application: any, ioInput: any, root: any, parseError: any, KaitaiStream: any, exported: any, module: any, inputBuffer: any;
 
 class IDebugInfo {
     start: number;
     end: number;
     arr?: IDebugInfo[];
+    enumName?: string;
 }
 
 function isUndef(obj) { return typeof obj === "undefined"; }
@@ -25,8 +26,15 @@ function exportValue(obj, debug: IDebugInfo, path: string[], noLazy?: boolean): 
 
     if (result.type === ObjectType.TypedArray)
         result.bytes = obj;
-    else if (result.type === ObjectType.Primitive || result.type === ObjectType.Undefined)
+    else if (result.type === ObjectType.Primitive || result.type === ObjectType.Undefined) {
         result.primitiveValue = obj;
+        if (debug && debug.enumName) {
+            result.enumName = debug.enumName;
+            var curr = module.exports;
+            debug.enumName.split('.').slice(1).forEach(p => curr = curr[p]);
+            result.enumStringValue = curr[result.primitiveValue];
+        }
+    }
     else if (result.type === ObjectType.Array)
         result.arrayItems = obj.map((item, i) => exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy));
     else if (result.type === ObjectType.Object) {
@@ -67,18 +75,18 @@ application.setInterface({
         ioInput = new KaitaiStream(inputBuffer, 0);
         parseError = null;
         try {
-            parsed = new module.exports(ioInput);
-            parsed._read();
+            root = new module.exports(ioInput);
+            root._read();
         } catch (e) {
             parseError = { message: e.message, stack: e.stack };
         }
 
-        exported = exportValue(parsed, <IDebugInfo>{ start: 0, end: inputBuffer.byteLength }, [], noLazy);
-        //console.log('[jail] parsed', parsed, 'exported', exported);
+        exported = exportValue(root, <IDebugInfo>{ start: 0, end: inputBuffer.byteLength }, [], noLazy);
+        console.log('[jail] root', root, 'exported', exported);
         cb(exported, parseError);
     },
     get: function (path, cb) {
-        var obj = parsed;
+        var obj = root;
         var parent = null;
         try {
             path.forEach(key => {
