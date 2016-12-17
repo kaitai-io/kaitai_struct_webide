@@ -175,3 +175,9 @@ interface Date {
     format(format: string): string;
 }
 
+function s(strings, ...values) {
+    var result = strings[0];
+    for (var i = 1; i < strings.length; i++)
+        result += htmlescape(values[i - 1]) + strings[i];
+    return result;
+}

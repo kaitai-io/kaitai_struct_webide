@@ -134,4 +134,10 @@ function getAllNodes(tree) {
     var json = tree.get_json().forEach(item => collectNodes(item, allNodes));
     return allNodes;
 }
+function s(strings, ...values) {
+    var result = strings[0];
+    for (var i = 1; i < strings.length; i++)
+        result += htmlescape(values[i - 1]) + strings[i];
+    return result;
+}
 //# sourceMappingURL=utils.js.map

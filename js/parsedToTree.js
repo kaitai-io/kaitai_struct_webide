@@ -3,10 +3,15 @@
 function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
     function primitiveToText(exported) {
         if (exported.type === ObjectType.Primitive) {
-            var strValue = Number.isInteger(exported.primitiveValue) ? `0x${exported.primitiveValue.toString(16).toUpperCase()}` : exported.primitiveValue.toString();
-            if (exported.enumStringValue)
-                strValue = `${exported.enumStringValue} (${strValue})`;
-            return strValue;
+            var value = exported.primitiveValue;
+            if (Number.isInteger(value)) {
+                value = s `0x${value.toString(16).toUpperCase()}<span class="intVal"> = ${value}</span>`;
+                if (exported.enumStringValue)
+                    value = `${htmlescape(exported.enumStringValue)} <span class="enumDesc">(${value})</span>`;
+            }
+            else
+                value = s `${value}`;
+            return value;
         }
         else if (exported.type === ObjectType.TypedArray) {
             var text = '[';
@@ -18,7 +23,7 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
                 text += (i == 0 ? '' : ', ') + exported.bytes[i];
             }
             text += ']';
-            return text;
+            return s `${text}`;
         }
         else
             throw new Error("primitiveToText: object is not primitive!");
@@ -27,7 +32,7 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
         var propName = item.path.last();
         var isObject = item.type === ObjectType.Object;
         var isArray = item.type === ObjectType.Array;
-        var text = (isArray ? `${propName}` : isObject ? `${propName} [${item.object.class}]` : (showProp ? `${propName} = ` : '') + primitiveToText(item));
+        var text = (isArray ? s `${propName}` : isObject ? s `${propName} [${item.object.class}]` : (showProp ? s `${propName} = ` : '') + primitiveToText(item));
         return { text: text, children: isObject || isArray, data: { exported: item } };
     }
     function exportedToNodes(exported, showProp) {
@@ -39,7 +44,7 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
             return exported.arrayItems.map((item, i) => childItemToNode(item, true));
         else {
             var obj = exported.object;
-            return Object.keys(obj.fields).map(fieldName => childItemToNode(obj.fields[fieldName], true)).concat(Object.keys(obj.propPaths).map(propName => ({ text: propName, children: true, data: { propPath: obj.propPaths[propName] } })));
+            return Object.keys(obj.fields).map(fieldName => childItemToNode(obj.fields[fieldName], true)).concat(Object.keys(obj.propPaths).map(propName => ({ text: s `${propName}`, children: true, data: { propPath: obj.propPaths[propName] } })));
         }
     }
     function getProp(path) {
@@ -111,7 +116,7 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
         localStorage.setItem('parsedTreeOpenedNodes', Object.keys(parsedTreeOpenedNodes).join(','));
     }
     jsTreeElement.jstree("destroy");
-    var jstree = jsTreeElement.jstree({ core: { data: (node, cb) => getNode(node, cb), themes: { icons: false }, multiple: false } }).jstree(true);
+    var jstree = jsTreeElement.jstree({ core: { data: (node, cb) => getNode(node, cb), themes: { icons: false }, multiple: false, force_text: false } }).jstree(true);
     jstree.on = (...args) => jstree.element.on(...args);
     jstree.off = (...args) => jstree.element.off(...args);
     jstree.on('keyup.jstree', e => jstree.activate_node(e.target.id));

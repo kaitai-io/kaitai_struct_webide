@@ -61,4 +61,5 @@ body { color:#333 }
 #practiceStatus .inactive { opacity:0.5; color:#fff }
 #practiceStatus .acceptedByServer, #practiceStatus .declinedByServer { display:none }
 #welcomeModal .licenses { font-size:12px; margin-bottom:10px }
+#parsedDataTree .intVal, #parsedDataTree .enumDesc { color:#bbb }
 /*.marker_match { background:rgba(80, 255, 80, 0.30); }*/
