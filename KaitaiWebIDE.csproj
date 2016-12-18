@@ -45,6 +45,7 @@
     <TypeScriptCompile Include="src\entities.ts" />
     <TypeScriptCompile Include="src\FileDrop.ts" />
     <TypeScriptCompile Include="src\kaitaiJail.ts" />
+    <TypeScriptCompile Include="src\KsySchema.ts" />
     <TypeScriptCompile Include="src\parsedToJson.ts" />
     <TypeScriptCompile Include="src\parsedToTree.ts" />
     <TypeScriptCompile Include="src\practiceMode.ts" />

@@ -13,7 +13,7 @@ var itree;
 function compile(srcYaml: string, kslang: string, debug: true|false|'both') {
     var src;
     try {
-        src = YAML.parse(srcYaml);
+        src = <KsySchema.IKsyFile>YAML.parse(srcYaml);
     } catch (parseErr) {
         showError("YAML parsing error: ", parseErr);
         return;
