@@ -13,11 +13,16 @@ function compile(srcYaml, kslang, debug) {
         showError("YAML parsing error: ", parseErr);
         return;
     }
+    console.log('yaml', src);
     try {
-        var ks = io.kaitai.struct.MainJs();
-        var rRelease = (debug === false || debug === 'both') ? ks.compile(kslang, src, false) : null;
-        var rDebug = (debug === true || debug === 'both') ? ks.compile(kslang, src, true) : null;
-        return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
+        if (kslang === 'json')
+            return [JSON.stringify(src, null, 4)];
+        else {
+            var ks = io.kaitai.struct.MainJs();
+            var rRelease = (debug === false || debug === 'both') ? ks.compile(kslang, src, false) : null;
+            var rDebug = (debug === true || debug === 'both') ? ks.compile(kslang, src, true) : null;
+            return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
+        }
     }
     catch (compileErr) {
         console.log(compileErr.s$1);
@@ -62,6 +67,7 @@ function reparse() {
             //console.log('reparse exportedRoot', exportedRoot);
             itree = new IntervalTree(dataProvider.length / 2);
             handleError(error);
+            kaitaiIde.root = exportedRoot;
             ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, e => handleError(error || e), () => ui.hexViewer.onSelectionChanged());
             ui.parsedDataTree.on('select_node.jstree', function (e, selectNodeArgs) {
                 var node = selectNodeArgs.node;
