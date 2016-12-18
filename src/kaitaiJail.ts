@@ -30,9 +30,21 @@ function exportValue(obj, debug: IDebugInfo, path: string[], noLazy?: boolean): 
         result.primitiveValue = obj;
         if (debug && debug.enumName) {
             result.enumName = debug.enumName;
-            var curr = module.exports;
-            debug.enumName.split('.').slice(1).forEach(p => curr = curr[p]);
-            result.enumStringValue = curr[result.primitiveValue];
+            var enumObj = module.exports;
+            debug.enumName.split('.').slice(1).forEach(p => enumObj = enumObj[p]);
+
+            var flagCheck = 0, flagSuccess = true;
+            var flagStr = Object.keys(enumObj).filter(x => isNaN(<any>x)).filter(x => {
+                if (flagCheck & enumObj[x]) {
+                    flagSuccess = false;
+                    return false;
+                }
+
+                flagCheck |= enumObj[x];
+                return obj & enumObj[x];
+            }).join("|");
+
+            result.enumStringValue = enumObj[obj] || (flagSuccess && flagStr);
         }
     }
     else if (result.type === ObjectType.Array)

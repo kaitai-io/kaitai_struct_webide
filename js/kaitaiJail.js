@@ -21,9 +21,18 @@ function exportValue(obj, debug, path, noLazy) {
         result.primitiveValue = obj;
         if (debug && debug.enumName) {
             result.enumName = debug.enumName;
-            var curr = module.exports;
-            debug.enumName.split('.').slice(1).forEach(p => curr = curr[p]);
-            result.enumStringValue = curr[result.primitiveValue];
+            var enumObj = module.exports;
+            debug.enumName.split('.').slice(1).forEach(p => enumObj = enumObj[p]);
+            var flagCheck = 0, flagSuccess = true;
+            var flagStr = Object.keys(enumObj).filter(x => isNaN(x)).filter(x => {
+                if (flagCheck & enumObj[x]) {
+                    flagSuccess = false;
+                    return false;
+                }
+                flagCheck |= enumObj[x];
+                return obj & enumObj[x];
+            }).join("|");
+            result.enumStringValue = enumObj[obj] || (flagSuccess && flagStr);
         }
     }
     else if (result.type === ObjectType.Array)
@@ -66,7 +75,7 @@ application.setInterface({
             parseError = { message: e.message, stack: e.stack };
         }
         exported = exportValue(root, { start: 0, end: inputBuffer.byteLength }, [], noLazy);
-        console.log('[jail] root', root, 'exported', exported);
+        //console.log('[jail] root', root, 'exported', exported);
         cb(exported, parseError);
     },
     get: function (path, cb) {
