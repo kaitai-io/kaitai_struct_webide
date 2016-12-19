@@ -1,13 +1,13 @@
 ;
 ;
 function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
-    function primitiveToText(exported) {
+    function primitiveToText(exported, detailed = true) {
         if (exported.type === ObjectType.Primitive) {
             var value = exported.primitiveValue;
             if (Number.isInteger(value)) {
-                value = s `0x${value.toString(16).toUpperCase()}<span class="intVal"> = ${value}</span>`;
+                value = s `0x${value.toString(16).toUpperCase()}` + (detailed ? s `<span class="intVal"> = ${value}</span>` : '');
                 if (exported.enumStringValue)
-                    value = `${htmlescape(exported.enumStringValue)} <span class="enumDesc">(${value})</span>`;
+                    value = `${htmlescape(exported.enumStringValue)}` + (detailed ? ` <span class="enumDesc">(${value})</span>` : '');
             }
             else
                 value = s `${value}`;
@@ -28,11 +28,32 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
         else
             throw new Error("primitiveToText: object is not primitive!");
     }
+    function reprObject(obj) {
+        var repr = ((((obj.object.ksyType || {}).extensions || {}).webide) || {}).representation;
+        if (!repr)
+            return "";
+        return repr.replace(/{(.*?)}/g, (g0, g1) => {
+            var currItem = obj;
+            g1.split('.').forEach(k => currItem = currItem.object.fields[k]);
+            if (currItem.type === ObjectType.Object)
+                return reprObject(currItem);
+            else
+                return primitiveToText(currItem, false);
+        });
+    }
     function childItemToNode(item, showProp) {
         var propName = item.path.last();
         var isObject = item.type === ObjectType.Object;
         var isArray = item.type === ObjectType.Array;
-        var text = (isArray ? s `${propName}` : isObject ? s `${propName} [${item.object.class}]` : (showProp ? s `${propName} = ` : '') + primitiveToText(item));
+        var text;
+        if (isArray)
+            text = s `${propName}`;
+        else if (isObject) {
+            var repr = reprObject(item);
+            text = s `${propName} [${item.object.class}]` + (repr ? ": " + repr : "");
+        }
+        else
+            text = (showProp ? s `${propName} = ` : '') + primitiveToText(item);
         return { text: text, children: isObject || isArray, data: { exported: item } };
     }
     function exportedToNodes(exported, showProp) {

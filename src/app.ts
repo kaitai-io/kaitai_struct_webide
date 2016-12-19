@@ -9,25 +9,34 @@ $.jstree.defaults.core.force_text = true;
 
 var dataProvider: IDataProvider;
 var itree;
+var ksySchema: KsySchema.IKsyFile;
 
-function compile(srcYaml: string, kslang: string, debug: true|false|'both') {
-    var src;
+function compile(srcYaml: string, kslang: string, debug: true | false | 'both') {
+    var compilerSchema;
     try {
-        src = <KsySchema.IKsyFile>YAML.parse(srcYaml);
+        kaitaiIde.ksySchema = ksySchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
+
+        compilerSchema = <KsySchema.IKsyFile>YAML.parse(srcYaml); // we have to modify before sending into the compiler so we need a copy
+        function filterOutExtensions(type: KsySchema.IType) {
+            delete type.extensions;
+            if (type.types)
+                Object.keys(type.types).forEach(typeName => filterOutExtensions(type.types[typeName]));
+        }
+        filterOutExtensions(compilerSchema);
     } catch (parseErr) {
         showError("YAML parsing error: ", parseErr);
         return;
     }
 
-    console.log('yaml', src);
+    console.log('ksySchema', ksySchema);
 
     try {
         if (kslang === 'json')
-            return [JSON.stringify(src, null, 4)];
+            return [JSON.stringify(ksySchema, null, 4)];
         else {
             var ks = io.kaitai.struct.MainJs();
-            var rRelease = (debug === false || debug === 'both') ? ks.compile(kslang, src, false) : null;
-            var rDebug = (debug === true || debug === 'both') ? ks.compile(kslang, src, true) : null;
+            var rRelease = (debug === false || debug === 'both') ? ks.compile(kslang, compilerSchema, false) : null;
+            var rDebug = (debug === true || debug === 'both') ? ks.compile(kslang, compilerSchema, true) : null;
             return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
         }
     } catch (compileErr) {
@@ -65,6 +74,33 @@ function recompile() {
     });
 }
 
+function fillKsyTypes(root: IExportedValue, schema: KsySchema.IKsyFile) {
+    var types: { [name: string]: KsySchema.IType } = {};
+
+    function ksyNameToJsName(ksyName) { return ksyName.split('_').map(x => x.ucFirst()).join(''); }
+
+    function collectTypes(ts: { [name: string]: KsySchema.IType }) {
+        if (!ts) return;
+        Object.keys(ts).forEach(name => {
+            types[ksyNameToJsName(name)] = ts[name];
+            collectTypes(ts[name].types);
+        });
+    }
+
+    collectTypes(schema.types);
+    types[ksyNameToJsName(schema.meta.id)] = schema;
+
+    function fillTypes(val: IExportedValue) {
+        if (val.type === ObjectType.Object) {
+            val.object.ksyType = types[val.object.class];
+            Object.keys(val.object.fields).forEach(fieldName => fillTypes(val.object.fields[fieldName]));
+        } else if (val.type === ObjectType.Array)
+            val.arrayItems.forEach(item => fillTypes(item));
+    }
+
+    fillTypes(root);
+}
+
 var formatReady, selectedInTree = false, blockRecursive = false;
 function reparse() {
     var jsTree = <any>ui.parsedDataTreeCont.getElement();
@@ -84,6 +120,7 @@ function reparse() {
             handleError(error);
 
             kaitaiIde.root = exportedRoot;
+            fillKsyTypes(exportedRoot, ksySchema);
 
             ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, e => handleError(error || e), () => ui.hexViewer.onSelectionChanged());
             ui.parsedDataTree.on('select_node.jstree', function (e, selectNodeArgs) {

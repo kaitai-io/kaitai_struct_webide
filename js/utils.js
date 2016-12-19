@@ -33,6 +33,9 @@ class Delayed {
         }, this.delay);
     }
 }
+String.prototype.ucFirst = function () {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
 if (!String.prototype.repeat) {
     String.prototype.repeat = function (count) {
         'use strict';

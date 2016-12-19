@@ -43,6 +43,11 @@ class Delayed {
 interface String {
     repeat(count: number): string;
     endsWith(searchString: string, position: number): boolean;
+    ucFirst(): string;
+}
+
+String.prototype.ucFirst = function () {
+    return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
 if (!String.prototype.repeat) {

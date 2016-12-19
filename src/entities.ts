@@ -8,6 +8,7 @@
 
 interface IExportedObject {
     class?: string;
+    ksyType?: KsySchema.IType;
     fields?: { [name: string]: IExportedValue; };
     propPaths?: { [name: string]: string[]; };
 }
