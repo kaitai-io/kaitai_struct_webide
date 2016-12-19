@@ -65,7 +65,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
             text = s`${propName}`;
         else if (isObject) {
             var repr = reprObject(item);
-            text = s`${propName} [${item.object.class}]` + (repr ? ": " + repr : "");
+            text = s`${propName} [${item.object.class}]` + (repr ? s`: ${repr}` : '');
         }
         else
             text = (showProp ? s`${propName} = ` : '') + primitiveToText(item);
