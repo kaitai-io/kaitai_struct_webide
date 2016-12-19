@@ -20,7 +20,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
             } else
                 value = s`${value}`;
 
-            return value;
+            return `<span class="primitiveValue">${value}</span>`;
         }
         else if (exported.type === ObjectType.TypedArray) {
             var text = '[';
@@ -44,7 +44,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
 
         function ksyNameToJsName(ksyName) { return ksyName.split('_').map((x,i) => (i === 0 ? x : x.ucFirst())).join(''); }
 
-        return repr.replace(/{(.*?)}/g, (g0, g1) => {
+        return htmlescape(repr).replace(/{(.*?)}/g, (g0, g1) => {
             var currItem = obj;
             g1.split('.').forEach(k => currItem = currItem.object.fields[ksyNameToJsName(k)]);
 
@@ -65,10 +65,10 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
             text = s`${propName}`;
         else if (isObject) {
             var repr = reprObject(item);
-            text = s`${propName} [${item.object.class}]` + (repr ? s`: ${repr}` : '');
+            text = s`${propName} [<span class="className">${item.object.class}</span>]` + (repr ? `: ${repr}` : '');
         }
         else
-            text = (showProp ? s`${propName} = ` : '') + primitiveToText(item);
+            text = (showProp ? s`<span class="propName">${propName}</span> = ` : '') + primitiveToText(item);
 
         return <ParsedTreeNode>{ text: text, children: isObject || isArray, data: { exported: item } };
     }
