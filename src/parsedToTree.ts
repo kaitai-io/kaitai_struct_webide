@@ -42,9 +42,11 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
         var repr = ((((obj.object.ksyType || <any>{}).extensions || {}).webide) || {}).representation;
         if (!repr) return "";
 
+        function ksyNameToJsName(ksyName) { return ksyName.split('_').map((x,i) => (i === 0 ? x : x.ucFirst())).join(''); }
+
         return repr.replace(/{(.*?)}/g, (g0, g1) => {
             var currItem = obj;
-            g1.split('.').forEach(k => currItem = currItem.object.fields[k]);
+            g1.split('.').forEach(k => currItem = currItem.object.fields[ksyNameToJsName(k)]);
 
             if (currItem.type === ObjectType.Object)
                 return reprObject(currItem);
