@@ -6,11 +6,16 @@
     public static Undefined = "Undefined";
 }
 
+interface IInstance {
+    path: string[];
+    offset: number;
+}
+
 interface IExportedObject {
     class?: string;
     ksyType?: KsySchema.IType;
     fields?: { [name: string]: IExportedValue; };
-    propPaths?: { [name: string]: string[]; };
+    instances?: { [name: string]: IInstance; };
 }
 
 interface IExportedValue {

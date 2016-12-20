@@ -1,6 +1,6 @@
 ;
 ;
-function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
+function parsedToTree(jsTreeElement, exportedRoot, ksySchema, handleError, cb) {
     function primitiveToText(exported, detailed = true) {
         if (exported.type === ObjectType.Primitive) {
             var value = exported.primitiveValue;
@@ -36,6 +36,8 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
         return htmlescape(repr).replace(/{(.*?)}/g, (g0, g1) => {
             var currItem = obj;
             g1.split('.').forEach(k => currItem = currItem.object.fields[ksyNameToJsName(k)]);
+            if (!currItem)
+                return "";
             if (currItem.type === ObjectType.Object)
                 return reprObject(currItem);
             else
@@ -66,7 +68,7 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
             return exported.arrayItems.map((item, i) => childItemToNode(item, true));
         else {
             var obj = exported.object;
-            return Object.keys(obj.fields).map(fieldName => childItemToNode(obj.fields[fieldName], true)).concat(Object.keys(obj.propPaths).map(propName => ({ text: s `${propName}`, children: true, data: { propPath: obj.propPaths[propName] } })));
+            return Object.keys(obj.fields).map(fieldName => childItemToNode(obj.fields[fieldName], true)).concat(Object.keys(obj.instances).map(propName => ({ text: s `${propName}`, children: true, data: { instance: obj.instances[propName] } })));
         }
     }
     function getProp(path) {
@@ -85,12 +87,12 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
         if (exp.type === ObjectType.Object) {
             var fieldNames = Object.keys(exp.object.fields);
             var objOffset = exp.object.fields[fieldNames[0]].start === 0 ? exp.start - offset : 0;
-            if (fieldNames.length > 0) {
-                fieldNames.forEach(fieldName => fixOffsets(exp.object.fields[fieldName], offset + objOffset));
-            }
+            fieldNames.forEach(fieldName => fixOffsets(exp.object.fields[fieldName], offset + objOffset));
+            Object.keys(exp.object.instances).forEach(propName => exp.object.instances[propName].offset = offset);
         }
         else if (exp.type === ObjectType.Array && exp.arrayItems.length > 0) {
-            var objOffset = exp.arrayItems[0].start === 0 ? exp.start : 0;
+            //var objOffset = exp.arrayItems[0].start === 0 ? exp.start : 0;
+            var objOffset = offset;
             exp.arrayItems.forEach(item => fixOffsets(item, objOffset));
         }
     }
@@ -104,14 +106,40 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
             itree.add(exp.start, exp.end - 1, exp.path.join('/'));
         }
     }
+    function fillKsyTypes(root, schema) {
+        var types = {};
+        function ksyNameToJsName(ksyName) { return ksyName.split('_').map(x => x.ucFirst()).join(''); }
+        function collectTypes(ts) {
+            if (!ts)
+                return;
+            Object.keys(ts).forEach(name => {
+                types[ksyNameToJsName(name)] = ts[name];
+                collectTypes(ts[name].types);
+            });
+        }
+        collectTypes(schema.types);
+        types[ksyNameToJsName(schema.meta.id)] = schema;
+        function fillTypes(val) {
+            if (val.type === ObjectType.Object) {
+                val.object.ksyType = types[val.object.class];
+                Object.keys(val.object.fields).forEach(fieldName => fillTypes(val.object.fields[fieldName]));
+            }
+            else if (val.type === ObjectType.Array)
+                val.arrayItems.forEach(item => fillTypes(item));
+        }
+        console.log('fillKsyTypes', root);
+        fillTypes(root);
+    }
     function getNode(node, cb) {
         var isRoot = node.id === '#';
         var expNode = isRoot ? exportedRoot : node.data.exported;
         var isInstance = !expNode;
-        var valuePromise = isInstance ? getProp(node.data.propPath).then(exp => node.data.exported = exp) : Promise.resolve(expNode);
+        var valuePromise = isInstance ? getProp(node.data.instance.path).then(exp => node.data.exported = exp) : Promise.resolve(expNode);
         valuePromise.then(exp => {
             if (isRoot || isInstance) {
-                fixOffsets(exp, 0);
+                //console.log('fixOffsets', node.text, node.data ? node.data.instance.offset : 0, exp, node);
+                fillKsyTypes(exp, ksySchema);
+                fixOffsets(exp, node.data ? node.data.instance.offset : 0);
                 fillIntervals(exp);
             }
             var nodes = exportedToNodes(exp, !isInstance);
@@ -123,7 +151,7 @@ function parsedToTree(jsTreeElement, exportedRoot, handleError, cb) {
             handleError(err);
         });
     }
-    function getNodeId(node) { return 'inputField_' + (node.data.exported ? node.data.exported.path : node.data.propPath).join('_'); }
+    function getNodeId(node) { return 'inputField_' + (node.data.exported ? node.data.exported.path : node.data.instance.path).join('_'); }
     var parsedTreeOpenedNodes = {};
     var parsedTreeOpenedNodesStr = localStorage.getItem('parsedTreeOpenedNodes');
     if (parsedTreeOpenedNodesStr)

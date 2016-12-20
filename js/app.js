@@ -62,29 +62,6 @@ function recompile() {
         });
     });
 }
-function fillKsyTypes(root, schema) {
-    var types = {};
-    function ksyNameToJsName(ksyName) { return ksyName.split('_').map(x => x.ucFirst()).join(''); }
-    function collectTypes(ts) {
-        if (!ts)
-            return;
-        Object.keys(ts).forEach(name => {
-            types[ksyNameToJsName(name)] = ts[name];
-            collectTypes(ts[name].types);
-        });
-    }
-    collectTypes(schema.types);
-    types[ksyNameToJsName(schema.meta.id)] = schema;
-    function fillTypes(val) {
-        if (val.type === ObjectType.Object) {
-            val.object.ksyType = types[val.object.class];
-            Object.keys(val.object.fields).forEach(fieldName => fillTypes(val.object.fields[fieldName]));
-        }
-        else if (val.type === ObjectType.Array)
-            val.arrayItems.forEach(item => fillTypes(item));
-    }
-    fillTypes(root);
-}
 var formatReady, selectedInTree = false, blockRecursive = false;
 function reparse() {
     var jsTree = ui.parsedDataTreeCont.getElement();
@@ -99,8 +76,7 @@ function reparse() {
             itree = new IntervalTree(dataProvider.length / 2);
             handleError(error);
             kaitaiIde.root = exportedRoot;
-            fillKsyTypes(exportedRoot, ksySchema);
-            ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, e => handleError(error || e), () => ui.hexViewer.onSelectionChanged());
+            ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, ksySchema, e => handleError(error || e), () => ui.hexViewer.onSelectionChanged());
             ui.parsedDataTree.on('select_node.jstree', function (e, selectNodeArgs) {
                 var node = selectNodeArgs.node;
                 //console.log('node', node);

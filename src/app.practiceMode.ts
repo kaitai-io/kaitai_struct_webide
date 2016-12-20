@@ -129,7 +129,7 @@ function practiceExportedChanged(exportedRoot: IExportedValue) {
         else if (exp.type === ObjectType.Object) {
             var result = {};
             Object.keys(exp.object.fields).forEach(fieldName => { result[fieldName] = exportedToNative(exp.object.fields[fieldName]); });
-            Object.keys(exp.object.propPaths).forEach(fieldName => {
+            Object.keys(exp.object.instances).forEach(fieldName => {
                 result[fieldName] = exportedToNative(exp.object.fields[fieldName]);
             });
             return result;

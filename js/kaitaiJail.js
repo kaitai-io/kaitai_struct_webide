@@ -38,9 +38,9 @@ function exportValue(obj, debug, path, noLazy) {
     else if (result.type === ObjectType.Array)
         result.arrayItems = obj.map((item, i) => exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy));
     else if (result.type === ObjectType.Object) {
-        result.object = { class: obj.constructor.name, propPaths: {}, fields: {} };
+        result.object = { class: obj.constructor.name, instances: {}, fields: {} };
         Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor").forEach(propName => {
-            result.object.propPaths[propName] = path.concat(propName);
+            result.object.instances[propName] = { path: path.concat(propName), offset: 0 };
             if (noLazy) {
                 console.log('noLazy', propName, obj[propName]);
                 result.object.fields[propName] = exportValue(obj[propName], obj._debug[propName], path.concat(propName), noLazy);

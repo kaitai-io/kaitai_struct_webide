@@ -1,4 +1,4 @@
-﻿interface ParsedTreeNodeData { exported?: IExportedValue, propPath?: string[] };
+﻿interface ParsedTreeNodeData { exported?: IExportedValue, instance?: IInstance };
 interface JSTreeNode<TData> { id?: string, text?: string, icon?: string, children?: JSTreeNode<TData>[] | boolean, data?: TData };
 interface ParsedTreeNode extends JSTreeNode<ParsedTreeNodeData> { }
 
@@ -7,7 +7,7 @@ interface JSTree {
     openNodes(nodeIds: string[], cb?: (foundAll: boolean) => void);
 }
 
-function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, cb) {
+function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksySchema: KsySchema.IKsyFile, handleError, cb) {
     function primitiveToText(exported: IExportedValue, detailed: boolean = true): string {
         if (exported.type === ObjectType.Primitive) {
             var value = exported.primitiveValue;
@@ -48,6 +48,8 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
             var currItem = obj;
             g1.split('.').forEach(k => currItem = currItem.object.fields[ksyNameToJsName(k)]);
 
+            if (!currItem) return "";
+
             if (currItem.type === ObjectType.Object)
                 return reprObject(currItem);
             else
@@ -83,7 +85,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
         else {
             var obj = exported.object;
             return Object.keys(obj.fields).map(fieldName => childItemToNode(obj.fields[fieldName], true)).concat(
-                Object.keys(obj.propPaths).map(propName => <ParsedTreeNode>{ text: s`${propName}`, children: true, data: { propPath: obj.propPaths[propName] } }));
+                Object.keys(obj.instances).map(propName => <ParsedTreeNode>{ text: s`${propName}`, children: true, data: { instance: obj.instances[propName] } }));
         }
     }
 
@@ -105,12 +107,12 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
         if (exp.type === ObjectType.Object) {
             var fieldNames = Object.keys(exp.object.fields);
             var objOffset = exp.object.fields[fieldNames[0]].start === 0 ? exp.start - offset : 0;
-            if (fieldNames.length > 0) {
-                fieldNames.forEach(fieldName => fixOffsets(exp.object.fields[fieldName], offset + objOffset));
-            }
+            fieldNames.forEach(fieldName => fixOffsets(exp.object.fields[fieldName], offset + objOffset));
+            Object.keys(exp.object.instances).forEach(propName => exp.object.instances[propName].offset = offset);
         }
         else if (exp.type === ObjectType.Array && exp.arrayItems.length > 0) {
-            var objOffset = exp.arrayItems[0].start === 0 ? exp.start : 0;
+            //var objOffset = exp.arrayItems[0].start === 0 ? exp.start : 0;
+            var objOffset = offset;
             exp.arrayItems.forEach(item => fixOffsets(item, objOffset));
         }
     }
@@ -125,15 +127,45 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
         }
     }
 
+    function fillKsyTypes(root: IExportedValue, schema: KsySchema.IKsyFile) {
+        var types: { [name: string]: KsySchema.IType } = {};
+
+        function ksyNameToJsName(ksyName) { return ksyName.split('_').map(x => x.ucFirst()).join(''); }
+
+        function collectTypes(ts: { [name: string]: KsySchema.IType }) {
+            if (!ts) return;
+            Object.keys(ts).forEach(name => {
+                types[ksyNameToJsName(name)] = ts[name];
+                collectTypes(ts[name].types);
+            });
+        }
+
+        collectTypes(schema.types);
+        types[ksyNameToJsName(schema.meta.id)] = schema;
+
+        function fillTypes(val: IExportedValue) {
+            if (val.type === ObjectType.Object) {
+                val.object.ksyType = types[val.object.class];
+                Object.keys(val.object.fields).forEach(fieldName => fillTypes(val.object.fields[fieldName]));
+            } else if (val.type === ObjectType.Array)
+                val.arrayItems.forEach(item => fillTypes(item));
+        }
+
+        console.log('fillKsyTypes', root);
+        fillTypes(root);
+    }
+
     function getNode(node: ParsedTreeNode, cb: (items: ParsedTreeNode[]) => void) {
         var isRoot = node.id === '#';
         var expNode = isRoot ? exportedRoot : node.data.exported;
 
         var isInstance = !expNode;
-        var valuePromise = isInstance ? getProp(node.data.propPath).then(exp => node.data.exported = exp) : Promise.resolve(expNode);
+        var valuePromise = isInstance ? getProp(node.data.instance.path).then(exp => node.data.exported = exp) : Promise.resolve(expNode);
         valuePromise.then(exp => {
             if (isRoot || isInstance) {
-                fixOffsets(exp, 0);
+                //console.log('fixOffsets', node.text, node.data ? node.data.instance.offset : 0, exp, node);
+                fillKsyTypes(exp, ksySchema);
+                fixOffsets(exp, node.data ? node.data.instance.offset : 0);
                 fillIntervals(exp);
             }
 
@@ -148,7 +180,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, handleError, 
         });
     }
 
-    function getNodeId(node: ParsedTreeNode) { return 'inputField_' + (node.data.exported ? node.data.exported.path : node.data.propPath).join('_'); }
+    function getNodeId(node: ParsedTreeNode) { return 'inputField_' + (node.data.exported ? node.data.exported.path : node.data.instance.path).join('_'); }
 
     var parsedTreeOpenedNodes = {};
     var parsedTreeOpenedNodesStr = localStorage.getItem('parsedTreeOpenedNodes')
