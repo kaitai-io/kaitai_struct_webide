@@ -20,9 +20,9 @@ function getObjectType(obj) {
         return ObjectType.Object;
 }
 
-function exportValue(obj, debug: IDebugInfo, path: string[], noLazy?: boolean): IExportedValue {
+function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boolean, ioOffset?: number): IExportedValue {
     //if (!debug) debugger;
-    var result = <IExportedValue>{ start: debug && debug.start, end: debug && debug.end, path: path, type: getObjectType(obj) };
+    var result = <IExportedValue>{ start: debug && debug.start, end: debug && debug.end, ioOffset: ioOffset, path: path, type: getObjectType(obj) };
 
     if (result.type === ObjectType.TypedArray)
         result.bytes = obj;
@@ -48,8 +48,16 @@ function exportValue(obj, debug: IDebugInfo, path: string[], noLazy?: boolean): 
         }
     }
     else if (result.type === ObjectType.Array)
-        result.arrayItems = obj.map((item, i) => exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy));
+        result.arrayItems = obj.map((item, i) => exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy, ioOffset));
     else if (result.type === ObjectType.Object) {
+        var childIoOffset = obj._io._byteOffset;
+
+        if (result.start === childIoOffset) { // new KaitaiStream was used, fix start position
+            //console.log('m', path.join('/'), result.ioOffset, childIoOffset);
+            result.ioOffset = childIoOffset;
+            result.start = 0;
+        }
+
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
 
         Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor").forEach(propName => {
@@ -57,11 +65,11 @@ function exportValue(obj, debug: IDebugInfo, path: string[], noLazy?: boolean): 
 
             if (noLazy) {
                 console.log('noLazy', propName, obj[propName]);
-                result.object.fields[propName] = exportValue(obj[propName], obj._debug[propName], path.concat(propName), noLazy);
+                result.object.fields[propName] = exportValue(obj[propName], obj._debug[propName], path.concat(propName), noLazy, childIoOffset);
             }
         });
 
-        Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key), noLazy));
+        Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key), noLazy, childIoOffset));
     }
     else
         console.log(`Unknown object type: ${result.type}`);
@@ -92,7 +100,7 @@ application.setInterface({
             parseError = { message: e.message, stack: e.stack };
         }
 
-        exported = exportValue(root, <IDebugInfo>{ start: 0, end: inputBuffer.byteLength }, [], noLazy);
+        exported = exportValue(root, <IDebugInfo>{ start: 0, end: inputBuffer.byteLength }, [], noLazy, 0);
         //console.log('[jail] root', root, 'exported', exported);
         cb(exported, parseError);
     },
@@ -108,7 +116,9 @@ application.setInterface({
             parseError = { message: e.message, stack: e.stack };
         }
 
-        exported = exportValue(obj, <IDebugInfo>parent._debug['_m_' + path[path.length - 1]], path);
+        exported = exportValue(obj, <IDebugInfo>parent._debug['_m_' + path[path.length - 1]], path, false, parent._io && parent._io._byteOffset);
+        //console.log('jail get', path.join('/'), exported.ioOffset, exported.start, exported.end);
+
         //console.log('get original =', obj, ', exported =', exported);
         cb(exported, parseError);
     }

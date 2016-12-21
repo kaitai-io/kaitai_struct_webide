@@ -21,6 +21,7 @@ interface IExportedObject {
 interface IExportedValue {
     type: ObjectType;
     path: string[];
+    ioOffset: number;
     start: number;
     end: number;
 

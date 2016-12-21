@@ -28,7 +28,7 @@ function compile(srcYaml: string, kslang: string, debug: true | false | 'both') 
         return;
     }
 
-    console.log('ksySchema', ksySchema);
+    //console.log('ksySchema', ksySchema);
 
     try {
         if (kslang === 'json')
@@ -101,7 +101,7 @@ function reparse() {
                 var exp = node.data.exported;
                 if (!blockRecursive && exp && exp.start < exp.end) {
                     selectedInTree = true;
-                    ui.hexViewer.setSelection(exp.start, exp.end - 1);
+                    ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
                     selectedInTree = false;
                 }
             });

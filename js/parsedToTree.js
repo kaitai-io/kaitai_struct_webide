@@ -81,21 +81,6 @@ function parsedToTree(jsTreeElement, exportedRoot, ksySchema, handleError, cb) {
             });
         });
     }
-    function fixOffsets(exp, offset) {
-        exp.start += offset;
-        exp.end += offset;
-        if (exp.type === ObjectType.Object) {
-            var fieldNames = Object.keys(exp.object.fields);
-            var objOffset = exp.object.fields[fieldNames[0]].start === 0 ? exp.start - offset : 0;
-            fieldNames.forEach(fieldName => fixOffsets(exp.object.fields[fieldName], offset + objOffset));
-            Object.keys(exp.object.instances).forEach(propName => exp.object.instances[propName].offset = offset);
-        }
-        else if (exp.type === ObjectType.Array && exp.arrayItems.length > 0) {
-            //var objOffset = exp.arrayItems[0].start === 0 ? exp.start : 0;
-            var objOffset = offset;
-            exp.arrayItems.forEach(item => fixOffsets(item, objOffset));
-        }
-    }
     function fillIntervals(exp) {
         if (exp.type === ObjectType.Object) {
             Object.keys(exp.object.fields).forEach(fieldName => fillIntervals(exp.object.fields[fieldName]));
@@ -103,7 +88,7 @@ function parsedToTree(jsTreeElement, exportedRoot, ksySchema, handleError, cb) {
         else if (exp.type === ObjectType.Array)
             exp.arrayItems.forEach(item => fillIntervals(item));
         else if (exp.start < exp.end) {
-            itree.add(exp.start, exp.end - 1, exp.path.join('/'));
+            itree.add(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1, exp.path.join('/'));
         }
     }
     function fillKsyTypes(root, schema) {
@@ -127,7 +112,7 @@ function parsedToTree(jsTreeElement, exportedRoot, ksySchema, handleError, cb) {
             else if (val.type === ObjectType.Array)
                 val.arrayItems.forEach(item => fillTypes(item));
         }
-        console.log('fillKsyTypes', root);
+        //console.log('fillKsyTypes', root);
         fillTypes(root);
     }
     function getNode(node, cb) {
@@ -137,9 +122,7 @@ function parsedToTree(jsTreeElement, exportedRoot, ksySchema, handleError, cb) {
         var valuePromise = isInstance ? getProp(node.data.instance.path).then(exp => node.data.exported = exp) : Promise.resolve(expNode);
         valuePromise.then(exp => {
             if (isRoot || isInstance) {
-                //console.log('fixOffsets', node.text, node.data ? node.data.instance.offset : 0, exp, node);
                 fillKsyTypes(exp, ksySchema);
-                fixOffsets(exp, node.data ? node.data.instance.offset : 0);
                 fillIntervals(exp);
             }
             var nodes = exportedToNodes(exp, !isInstance);
