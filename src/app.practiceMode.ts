@@ -1,4 +1,4 @@
-﻿var practiceDiff: AceAjax.Editor, Range: any, markers = [];
+﻿var practiceDiff: AceAjax.Editor, aceRange: any, markers = [];
 
 interface ILine { start: number; end: number; idx: number; match: string; }
 
@@ -148,7 +148,7 @@ function practiceExportedChanged(exportedRoot: IExportedValue) {
     markers.forEach(marker => practiceDiff.session.removeMarker(marker));
     markers = [];
     lines.forEach(line => {
-        markers.push(practiceDiff.session.addMarker(new Range(line.idx, 0, line.idx, 1), `marker_${line.match}`, "fullLine", false));
+        markers.push(practiceDiff.session.addMarker(new aceRange(line.idx, 0, line.idx, 1), `marker_${line.match}`, "fullLine", false));
     });
 
     console.log('win?', win);
@@ -170,7 +170,7 @@ function practiceExportedChanged(exportedRoot: IExportedValue) {
 }
 
 $(() => {
-    Range = ace.require('ace/range').Range;
+    aceRange = ace.require('ace/range').Range;
 
     practiceDiff = ace.edit('practiceDiff');
     practiceDiff.setTheme("ace/theme/monokai");

@@ -1,4 +1,4 @@
-var practiceDiff, Range, markers = [];
+var practiceDiff, aceRange, markers = [];
 function practiceExportedChanged(exportedRoot) {
     function numConv(num) {
         return num % 1 > 10e-9 ? Math.round(num * 1000000) / 1000000 : num;
@@ -103,7 +103,7 @@ function practiceExportedChanged(exportedRoot) {
         else if (exp.type === ObjectType.Object) {
             var result = {};
             Object.keys(exp.object.fields).forEach(fieldName => { result[fieldName] = exportedToNative(exp.object.fields[fieldName]); });
-            Object.keys(exp.object.propPaths).forEach(fieldName => {
+            Object.keys(exp.object.instances).forEach(fieldName => {
                 result[fieldName] = exportedToNative(exp.object.fields[fieldName]);
             });
             return result;
@@ -121,7 +121,7 @@ function practiceExportedChanged(exportedRoot) {
     markers.forEach(marker => practiceDiff.session.removeMarker(marker));
     markers = [];
     lines.forEach(line => {
-        markers.push(practiceDiff.session.addMarker(new Range(line.idx, 0, line.idx, 1), `marker_${line.match}`, "fullLine", false));
+        markers.push(practiceDiff.session.addMarker(new aceRange(line.idx, 0, line.idx, 1), `marker_${line.match}`, "fullLine", false));
     });
     console.log('win?', win);
     $('#practiceStatus .inProgress').toggleClass('inactive', win);
@@ -140,7 +140,7 @@ function practiceExportedChanged(exportedRoot) {
     }
 }
 $(() => {
-    Range = ace.require('ace/range').Range;
+    aceRange = ace.require('ace/range').Range;
     practiceDiff = ace.edit('practiceDiff');
     practiceDiff.setTheme("ace/theme/monokai");
     practiceDiff.getSession().setMode(`ace/mode/javascript`);
