@@ -18,7 +18,7 @@ function compile(srcYaml: string, kslang: string, debug: true | false | 'both') 
 
         compilerSchema = <KsySchema.IKsyFile>YAML.parse(srcYaml); // we have to modify before sending into the compiler so we need a copy
         function filterOutExtensions(type: KsySchema.IType) {
-            delete type.extensions;
+            Object.keys(type).filter(x => x.startsWith("-")).forEach(keyName => delete type[keyName]);
             if (type.types)
                 Object.keys(type.types).forEach(typeName => filterOutExtensions(type.types[typeName]));
         }

@@ -39,7 +39,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksySchema: Ks
     }
 
     function reprObject(obj: IExportedValue) {
-        var repr = ((((obj.object.ksyType || <any>{}).extensions || {}).webide) || {}).representation;
+        var repr = obj.object.ksyType && obj.object.ksyType["-webide-representation"];
         if (!repr) return "";
 
         function ksyNameToJsName(ksyName) { return ksyName.split('_').map((x,i) => (i === 0 ? x : x.ucFirst())).join(''); }

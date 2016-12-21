@@ -11,7 +11,7 @@ function compile(srcYaml, kslang, debug) {
         kaitaiIde.ksySchema = ksySchema = YAML.parse(srcYaml);
         compilerSchema = YAML.parse(srcYaml); // we have to modify before sending into the compiler so we need a copy
         function filterOutExtensions(type) {
-            delete type.extensions;
+            Object.keys(type).filter(x => x.startsWith("-")).forEach(keyName => delete type[keyName]);
             if (type.types)
                 Object.keys(type.types).forEach(typeName => filterOutExtensions(type.types[typeName]));
         }

@@ -44,12 +44,7 @@
         types: { [name: string]: IType };
         enums: { [name: string]: { [intValue: string]: string } };
         instances: { [name: string]: IInstance };
-        extensions: {
-            [key: string]: any;
-            webide: {
-                representation: string;
-            }
-        }
+        "-webide-representation"?: string;
     }
 
     export interface IKsyFile extends IType {
