@@ -66,10 +66,12 @@ function parsedToTree(jsTreeElement, exportedRoot, ksySchema, handleError, cb) {
             return [childItemToNode(exported, showProp)];
         else if (exported.type === ObjectType.Array)
             return exported.arrayItems.map((item, i) => childItemToNode(item, true));
-        else {
+        else if (exported.type === ObjectType.Object) {
             var obj = exported.object;
             return Object.keys(obj.fields).map(fieldName => childItemToNode(obj.fields[fieldName], true)).concat(Object.keys(obj.instances).map(propName => ({ text: s `${propName}`, children: true, data: { instance: obj.instances[propName] } })));
         }
+        else
+            throw new Error(`Unknown object type: ${exported.type}`);
     }
     function getProp(path) {
         return new Promise((resolve, reject) => {
@@ -125,7 +127,7 @@ function parsedToTree(jsTreeElement, exportedRoot, ksySchema, handleError, cb) {
                 fillKsyTypes(exp, ksySchema);
                 fillIntervals(exp);
             }
-            var nodes = exportedToNodes(exp, !isInstance);
+            var nodes = exportedToNodes(exp, true);
             nodes.forEach(node => node.id = getNodeId(node));
             cb(nodes);
             handleError(null);
