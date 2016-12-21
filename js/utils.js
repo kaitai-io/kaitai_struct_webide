@@ -93,12 +93,23 @@ if (!String.prototype.endsWith) {
 if (!Array.prototype.last) {
     Array.prototype.last = function () { return this[this.length - 1]; };
 }
-function arrayBufferToBase64(buffer) {
-    var bytes = new Uint8Array(buffer);
+function asciiEncode(bytes) {
     var len = bytes.byteLength;
     var binary = '';
     for (var i = 0; i < len; i++)
         binary += String.fromCharCode(bytes[i]);
+    return binary;
+}
+function hexEncode(bytes) {
+    var len = bytes.byteLength;
+    var binary = '0x';
+    for (var i = 0; i < len; i++)
+        binary += bytes[i].toString(16);
+    return binary;
+}
+function arrayBufferToBase64(buffer) {
+    var bytes = new Uint8Array(buffer);
+    var binary = asciiEncode(bytes);
     return window.btoa(binary);
 }
 function readBlob(blob, mode, ...args) {

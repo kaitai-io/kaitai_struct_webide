@@ -35,11 +35,17 @@ function parsedToTree(jsTreeElement, exportedRoot, ksySchema, handleError, cb) {
         function ksyNameToJsName(ksyName) { return ksyName.split('_').map((x, i) => (i === 0 ? x : x.ucFirst())).join(''); }
         return htmlescape(repr).replace(/{(.*?)}/g, (g0, g1) => {
             var currItem = obj;
-            g1.split('.').forEach(k => currItem = currItem.object.fields[ksyNameToJsName(k)]);
+            var parts = g1.split(':');
+            var format = parts.length > 1 ? parts[1] : null;
+            parts[0].split('.').forEach(k => currItem = currItem && currItem.object.fields[ksyNameToJsName(k)]);
             if (!currItem)
                 return "";
             if (currItem.type === ObjectType.Object)
                 return reprObject(currItem);
+            else if (format === 'str' && currItem.type === ObjectType.TypedArray)
+                return s `"${asciiEncode(currItem.bytes)}"`;
+            else if (format === 'hex' && currItem.type === ObjectType.TypedArray)
+                return `${hexEncode(currItem.bytes)}`;
             else
                 return primitiveToText(currItem, false);
         });
