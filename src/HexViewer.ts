@@ -74,8 +74,6 @@ class HexViewer {
     private maxScrollHeight: number;
     private maxRow: number;
     private totalHeight: number;
-    private visibleOffsetStart: number;
-    private visibleOffsetEnd: number;
     private scrollbox: JQuery;
     private heightbox: JQuery;
     private content: JQuery;
@@ -195,11 +193,11 @@ class HexViewer {
         this.refresh();
     }
 
+    get visibleOffsetStart(): number { return this.topRow * this.bytesPerLine; }
+    get visibleOffsetEnd(): number { return (this.topRow + this.rowCount - 1) * this.bytesPerLine - 1; }
+
     public refresh() {
         if (!this.dataProvider) return false;
-
-        this.visibleOffsetStart = this.topRow * this.bytesPerLine;
-        this.visibleOffsetEnd = (this.topRow + this.rowCount - 1) * this.bytesPerLine - 1;
 
         var intIdx;
         for (intIdx = 0; intIdx < this.intervals.length; intIdx++)
@@ -285,7 +283,7 @@ class HexViewer {
         var oldStart = this.selectionStart, oldEnd = this.selectionEnd;
         this.selectionStart = start < end ? start : end;
         this.selectionEnd = Math.min(start < end ? end : start, this.dataProvider.length - 1);
-        if (this.selectionStart != oldStart || this.selectionEnd != oldEnd) {
+        if (this.selectionStart !== oldStart || this.selectionEnd !== oldEnd) {
             this.isRecursive = true;
             try {
                 if (this.onSelectionChanged)
@@ -293,10 +291,10 @@ class HexViewer {
             } finally {
                 this.isRecursive = false;
 
-                if (this.selectionStart != -1) {
+                if (this.selectionStart !== -1) {
                     if (this.selectionEnd > this.visibleOffsetEnd)
                         this.topRow = Math.max(Math.floor(this.selectionEnd / this.bytesPerLine) - this.rowCount + 2, 0);
-                    else if (this.selectionStart < this.visibleOffsetStart)
+                    if (this.selectionStart < this.visibleOffsetStart)
                         this.topRow = Math.floor(this.selectionStart / this.bytesPerLine);
 
                     this.scrollbox.scrollTop(Math.round(this.topRow / this.maxRow * this.maxScrollHeight));
