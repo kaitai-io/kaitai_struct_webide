@@ -64,7 +64,7 @@ class HexViewer {
         this.contentOuter.append($(`<div class="header"><span class="hex">${charSpans}</span><span class="ascii">${charSpans}</span></div>`));
         this.content = $('<div class="content"></div>').appendTo(this.contentOuter).on('mousedown', e => this.cellMouseAction(e));
         $(document).mouseup(e => this.cellMouseAction(e));
-        this.intervals = [];
+        this.intervalTree = null;
         this.scrollbox.on('scroll', e => {
             var scrollTop = this.scrollbox.scrollTop();
             this.contentOuter.css('top', scrollTop + 'px');
@@ -149,10 +149,9 @@ class HexViewer {
     refresh() {
         if (!this.dataProvider)
             return false;
-        var intIdx;
-        for (intIdx = 0; intIdx < this.intervals.length; intIdx++)
-            if (this.intervals[intIdx].start <= this.visibleOffsetStart && this.visibleOffsetStart <= this.intervals[intIdx].end)
-                break;
+        var intervals = this.intervalTree ? this.intervalTree.search(this.visibleOffsetStart, this.visibleOffsetEnd) : [];
+        var intIdx = 0;
+        console.log('intervals', intervals);
         var viewData = this.dataProvider.get(this.visibleOffsetStart, Math.min(this.rowCount * this.bytesPerLine, this.dataProvider.length - this.visibleOffsetStart));
         for (var iRow = 0; iRow < this.rowCount; iRow++) {
             var rowOffset = iRow * this.bytesPerLine;
@@ -181,7 +180,7 @@ class HexViewer {
                 $(asciiCell).toggleClass('selected', isSelected);
                 var skipInt = 0;
                 for (var level = 0; level < this.maxLevel; level++) {
-                    var int = this.intervals[intIdx + level];
+                    var int = intervals[intIdx + level];
                     var intIn = int && int.start <= dataOffset && dataOffset <= int.end;
                     var intStart = intIn && int.start === dataOffset;
                     var intEnd = intIn && int.end === dataOffset;
@@ -194,15 +193,8 @@ class HexViewer {
             }
         }
     }
-    setIntervals(intervals) {
-        //this.intervals = intervals.sort((a, b) => a.start != b.start ? a.start - b.start : a.end - b.end);
-        this.intervals = [];
-        for (var i = 0; i < intervals.length; i++) {
-            var int = intervals[i];
-            if (i == 0 || !(int.start == intervals[i - 1].start && int.end == intervals[i - 1].end))
-                this.intervals.push(int);
-        }
-        //console.log('setIntervals', this.intervals.map(i => `${i.start}-${i.end}`).join(' '));
+    setIntervalTree(itree) {
+        this.intervalTree = itree;
         this.refresh();
     }
     setDataProvider(dataProvider) {

@@ -46,9 +46,9 @@
 .hexViewer .start .start .start .start .hexcell { padding: 0 1px }
 .hexViewer .start .start .start .start .start .hexcell { padding: 0 0 }
 
-.hexViewer .m0 { background: #fdd }
+.hexViewer .m0 { background: #dfd; }
 .hexViewer .m1 { background: #ddf; }
-.hexViewer .m2 { background: #dfd; }
+.hexViewer .m2 { background: #fdd; }
 .hexViewer .m3 { background: orange; }
 .hexViewer .m4 { background: purple; }
 /*.hexViewer .m0 .hexcell { color: white }*/

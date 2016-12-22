@@ -132,6 +132,7 @@ function parsedToTree(jsTreeElement, exportedRoot, ksySchema, handleError, cb) {
             if (isRoot || isInstance) {
                 fillKsyTypes(exp, ksySchema);
                 fillIntervals(exp);
+                ui.hexViewer.setIntervalTree(itree);
             }
             var nodes = exportedToNodes(exp, true);
             nodes.forEach(node => node.id = getNodeId(node));

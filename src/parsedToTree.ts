@@ -155,6 +155,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksySchema: Ks
             if (isRoot || isInstance) {
                 fillKsyTypes(exp, ksySchema);
                 fillIntervals(exp);
+                ui.hexViewer.setIntervalTree(itree);
             }
 
             var nodes = exportedToNodes(exp, true);
