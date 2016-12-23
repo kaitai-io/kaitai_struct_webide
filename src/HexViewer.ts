@@ -200,10 +200,10 @@ class HexViewer {
         if (!this.dataProvider) return false;
 
         var intervals = this.intervalTree ? this.intervalTree.search(this.visibleOffsetStart, this.visibleOffsetEnd) : [];
+        var intIdxBase = intervals.length === 0 ? 0 : JSON.parse(intervals[0].id).id;
         var intIdx = 0;
-        console.log('intervals', intervals);
+        //console.log('intervals', intervals);
 
-        var alternate = false;
         var viewData = this.dataProvider.get(this.visibleOffsetStart, Math.min(this.rowCount * this.bytesPerLine, this.dataProvider.length - this.visibleOffsetStart));
         for (var iRow = 0; iRow < this.rowCount; iRow++) {
             var rowOffset = iRow * this.bytesPerLine;
@@ -241,13 +241,11 @@ class HexViewer {
                     var intIn = int && int.start <= dataOffset && dataOffset <= int.end;
                     var intStart = intIn && int.start === dataOffset;
                     var intEnd = intIn && int.end === dataOffset;
-                    hexCell.levels[level].className = `l${this.maxLevel - 1 - level} ${alternate ? "even" : "odd"}` +
+                    hexCell.levels[level].className = `l${this.maxLevel - 1 - level} ${((intIdxBase + intIdx) % 2 === 0) ? "even" : "odd"}` +
                         (intIn ? ` m${level}` : "") + (intStart ? " start" : "") + (intEnd ? " end" : "") + (isSelected ? " selected" : "");
 
-                    if (intEnd) {
+                    if (intEnd)
                         skipInt++;
-                        alternate = !alternate;
-                    }
                 }
                 
                 intIdx += skipInt;

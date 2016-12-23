@@ -33,10 +33,11 @@
         id: string;
     }
 
-    interface IInstance extends IAttributeLike {
+    export interface IInstance extends IAttributeLike {
         io?: string;
         pos?: string | number;
         value?: string | number;
+        "-webide-parse-mode"?: "eager" | "lazy";
     }
 
     export interface IType {
@@ -45,6 +46,9 @@
         enums: { [name: string]: { [intValue: string]: string } };
         instances: { [name: string]: IInstance };
         "-webide-representation"?: string;
+
+        typesByJsName: { [name: string]: IType };
+        instancesByJsName: { [name: string]: IInstance };
     }
 
     export interface IKsyFile extends IType {

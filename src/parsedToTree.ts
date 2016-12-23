@@ -7,7 +7,7 @@ interface JSTree {
     openNodes(nodeIds: string[], cb?: (foundAll: boolean) => void);
 }
 
-function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksySchema: KsySchema.IKsyFile, handleError, cb) {
+function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKsyTypes, handleError, cb) {
     function primitiveToText(exported: IExportedValue, detailed: boolean = true): string {
         if (exported.type === ObjectType.Primitive) {
             var value = exported.primitiveValue;
@@ -107,54 +107,37 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksySchema: Ks
         })
     }
 
-    function fillIntervals(exp: IExportedValue) {
-        if (exp.type === ObjectType.Object) {
-            Object.keys(exp.object.fields).forEach(fieldName => fillIntervals(exp.object.fields[fieldName]));
-        } else if (exp.type === ObjectType.Array)
-            exp.arrayItems.forEach(item => fillIntervals(item));
-        else if (exp.start < exp.end) {
-            itree.add(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1, exp.path.join('/'));
-        }
-    }
-
-    function fillKsyTypes(root: IExportedValue, schema: KsySchema.IKsyFile) {
-        var types: { [name: string]: KsySchema.IType } = {};
-
-        function ksyNameToJsName(ksyName) { return ksyName.split('_').map(x => x.ucFirst()).join(''); }
-
-        function collectTypes(ts: { [name: string]: KsySchema.IType }) {
-            if (!ts) return;
-            Object.keys(ts).forEach(name => {
-                types[ksyNameToJsName(name)] = ts[name];
-                collectTypes(ts[name].types);
-            });
-        }
-
-        collectTypes(schema.types);
-        types[ksyNameToJsName(schema.meta.id)] = schema;
-
-        function fillTypes(val: IExportedValue) {
-            if (val.type === ObjectType.Object) {
-                val.object.ksyType = types[val.object.class];
-                Object.keys(val.object.fields).forEach(fieldName => fillTypes(val.object.fields[fieldName]));
-            } else if (val.type === ObjectType.Array)
-                val.arrayItems.forEach(item => fillTypes(item));
-        }
-
-        //console.log('fillKsyTypes', root);
-        fillTypes(root);
-    }
-
     function getNode(node: ParsedTreeNode, cb: (items: ParsedTreeNode[]) => void) {
         var isRoot = node.id === '#';
         var expNode = isRoot ? exportedRoot : node.data.exported;
+
+        function fillKsyTypes(val: IExportedValue) {
+            if (val.type === ObjectType.Object) {
+                val.object.ksyType = ksyTypes[val.object.class];
+                Object.keys(val.object.fields).forEach(fieldName => fillKsyTypes(val.object.fields[fieldName]));
+            } else if (val.type === ObjectType.Array)
+                val.arrayItems.forEach(item => fillKsyTypes(item));
+        }
 
         var isInstance = !expNode;
         var valuePromise = isInstance ? getProp(node.data.instance.path).then(exp => node.data.exported = exp) : Promise.resolve(expNode);
         valuePromise.then(exp => {
             if (isRoot || isInstance) {
-                fillKsyTypes(exp, ksySchema);
+                fillKsyTypes(exp);
+
+                var intId = 0;
+                function fillIntervals(exp: IExportedValue) {
+                    if (exp.type === ObjectType.Object) {
+                        Object.keys(exp.object.fields).forEach(fieldName => fillIntervals(exp.object.fields[fieldName]));
+                    } else if (exp.type === ObjectType.Array)
+                        exp.arrayItems.forEach(item => fillIntervals(item));
+                    else if (exp.start < exp.end) {
+                        itree.add(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1, JSON.stringify({ id: intId++, path: exp.path.join('/') }));
+                    }
+                }
+
                 fillIntervals(exp);
+
                 ui.hexViewer.setIntervalTree(itree);
             }
 

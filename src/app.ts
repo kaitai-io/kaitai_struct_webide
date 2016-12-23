@@ -10,18 +10,63 @@ $.jstree.defaults.core.force_text = true;
 var dataProvider: IDataProvider;
 var itree;
 var ksySchema: KsySchema.IKsyFile;
+var ksyTypes: IKsyTypes;
+
+interface IKsyTypes { [name: string]: KsySchema.IType };
 
 function compile(srcYaml: string, kslang: string, debug: true | false | 'both') {
     var compilerSchema;
     try {
         kaitaiIde.ksySchema = ksySchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
 
+        function collectKsyTypes(schema: KsySchema.IKsyFile): IKsyTypes {
+            var types: IKsyTypes = {};
+
+            function ksyNameToJsName(ksyName) { return ksyName.split('_').map(x => x.ucFirst()).join(''); }
+
+            function collectTypes(parent: KsySchema.IType) {
+                if (parent.types) {
+                    parent.typesByJsName = {};
+                    Object.keys(parent.types).forEach(name => {
+                        var jsName = ksyNameToJsName(name);
+                        parent.typesByJsName[jsName] = types[jsName] = parent.types[name];
+                        collectTypes(parent.types[name]);
+                    });
+                }
+
+                if (parent.instances) {
+                    parent.instancesByJsName = {};
+                    Object.keys(parent.instances).forEach(name => {
+                        var jsName = ksyNameToJsName(name);
+                        parent.instancesByJsName[jsName] = parent.instances[name];
+                    });
+                }
+            }
+
+            collectTypes(schema);
+            types[ksyNameToJsName(schema.meta.id)] = schema;
+
+            return types;
+        }
+
+        kaitaiIde.ksyTypes = ksyTypes = collectKsyTypes(ksySchema);
+
         compilerSchema = <KsySchema.IKsyFile>YAML.parse(srcYaml); // we have to modify before sending into the compiler so we need a copy
+
+        function removeWebIdeKeys(obj: any) {
+            Object.keys(obj).filter(x => x.startsWith("-webide-")).forEach(keyName => delete obj[keyName]);
+        }
+
         function filterOutExtensions(type: KsySchema.IType) {
-            Object.keys(type).filter(x => x.startsWith("-")).forEach(keyName => delete type[keyName]);
+            removeWebIdeKeys(type);
+
             if (type.types)
                 Object.keys(type.types).forEach(typeName => filterOutExtensions(type.types[typeName]));
+
+            if (type.instances)
+                Object.keys(type.instances).forEach(instanceName => removeWebIdeKeys(type.instances[instanceName]));
         }
+
         filterOutExtensions(compilerSchema);
     } catch (parseErr) {
         showError("YAML parsing error: ", parseErr);
@@ -81,7 +126,7 @@ function reparse() {
 
     return Promise.all([jailReady, inputReady, formatReady]).then(() => {
         var debugCode = ui.genCodeDebugViewer.getValue();
-        return jailrun(`module = { exports: true }; \n ${debugCode} \n`);
+        return jailrun(`module = { exports: true }; ksyTypes = args.ksyTypes; \n ${debugCode} \n`, { ksyTypes });
     }).then(() => {
         //console.log('recompiled');
 
@@ -94,7 +139,7 @@ function reparse() {
 
             kaitaiIde.root = exportedRoot;
 
-            ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, ksySchema, e => handleError(error || e), () => ui.hexViewer.onSelectionChanged());
+            ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, ksyTypes, e => handleError(error || e), () => ui.hexViewer.onSelectionChanged());
             ui.parsedDataTree.on('select_node.jstree', function (e, selectNodeArgs) {
                 var node = <ParsedTreeNode>selectNodeArgs.node;
                 //console.log('node', node);
@@ -181,7 +226,7 @@ $(() => {
             if (intervals.length > 0) {
                 //console.log('selected node', intervals[0].id);
                 blockRecursive = true;
-                ui.parsedDataTree.activatePath(intervals[0].id, () => blockRecursive = false);
+                ui.parsedDataTree.activatePath(JSON.parse(intervals[0].id).path, () => blockRecursive = false);
             }
         }
 

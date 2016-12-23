@@ -45,14 +45,16 @@ function exportValue(obj, debug, path, noLazy, ioOffset) {
             result.start = 0;
         }
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
-        Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor").forEach(propName => {
-            result.object.instances[propName] = { path: path.concat(propName), offset: 0 };
-            if (noLazy) {
-                console.log('noLazy', propName, obj[propName]);
-                result.object.fields[propName] = exportValue(obj[propName], obj._debug[propName], path.concat(propName), noLazy, childIoOffset);
-            }
-        });
+        var ksyType = ksyTypes[result.object.class];
         Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key), noLazy, childIoOffset));
+        Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor").forEach(propName => {
+            var ksyInstanceData = ksyType && ksyType.instances[propName];
+            var eagerLoad = ksyInstanceData && ksyInstanceData["-webide-parse-mode"] === "eager";
+            if (eagerLoad || noLazy)
+                result.object.fields[propName] = exportValue(obj[propName], obj._debug['_m_' + propName], path.concat(propName), noLazy, childIoOffset);
+            else
+                result.object.instances[propName] = { path: path.concat(propName), offset: 0 };
+        });
     }
     else
         console.log(`Unknown object type: ${result.type}`);

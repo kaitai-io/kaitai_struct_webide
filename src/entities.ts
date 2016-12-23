@@ -32,4 +32,5 @@ interface IExportedValue {
 
     enumName?: string;
     enumStringValue?: string;
+    //isInstance?: boolean;
 }
