@@ -12,7 +12,7 @@ function isUndef(obj) { return typeof obj === "undefined"; }
 function getObjectType(obj) {
     if (obj instanceof Uint8Array)
         return ObjectType.TypedArray;
-    else if (typeof obj !== "object")
+    else if (obj === null || typeof obj !== "object")
         return isUndef(obj) ? ObjectType.Undefined : ObjectType.Primitive;
     else if (Array.isArray(obj))
         return ObjectType.Array;
