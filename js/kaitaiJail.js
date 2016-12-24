@@ -42,7 +42,8 @@ function exportValue(obj, debug, path, noLazy, ioOffset) {
         if (result.start === childIoOffset) {
             //console.log('m', path.join('/'), result.ioOffset, childIoOffset);
             result.ioOffset = childIoOffset;
-            result.start = 0;
+            result.start -= childIoOffset;
+            result.end -= childIoOffset;
         }
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
         var ksyType = ksyTypes[result.object.class];

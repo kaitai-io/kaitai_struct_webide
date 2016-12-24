@@ -55,7 +55,8 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         if (result.start === childIoOffset) { // new KaitaiStream was used, fix start position
             //console.log('m', path.join('/'), result.ioOffset, childIoOffset);
             result.ioOffset = childIoOffset;
-            result.start = 0;
+            result.start -= childIoOffset;
+            result.end -= childIoOffset;
         }
 
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
