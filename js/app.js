@@ -1,5 +1,5 @@
 /// <reference path="../lib/ts-types/goldenlayout.d.ts" />
-/// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
+// /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 $.jstree.defaults.core.force_text = true;
 var dataProvider;
@@ -13,12 +13,12 @@ function compile(srcYaml, kslang, debug) {
         kaitaiIde.ksySchema = ksySchema = YAML.parse(srcYaml);
         function collectKsyTypes(schema) {
             var types = {};
-            function ksyNameToJsName(ksyName) { return ksyName.split('_').map(x => x.ucFirst()).join(''); }
+            function ksyNameToJsName(ksyName, isProp) { return ksyName.split('_').map((x, i) => i == 0 && isProp ? x : x.ucFirst()).join(''); }
             function collectTypes(parent) {
                 if (parent.types) {
                     parent.typesByJsName = {};
                     Object.keys(parent.types).forEach(name => {
-                        var jsName = ksyNameToJsName(name);
+                        var jsName = ksyNameToJsName(name, false);
                         parent.typesByJsName[jsName] = types[jsName] = parent.types[name];
                         collectTypes(parent.types[name]);
                     });
@@ -26,13 +26,13 @@ function compile(srcYaml, kslang, debug) {
                 if (parent.instances) {
                     parent.instancesByJsName = {};
                     Object.keys(parent.instances).forEach(name => {
-                        var jsName = ksyNameToJsName(name);
+                        var jsName = ksyNameToJsName(name, true);
                         parent.instancesByJsName[jsName] = parent.instances[name];
                     });
                 }
             }
             collectTypes(schema);
-            types[ksyNameToJsName(schema.meta.id)] = schema;
+            types[ksyNameToJsName(schema.meta.id, false)] = schema;
             return types;
         }
         kaitaiIde.ksyTypes = ksyTypes = collectKsyTypes(ksySchema);
