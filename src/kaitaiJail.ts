@@ -55,7 +55,8 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         if (result.start === childIoOffset) { // new KaitaiStream was used, fix start position
             //console.log('m', path.join('/'), result.ioOffset, childIoOffset);
             result.ioOffset = childIoOffset;
-            result.start = 0;
+            result.start -= childIoOffset;
+            result.end -= childIoOffset;
         }
 
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
@@ -64,7 +65,7 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key), noLazy, childIoOffset));
 
         Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor").forEach(propName => {
-            var ksyInstanceData = ksyType && ksyType.instances[propName];
+            var ksyInstanceData = ksyType && ksyType.instancesByJsName[propName];
             var eagerLoad = ksyInstanceData && ksyInstanceData["-webide-parse-mode"] === "eager";
 
             if (eagerLoad || noLazy)

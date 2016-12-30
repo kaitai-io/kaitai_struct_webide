@@ -1,5 +1,5 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
-/// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
+// /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 
 declare var YAML: any, io: any, jailed: any, IntervalTree: any, localforage: LocalForage, bigInt: any, kaitaiIde: any;
 
@@ -22,13 +22,13 @@ function compile(srcYaml: string, kslang: string, debug: true | false | 'both') 
         function collectKsyTypes(schema: KsySchema.IKsyFile): IKsyTypes {
             var types: IKsyTypes = {};
 
-            function ksyNameToJsName(ksyName) { return ksyName.split('_').map(x => x.ucFirst()).join(''); }
+            function ksyNameToJsName(ksyName, isProp) { return ksyName.split('_').map((x,i) => i == 0 && isProp ? x : x.ucFirst()).join(''); }
 
             function collectTypes(parent: KsySchema.IType) {
                 if (parent.types) {
                     parent.typesByJsName = {};
                     Object.keys(parent.types).forEach(name => {
-                        var jsName = ksyNameToJsName(name);
+                        var jsName = ksyNameToJsName(name, false);
                         parent.typesByJsName[jsName] = types[jsName] = parent.types[name];
                         collectTypes(parent.types[name]);
                     });
@@ -37,14 +37,14 @@ function compile(srcYaml: string, kslang: string, debug: true | false | 'both') 
                 if (parent.instances) {
                     parent.instancesByJsName = {};
                     Object.keys(parent.instances).forEach(name => {
-                        var jsName = ksyNameToJsName(name);
+                        var jsName = ksyNameToJsName(name, true);
                         parent.instancesByJsName[jsName] = parent.instances[name];
                     });
                 }
             }
 
             collectTypes(schema);
-            types[ksyNameToJsName(schema.meta.id)] = schema;
+            types[ksyNameToJsName(schema.meta.id, false)] = schema;
 
             return types;
         }

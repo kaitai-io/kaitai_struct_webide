@@ -51,7 +51,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
             var format = <any>{ sep: ', ' };
             if (parts.length > 1)
                 parts[1].split(',').map(x => x.split('=')).forEach(kv => format[kv[0]] = kv.length > 1 ? kv[1] : true);
-            parts[0].split('.').forEach(k => currItem = currItem && currItem.object.fields[ksyNameToJsName(k)]);
+            parts[0].split('.').forEach(k => currItem = currItem && currItem.object && currItem.object.fields[ksyNameToJsName(k)]);
 
             if (!currItem) return "";
 
