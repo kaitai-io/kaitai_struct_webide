@@ -63,8 +63,10 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
                 return s`${hexEncode(currItem.bytes)}`;
             else if (format.dec && currItem.type === ObjectType.Primitive && Number.isInteger(currItem.primitiveValue))
                 return s`${currItem.primitiveValue}`;
-            else if (currItem.type === ObjectType.Array)
-                return s`${currItem.arrayItems.map(item => reprObject(item)).join(format.sep)}`;
+            else if (currItem.type === ObjectType.Array) {
+                var escapedSep = s`${format.sep}`;
+                return currItem.arrayItems.map(item => reprObject(item)).join(escapedSep);
+            }
             else
                 return primitiveToText(currItem, false);
         });
