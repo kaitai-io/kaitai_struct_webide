@@ -112,7 +112,7 @@ function reparse() {
             ui.parsedDataTree.on('select_node.jstree', function (e, selectNodeArgs) {
                 var node = selectNodeArgs.node;
                 //console.log('node', node);
-                var exp = node.data.exported;
+                var exp = ui.parsedDataTree.getNodeData(node).exported;
                 if (!blockRecursive && exp && exp.start < exp.end) {
                     selectedInTree = true;
                     //console.log('setSelection', exp.ioOffset, exp.start);

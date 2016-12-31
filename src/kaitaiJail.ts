@@ -72,7 +72,7 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
             if (eagerLoad || noLazy)
                 result.object.fields[propName] = exportValue(obj[propName], obj._debug['_m_' + propName], path.concat(propName), noLazy, childIoOffset);
             else
-                result.object.instances[propName] = { path: path.concat(propName), offset: 0 };
+                result.object.instances[propName] = <IInstance>{ path: path.concat(propName), offset: 0 };
         });
     }
     else

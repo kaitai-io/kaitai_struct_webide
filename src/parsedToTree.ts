@@ -1,10 +1,11 @@
-﻿interface ParsedTreeNodeData { exported?: IExportedValue, instance?: IInstance };
+﻿interface ParsedTreeNodeData { exported?: IExportedValue, instance?: IInstance, parent?: IExportedValue; };
 interface JSTreeNode<TData> { id?: string, text?: string, icon?: string, children?: JSTreeNode<TData>[] | boolean, data?: TData };
-interface ParsedTreeNode extends JSTreeNode<ParsedTreeNodeData> { }
+interface ParsedTreeNode extends JSTreeNode<{idx:number}> { }
 
 interface JSTree {
     activatePath(path: string, cb?: (success: boolean) => void);
     openNodes(nodeIds: string[], cb?: (foundAll: boolean) => void);
+    getNodeData(node: ParsedTreeNode): ParsedTreeNodeData;
 }
 
 function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKsyTypes, handleError, cb) {
@@ -51,7 +52,16 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
             var format = <any>{ sep: ', ' };
             if (parts.length > 1)
                 parts[1].split(',').map(x => x.split('=')).forEach(kv => format[kv[0]] = kv.length > 1 ? kv[1] : true);
-            parts[0].split('.').forEach(k => currItem = currItem && currItem.object && currItem.object.fields[ksyNameToJsName(k)]);
+            parts[0].split('.').forEach(k => {
+                if (!currItem || !currItem.object)
+                    currItem = null;
+                else {
+                    var child = k === "_parent" ? currItem.parent : currItem.object.fields[ksyNameToJsName(k)];
+                    if (!child)
+                        console.log('[webrepr] child not found in object', currItem, k);
+                    currItem = child;
+                }
+            });
 
             if (!currItem) return "";
 
@@ -72,6 +82,22 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
         });
     }
 
+    var nodeDatas: ParsedTreeNodeData[] = [];
+    kaitaiIde.nodeDatas = nodeDatas;
+    function addNodeData(data: ParsedTreeNodeData) {
+        var idx = nodeDatas.length;
+        nodeDatas.push(data);
+        return { idx: idx };
+    }
+
+    function getNodeData(node: ParsedTreeNode) {
+        if (!node || !node.data) {
+            console.log('no node data', node);
+            return null;
+        }
+        return nodeDatas[node.data.idx];
+    }
+
     function childItemToNode(item: IExportedValue, showProp: boolean) {
         var propName = item.path.last();
         var isObject = item.type === ObjectType.Object;
@@ -87,7 +113,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
         else
             text = (showProp ? s`<span class="propName">${propName}</span> = ` : '') + primitiveToText(item);
 
-        return <ParsedTreeNode>{ text: text, children: isObject || isArray, data: { exported: item } };
+        return <ParsedTreeNode>{ text: text, children: isObject || isArray, data: addNodeData({ exported: item }) };
     }
 
     function exportedToNodes(exported: IExportedValue, showProp: boolean): ParsedTreeNode[] {
@@ -100,7 +126,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
         else if (exported.type === ObjectType.Object){
             var obj = exported.object;
             return Object.keys(obj.fields).map(fieldName => childItemToNode(obj.fields[fieldName], true)).concat(
-                Object.keys(obj.instances).map(propName => <ParsedTreeNode>{ text: s`${propName}`, children: true, data: { instance: obj.instances[propName] } }));
+                Object.keys(obj.instances).map(propName => <ParsedTreeNode>{ text: s`${propName}`, children: true, data: addNodeData({ instance: obj.instances[propName], parent: exported }) }));
         } else
             throw new Error(`Unknown object type: ${exported.type}`);
     }
@@ -118,7 +144,8 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
 
     function getNode(node: ParsedTreeNode, cb: (items: ParsedTreeNode[]) => void) {
         var isRoot = node.id === '#';
-        var expNode = isRoot ? exportedRoot : node.data.exported;
+        var nodeData = getNodeData(node);
+        var expNode = isRoot ? exportedRoot : nodeData.exported;
 
         function fillKsyTypes(val: IExportedValue) {
             if (val.type === ObjectType.Object) {
@@ -129,7 +156,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
         }
 
         var isInstance = !expNode;
-        var valuePromise = isInstance ? getProp(node.data.instance.path).then(exp => node.data.exported = exp) : Promise.resolve(expNode);
+        var valuePromise = isInstance ? getProp(nodeData.instance.path).then(exp => nodeData.exported = exp) : Promise.resolve(expNode);
         valuePromise.then(exp => {
             if (isRoot || isInstance) {
                 fillKsyTypes(exp);
@@ -150,10 +177,24 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
                 ui.hexViewer.setIntervalTree(itree);
             }
 
+            function fillParents(value: IExportedValue, parent: IExportedValue) {
+                //console.log('fillParents', value.path.join('/'), value, parent);
+                value.parent = parent;
+                if (value.type === ObjectType.Object) {
+                    Object.keys(value.object.fields).forEach(fieldName => fillParents(value.object.fields[fieldName], value));
+                } else if (value.type === ObjectType.Array)
+                    value.arrayItems.forEach(item => fillParents(item, parent));
+            }
+
+            if(!exp.parent)
+                fillParents(exp, nodeData && nodeData.parent);
+
             var nodes = exportedToNodes(exp, true);
             nodes.forEach(node => node.id = getNodeId(node));
-            cb(nodes);
 
+            //console.log(exp, nodeData);
+
+            cb(nodes);
             handleError(null);
         }).catch(err => {
             cb([]);
@@ -161,7 +202,10 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
         });
     }
 
-    function getNodeId(node: ParsedTreeNode) { return 'inputField_' + (node.data.exported ? node.data.exported.path : node.data.instance.path).join('_'); }
+    function getNodeId(node: ParsedTreeNode) {
+        var nodeData = getNodeData(node);
+        return 'inputField_' + (nodeData.exported ? nodeData.exported.path : nodeData.instance.path).join('_');
+    }
 
     var parsedTreeOpenedNodes = {};
     var parsedTreeOpenedNodesStr = localStorage.getItem('parsedTreeOpenedNodes')
@@ -180,6 +224,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
 
     jsTreeElement.jstree("destroy");
     var jstree = jsTreeElement.jstree({ core: { data: (node, cb) => getNode(node, cb), themes: { icons: false }, multiple: false, force_text: false } }).jstree(true);
+    jstree.getNodeData = getNodeData;
     jstree.on = (...args) => jstree.element.on(...args);
     jstree.off = (...args) => jstree.element.off(...args);
     jstree.on('keyup.jstree', e => jstree.activate_node(e.target.id));

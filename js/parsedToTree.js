@@ -39,7 +39,16 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
             var format = { sep: ', ' };
             if (parts.length > 1)
                 parts[1].split(',').map(x => x.split('=')).forEach(kv => format[kv[0]] = kv.length > 1 ? kv[1] : true);
-            parts[0].split('.').forEach(k => currItem = currItem && currItem.object && currItem.object.fields[ksyNameToJsName(k)]);
+            parts[0].split('.').forEach(k => {
+                if (!currItem || !currItem.object)
+                    currItem = null;
+                else {
+                    var child = k === "_parent" ? currItem.parent : currItem.object.fields[ksyNameToJsName(k)];
+                    if (!child)
+                        console.log('[webrepr] child not found in object', currItem, k);
+                    currItem = child;
+                }
+            });
             if (!currItem)
                 return "";
             if (currItem.type === ObjectType.Object)
@@ -58,6 +67,20 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
                 return primitiveToText(currItem, false);
         });
     }
+    var nodeDatas = [];
+    kaitaiIde.nodeDatas = nodeDatas;
+    function addNodeData(data) {
+        var idx = nodeDatas.length;
+        nodeDatas.push(data);
+        return { idx: idx };
+    }
+    function getNodeData(node) {
+        if (!node || !node.data) {
+            console.log('no node data', node);
+            return null;
+        }
+        return nodeDatas[node.data.idx];
+    }
     function childItemToNode(item, showProp) {
         var propName = item.path.last();
         var isObject = item.type === ObjectType.Object;
@@ -71,7 +94,7 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
         }
         else
             text = (showProp ? s `<span class="propName">${propName}</span> = ` : '') + primitiveToText(item);
-        return { text: text, children: isObject || isArray, data: { exported: item } };
+        return { text: text, children: isObject || isArray, data: addNodeData({ exported: item }) };
     }
     function exportedToNodes(exported, showProp) {
         if (exported.type === ObjectType.Undefined)
@@ -82,7 +105,7 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
             return exported.arrayItems.map((item, i) => childItemToNode(item, true));
         else if (exported.type === ObjectType.Object) {
             var obj = exported.object;
-            return Object.keys(obj.fields).map(fieldName => childItemToNode(obj.fields[fieldName], true)).concat(Object.keys(obj.instances).map(propName => ({ text: s `${propName}`, children: true, data: { instance: obj.instances[propName] } })));
+            return Object.keys(obj.fields).map(fieldName => childItemToNode(obj.fields[fieldName], true)).concat(Object.keys(obj.instances).map(propName => ({ text: s `${propName}`, children: true, data: addNodeData({ instance: obj.instances[propName], parent: exported }) })));
         }
         else
             throw new Error(`Unknown object type: ${exported.type}`);
@@ -99,7 +122,8 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
     }
     function getNode(node, cb) {
         var isRoot = node.id === '#';
-        var expNode = isRoot ? exportedRoot : node.data.exported;
+        var nodeData = getNodeData(node);
+        var expNode = isRoot ? exportedRoot : nodeData.exported;
         function fillKsyTypes(val) {
             if (val.type === ObjectType.Object) {
                 val.object.ksyType = ksyTypes[val.object.class];
@@ -109,7 +133,7 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
                 val.arrayItems.forEach(item => fillKsyTypes(item));
         }
         var isInstance = !expNode;
-        var valuePromise = isInstance ? getProp(node.data.instance.path).then(exp => node.data.exported = exp) : Promise.resolve(expNode);
+        var valuePromise = isInstance ? getProp(nodeData.instance.path).then(exp => nodeData.exported = exp) : Promise.resolve(expNode);
         valuePromise.then(exp => {
             if (isRoot || isInstance) {
                 fillKsyTypes(exp);
@@ -127,8 +151,20 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
                 fillIntervals(exp);
                 ui.hexViewer.setIntervalTree(itree);
             }
+            function fillParents(value, parent) {
+                //console.log('fillParents', value.path.join('/'), value, parent);
+                value.parent = parent;
+                if (value.type === ObjectType.Object) {
+                    Object.keys(value.object.fields).forEach(fieldName => fillParents(value.object.fields[fieldName], value));
+                }
+                else if (value.type === ObjectType.Array)
+                    value.arrayItems.forEach(item => fillParents(item, parent));
+            }
+            if (!exp.parent)
+                fillParents(exp, nodeData && nodeData.parent);
             var nodes = exportedToNodes(exp, true);
             nodes.forEach(node => node.id = getNodeId(node));
+            //console.log(exp, nodeData);
             cb(nodes);
             handleError(null);
         }).catch(err => {
@@ -136,7 +172,10 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
             handleError(err);
         });
     }
-    function getNodeId(node) { return 'inputField_' + (node.data.exported ? node.data.exported.path : node.data.instance.path).join('_'); }
+    function getNodeId(node) {
+        var nodeData = getNodeData(node);
+        return 'inputField_' + (nodeData.exported ? nodeData.exported.path : nodeData.instance.path).join('_');
+    }
     var parsedTreeOpenedNodes = {};
     var parsedTreeOpenedNodesStr = localStorage.getItem('parsedTreeOpenedNodes');
     if (parsedTreeOpenedNodesStr)
@@ -152,6 +191,7 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
     }
     jsTreeElement.jstree("destroy");
     var jstree = jsTreeElement.jstree({ core: { data: (node, cb) => getNode(node, cb), themes: { icons: false }, multiple: false, force_text: false } }).jstree(true);
+    jstree.getNodeData = getNodeData;
     jstree.on = (...args) => jstree.element.on(...args);
     jstree.off = (...args) => jstree.element.off(...args);
     jstree.on('keyup.jstree', e => jstree.activate_node(e.target.id));
