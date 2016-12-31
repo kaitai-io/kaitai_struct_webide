@@ -25,11 +25,11 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
         else if (exported.type === ObjectType.TypedArray) {
             var text = '[';
             for (var i = 0; i < exported.bytes.byteLength; i++) {
-                if (i == 8) {
+                if (i === 8) {
                     text += ", ...";
                     break;
                 }
-                text += (i == 0 ? '' : ', ') + exported.bytes[i];
+                text += (i === 0 ? '' : ', ') + exported.bytes[i];
             }
             text += ']';
 
@@ -113,7 +113,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
                 else
                     reject(error);
             });
-        })
+        });
     }
 
     function getNode(node: ParsedTreeNode, cb: (items: ParsedTreeNode[]) => void) {

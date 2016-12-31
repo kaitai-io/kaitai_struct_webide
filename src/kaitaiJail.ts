@@ -3,6 +3,7 @@
 class IDebugInfo {
     start: number;
     end: number;
+    ioOffset: number;
     arr?: IDebugInfo[];
     enumName?: string;
 }
@@ -119,8 +120,9 @@ application.setInterface({
             parseError = { message: e.message, stack: e.stack };
         }
 
-        exported = exportValue(obj, <IDebugInfo>parent._debug['_m_' + path[path.length - 1]], path, false, parent._io && parent._io._byteOffset);
-        //console.log('jail get', path.join('/'), exported.ioOffset, exported.start, exported.end);
+        var debug = <IDebugInfo>parent._debug['_m_' + path[path.length - 1]];
+        exported = exportValue(obj, debug, path, false, debug.ioOffset); //
+        //console.log('jail get', path.join('/'), 'ioOffset', exported.ioOffset, 'start', exported.start, 'end', exported.end, 'obj', obj, 'debug', debug, 'exported', exported, 'parent', parent);
 
         //console.log('get original =', obj, ', exported =', exported);
         cb(exported, parseError);

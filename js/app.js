@@ -115,6 +115,7 @@ function reparse() {
                 var exp = node.data.exported;
                 if (!blockRecursive && exp && exp.start < exp.end) {
                     selectedInTree = true;
+                    //console.log('setSelection', exp.ioOffset, exp.start);
                     ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
                     selectedInTree = false;
                 }

@@ -16,11 +16,11 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
         else if (exported.type === ObjectType.TypedArray) {
             var text = '[';
             for (var i = 0; i < exported.bytes.byteLength; i++) {
-                if (i == 8) {
+                if (i === 8) {
                     text += ", ...";
                     break;
                 }
-                text += (i == 0 ? '' : ', ') + exported.bytes[i];
+                text += (i === 0 ? '' : ', ') + exported.bytes[i];
             }
             text += ']';
             return s `${text}`;
