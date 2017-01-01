@@ -44,8 +44,8 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
                     currItem = null;
                 else {
                     var child = k === "_parent" ? currItem.parent : currItem.object.fields[ksyNameToJsName(k)];
-                    if (!child)
-                        console.log('[webrepr] child not found in object', currItem, k);
+                    //if (!child)
+                    //    console.log('[webrepr] child not found in object', currItem, k);
                     currItem = child;
                 }
             });
@@ -261,7 +261,14 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
         jstree.openNodes(expandNodes, foundAll => {
             //console.log('activatePath', foundAll, activateId);
             jstree.activate_node(activateId, null);
-            $(`#${activateId}`).get(0).scrollIntoView();
+            if (foundAll) {
+                var element = $(`#${activateId}`).get(0);
+                if (element)
+                    element.scrollIntoView();
+                else {
+                    console.log('element not found', activateId);
+                }
+            }
             cb && cb(foundAll);
         });
     };
