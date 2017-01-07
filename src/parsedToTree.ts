@@ -164,6 +164,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
                 var intId = 0;
                 function fillIntervals(exp: IExportedValue) {
                     var objects = collectAllObjects(exp);
+                    var typedArrays = objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64);
                     var intervals = objects.filter(exp => (exp.type === ObjectType.Primitive || exp.type === ObjectType.TypedArray) && exp.start < exp.end)
                         .map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1, id: JSON.stringify({ id: intId++, path: exp.path.join('/') }) }))
                         .sort((a, b) => a.start - b.start);
@@ -178,17 +179,18 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
                     }
 
                     if (!isInstance) {
-                        kaitaiIde.nonParsed = [];
+                        var nonParsed = [];
 
                         var lastEnd = -1;
                         intervalsFiltered.forEach(i => {
                             if (i.start !== lastEnd + 1)
-                                kaitaiIde.nonParsed.push({ start: lastEnd + 1, end: i.start - 1 });
+                                nonParsed.push({ start: lastEnd + 1, end: i.start - 1 });
 
                             lastEnd = i.end;
                         });
 
-                        //kaitaiIde.nonParsed.push({ start: lastEnd + 1, end:  });
+                        ui.unparsedIntSel.setIntervals(nonParsed);
+                        ui.bytesIntSel.setIntervals(typedArrays.map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1 })));
                     }
 
                     intervalsFiltered.forEach(i => itree.add(i.start, i.end, i.id));

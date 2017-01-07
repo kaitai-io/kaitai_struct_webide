@@ -241,7 +241,7 @@ $(() => {
         var newFn = `${inputFsItem.fn.split('/').last()}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
         saveFile(new Uint8Array(inputContent, start, end - start + 1), newFn);
     });
-    $("#exportToJson").on('click', e => {
+    kaitaiIde.exportToJson = (useHex = false) => {
         var indentLen = 2;
         var result = "";
         function expToNative(value, padLvl = 0) {
@@ -268,14 +268,14 @@ $(() => {
                 if (value.bytes.length <= 64)
                     result += "[" + Array.from(value.bytes).join(', ') + "]";
                 else {
-                    result += `{ "$start": ${value.ioOffset + value.start}, "$end": ${value.ioOffset + value.end} }`;
+                    result += `{ "$start": ${value.ioOffset + value.start}, "$end": ${value.ioOffset + value.end - 1} }`;
                 }
             }
             else if (value.type === ObjectType.Primitive) {
                 if (value.enumStringValue)
                     result += `{ "name": ${JSON.stringify(value.enumStringValue)}, "value": ${value.primitiveValue} }`;
                 else if (typeof value.primitiveValue === "number")
-                    result += `${value.primitiveValue}`;
+                    result += useHex ? `0x${value.primitiveValue.toString(16)}` : `${value.primitiveValue}`;
                 else
                     result += `${JSON.stringify(value.primitiveValue)}`;
             }
@@ -283,7 +283,7 @@ $(() => {
         function getParsedIntervals(root) {
             var objects = collectAllObjects(root).slice(1);
             //console.log('objects', objects);
-            var allInts = objects.map(x => ({ start: x.ioOffset + x.start, end: x.ioOffset + x.end })).filter(x => !isNaN(x.start) && !isNaN(x.end)).sort((a, b) => a.start - b.start);
+            var allInts = objects.map(x => ({ start: x.ioOffset + x.start, end: x.ioOffset + x.end - 1 })).filter(x => !isNaN(x.start) && !isNaN(x.end)).sort((a, b) => a.start - b.start);
             //console.log('allInts', allInts);
             var intervals = [];
             intervals.push(allInts[0]);
@@ -301,7 +301,32 @@ $(() => {
             addEditorTab('json export', result, 'json');
             //console.log('parsed intervals', getParsedIntervals(exportedRoot));
         }, true);
-    });
+    };
+    $("#exportToJson, #exportToJsonHex").on('click', e => kaitaiIde.exportToJson(e.target.id === "exportToJsonHex"));
     $("#disableLazyParsing").on('click', reparse);
+    class IntervalViewer {
+        constructor(htmlIdPrefix) {
+            this.htmlIdPrefix = htmlIdPrefix;
+            ["Curr", "Total", "Prev", "Next"].forEach(control => this[`html${control}`] = $(`#${htmlIdPrefix}${control}`));
+            this.htmlNext.on('click', () => this.move(+1));
+            this.htmlPrev.on('click', () => this.move(-1));
+        }
+        move(direction) {
+            if (this.intervals.length === 0)
+                return;
+            this.currentIdx = (this.intervals.length + this.currentIdx + direction) % this.intervals.length;
+            var curr = this.intervals[this.currentIdx];
+            ui.hexViewer.setSelection(curr.start, curr.end);
+            this.htmlCurr.text(this.currentIdx + 1);
+        }
+        setIntervals(intervals) {
+            this.intervals = intervals;
+            this.currentIdx = -1;
+            this.htmlCurr.text("-");
+            this.htmlTotal.text(this.intervals.length);
+        }
+    }
+    ui.unparsedIntSel = new IntervalViewer("unparsed");
+    ui.bytesIntSel = new IntervalViewer("bytes");
 });
 //# sourceMappingURL=app.js.map

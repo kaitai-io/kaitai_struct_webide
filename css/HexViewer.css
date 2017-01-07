@@ -14,6 +14,8 @@
 .hexViewer .selected { background:#0076e0; color:white }
 .hexViewer .asciicell { padding: 2px 0 }
 
+.hexViewer .hexRow { height:21px; }
+
 .hexViewer .addrPart { color: #ccc; }
 .hexViewer .hexPart { margin-left: 8px; }
 .hexViewer .asciiPart { margin-left: 8px; }

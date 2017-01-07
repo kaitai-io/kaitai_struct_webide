@@ -63,7 +63,7 @@ interface IDataProvider {
 }
 
 class HexViewer {
-    private rowHeight = 19;
+    private rowHeight = 21;
     private bytesPerLine = 16;
 
     private intervalTree: any;

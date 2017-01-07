@@ -64,8 +64,20 @@
         <input type="checkbox" id="disableLazyParsing" />
         <label for="disableLazyParsing">disable lazy parsing</label>
     </div>
+    <div id="unparsedDiv">
+        Unparsed parts:
+        <a id="unparsedPrev" href="#">&lt;&lt;</a>
+        <span id="unparsedCurr">1</span> / <span id="unparsedTotal">1</span>
+        <a id="unparsedNext" href="#">&gt;&gt;</a>
+    </div>
+    <div id="bytesDiv">
+        Byte arrays:
+        <a id="bytesPrev" href="#">&lt;&lt;</a>
+        <span id="bytesCurr">1</span> / <span id="bytesTotal">1</span>
+        <a id="bytesNext" href="#">&gt;&gt;</a>
+    </div>
     <div id="exportToJsonDiv">
-        <a id="exportToJson" href="#">export to JSON</a>
+        <a id="exportToJson" href="#">export to JSON</a> (<a id="exportToJsonHex" href="#">hex</a>)
     </div>
     <div>
         <a id="aboutWebIde" href="#">about webide</a>

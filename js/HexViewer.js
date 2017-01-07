@@ -49,7 +49,7 @@ class HexViewUtils {
 class HexViewer {
     constructor(containerId, dataProvider) {
         this.dataProvider = dataProvider;
-        this.rowHeight = 19;
+        this.rowHeight = 21;
         this.bytesPerLine = 16;
         this.rows = [];
         this.topRow = 0;
