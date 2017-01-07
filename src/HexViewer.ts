@@ -194,12 +194,12 @@ class HexViewer {
     }
 
     get visibleOffsetStart(): number { return this.topRow * this.bytesPerLine; }
-    get visibleOffsetEnd(): number { return (this.topRow + this.rowCount - 1) * this.bytesPerLine - 1; }
+    get visibleOffsetEnd(): number { return (this.topRow + this.rowCount - 2) * this.bytesPerLine - 1; }
 
     public refresh() {
         if (!this.dataProvider) return false;
 
-        var intervals = this.intervalTree ? this.intervalTree.search(this.visibleOffsetStart, this.visibleOffsetEnd) : [];
+        var intervals = this.intervalTree ? this.intervalTree.search(this.visibleOffsetStart, this.visibleOffsetEnd + this.bytesPerLine * 2) : [];
 
         var intIdxBase = intervals.length === 0 ? 0 : JSON.parse(intervals[0].id).id;
         var intIdx = 0;
@@ -287,7 +287,7 @@ class HexViewer {
 
                 if (this.selectionStart !== -1) {
                     if (this.selectionEnd > this.visibleOffsetEnd)
-                        this.topRow = Math.max(Math.floor(this.selectionEnd / this.bytesPerLine) - this.rowCount + 2, 0);
+                        this.topRow = Math.max(Math.floor(this.selectionEnd / this.bytesPerLine) - this.rowCount + 3, 0);
                     if (this.selectionStart < this.visibleOffsetStart)
                         this.topRow = Math.floor(this.selectionStart / this.bytesPerLine);
 
