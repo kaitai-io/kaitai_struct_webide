@@ -44,6 +44,7 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
                 return obj & enumObj[x];
             }).join("|");
 
+            //console.log(debug.enumName, enumObj, enumObj[obj], flagSuccess, flagStr);
             result.enumStringValue = enumObj[obj] || (flagSuccess && flagStr);
         }
     }

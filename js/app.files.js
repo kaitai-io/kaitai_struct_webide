@@ -157,7 +157,7 @@ $(() => {
         var data = getSelectedData();
         var isFolder = data && data.type === 'folder';
         var isLocal = data && data.fsType === 'local';
-        var isKsy = data && data.fn.endsWith('.ksy') && !isFolder;
+        var isKsy = data && data.fn && data.fn.endsWith('.ksy') && !isFolder;
         function setEnabled(item, isEnabled) { item.toggleClass('disabled', !isEnabled); }
         setEnabled(uiFiles.createFolder, isLocal && isFolder);
         setEnabled(uiFiles.createKsyFile, isLocal && isFolder);

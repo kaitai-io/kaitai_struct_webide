@@ -31,6 +31,7 @@ function exportValue(obj, debug, path, noLazy) {
                 flagCheck |= enumObj[x];
                 return obj & enumObj[x];
             }).join("|");
+            //console.log(debug.enumName, enumObj, enumObj[obj], flagSuccess, flagStr);
             result.enumStringValue = enumObj[obj] || (flagSuccess && flagStr);
         }
     }
