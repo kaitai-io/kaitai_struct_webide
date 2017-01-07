@@ -12,9 +12,8 @@ function getObjectType(obj) {
     else
         return ObjectType.Object;
 }
-function exportValue(obj, debug, path, noLazy, ioOffset) {
-    //if (!debug) debugger;
-    var result = { start: debug && debug.start, end: debug && debug.end, ioOffset: ioOffset, path: path, type: getObjectType(obj) };
+function exportValue(obj, debug, path, noLazy) {
+    var result = { start: debug && debug.start, end: debug && debug.end, ioOffset: debug && debug.ioOffset, path: path, type: getObjectType(obj) };
     if (result.type === ObjectType.TypedArray)
         result.bytes = obj;
     else if (result.type === ObjectType.Primitive || result.type === ObjectType.Undefined) {
@@ -36,24 +35,23 @@ function exportValue(obj, debug, path, noLazy, ioOffset) {
         }
     }
     else if (result.type === ObjectType.Array) {
-        result.arrayItems = obj.map((item, i) => exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy, ioOffset));
+        result.arrayItems = obj.map((item, i) => exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy));
     }
     else if (result.type === ObjectType.Object) {
         var childIoOffset = obj._io._byteOffset;
         if (result.start === childIoOffset) {
-            //console.log('m', path.join('/'), result.ioOffset, childIoOffset);
             result.ioOffset = childIoOffset;
             result.start -= childIoOffset;
             result.end -= childIoOffset;
         }
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
         var ksyType = ksyTypes[result.object.class];
-        Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key), noLazy, childIoOffset));
+        Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key), noLazy));
         Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== '_' && x !== "constructor").forEach(propName => {
             var ksyInstanceData = ksyType && ksyType.instancesByJsName[propName];
             var eagerLoad = ksyInstanceData && ksyInstanceData["-webide-parse-mode"] === "eager";
             if (eagerLoad || noLazy)
-                result.object.fields[propName] = exportValue(obj[propName], obj._debug['_m_' + propName], path.concat(propName), noLazy, 0);
+                result.object.fields[propName] = exportValue(obj[propName], obj._debug['_m_' + propName], path.concat(propName), noLazy);
             else
                 result.object.instances[propName] = { path: path.concat(propName), offset: 0 };
         });
@@ -84,7 +82,7 @@ application.setInterface({
         catch (e) {
             parseError = { message: e.message, stack: e.stack };
         }
-        exported = exportValue(root, { start: 0, end: inputBuffer.byteLength }, [], noLazy, 0);
+        exported = exportValue(root, { start: 0, end: inputBuffer.byteLength }, [], noLazy);
         //console.log('[jail] root', root, 'exported', exported);
         cb(exported, parseError);
     },
@@ -101,7 +99,7 @@ application.setInterface({
             parseError = { message: e.message, stack: e.stack };
         }
         var debug = parent._debug['_m_' + path[path.length - 1]];
-        exported = exportValue(obj, debug, path, false, debug.ioOffset); //
+        exported = exportValue(obj, debug, path, false); //
         //console.log('jail get', path.join('/'), 'ioOffset', exported.ioOffset, 'start', exported.start, 'end', exported.end, 'obj', obj, 'debug', debug, 'exported', exported, 'parent', parent);
         //console.log('get original =', obj, ', exported =', exported);
         cb(exported, parseError);

@@ -298,7 +298,7 @@ $(() => {
         jail.remote.reparse((exportedRoot, error) => {
             console.log('exported', exportedRoot);
             expToNative(exportedRoot);
-            addEditorTab('json', result, 'json');
+            addEditorTab('json export', result, 'json');
             //console.log('parsed intervals', getParsedIntervals(exportedRoot));
         }, true);
     });

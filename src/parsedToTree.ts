@@ -177,6 +177,20 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
                         });
                     }
 
+                    if (!isInstance) {
+                        kaitaiIde.nonParsed = [];
+
+                        var lastEnd = -1;
+                        intervalsFiltered.forEach(i => {
+                            if (i.start !== lastEnd + 1)
+                                kaitaiIde.nonParsed.push({ start: lastEnd + 1, end: i.start - 1 });
+
+                            lastEnd = i.end;
+                        });
+
+                        //kaitaiIde.nonParsed.push({ start: lastEnd + 1, end:  });
+                    }
+
                     intervalsFiltered.forEach(i => itree.add(i.start, i.end, i.id));
                 }
 
