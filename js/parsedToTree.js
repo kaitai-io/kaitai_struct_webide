@@ -5,7 +5,7 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
         if (exported.type === ObjectType.Primitive) {
             var value = exported.primitiveValue;
             if (Number.isInteger(value)) {
-                value = s `0x${value.toString(16).toUpperCase()}` + (detailed ? s `<span class="intVal"> = ${value}</span>` : '');
+                value = s `${value < 0 ? '-' : ''}0x${Math.abs(value).toString(16).toUpperCase()}` + (detailed ? s `<span class="intVal"> = ${value}</span>` : '');
                 if (exported.enumStringValue)
                     value = `${htmlescape(exported.enumStringValue)}` + (detailed ? ` <span class="enumDesc">(${value})</span>` : '');
             }
