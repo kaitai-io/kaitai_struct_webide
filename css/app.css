@@ -65,7 +65,8 @@ body { color:#333 }
 #parsedDataTree .propName { color: blue; }
 #parsedDataTree .className { color: green; }
 #parsedDataTree .primitiveValue { font-weight: bold }
-#disableLazyParsingDiv, #exportToJsonDiv, #unparsedDiv, #bytesDiv { font-size:13px; margin-top:5px }
+#disableLazyParsingDiv, #exportToJsonDiv, #unparsedDiv, #bytesDiv, #parsedPathDiv { font-size:13px; margin-top:5px }
+#parsedPath { word-break: break-all; }
 #unparsedDiv { margin-top:0 }
 #disableLazyParsingDiv label { margin-left:2px; font-weight:normal; vertical-align:middle }
 /*.marker_match { background:rgba(80, 255, 80, 0.30); }*/
