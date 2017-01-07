@@ -154,7 +154,7 @@ function reparse() {
 
             if (isPracticeMode)
                 practiceExportedChanged(exportedRoot);
-        }, isPracticeMode);
+        }, isPracticeMode || $("#disableLazyParsing").is(':checked'));
     });
 }
 
@@ -341,10 +341,33 @@ $(() => {
             }
         }
 
+        function getParsedIntervals(root: IExportedValue) {
+            var objects = collectAllObjects(root).slice(1);
+            //console.log('objects', objects);
+
+            var allInts = objects.map(x => ({ start: x.ioOffset + x.start, end: x.ioOffset + x.end })).filter(x => !isNaN(x.start) && !isNaN(x.end)).sort((a, b) => a.start - b.start);
+            //console.log('allInts', allInts);
+
+            var intervals = [];
+            intervals.push(allInts[0]);
+
+            for (var i = 1; i < allInts.length; i++) {
+                if (intervals.last().end < allInts[i].start)
+                    intervals.push(allInts[i]);
+                else
+                    intervals.last().end = Math.max(intervals.last().end, allInts[i].end);
+            }
+
+            return intervals;
+        }
+
         jail.remote.reparse((exportedRoot: IExportedValue, error) => {
             console.log('exported', exportedRoot);
             expToNative(exportedRoot);
             addEditorTab('json', result, 'json');
+            //console.log('parsed intervals', getParsedIntervals(exportedRoot));
         }, true);
     });
+
+    $("#disableLazyParsing").on('click', reparse);
 });

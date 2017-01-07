@@ -200,6 +200,7 @@ class HexViewer {
         if (!this.dataProvider) return false;
 
         var intervals = this.intervalTree ? this.intervalTree.search(this.visibleOffsetStart, this.visibleOffsetEnd) : [];
+
         var intIdxBase = intervals.length === 0 ? 0 : JSON.parse(intervals[0].id).id;
         var intIdx = 0;
         //console.log('intervals', intervals);

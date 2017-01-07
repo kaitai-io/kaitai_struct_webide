@@ -139,14 +139,19 @@ function parsedToTree(jsTreeElement, exportedRoot, ksyTypes, handleError, cb) {
                 fillKsyTypes(exp);
                 var intId = 0;
                 function fillIntervals(exp) {
-                    if (exp.type === ObjectType.Object) {
-                        Object.keys(exp.object.fields).forEach(fieldName => fillIntervals(exp.object.fields[fieldName]));
+                    var objects = collectAllObjects(exp);
+                    var intervals = objects.filter(exp => (exp.type === ObjectType.Primitive || exp.type === ObjectType.TypedArray) && exp.start < exp.end)
+                        .map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1, id: JSON.stringify({ id: intId++, path: exp.path.join('/') }) }))
+                        .sort((a, b) => a.start - b.start);
+                    var intervalsFiltered = [];
+                    if (intervals.length > 0) {
+                        intervalsFiltered = [intervals[0]];
+                        intervals.slice(1).forEach(int => {
+                            if (int.start > intervalsFiltered.last().end)
+                                intervalsFiltered.push(int);
+                        });
                     }
-                    else if (exp.type === ObjectType.Array)
-                        exp.arrayItems.forEach(item => fillIntervals(item));
-                    else if (exp.start < exp.end) {
-                        itree.add(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1, JSON.stringify({ id: intId++, path: exp.path.join('/') }));
-                    }
+                    intervalsFiltered.forEach(i => itree.add(i.start, i.end, i.id));
                 }
                 fillIntervals(exp);
                 ui.hexViewer.setIntervalTree(itree);

@@ -48,8 +48,9 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
             result.enumStringValue = enumObj[obj] || (flagSuccess && flagStr);
         }
     }
-    else if (result.type === ObjectType.Array)
+    else if (result.type === ObjectType.Array) {
         result.arrayItems = obj.map((item, i) => exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy, ioOffset));
+    }
     else if (result.type === ObjectType.Object) {
         var childIoOffset = obj._io._byteOffset;
 
@@ -70,7 +71,7 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
             var eagerLoad = ksyInstanceData && ksyInstanceData["-webide-parse-mode"] === "eager";
 
             if (eagerLoad || noLazy)
-                result.object.fields[propName] = exportValue(obj[propName], obj._debug['_m_' + propName], path.concat(propName), noLazy, childIoOffset);
+                result.object.fields[propName] = exportValue(obj[propName], obj._debug['_m_' + propName], path.concat(propName), noLazy, 0);
             else
                 result.object.instances[propName] = <IInstance>{ path: path.concat(propName), offset: 0 };
         });
