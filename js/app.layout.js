@@ -37,6 +37,12 @@ var myLayout = new GoldenLayout({
 function getLayoutNodeById(id) {
     return myLayout._getAllContentItems().filter(x => x.config.id === id)[0];
 }
+var dynCompId = 1;
+function addEditorTab(title, data, lang = null, parent = 'codeTab') {
+    var componentName = `dynComp${dynCompId++}`;
+    addEditor(componentName, lang, true, editor => editor.setValue(data, -1));
+    getLayoutNodeById(parent).addChild({ type: 'component', componentName, title });
+}
 var ui = {
     ksyEditor: null,
     genCodeViewer: null,

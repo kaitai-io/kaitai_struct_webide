@@ -65,4 +65,6 @@ body { color:#333 }
 #parsedDataTree .propName { color: blue; }
 #parsedDataTree .className { color: green; }
 #parsedDataTree .primitiveValue { font-weight: bold }
+#exportToJsonDiv { margin-top:8px }
+#exportToJson { font-size:13px }
 /*.marker_match { background:rgba(80, 255, 80, 0.30); }*/

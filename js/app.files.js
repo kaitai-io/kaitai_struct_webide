@@ -184,7 +184,6 @@ $(() => {
     });
     ctxAction(uiFiles.deleteItem, e => ui.fileTree.delete_node(ui.fileTree.get_selected()));
     ctxAction(uiFiles.openItem, e => $(contextMenuTarget).trigger('dblclick'));
-    var dynCodeId = 1;
     ctxAction(uiFiles.generateParser, e => {
         var fsItem = getSelectedData();
         var linkData = $(e.target).data();
@@ -192,10 +191,8 @@ $(() => {
         fss[fsItem.fsType].get(fsItem.fn).then(content => {
             var compiled = compile(content, linkData.kslang, !!linkData.ksdebug);
             compiled.forEach((compItem, i) => {
-                var componentName = `dynCode${dynCodeId++}`;
-                addEditor(componentName, linkData.acelang, true, editor => editor.setValue(compItem, -1));
                 var title = fsItem.fn.split('/').last() + ' [' + $(e.target).text() + ']' + (compiled.length == 1 ? '' : ` ${i + 1}/${compiled.length}`);
-                getLayoutNodeById('codeTab').addChild({ type: 'component', componentName, title });
+                addEditorTab(title, compItem, linkData.acelang);
             });
         });
     });
