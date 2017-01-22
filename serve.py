@@ -12,14 +12,24 @@ import subprocess
 import re
 
 PORT = 8000
-watchDirs = ['index.html', 'js/*', 'css/*']
+watchDirs = ['index.html', 'js/', 'css/', 'v2/src/']
 compileDirs = ['src/*.ts', 'lib/ts-types/*.ts']
 compileCmd = r'tsc --outDir js/ --sourcemap --target ES6 --noEmitOnError %s'
 
 compileInProgress = False
 
+import fnmatch
+import os
+
+
 def getFiles(dirs):
-    return [fn for pattern in dirs for fn in glob.glob(pattern)]
+    matches = []
+    for dir in dirs:
+        for root, dirnames, filenames in os.walk(dir):
+            for filename in filenames:
+                matches.append(os.path.join(root, filename))
+    return matches
+    #return [fn for pattern in dirs for fn in glob.glob(pattern)]
 
 def getLastChange(dirs):
     if compileInProgress:
@@ -53,6 +63,13 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(result))
         
+    def end_headers(self):
+        
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self)
+
     def do_GET(self):
         if self.path == '/status':
             lastChange = getLastChange(watchDirs)

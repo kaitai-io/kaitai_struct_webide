@@ -1,0 +1,12 @@
+{
+  "jspm": {
+    "dependencies": {
+      "aurelia-bootstrapper": "npm:aurelia-bootstrapper@^2.0.1",
+      "aurelia-framework": "npm:aurelia-framework@^1.0.8",
+      "bootstrap": "github:twbs/bootstrap@^3.3.7"
+    },
+    "devDependencies": {
+      "typescript": "npm:typescript@^2.0.7"
+    }
+  }
+}

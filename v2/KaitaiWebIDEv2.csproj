@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{B7E0D29B-784A-4FBA-8A02-AE7DD629BD41}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="config.js" />
+    <Content Include="index.html" />
+    <Content Include="src\app.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="main.ts" />
+    <TypeScriptCompile Include="src\app.ts" />
+    <TypeScriptCompile Include="src\views\values.ts" />
+    <TypeScriptCompile Include="typings\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-binding\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-bootstrapper\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-dependency-injection\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-event-aggregator\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-framework\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-history-browser\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-history\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-loader\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-logging-console\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-logging\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-metadata\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-pal-browser\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-pal\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-path\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-polyfills\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-route-recognizer\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-router\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-task-queue\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-templating-binding\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-templating-resources\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-templating-router\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\aurelia-templating\index.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="src\components\item-stepper\item-stepper.html" />
+    <TypeScriptCompile Include="src\components\item-stepper\item-stepper.ts" />
+    <Content Include="src\views\values.html" />
+    <Content Include="typings\modules\aurelia-binding\typings.json" />
+    <Content Include="typings\modules\aurelia-bootstrapper\typings.json" />
+    <Content Include="typings\modules\aurelia-dependency-injection\typings.json" />
+    <Content Include="typings\modules\aurelia-event-aggregator\typings.json" />
+    <Content Include="typings\modules\aurelia-framework\typings.json" />
+    <Content Include="typings\modules\aurelia-history-browser\typings.json" />
+    <Content Include="typings\modules\aurelia-history\typings.json" />
+    <Content Include="typings\modules\aurelia-loader\typings.json" />
+    <Content Include="typings\modules\aurelia-logging-console\typings.json" />
+    <Content Include="typings\modules\aurelia-logging\typings.json" />
+    <Content Include="typings\modules\aurelia-metadata\typings.json" />
+    <Content Include="typings\modules\aurelia-pal-browser\typings.json" />
+    <Content Include="typings\modules\aurelia-pal\typings.json" />
+    <Content Include="typings\modules\aurelia-path\typings.json" />
+    <Content Include="typings\modules\aurelia-polyfills\typings.json" />
+    <Content Include="typings\modules\aurelia-route-recognizer\typings.json" />
+    <Content Include="typings\modules\aurelia-router\typings.json" />
+    <Content Include="typings\modules\aurelia-task-queue\typings.json" />
+    <Content Include="typings\modules\aurelia-templating-binding\typings.json" />
+    <Content Include="typings\modules\aurelia-templating-resources\typings.json" />
+    <Content Include="typings\modules\aurelia-templating-router\typings.json" />
+    <Content Include="typings\modules\aurelia-templating\typings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="package.json" />
+    <Content Include="typings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="tsconfig.json" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>KaitaiWebIDEv2</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets')" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>63546</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:63546/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptTarget>ES6</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptModuleKind />
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+</Project>

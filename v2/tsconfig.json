@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es6",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "module": "amd"
+  },
+  "compileOnSave": true,
+  "exclude": [
+    "jspm_packages"
+  ]
+}
