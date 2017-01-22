@@ -20,3 +20,4 @@ var libs = [
 ];
 
 builder.bundle(libs.join(' + '), 'aurelia.js').then(() => console.log('Build complete')).catch(err => console.log('Build error', err));
+builder.bundle(libs.join(' + '), 'aurelia.min.js', { minify: true }).then(() => console.log('Build complete')).catch(err => console.log('Build error', err));

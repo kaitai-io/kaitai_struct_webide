@@ -6,5 +6,5 @@
     <div>List2: <item-stepper items.bind="list2" selected.bind="selItem" /></div>
     Selected item: ${selItem}
     <require from="./components/ConverterPanel/ConverterPanel"></require>
-    <converter-panel data.bind="converterPanelData"></converter-panel>
+    <converter-panel view-model.ref="converterPanel" data.bind="converterPanelData"></converter-panel>
 </template>

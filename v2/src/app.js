@@ -18,6 +18,7 @@ define(["require", "exports", 'aurelia-framework'], function (require, exports, 
             setTimeout(() => {
                 this.converterPanelData = new Uint8Array([66, 67, 68, 69, 70, 71, 72, 73]);
             }, 1000);
+            console.log(this.converterPanel);
         }
         selitemChanged() {
             console.log('selitemChanged');
