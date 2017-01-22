@@ -10,21 +10,30 @@ import threading
 import time
 import subprocess
 import re
+import fnmatch
 
 PORT = 8000
-watchDirs = ['index.html', 'js/*', 'css/*']
+watchDirs = ['index.html', 'js/', 'css/', 'v2/src/']
 compileDirs = ['src/*.ts', 'lib/ts-types/*.ts']
 compileCmd = r'tsc --outDir js/ --sourcemap --target ES6 --noEmitOnError %s'
 
 compileInProgress = False
 
-def getFiles(dirs):
-    return [fn for pattern in dirs for fn in glob.glob(pattern)]
+def getFiles(dirs): 
+    return [fn for pattern in dirs for fn in glob.glob(pattern)] 
+
+def getFilesRecursive(dirs): 
+    matches = [] 
+    for dir in dirs: 
+        for root, dirnames, filenames in os.walk(dir): 
+            for filename in filenames: 
+                matches.append(os.path.join(root, filename)) 
+    return matches 
 
 def getLastChange(dirs):
     if compileInProgress:
         return None
-    files = [{'fn': fn, 'modTime': os.path.getmtime(fn)} for fn in getFiles(dirs)]
+    files = [{'fn': fn, 'modTime': os.path.getmtime(fn)} for fn in getFilesRecursive(dirs)]
     files = sorted(files, key=lambda x: x['modTime'], reverse=True)
     return files[0] if len(files) > 0 else None
 
@@ -53,6 +62,13 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(result))
         
+    def end_headers(self): 
+         
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate") 
+        self.send_header("Pragma", "no-cache") 
+        self.send_header("Expires", "0") 
+        SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self) 
+
     def do_GET(self):
         if self.path == '/status':
             lastChange = getLastChange(watchDirs)
