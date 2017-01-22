@@ -1,8 +1,10 @@
 <template>
     <!--<require from="bootstrap/css/bootstrap.css"></require>-->
     <div>hello9</div>
-    <require from="./components/item-stepper/item-stepper"></require>
+    <require from="./components/ItemStepper/ItemStepper"></require>
     <div>List1: <item-stepper items.bind="list1" selected.bind="selItem" /></div>
     <div>List2: <item-stepper items.bind="list2" selected.bind="selItem" /></div>
     Selected item: ${selItem}
+    <require from="./components/ConverterPanel/ConverterPanel"></require>
+    <converter-panel data.bind="converterPanelData"></converter-panel>
 </template>

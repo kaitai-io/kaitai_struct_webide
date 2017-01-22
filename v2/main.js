@@ -1,8 +1,8 @@
-define(["require", "exports"], function (require, exports) {
+define(["require", "exports", "./src/app"], function (require, exports, app_1) {
     "use strict";
     function configure(aurelia) {
         aurelia.use.standardConfiguration().developmentLogging();
-        aurelia.start().then(a => a.setRoot("src/app"));
+        aurelia.start().then(a => a.setRoot("src/app")).then(a => app_1.App.instance.start());
     }
     exports.configure = configure;
 });

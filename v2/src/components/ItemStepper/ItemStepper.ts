@@ -1,8 +1,9 @@
-﻿import { bindable } from 'aurelia-framework';
+﻿import { bindable } from "aurelia-framework";
 import { bindingMode } from "aurelia-binding";
 
 export class ItemStepper {
     @bindable private current: number = 0;
+    @bindable private currentStr = "-";
     private total: number = 0;
 
     @bindable items: any[];
@@ -14,18 +15,16 @@ export class ItemStepper {
     }
 
     currentChanged() {
-        this.selected = this.items[this.current - 1];
+        if (this.current === 0)
+            this.currentStr = "-";
+        else {
+            this.selected = this.items[this.current - 1];
+            this.currentStr = this.current.toString();
+        }            
     }
 
     move(direction: number) {
         var newCurr = this.current + direction;
-
-        if (newCurr > this.total)
-            newCurr = 1;
-
-        if (newCurr < 1)
-            newCurr = this.total;
-
-        this.current = newCurr;
+        this.current = newCurr > this.total ? 1 : newCurr < 1 ? this.total : newCurr;
     }
 }

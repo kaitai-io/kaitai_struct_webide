@@ -24,11 +24,18 @@
   <ItemGroup>
     <Content Include="config.js" />
     <Content Include="index.html" />
+    <Content Include="lib\BigInteger\BigInteger.js" />
+    <Content Include="lib\date.format\date.format.js" />
+    <Content Include="lib\text-encoding\encoding-indexes.js" />
+    <Content Include="lib\text-encoding\encoding.js" />
     <Content Include="src\app.html" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="lib\DateFormatHelper.ts" />
     <TypeScriptCompile Include="main.ts" />
     <TypeScriptCompile Include="src\app.ts" />
+    <TypeScriptCompile Include="src\components\ConverterPanel\ConverterPanel.ts" />
+    <TypeScriptCompile Include="src\interfaces.ts" />
     <TypeScriptCompile Include="src\views\values.ts" />
     <TypeScriptCompile Include="typings\index.d.ts" />
     <TypeScriptCompile Include="typings\modules\aurelia-binding\index.d.ts" />
@@ -53,10 +60,13 @@
     <TypeScriptCompile Include="typings\modules\aurelia-templating-resources\index.d.ts" />
     <TypeScriptCompile Include="typings\modules\aurelia-templating-router\index.d.ts" />
     <TypeScriptCompile Include="typings\modules\aurelia-templating\index.d.ts" />
+    <TypeScriptCompile Include="typings\modules\requirejs\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="src\components\item-stepper\item-stepper.html" />
-    <TypeScriptCompile Include="src\components\item-stepper\item-stepper.ts" />
+    <Content Include="src\components\ConverterPanel\ConverterPanel.css" />
+    <Content Include="src\components\ConverterPanel\ConverterPanel.html" />
+    <Content Include="src\components\ItemStepper\ItemStepper.html" />
+    <TypeScriptCompile Include="src\components\ItemStepper\ItemStepper.ts" />
     <Content Include="src\views\values.html" />
     <Content Include="typings\modules\aurelia-binding\typings.json" />
     <Content Include="typings\modules\aurelia-bootstrapper\typings.json" />
@@ -87,6 +97,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="tsconfig.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="typings\modules\requirejs\typings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lib\BigInteger\LICENSE" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lib\text-encoding\LICENSE.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lib\date.format\LICENSE" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>

@@ -4,11 +4,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", 'aurelia-framework', "aurelia-binding"], function (require, exports, aurelia_framework_1, aurelia_binding_1) {
+define(["require", "exports", "aurelia-framework", "aurelia-binding"], function (require, exports, aurelia_framework_1, aurelia_binding_1) {
     "use strict";
     class ItemStepper {
         constructor() {
             this.current = 0;
+            this.currentStr = "-";
             this.total = 0;
         }
         itemsChanged() {
@@ -16,20 +17,24 @@ define(["require", "exports", 'aurelia-framework', "aurelia-binding"], function 
             this.total = this.items.length;
         }
         currentChanged() {
-            this.selected = this.items[this.current - 1];
+            if (this.current === 0)
+                this.currentStr = "-";
+            else {
+                this.selected = this.items[this.current - 1];
+                this.currentStr = this.current.toString();
+            }
         }
         move(direction) {
             var newCurr = this.current + direction;
-            if (newCurr > this.total)
-                newCurr = 1;
-            if (newCurr < 1)
-                newCurr = this.total;
-            this.current = newCurr;
+            this.current = newCurr > this.total ? 1 : newCurr < 1 ? this.total : newCurr;
         }
     }
     __decorate([
         aurelia_framework_1.bindable
     ], ItemStepper.prototype, "current", void 0);
+    __decorate([
+        aurelia_framework_1.bindable
+    ], ItemStepper.prototype, "currentStr", void 0);
     __decorate([
         aurelia_framework_1.bindable
     ], ItemStepper.prototype, "items", void 0);
@@ -38,4 +43,4 @@ define(["require", "exports", 'aurelia-framework', "aurelia-binding"], function 
     ], ItemStepper.prototype, "selected", void 0);
     exports.ItemStepper = ItemStepper;
 });
-//# sourceMappingURL=item-stepper.js.map
+//# sourceMappingURL=ItemStepper.js.map

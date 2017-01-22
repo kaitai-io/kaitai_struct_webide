@@ -1,0 +1,22 @@
+﻿<template>
+    <require from="./ConverterPanel.css"></require>
+    <div class="converterPanel">
+        <table>
+            <thead><tr><th class="typeCol">Type</th><th class="typeValue">Value (unsigned)</th><th>(signed)</th></tr></thead>
+            <tr><td>i8</td>      <td                             >${val.u8}</td>   <td>${val.s8}</td></tr>
+            <tr><td>i16le</td>   <td                             >${val.u16le}</td><td>${val.s16le}</td></tr>
+            <tr><td>i32le</td>   <td                             >${val.u32le}</td><td>${val.s32le}</td></tr>
+            <tr><td>i64le</td>   <td                             >${val.u64le}</td><td>${val.s64le}</td></tr>
+            <tr><td>i16be</td>   <td                             >${val.u16be}</td><td>${val.s16be}</td></tr>
+            <tr><td>i32be</td>   <td                             >${val.u32be}</td><td>${val.s32be}</td></tr>
+            <tr><td>i64be</td>   <td                             >${val.u64be}</td><td>${val.s64be}</td></tr>
+            <tr><td>float</td>   <td colspan="2"                 >${val.float}</td></tr>
+            <tr><td>double</td>  <td colspan="2"                 >${val.double}</td></tr>
+            <tr><td>unixts</td>  <td colspan="2"                 >${val.unixts}</td></tr>
+            <tr><td>ascii</td>   <td colspan="2"><div class="str">${val.ascii}</div></td></tr>
+            <tr><td>utf8</td>    <td colspan="2"><div class="str">${val.utf8}</div></td></tr>
+            <tr><td>utf16le</td> <td colspan="2"><div class="str">${val.utf16le}</div></td></tr>
+            <tr><td>utf16be</td> <td colspan="2"><div class="str">${val.utf16be}</div></td></tr>
+        </table>
+    </div>
+</template>
