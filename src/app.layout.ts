@@ -1,14 +1,24 @@
-﻿var practiceChallNameMatch = /practice=([a-z0-9]+)/.exec(location.href);
+﻿/// <reference path="../lib/ts-types/ace.d.ts"/>
+
+declare var practiceMode: any;
+var practiceMode = practiceMode || {};
+var practiceChallNameMatch = /practice=([a-z0-9]+)/.exec(location.href);
 var practiceChallName = practiceChallNameMatch ? practiceChallNameMatch[1] : practiceMode.chall;
 var practiceChall = practiceMode && practiceChallName && practiceMode.challs[practiceChallName];
 var isPracticeMode = !!practiceChall;
 
+import * as GoldenLayout from "goldenlayout";
+import HexViewer from "./HexViewer";
+import * as ace from "ace/ace";
+
+console.log(ace);
+
 var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },
     content: [
-        { type: 'row', content: []
-            .concat(isPracticeMode ? [] : { type: 'component', componentName: 'fileTreeCont', title: 'files', isClosable: false, width:12 })
-            .concat(isPracticeMode ? { type: 'component', componentName: 'practicePanel', title: 'practice mode', isClosable: false, width: 25 } : [])
+        { type: 'row', content: (<any[]>[])
+            .concat(isPracticeMode ? [] : [{ type: 'component', componentName: 'fileTreeCont', title: 'files', isClosable: false, width:12 }])
+            .concat(isPracticeMode ? [{ type: 'component', componentName: 'practicePanel', title: 'practice mode', isClosable: false, width: 25 }] : [])
             .concat(
                 { type: 'column', id: 'mainArea', isClosable: false, content: [
                     { type: 'row', content: [
@@ -54,16 +64,16 @@ var ui = {
     genCodeDebugViewer: <AceAjax.Editor>null,
     //parsedDataViewer: <AceAjax.Editor>null,
     parsedDataTreeCont: <GoldenLayout.Container>null,
-    parsedDataTree: <JSTree>null,
-    hexViewer: <HexViewer>null,
+    parsedDataTree: <any>null, //<JSTree>null,
+    hexViewer: <any>null, //<HexViewer>null,
     errorWindow: <GoldenLayout.Container>null,
     infoPanel: <GoldenLayout.Container>null,
     fileTreeCont: <JQuery>null,
-    fileTree: <JSTree>null,
+    fileTree: <any>null, //<JSTree>null,
     converterPanel: <JQuery>null,
     practicePanelCont: <GoldenLayout.Container>null,
-    unparsedIntSel: IntervalViewer,
-    bytesIntSel: IntervalViewer,
+    unparsedIntSel: <any>null, //IntervalViewer,
+    bytesIntSel: <any>null, //IntervalViewer,
 };
 
 function addComponent(name: string, generatorCallback?) {

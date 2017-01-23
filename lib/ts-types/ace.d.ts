@@ -2981,3 +2981,7 @@ declare namespace AceAjax {
 }
 
 declare var ace: AceAjax.Ace;
+
+declare module "ace/ace" {
+    export = ace;
+}

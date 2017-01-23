@@ -1,6 +1,7 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
 // /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 
+import ConverterPanel from "./components/ConverterPanel";
 declare var YAML: any, io: any, jailed: any, IntervalTree: any, localforage: LocalForage, bigInt: any, kaitaiIde: any;
 
 var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
@@ -90,8 +91,6 @@ function compile(srcYaml: string, kslang: string, debug: true | false | 'both') 
         return;
     }
 }
-
-function isKsyFile(fn) { return fn.toLowerCase().endsWith('.ksy'); }
 
 var ksyFsItemName = isPracticeMode ? `ksyFsItem_practice_${practiceChallName}` : 'ksyFsItem';
 
@@ -192,16 +191,6 @@ function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
     });
 }
 
-function addNewFiles(files: IFileProcessItem[]) {
-    return Promise.all(files.map(file => {
-        return (isKsyFile(file.file.name) ? file.read('text') : file.read('arrayBuffer')).then(content => {
-            return localFs.put(file.file.name, content).then(fsItem => {
-                return files.length == 1 ? loadFsItem(fsItem) : Promise.resolve();
-            });
-        });
-    })).then(refreshFsNodes);
-}
-
 localStorage.setItem('lastVersion', kaitaiIde.version);
 
 if (isPracticeMode)
@@ -235,7 +224,7 @@ $(() => {
             }
         }
 
-        refreshConverterPanel(ui.converterPanel, dataProvider, start);
+        new ConverterPanel(ui.converterPanel).refresh(dataProvider, start);
     };
 
     refreshSelectionInput();

@@ -1,3 +1,4 @@
+/// <reference path="jquery.d.ts"/>>
 // Type definitions for GoldenLayout v1.5.x
 // Project: https://golden-layout.com/
 
@@ -828,4 +829,6 @@ declare namespace GoldenLayout {
     }
 }
 
-//export = GoldenLayout;
+declare module "goldenlayout" {
+    export = GoldenLayout;
+}

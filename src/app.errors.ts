@@ -1,4 +1,6 @@
-﻿var lastErrWndSize = 100; // 34
+﻿declare var ui: any;
+
+var lastErrWndSize = 100; // 34
 function showError(...args) {
     console.log.apply(window, args);
     var errMsg = args.filter(x => x.toString() !== {}.toString()).join(' ');

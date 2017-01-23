@@ -1,4 +1,4 @@
-var jail, TextDecoder;
+var jail, TextDecoder, baseUrl, jailed;
 var jailReady, inputReady;
 function jailrun(code, args, cb = null) {
     return jailReady.then(() => {

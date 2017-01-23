@@ -10,7 +10,7 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -25,34 +25,22 @@
     <Content Include="css\app.css" />
     <Content Include="css\HexViewer.css" />
     <Content Include="index.html" />
-    <Content Include="js\autorefresh.js" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="lib\ts-types\ace.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\goldenlayout.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\jquery.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\jstree.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\localForage.d.ts" />
-    <TypeScriptCompile Include="src\app.converterPanel.ts" />
-    <TypeScriptCompile Include="src\app.errors.ts" />
-    <TypeScriptCompile Include="src\app.files.ts" />
-    <TypeScriptCompile Include="src\app.jail.ts" />
+    <TypeScriptCompile Include="lib\ts-types\other.d.ts" />
     <TypeScriptCompile Include="src\app.layout.ts" />
-    <TypeScriptCompile Include="src\app.practiceMode.ts" />
-    <TypeScriptCompile Include="src\app.selectionInput.ts" />
-    <TypeScriptCompile Include="src\app.ts" />
-    <TypeScriptCompile Include="src\app.unsupportedBrowser.ts" />
-    <TypeScriptCompile Include="src\entities.ts" />
-    <TypeScriptCompile Include="src\FileDrop.ts" />
-    <TypeScriptCompile Include="src\kaitaiJail.ts" />
-    <TypeScriptCompile Include="src\KsySchema.ts" />
-    <TypeScriptCompile Include="src\parsedToJson.ts" />
-    <TypeScriptCompile Include="src\parsedToTree.ts" />
-    <TypeScriptCompile Include="src\practiceMode.ts" />
-    <TypeScriptCompile Include="src\utils.ts" />
     <TypeScriptCompile Include="src\HexViewer.ts" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="lib\bowser\bowser.js" />
+    <Content Include="tsconfig_.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lib\bowser\LICENSE" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>
@@ -86,12 +74,11 @@
     <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
     <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
     <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
-    <TypeScriptModuleKind>
-    </TypeScriptModuleKind>
+    <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
     <TypeScriptOutFile />
     <TypeScriptOutDir>js\</TypeScriptOutDir>
     <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
-    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptNoEmitOnError>False</TypeScriptNoEmitOnError>
     <TypeScriptMapRoot />
     <TypeScriptSourceRoot />
   </PropertyGroup>

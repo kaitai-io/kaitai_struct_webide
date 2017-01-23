@@ -1,0 +1,22 @@
+﻿{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es6",
+    "experimentalDecorators": true,
+    "module": "amd",
+    "baseUrl": ".", // This must be specified if "paths" is.
+    "paths": {
+      "bowser": [ "lib/bowser/bowser" ],
+      "goldenlayout": [ "lib/goldenlayout/goldenlayout" ]
+    }
+  },
+  "compileOnSave": true,
+  "files": [
+    "src/app.layout.ts",
+    "src/app.unsupportedBrowser.ts",
+    "lib/ts-types/goldenlayout.d.ts"
+  ]
+}

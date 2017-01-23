@@ -14,12 +14,26 @@
     <link rel="stylesheet" type="text/css" href="lib/jstree/themes/default-dark/style.min.css" />
     <link rel="stylesheet" type="text/css" href="lib/font-awesome/font-awesome.min.css" />
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.js"></script>
     <script src="lib/jquery/jquery-3.1.1.min.js"></script>
     <script src="lib/bootstrap/bootstrap.min.js"></script>
     <script src="js/autorefresh.js"></script>
-    <script src="lib/goldenlayout/goldenlayout.js"></script>
-    <script src="lib/jstree/jstree.js"></script>
-    <script src="js/config.js"></script>
+    <!--<script src="lib/goldenlayout/goldenlayout.js"></script>-->
+    <!--<script src="lib/jstree/jstree.js"></script>-->
+    <!--<script src="js/app.layout.js"></script>-->
+    <script>
+        requirejs.config({
+            paths: {
+                'bowser': 'lib/bowser/bowser',
+                'goldenlayout': 'lib/goldenlayout/goldenlayout',
+                'ace/ace': 'lib/ace/ace',
+                'ace': 'lib/ace'
+            }
+        });
+
+        require(["js/app.layout"], layout => console.log(layout));
+    </script>
+    <!--<script src="js/config.js"></script>
     <script src="js/practiceMode.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/parsedToJson.js"></script>
@@ -30,8 +44,7 @@
     <script src="js/kaitaiFsFiles.js"></script>
     <script src="js/app.files.js"></script>
     <script src="js/app.selectionInput.js"></script>
-    <script src="js/app.converterPanel.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/app.js"></script>-->
 </head>
 <body>
 
@@ -43,9 +56,10 @@
 <noscript>
     <div id="noscript">This app requires Javascript to work. <a href="http://enable-javascript.com/" target="_blank">Learn how to enable Javascript.</a></div>
 </noscript>
-
-<script src="lib/bowser/bowser.js"></script>
-<script src="js/app.unsupportedBrowser.js"></script>
+    
+<script>
+    require(["js/app.unsupportedBrowser"]);
+</script>
 
 <div id="fileDrop">
     <div>
@@ -237,7 +251,7 @@
 </div>
 
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js" type="text/javascript" charset="utf-8"></script> -->
-<script src="lib/ace/ace.js"></script>
+<!--<script src="lib/ace/ace.js"></script>
 <script src="lib/kaitai/yaml.js"></script>
 <script src="lib/kaitai/kaitai-struct-compiler-fastopt.js"></script>
 <script src="js/HexViewer.js"></script>
@@ -248,6 +262,6 @@
 <script src="lib/localForage/localforage.js"></script>
 <script src="js/parsedToTree.js"></script>
 <script src="lib/BigInteger/BigInteger.js"></script>
-<script src="lib/date.format/date.format.js"></script>
+<script src="lib/date.format/date.format.js"></script>-->
 </body>
 </html>

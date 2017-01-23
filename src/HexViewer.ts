@@ -62,7 +62,7 @@ interface IDataProvider {
     get(offset: number, length: number);
 }
 
-class HexViewer {
+export default class HexViewer {
     private rowHeight = 21;
     private bytesPerLine = 16;
 
