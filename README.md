@@ -13,8 +13,15 @@ Online editor / visualizer for Kaitai Struct .ksy files
 
 [https://kt.pe/kaitai_struct_webide/](https://kt.pe/kaitai_struct_webide/)
 
-## compile / install
+## run locally (without compiling / modifying the source code)
 
+- `git clone --recursive https://github.com/koczkatamas/kaitai_struct_webide`
+- serve on a webserver (ex. `python -mSimpleHTTPServer` or `python serve.py`)
+- Go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+
+## compile and run locally
+
+- `git clone --recursive https://github.com/koczkatamas/kaitai_struct_webide`
 - `npm install -g typescript@2.0`
 - `python serve.py --compile`
 - Go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
