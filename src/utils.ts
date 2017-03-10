@@ -5,7 +5,7 @@
 
     return new Promise<ArrayBuffer>((resolve, reject) => {
         xhr.onload = function (e) {
-            resolve(this.response);
+            resolve((<any>this).response);
         };
 
         xhr.send();

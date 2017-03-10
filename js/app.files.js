@@ -56,12 +56,10 @@ class KaitaiFs {
     put(fn, data) { return Promise.reject('KaitaiFs.put is not implemented!'); }
 }
 class StaticFs {
-    constructor() {
-        this.files = {};
-    }
+    constructor() { this.files = {}; }
     getRootNode() { return Promise.resolve(Object.keys(this.files).map(fn => ({ fsType: 'static', type: 'file', fn }))); }
     get(fn) { return Promise.resolve(this.files[fn]); }
-    put(fn, data) { this.files[fn] = data; return Promise.resolve(); }
+    put(fn, data) { this.files[fn] = data; return Promise.resolve(null); }
 }
 var kaitaiRoot = { fsType: 'kaitai' };
 kaitaiFsFiles.forEach(fn => fsHelper.selectNode(kaitaiRoot, fn));
@@ -189,10 +187,11 @@ $(() => {
         var linkData = $(e.target).data();
         //console.log(fsItem, linkData);
         fss[fsItem.fsType].get(fsItem.fn).then(content => {
-            var compiled = compile(content, linkData.kslang, !!linkData.ksdebug);
-            compiled.forEach((compItem, i) => {
-                var title = fsItem.fn.split('/').last() + ' [' + $(e.target).text() + ']' + (compiled.length == 1 ? '' : ` ${i + 1}/${compiled.length}`);
-                addEditorTab(title, compItem, linkData.acelang);
+            return compile(content, linkData.kslang, !!linkData.ksdebug).then(compiled => {
+                compiled.forEach((compItem, i) => {
+                    var title = fsItem.fn.split('/').last() + ' [' + $(e.target).text() + ']' + (compiled.length == 1 ? '' : ` ${i + 1}/${compiled.length}`);
+                    addEditorTab(title, compItem, linkData.acelang);
+                });
             });
         });
     });

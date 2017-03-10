@@ -2,6 +2,28 @@
 // /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 $.jstree.defaults.core.force_text = true;
+class IntervalViewer {
+    constructor(htmlIdPrefix) {
+        this.htmlIdPrefix = htmlIdPrefix;
+        ["Curr", "Total", "Prev", "Next"].forEach(control => this[`html${control}`] = $(`#${htmlIdPrefix}${control}`));
+        this.htmlNext.on('click', () => this.move(+1));
+        this.htmlPrev.on('click', () => this.move(-1));
+    }
+    move(direction) {
+        if (this.intervals.length === 0)
+            return;
+        this.currentIdx = (this.intervals.length + this.currentIdx + direction) % this.intervals.length;
+        var curr = this.intervals[this.currentIdx];
+        ui.hexViewer.setSelection(curr.start, curr.end);
+        this.htmlCurr.text(this.currentIdx + 1);
+    }
+    setIntervals(intervals) {
+        this.intervals = intervals;
+        this.currentIdx = -1;
+        this.htmlCurr.text("-");
+        this.htmlTotal.text(this.intervals.length);
+    }
+}
 var dataProvider;
 var itree;
 var ksySchema;
@@ -54,20 +76,21 @@ function compile(srcYaml, kslang, debug) {
         return;
     }
     //console.log('ksySchema', ksySchema);
-    try {
-        if (kslang === 'json')
-            return [JSON.stringify(ksySchema, null, 4)];
-        else {
-            var ks = io.kaitai.struct.MainJs();
-            var rRelease = (debug === false || debug === 'both') ? ks.compile(kslang, compilerSchema, false) : null;
-            var rDebug = (debug === true || debug === 'both') ? ks.compile(kslang, compilerSchema, true) : null;
+    if (kslang === 'json')
+        return Promise.resolve();
+    else {
+        var ks = io.kaitai.struct.MainJs();
+        var rReleasePromise = (debug === false || debug === 'both') ? ks.compile(kslang, compilerSchema, null, false) : Promise.resolve(null);
+        var rDebugPromise = (debug === true || debug === 'both') ? ks.compile(kslang, compilerSchema, null, true) : Promise.resolve(null);
+        console.log('rReleasePromise', rReleasePromise, 'rDebugPromise', rDebugPromise);
+        return Promise.all([rReleasePromise, rDebugPromise]).then(([rRelease, rDebug]) => {
+            console.log('rRelease', rRelease, 'rDebug', rDebug);
             return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
-        }
-    }
-    catch (compileErr) {
-        console.log(compileErr.s$1);
-        showError("KS compilation error: ", compileErr);
-        return;
+        }, compileErr => {
+            console.log(compileErr);
+            showError("KS compilation error: ", compileErr);
+            return;
+        });
     }
 }
 function isKsyFile(fn) { return fn.toLowerCase().endsWith('.ksy'); }
@@ -85,12 +108,14 @@ function recompile() {
             }).then(() => addKsyFile('localStorage', newFn, ksyFsItem));
         }
         return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
-            var compiled = compile(srcYaml, 'javascript', 'both');
-            if (!compiled)
-                return;
-            ui.genCodeViewer.setValue(compiled.release[0], -1);
-            ui.genCodeDebugViewer.setValue(compiled.debug[0], -1);
-            return reparse();
+            return compile(srcYaml, 'javascript', 'both').then(compiled => {
+                if (!compiled)
+                    return;
+                var fileName = Object.keys(compiled.release)[0];
+                ui.genCodeViewer.setValue(compiled.release[fileName], -1);
+                ui.genCodeDebugViewer.setValue(compiled.debug[fileName], -1);
+                return reparse();
+            });
         });
     });
 }
@@ -156,7 +181,7 @@ function addNewFiles(files) {
     return Promise.all(files.map(file => {
         return (isKsyFile(file.file.name) ? file.read('text') : file.read('arrayBuffer')).then(content => {
             return localFs.put(file.file.name, content).then(fsItem => {
-                return files.length == 1 ? loadFsItem(fsItem) : Promise.resolve();
+                return files.length == 1 ? loadFsItem(fsItem) : Promise.resolve(null);
             });
         });
     })).then(refreshFsNodes);
@@ -306,28 +331,6 @@ $(() => {
     };
     $("#exportToJson, #exportToJsonHex").on('click', e => kaitaiIde.exportToJson(e.target.id === "exportToJsonHex"));
     $("#disableLazyParsing").on('click', reparse);
-    class IntervalViewer {
-        constructor(htmlIdPrefix) {
-            this.htmlIdPrefix = htmlIdPrefix;
-            ["Curr", "Total", "Prev", "Next"].forEach(control => this[`html${control}`] = $(`#${htmlIdPrefix}${control}`));
-            this.htmlNext.on('click', () => this.move(+1));
-            this.htmlPrev.on('click', () => this.move(-1));
-        }
-        move(direction) {
-            if (this.intervals.length === 0)
-                return;
-            this.currentIdx = (this.intervals.length + this.currentIdx + direction) % this.intervals.length;
-            var curr = this.intervals[this.currentIdx];
-            ui.hexViewer.setSelection(curr.start, curr.end);
-            this.htmlCurr.text(this.currentIdx + 1);
-        }
-        setIntervals(intervals) {
-            this.intervals = intervals;
-            this.currentIdx = -1;
-            this.htmlCurr.text("-");
-            this.htmlTotal.text(this.intervals.length);
-        }
-    }
     ui.unparsedIntSel = new IntervalViewer("unparsed");
     ui.bytesIntSel = new IntervalViewer("bytes");
 });
