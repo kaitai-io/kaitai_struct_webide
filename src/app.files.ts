@@ -73,7 +73,7 @@ class KaitaiFs implements IFileSystem {
 
     getRootNode() { return Promise.resolve(this.files); }
 
-    get(fn) {
+    get(fn): Promise<string|ArrayBuffer> {
         if (fn.toLowerCase().endsWith('.ksy'))
             return Promise.resolve<string>($.ajax({ url: fn }));
         else

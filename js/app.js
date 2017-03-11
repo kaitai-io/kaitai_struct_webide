@@ -29,6 +29,18 @@ var itree;
 var ksySchema;
 var ksyTypes;
 ;
+class JsImporter {
+    importYaml(name, mode) {
+        return new Promise(function (resolve, reject) {
+            console.log(`import yaml: ${name}, mode: ${mode}`);
+            return fss.kaitai.get(`formats/${name}.ksy`).then(ksyContent => {
+                var ksyModel = YAML.parse(ksyContent);
+                return resolve(ksyModel);
+            });
+        });
+    }
+}
+var jsImporter = new JsImporter();
 function compile(srcYaml, kslang, debug) {
     var compilerSchema;
     try {
@@ -80,8 +92,8 @@ function compile(srcYaml, kslang, debug) {
         return Promise.resolve();
     else {
         var ks = io.kaitai.struct.MainJs();
-        var rReleasePromise = (debug === false || debug === 'both') ? ks.compile(kslang, compilerSchema, null, false) : Promise.resolve(null);
-        var rDebugPromise = (debug === true || debug === 'both') ? ks.compile(kslang, compilerSchema, null, true) : Promise.resolve(null);
+        var rReleasePromise = (debug === false || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, false) : Promise.resolve(null);
+        var rDebugPromise = (debug === true || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, true) : Promise.resolve(null);
         console.log('rReleasePromise', rReleasePromise, 'rDebugPromise', rDebugPromise);
         return Promise.all([rReleasePromise, rDebugPromise]).then(([rRelease, rDebug]) => {
             console.log('rRelease', rRelease, 'rDebug', rDebug);
@@ -111,9 +123,10 @@ function recompile() {
             return compile(srcYaml, 'javascript', 'both').then(compiled => {
                 if (!compiled)
                     return;
-                var fileName = Object.keys(compiled.release)[0];
-                ui.genCodeViewer.setValue(compiled.release[fileName], -1);
-                ui.genCodeDebugViewer.setValue(compiled.debug[fileName], -1);
+                var fileNames = Object.keys(compiled.release);
+                console.log('ksyFsItem', ksyFsItem);
+                ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(''), -1);
+                ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(''), -1);
                 return reparse();
             });
         });
@@ -125,7 +138,8 @@ function reparse() {
     jsTree.jstree("destroy");
     return Promise.all([jailReady, inputReady, formatReady]).then(() => {
         var debugCode = ui.genCodeDebugViewer.getValue();
-        return jailrun(`module = { exports: true }; ksyTypes = args.ksyTypes; \n ${debugCode} \n`, { ksyTypes });
+        var jsClassName = kaitaiIde.ksySchema.meta.id.split('_').map(x => x.ucFirst()).join('');
+        return jailrun(`function define(name, deps, getter){ this[name] = getter(); }; define.amd = true; ksyTypes = args.ksyTypes;\n${debugCode}\nMainClass = ${jsClassName};`, { ksyTypes });
     }).then(() => {
         //console.log('recompiled');
         jail.remote.reparse((exportedRoot, error) => {
@@ -152,13 +166,14 @@ function reparse() {
         }, isPracticeMode || $("#disableLazyParsing").is(':checked'));
     });
 }
-var lastKsyContent, inputContent, inputFsItem;
+var lastKsyContent, inputContent, inputFsItem, lastKsyFsItem;
 function loadFsItem(fsItem, refreshGui = true) {
     if (!fsItem || fsItem.type !== 'file')
         return Promise.resolve();
     return fss[fsItem.fsType].get(fsItem.fn).then(content => {
         if (isKsyFile(fsItem.fn)) {
             localforage.setItem(ksyFsItemName, fsItem);
+            lastKsyFsItem = fsItem;
             lastKsyContent = content;
             ui.ksyEditor.setValue(content, -1);
             return Promise.resolve();

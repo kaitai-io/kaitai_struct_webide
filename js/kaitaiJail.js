@@ -1,4 +1,4 @@
-var application, ioInput, root, parseError, KaitaiStream, exported, module, inputBuffer;
+var application, ioInput, root, parseError, KaitaiStream, exported, module, inputBuffer, MainClass;
 class IDebugInfo {
 }
 function isUndef(obj) { return typeof obj === "undefined"; }
@@ -20,8 +20,8 @@ function exportValue(obj, debug, path, noLazy) {
         result.primitiveValue = obj;
         if (debug && debug.enumName) {
             result.enumName = debug.enumName;
-            var enumObj = module.exports;
-            debug.enumName.split('.').slice(1).forEach(p => enumObj = enumObj[p]);
+            var enumObj = this;
+            debug.enumName.split('.').forEach(p => enumObj = enumObj[p]);
             var flagCheck = 0, flagSuccess = true;
             var flagStr = Object.keys(enumObj).filter(x => isNaN(x)).filter(x => {
                 if (flagCheck & enumObj[x]) {
@@ -77,7 +77,7 @@ application.setInterface({
         ioInput = new KaitaiStream(inputBuffer, 0);
         parseError = null;
         try {
-            root = new module.exports(ioInput);
+            root = new MainClass(ioInput);
             root._read();
         }
         catch (e) {
