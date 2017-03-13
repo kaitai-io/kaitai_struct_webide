@@ -57,6 +57,8 @@ var ui = {
     fileTree: null,
     converterPanel: null,
     practicePanelCont: null,
+    unparsedIntSel: null,
+    bytesIntSel: null,
 };
 function addComponent(name, generatorCallback) {
     var editor;

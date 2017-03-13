@@ -1,4 +1,4 @@
-﻿var application: any, ioInput: any, root: any, parseError: any, KaitaiStream: any, exported: any, module: any, inputBuffer: any;
+﻿var application: any, ioInput: any, root: any, parseError: any, KaitaiStream: any, exported: any, module: any, inputBuffer: any, MainClass: any;
 
 class IDebugInfo {
     start: number;
@@ -30,8 +30,8 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         result.primitiveValue = obj;
         if (debug && debug.enumName) {
             result.enumName = debug.enumName;
-            var enumObj = module.exports;
-            debug.enumName.split('.').slice(1).forEach(p => enumObj = enumObj[p]);
+            var enumObj = this;
+            debug.enumName.split('.').forEach(p => enumObj = enumObj[p]);
 
             var flagCheck = 0, flagSuccess = true;
             var flagStr = Object.keys(enumObj).filter(x => isNaN(<any>x)).filter(x => {
@@ -98,7 +98,7 @@ application.setInterface({
         ioInput = new KaitaiStream(inputBuffer, 0);
         parseError = null;
         try {
-            root = new module.exports(ioInput);
+            root = new MainClass(ioInput);
             root._read();
         } catch (e) {
             parseError = { message: e.message, stack: e.stack };

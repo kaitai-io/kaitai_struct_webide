@@ -3,7 +3,7 @@
 interface IFileSystem {
     getRootNode(): Promise<any>;
     get(fn): Promise<string | ArrayBuffer>;
-    put(fn, data): Promise<void>;
+    put(fn, data): Promise<IFsItem>;
 }
 
 interface IFsItem {
@@ -73,7 +73,7 @@ class KaitaiFs implements IFileSystem {
 
     getRootNode() { return Promise.resolve(this.files); }
 
-    get(fn) {
+    get(fn): Promise<string|ArrayBuffer> {
         if (fn.toLowerCase().endsWith('.ksy'))
             return Promise.resolve<string>($.ajax({ url: fn }));
         else
@@ -88,7 +88,7 @@ class StaticFs implements IFileSystem {
     constructor() { this.files = {}; }
     getRootNode() { return Promise.resolve(Object.keys(this.files).map(fn => <IFsItem>{ fsType: 'static', type: 'file', fn })); }
     get(fn) { return Promise.resolve(this.files[fn]); }
-    put(fn, data) { this.files[fn] = data; return Promise.resolve(); }
+    put(fn, data) { this.files[fn] = data; return Promise.resolve(null); }
 }
 
 var kaitaiRoot = <IFsItem>{ fsType: 'kaitai' };
@@ -240,10 +240,11 @@ $(() => {
         //console.log(fsItem, linkData);
 
         fss[fsItem.fsType].get(fsItem.fn).then(content => {
-            var compiled = compile(content, linkData.kslang, !!linkData.ksdebug);
-            compiled.forEach((compItem, i) => {
-                var title = fsItem.fn.split('/').last() + ' [' + $(e.target).text() + ']' + (compiled.length == 1 ? '' : ` ${i + 1}/${compiled.length}`);
-                addEditorTab(title, compItem, linkData.acelang);
+            return compile(content, linkData.kslang, !!linkData.ksdebug).then(compiled => {
+                compiled.forEach((compItem, i) => {
+                    var title = fsItem.fn.split('/').last() + ' [' + $(e.target).text() + ']' + (compiled.length == 1 ? '' : ` ${i + 1}/${compiled.length}`);
+                    addEditorTab(title, compItem, linkData.acelang);
+                });
             });
         });
     });

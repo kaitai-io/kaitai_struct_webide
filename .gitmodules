@@ -1,6 +1,6 @@
 [submodule "formats"]
 	path = formats
-	url = https://github.com/koczkatamas/kaitai_struct_formats/
+	url = https://github.com/kaitai-io/kaitai_struct_formats/
 [submodule "lib/kaitai_js_runtime"]
 	path = lib/kaitai_js_runtime
 	url = https://github.com/kaitai-io/kaitai_struct_javascript_runtime/

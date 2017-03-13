@@ -62,8 +62,8 @@ var ui = {
     fileTree: <JSTree>null,
     converterPanel: <JQuery>null,
     practicePanelCont: <GoldenLayout.Container>null,
-    unparsedIntSel: IntervalViewer,
-    bytesIntSel: IntervalViewer,
+    unparsedIntSel: <IntervalViewer>null,
+    bytesIntSel: <IntervalViewer>null,
 };
 
 function addComponent(name: string, generatorCallback?) {

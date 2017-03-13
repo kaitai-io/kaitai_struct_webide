@@ -2,11 +2,45 @@
 // /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 $.jstree.defaults.core.force_text = true;
+class IntervalViewer {
+    constructor(htmlIdPrefix) {
+        this.htmlIdPrefix = htmlIdPrefix;
+        ["Curr", "Total", "Prev", "Next"].forEach(control => this[`html${control}`] = $(`#${htmlIdPrefix}${control}`));
+        this.htmlNext.on('click', () => this.move(+1));
+        this.htmlPrev.on('click', () => this.move(-1));
+    }
+    move(direction) {
+        if (this.intervals.length === 0)
+            return;
+        this.currentIdx = (this.intervals.length + this.currentIdx + direction) % this.intervals.length;
+        var curr = this.intervals[this.currentIdx];
+        ui.hexViewer.setSelection(curr.start, curr.end);
+        this.htmlCurr.text(this.currentIdx + 1);
+    }
+    setIntervals(intervals) {
+        this.intervals = intervals;
+        this.currentIdx = -1;
+        this.htmlCurr.text("-");
+        this.htmlTotal.text(this.intervals.length);
+    }
+}
 var dataProvider;
 var itree;
 var ksySchema;
 var ksyTypes;
 ;
+class JsImporter {
+    importYaml(name, mode) {
+        return new Promise(function (resolve, reject) {
+            console.log(`import yaml: ${name}, mode: ${mode}`);
+            return fss.kaitai.get(`formats/${name}.ksy`).then(ksyContent => {
+                var ksyModel = YAML.parse(ksyContent);
+                return resolve(ksyModel);
+            });
+        });
+    }
+}
+var jsImporter = new JsImporter();
 function compile(srcYaml, kslang, debug) {
     var compilerSchema;
     try {
@@ -54,20 +88,21 @@ function compile(srcYaml, kslang, debug) {
         return;
     }
     //console.log('ksySchema', ksySchema);
-    try {
-        if (kslang === 'json')
-            return [JSON.stringify(ksySchema, null, 4)];
-        else {
-            var ks = io.kaitai.struct.MainJs();
-            var rRelease = (debug === false || debug === 'both') ? ks.compile(kslang, compilerSchema, false) : null;
-            var rDebug = (debug === true || debug === 'both') ? ks.compile(kslang, compilerSchema, true) : null;
+    if (kslang === 'json')
+        return Promise.resolve();
+    else {
+        var ks = io.kaitai.struct.MainJs();
+        var rReleasePromise = (debug === false || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, false) : Promise.resolve(null);
+        var rDebugPromise = (debug === true || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, true) : Promise.resolve(null);
+        console.log('rReleasePromise', rReleasePromise, 'rDebugPromise', rDebugPromise);
+        return Promise.all([rReleasePromise, rDebugPromise]).then(([rRelease, rDebug]) => {
+            console.log('rRelease', rRelease, 'rDebug', rDebug);
             return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
-        }
-    }
-    catch (compileErr) {
-        console.log(compileErr.s$1);
-        showError("KS compilation error: ", compileErr);
-        return;
+        }, compileErr => {
+            console.log(compileErr);
+            showError("KS compilation error: ", compileErr);
+            return;
+        });
     }
 }
 function isKsyFile(fn) { return fn.toLowerCase().endsWith('.ksy'); }
@@ -85,12 +120,15 @@ function recompile() {
             }).then(() => addKsyFile('localStorage', newFn, ksyFsItem));
         }
         return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
-            var compiled = compile(srcYaml, 'javascript', 'both');
-            if (!compiled)
-                return;
-            ui.genCodeViewer.setValue(compiled.release[0], -1);
-            ui.genCodeDebugViewer.setValue(compiled.debug[0], -1);
-            return reparse();
+            return compile(srcYaml, 'javascript', 'both').then(compiled => {
+                if (!compiled)
+                    return;
+                var fileNames = Object.keys(compiled.release);
+                console.log('ksyFsItem', ksyFsItem);
+                ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(''), -1);
+                ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(''), -1);
+                return reparse();
+            });
         });
     });
 }
@@ -100,7 +138,8 @@ function reparse() {
     jsTree.jstree("destroy");
     return Promise.all([jailReady, inputReady, formatReady]).then(() => {
         var debugCode = ui.genCodeDebugViewer.getValue();
-        return jailrun(`module = { exports: true }; ksyTypes = args.ksyTypes; \n ${debugCode} \n`, { ksyTypes });
+        var jsClassName = kaitaiIde.ksySchema.meta.id.split('_').map(x => x.ucFirst()).join('');
+        return jailrun(`function define(name, deps, getter){ this[name] = getter(); }; define.amd = true; ksyTypes = args.ksyTypes;\n${debugCode}\nMainClass = ${jsClassName};`, { ksyTypes });
     }).then(() => {
         //console.log('recompiled');
         jail.remote.reparse((exportedRoot, error) => {
@@ -127,13 +166,14 @@ function reparse() {
         }, isPracticeMode || $("#disableLazyParsing").is(':checked'));
     });
 }
-var lastKsyContent, inputContent, inputFsItem;
+var lastKsyContent, inputContent, inputFsItem, lastKsyFsItem;
 function loadFsItem(fsItem, refreshGui = true) {
     if (!fsItem || fsItem.type !== 'file')
         return Promise.resolve();
     return fss[fsItem.fsType].get(fsItem.fn).then(content => {
         if (isKsyFile(fsItem.fn)) {
             localforage.setItem(ksyFsItemName, fsItem);
+            lastKsyFsItem = fsItem;
             lastKsyContent = content;
             ui.ksyEditor.setValue(content, -1);
             return Promise.resolve();
@@ -156,7 +196,7 @@ function addNewFiles(files) {
     return Promise.all(files.map(file => {
         return (isKsyFile(file.file.name) ? file.read('text') : file.read('arrayBuffer')).then(content => {
             return localFs.put(file.file.name, content).then(fsItem => {
-                return files.length == 1 ? loadFsItem(fsItem) : Promise.resolve();
+                return files.length == 1 ? loadFsItem(fsItem) : Promise.resolve(null);
             });
         });
     })).then(refreshFsNodes);
@@ -306,28 +346,6 @@ $(() => {
     };
     $("#exportToJson, #exportToJsonHex").on('click', e => kaitaiIde.exportToJson(e.target.id === "exportToJsonHex"));
     $("#disableLazyParsing").on('click', reparse);
-    class IntervalViewer {
-        constructor(htmlIdPrefix) {
-            this.htmlIdPrefix = htmlIdPrefix;
-            ["Curr", "Total", "Prev", "Next"].forEach(control => this[`html${control}`] = $(`#${htmlIdPrefix}${control}`));
-            this.htmlNext.on('click', () => this.move(+1));
-            this.htmlPrev.on('click', () => this.move(-1));
-        }
-        move(direction) {
-            if (this.intervals.length === 0)
-                return;
-            this.currentIdx = (this.intervals.length + this.currentIdx + direction) % this.intervals.length;
-            var curr = this.intervals[this.currentIdx];
-            ui.hexViewer.setSelection(curr.start, curr.end);
-            this.htmlCurr.text(this.currentIdx + 1);
-        }
-        setIntervals(intervals) {
-            this.intervals = intervals;
-            this.currentIdx = -1;
-            this.htmlCurr.text("-");
-            this.htmlTotal.text(this.intervals.length);
-        }
-    }
     ui.unparsedIntSel = new IntervalViewer("unparsed");
     ui.bytesIntSel = new IntervalViewer("bytes");
 });
