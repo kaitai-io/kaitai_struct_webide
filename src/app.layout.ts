@@ -1,7 +1,8 @@
-﻿var practiceChallNameMatch = /practice=([a-z0-9]+)/.exec(location.href);
-var practiceChallName = practiceChallNameMatch ? practiceChallNameMatch[1] : practiceMode.chall;
-var practiceChall = practiceMode && practiceChallName && practiceMode.challs[practiceChallName];
-var isPracticeMode = !!practiceChall;
+﻿import {IntervalViewer} from "./app";
+var practiceChallNameMatch = /practice=([a-z0-9]+)/.exec(location.href);
+export var practiceChallName = practiceChallNameMatch ? practiceChallNameMatch[1] : practiceMode.chall;
+export var practiceChall = practiceMode && practiceChallName && practiceMode.challs[practiceChallName];
+export var isPracticeMode = !!practiceChall;
 
 var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },
@@ -37,12 +38,12 @@ var myLayout = new GoldenLayout({
     ]
 });
 
-function getLayoutNodeById(id) {
+export function getLayoutNodeById(id) {
     return (<any>myLayout)._getAllContentItems().filter(x => x.config.id === id)[0];
 }
 
 var dynCompId = 1;
-function addEditorTab(title: string, data: string, lang: string = null, parent: string = 'codeTab') {
+export function addEditorTab(title: string, data: string, lang: string = null, parent: string = 'codeTab') {
     var componentName = `dynComp${dynCompId++}`;
     addEditor(componentName, lang, true, editor => editor.setValue(data, -1));
     getLayoutNodeById(parent).addChild({ type: 'component', componentName, title });
@@ -116,3 +117,5 @@ addExistingDiv('converterPanel');
 addExistingDiv('practicePanel');
 
 myLayout.init();
+
+export { ui };

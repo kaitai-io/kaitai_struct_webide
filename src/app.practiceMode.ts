@@ -1,8 +1,9 @@
-﻿var practiceDiff: AceAjax.Editor, aceRange: any, markers = [];
+﻿import {ui, practiceChall, practiceChallName } from "./app.layout";
+var practiceDiff: AceAjax.Editor, aceRange: any, markers = [];
 
 interface ILine { start: number; end: number; idx: number; match: string; }
 
-function practiceExportedChanged(exportedRoot: IExportedValue) {
+export function practiceExportedChanged(exportedRoot: IExportedValue) {
     function numConv(num: number) {
         return num % 1 > 10e-9 ? Math.round(num * 1000000) / 1000000 : num;
     }

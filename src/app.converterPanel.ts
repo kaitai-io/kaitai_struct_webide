@@ -1,4 +1,5 @@
-﻿function refreshConverterPanel(panel: JQuery, dataProvider: IDataProvider, offset: number) {
+﻿declare var bigInt, TextDecoder;
+function refreshConverterPanel(panel: JQuery, dataProvider: IDataProvider, offset: number) {
     if (dataProvider && offset != -1) {
         var data = dataProvider.get(offset, Math.min(dataProvider.length - offset, 64)).slice(0);
 
