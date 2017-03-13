@@ -1,0 +1,10 @@
+dist: trusty
+sudo: false
+
+language: javascript
+
+install:
+  - npm install typescript@2.1
+
+script:
+  - ./build
