@@ -30,7 +30,7 @@ for libName in sorted(licData):
     if 'source' in libData:
         licResult += 'Source: %s\n' % libData['source']
         wikiResult += 'Source: %s\n\n' % libData['source']
-        
+
     wikiResult += 'License: %s (%s)\n\n' % (libData['licenseName'], libData['licenseUrl'])
 
     licResult += '='*80 + '\n'
