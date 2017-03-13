@@ -9,3 +9,6 @@ install:
 
 script:
   - ./build
+
+after_success:
+  - ./publish
