@@ -8,6 +8,8 @@ import {refreshSelectionInput} from "./app.selectionInput";
 import {parsedToTree, ParsedTreeNode } from "./parsedToTree";
 import {jailrun, jailReady, inputReady } from "./app.jail";
 import {practiceExportedChanged} from "./app.practiceMode";
+import { IDataProvider } from "./HexViewer";
+import {refreshConverterPanel} from "./app.converterPanel";
 declare var YAML: any, io: any, jailed: any, jail: any, IntervalTree: any, localforage: LocalForage, bigInt: any, kaitaiIde: any;
 
 export var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';

@@ -29,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="lib\ts-types\ace.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\declarations.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\goldenlayout.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\jquery.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\jstree.d.ts" />

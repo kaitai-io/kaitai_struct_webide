@@ -1,5 +1,8 @@
-﻿declare var bigInt, TextDecoder;
-function refreshConverterPanel(panel: JQuery, dataProvider: IDataProvider, offset: number) {
+﻿import {IDataProvider as DataProvider} from "./HexViewer";
+
+declare var bigInt, TextDecoder;
+
+export function refreshConverterPanel(panel: JQuery, dataProvider: DataProvider, offset: number) {
     if (dataProvider && offset != -1) {
         var data = dataProvider.get(offset, Math.min(dataProvider.length - offset, 64)).slice(0);
 

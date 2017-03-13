@@ -1,4 +1,4 @@
-﻿declare var bowser: any;
+﻿import * as bowser from "bowser";
 
 if (localStorage.getItem('hideUnsupported') === 'true' || bowser.check({ chrome: "53", firefox: "49" }, true))
     $('#unsupportedBrowser').hide();
@@ -6,4 +6,4 @@ if (localStorage.getItem('hideUnsupported') === 'true' || bowser.check({ chrome:
 $('#unsupportedBrowser .closeBtn').on('click', () => {
     localStorage.setItem('hideUnsupported', 'true');
     $('#unsupportedBrowser').hide();
-});
+});    

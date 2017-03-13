@@ -239,4 +239,5 @@ define(["require", "exports"], function (require, exports) {
     }
     exports.HexViewer = HexViewer;
 });
+//# sourceMappingURL=HexViewer.js.map 
 //# sourceMappingURL=HexViewer.js.map
