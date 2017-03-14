@@ -1,9 +1,10 @@
-define(["require", "exports", "goldenlayout", "js/HexViewer"], function (require, exports, GoldenLayout, HexViewer_1) {
+define(["require", "exports", "goldenlayout", "HexViewer"], function (require, exports, GoldenLayout, HexViewer_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var practiceChallNameMatch = /practice=([a-z0-9]+)/.exec(location.href);
-    exports.practiceChallName = practiceChallNameMatch ? practiceChallNameMatch[1] : practiceMode.chall;
-    exports.practiceChall = practiceMode && exports.practiceChallName && practiceMode.challs[exports.practiceChallName];
+    exports.practiceMode = null;
+    exports.practiceChallName = practiceChallNameMatch ? practiceChallNameMatch[1] : exports.practiceMode && exports.practiceMode.chall;
+    exports.practiceChall = exports.practiceMode && exports.practiceChallName && exports.practiceMode.challs[exports.practiceChallName];
     exports.isPracticeMode = !!exports.practiceChall;
     var myLayout = new GoldenLayout({
         settings: { showCloseIcon: false, showPopoutIcon: false },

@@ -1,9 +1,10 @@
 ﻿import { IntervalViewer } from "./app";
 import * as GoldenLayout from "goldenlayout";
-import { HexViewer } from "js/HexViewer";
+import { HexViewer } from "HexViewer";
 
 var practiceChallNameMatch = /practice=([a-z0-9]+)/.exec(location.href);
-export var practiceChallName = practiceChallNameMatch ? practiceChallNameMatch[1] : practiceMode.chall;
+export var practiceMode = null;
+export var practiceChallName = practiceChallNameMatch ? practiceChallNameMatch[1] : practiceMode && practiceMode.chall;
 export var practiceChall = practiceMode && practiceChallName && practiceMode.challs[practiceChallName];
 export var isPracticeMode = !!practiceChall;
 

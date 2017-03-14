@@ -1,7 +1,7 @@
 ﻿import {ui} from "./app.layout";
 import { itree, IKsyTypes } from "./app";
-
-declare var jail, kaitaiIde;
+import {jail} from "./app.jail";
+declare var kaitaiIde;
 
 interface ParsedTreeNodeData { exported?: IExportedValue, instance?: IInstance, parent?: IExportedValue; };
 export interface JSTreeNode<TData> { id?: string, text?: string, icon?: string, children?: JSTreeNode<TData>[] | boolean, data?: TData };

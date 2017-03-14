@@ -1,4 +1,4 @@
-define(["require", "exports", "./app.layout", "./app"], function (require, exports, app_layout_1, app_1) {
+define(["require", "exports", "./app.layout", "./app", "./app.jail"], function (require, exports, app_layout_1, app_1, app_jail_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     ;
@@ -115,7 +115,7 @@ define(["require", "exports", "./app.layout", "./app"], function (require, expor
         }
         function getProp(path) {
             return new Promise((resolve, reject) => {
-                jail.remote.get(path, (expProp, error) => {
+                app_jail_1.jail.remote.get(path, (expProp, error) => {
                     if (expProp && !error)
                         resolve(expProp);
                     else

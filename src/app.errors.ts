@@ -1,4 +1,4 @@
-﻿import { ui, getLayoutNodeById, addEditorTab } from 'app.layout';
+﻿import { ui, getLayoutNodeById, addEditorTab } from './app.layout';
 
 var lastErrWndSize = 100; // 34
 export function showError(...args) {

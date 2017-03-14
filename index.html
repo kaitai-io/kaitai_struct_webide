@@ -1,5 +1,4 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -32,30 +31,27 @@
     <script src="js/autorefresh.js"></script>
 
     <script src="js/config.js"></script>
-    <script src="js/practiceMode.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/parsedToJson.js"></script>
     <script src="js/entities.js"></script>
+    <!--<script src="js/practiceMode.js"></script>-->
+    <!--
+    <script src="js/parsedToJson.js"></script>
+    <script src="js/entities.js"></script>-->
     <script>
         requirejs.config({
+            baseUrl: 'js/',
             paths: {
-                'bowser': 'lib/bowser/bowser',
-                'jstree': 'lib/jstree/jstree',
-                'jailed': 'lib/jailed/jailed',
-                'localforage': 'lib/localforage/localforage',
-                'goldenlayout': 'lib/goldenlayout/goldenlayout',
+                'bowser': '/lib/bowser/bowser',
+                'jstree': '/lib/jstree/jstree',
+                'jailed': '/lib/jailed/jailed',
+                'localforage': '/lib/localforage/localforage',
+                'goldenlayout': '/lib/goldenlayout/goldenlayout',
+                'js/_JailedSite': '/lib/jailed/_JailedSite',
             }
         });
 
-        require(['jstree', 'jailed', 'localforage', 'goldenlayout', 'js/app.unsupportedBrowser'], function (jsTree, jailed, localforage, goldenlayout) {
-            console.log('jsTree', $.jstree);
-            console.log('jailed', jailed);
-            console.log('localforage', localforage);
-            console.log('goldenlayout', goldenlayout);
-            //window.GoldenLayout = goldenlayout;
-            require(['js/app.layout'], function() {
-                
-            });
+        require(['jstree', 'app.unsupportedBrowser', 'app.layout', 'app.errors', 'kaitaiFsFiles', 'app.files'], function () {
+             //, 'app.jail', 'app.selectionInput', 'app.converterPanel', 'app', 'HexViewer', 'FileDrop', 'parsedToTree'
         });
     </script>
     <!--<script src="js/app.errors.js"></script>

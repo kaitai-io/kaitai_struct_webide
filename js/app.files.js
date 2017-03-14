@@ -1,4 +1,4 @@
-define(["require", "exports", "app.layout", "./app"], function (require, exports, app_layout_1, app_1) {
+define(["require", "exports", "app.layout", "./app", "localforage"], function (require, exports, app_layout_1, app_1, localforage) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var fsHelper = {

@@ -6,11 +6,12 @@ import {showError, handleError } from "./app.errors";
 import { IFsItem, fss, addKsyFile, staticFs, refreshFsNodes, localFs } from "./app.files";
 import {refreshSelectionInput} from "./app.selectionInput";
 import {parsedToTree, ParsedTreeNode } from "./parsedToTree";
-import {jailrun, jailReady, inputReady } from "./app.jail";
-import {practiceExportedChanged} from "./app.practiceMode";
+import {jailrun, jailReady, inputReady, jail } from "./app.jail";
 import { IDataProvider } from "./HexViewer";
 import {refreshConverterPanel} from "./app.converterPanel";
-declare var YAML: any, io: any, jailed: any, jail: any, IntervalTree: any, localforage: LocalForage, bigInt: any, kaitaiIde: any;
+import * as localforage from "localforage";
+import {initFileDrop} from "./FileDrop";
+declare var YAML: any, io: any, IntervalTree: any, bigInt: any, kaitaiIde: any;
 
 export var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 
@@ -224,8 +225,8 @@ function reparse() {
                 }
             });
 
-            if (isPracticeMode)
-                practiceExportedChanged(exportedRoot);
+            //if (isPracticeMode)
+            //    practiceExportedChanged(exportedRoot);
         }, isPracticeMode || $("#disableLazyParsing").is(':checked'));
     });
 }
@@ -273,8 +274,8 @@ export function addNewFiles(files: IFileProcessItem[]) {
 
 localStorage.setItem('lastVersion', kaitaiIde.version);
 
-if (isPracticeMode)
-    $.getScript('js/app.practiceMode.js');
+//if (isPracticeMode)
+//    $.getScript('js/app.practiceMode.js');
 
 $(() => {
     $('#webIdeVersion').text(kaitaiIde.version);

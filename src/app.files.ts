@@ -1,7 +1,8 @@
 ﻿import { ui, addEditorTab } from 'app.layout';
 import {compile, addNewFiles, loadFsItem } from "./app";
 import {JSTreeNode as JsTreeNode} from "./parsedToTree";
-declare var kaitaiFsFiles: string[], localforage: LocalForage;
+import * as localforage from "localforage";
+declare var kaitaiFsFiles: string[];
 
 interface IFileSystem {
     getRootNode(): Promise<any>;

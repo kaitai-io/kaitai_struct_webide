@@ -44,10 +44,10 @@ export function refreshSelectionInput() {
 }
 
 $(() => {
-    var inputSizeElement = $("<span />").css({ display: 'none' }).appendTo(document.body);
+    inputSizeElement = $("<span />").css({ display: 'none' }).appendTo(document.body);
 
-    var $selStart = $('#infoPanel .selStart');
-    var $selEnd = $('#infoPanel .selEnd');
+    $selStart = $('#infoPanel .selStart');
+    $selEnd = $('#infoPanel .selEnd');
     [$selStart, $selEnd].forEach(item => item.on('input', e => selectionInputChanged(e)));
 
     [$selStart, $selEnd].forEach(item => item.on('keydown', e => {

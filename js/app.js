@@ -1,6 +1,6 @@
 /// <reference path="../lib/ts-types/goldenlayout.d.ts" />
 // /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
-define(["require", "exports", "./app.layout", "./app.errors", "./app.files", "./app.selectionInput", "./parsedToTree", "./app.jail", "./app.practiceMode", "./app.converterPanel"], function (require, exports, app_layout_1, app_errors_1, app_files_1, app_selectionInput_1, parsedToTree_1, app_jail_1, app_practiceMode_1, app_converterPanel_1) {
+define(["require", "exports", "./app.layout", "./app.errors", "./app.files", "./app.selectionInput", "./parsedToTree", "./app.jail", "./app.converterPanel", "localforage", "./FileDrop"], function (require, exports, app_layout_1, app_errors_1, app_files_1, app_selectionInput_1, parsedToTree_1, app_jail_1, app_converterPanel_1, localforage, FileDrop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
@@ -144,7 +144,7 @@ define(["require", "exports", "./app.layout", "./app.errors", "./app.files", "./
             return app_jail_1.jailrun(`function define(name, deps, getter){ this[name] = getter(); }; define.amd = true; ksyTypes = args.ksyTypes;\n${debugCode}\nMainClass = ${jsClassName};`, { ksyTypes: exports.ksyTypes });
         }).then(() => {
             //console.log('recompiled');
-            jail.remote.reparse((exportedRoot, error) => {
+            app_jail_1.jail.remote.reparse((exportedRoot, error) => {
                 //console.log('reparse exportedRoot', exportedRoot);
                 exports.itree = new IntervalTree(exports.dataProvider.length / 2);
                 app_errors_1.handleError(error);
@@ -163,8 +163,8 @@ define(["require", "exports", "./app.layout", "./app.errors", "./app.files", "./
                         selectedInTree = false;
                     }
                 });
-                if (app_layout_1.isPracticeMode)
-                    app_practiceMode_1.practiceExportedChanged(exportedRoot);
+                //if (isPracticeMode)
+                //    practiceExportedChanged(exportedRoot);
             }, app_layout_1.isPracticeMode || $("#disableLazyParsing").is(':checked'));
         });
     }
@@ -206,8 +206,8 @@ define(["require", "exports", "./app.layout", "./app.errors", "./app.files", "./
     }
     exports.addNewFiles = addNewFiles;
     localStorage.setItem('lastVersion', kaitaiIde.version);
-    if (app_layout_1.isPracticeMode)
-        $.getScript('js/app.practiceMode.js');
+    //if (isPracticeMode)
+    //    $.getScript('js/app.practiceMode.js');
     $(() => {
         $('#webIdeVersion').text(kaitaiIde.version);
         $('#compilerVersion').text(io.kaitai.struct.MainJs().version + " (" + io.kaitai.struct.MainJs().buildDate + ")");
@@ -239,7 +239,7 @@ define(["require", "exports", "./app.layout", "./app.errors", "./app.files", "./
             exec: function (editor) { reparse(); }
         });
         if (!app_layout_1.isPracticeMode)
-            initFileDrop('fileDrop', addNewFiles);
+            FileDrop_1.initFileDrop('fileDrop', addNewFiles);
         function loadCachedFsItem(cacheKey, defFsType, defSample) {
             return localforage.getItem(cacheKey).then((fsItem) => loadFsItem(fsItem || { fsType: defFsType, fn: defSample, type: 'file' }, false));
         }
@@ -341,7 +341,7 @@ define(["require", "exports", "./app.layout", "./app.errors", "./app.files", "./
                 }
                 return intervals;
             }
-            jail.remote.reparse((exportedRoot, error) => {
+            app_jail_1.jail.remote.reparse((exportedRoot, error) => {
                 console.log('exported', exportedRoot);
                 expToNative(exportedRoot);
                 app_layout_1.addEditorTab('json export', result, 'json');

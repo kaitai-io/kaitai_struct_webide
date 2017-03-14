@@ -1,4 +1,4 @@
-define(["require", "exports", "app.layout"], function (require, exports, app_layout_1) {
+define(["require", "exports", "./app.layout"], function (require, exports, app_layout_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var lastErrWndSize = 100; // 34

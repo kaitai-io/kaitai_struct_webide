@@ -38,9 +38,9 @@ define(["require", "exports", "./app.layout", "./app"], function (require, expor
     }
     exports.refreshSelectionInput = refreshSelectionInput;
     $(() => {
-        var inputSizeElement = $("<span />").css({ display: 'none' }).appendTo(document.body);
-        var $selStart = $('#infoPanel .selStart');
-        var $selEnd = $('#infoPanel .selEnd');
+        inputSizeElement = $("<span />").css({ display: 'none' }).appendTo(document.body);
+        $selStart = $('#infoPanel .selStart');
+        $selEnd = $('#infoPanel .selEnd');
         [$selStart, $selEnd].forEach(item => item.on('input', e => selectionInputChanged(e)));
         [$selStart, $selEnd].forEach(item => item.on('keydown', e => {
             if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {

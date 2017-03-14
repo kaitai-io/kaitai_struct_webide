@@ -1,5 +1,5 @@
-﻿import {ksyTypes} from "./app";
-var application: any, ioInput: any, root: any, parseError: any, KaitaiStream: any, exported: any, module: any, inputBuffer: any, MainClass: any;
+﻿var application: any, ioInput: any, root: any, parseError: any, KaitaiStream: any, exported: any,
+    module: any, inputBuffer: any, MainClass: any, ksyTypes: any;
 
 class IDebugInfo {
     start: number;
