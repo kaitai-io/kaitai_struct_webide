@@ -38,17 +38,17 @@ def statusHook(lastChange):
         configFn = 'js/config.js'
         packageJsonFn = 'package.json'
         with open(configFn, 'rt') as f: configJs = f.read()
-        with open(packageJsonFn, 'rt') as f: packageJson = f.read()
         
-        currVersion = re.search(r'kaitaiIde\.version\s*=\s*[\'"](\d+\.\d+\.\d+)', configJs).group(1)
+        currVersion = re.search(r'kaitaiIde\.version\s*=\s*[\'"](\d+\.\d+\.\d+.\d+)', configJs).group(1)
         vp = currVersion.split('.')
-        newVersion = vp[0] + '.' + vp[1] + '.' + str(int(vp[2]) + 1)
+        newVersion = '.'.join(vp[:-1] + [str(int(vp[-1]) + 1)])
         print "Changed: %r, new version: %r" % (lastChange, newVersion)
         configJs = configJs.replace(currVersion, newVersion)
-        packageJson = re.sub(r'(version": ")(\d+\.\d+\.\d+)', (lambda m: m.group(1) + newVersion), packageJson) 
-        
         with open(configFn, 'wt') as f: f.write(configJs)
-        with open(packageJsonFn, 'wt') as f: f.write(packageJson)
+        
+        #with open(packageJsonFn, 'rt') as f: packageJson = f.read()
+        #packageJson = re.sub(r'(version": ")(\d+\.\d+\.\d+)', (lambda m: m.group(1) + newVersion), packageJson) 
+        #with open(packageJsonFn, 'wt') as f: f.write(packageJson)
     lastMod = currMod
     
 class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):

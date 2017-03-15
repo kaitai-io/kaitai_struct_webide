@@ -1,6 +1,5 @@
 {
   "name": "kaitai_struct_webide",
-  "version": "0.1.745",
   "description": "Web IDE for Kaitai Struct",
   "directories": {
     "doc": "docs"
