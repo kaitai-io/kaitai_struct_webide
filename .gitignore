@@ -246,3 +246,6 @@ user.ksy
 
 # Our complete HTML build
 out/
+
+# Generated file
+js/kaitaiFsFiles.js
