@@ -8,6 +8,7 @@ install:
   - npm install typescript@2.1
 
 script:
+  - ./genKaitaiFsFiles.py
   - ./build
 
 after_success:
