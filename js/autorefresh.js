@@ -1,6 +1,6 @@
 var lastMod = null;
 function checkModifications() {
-    $.getJSON('status', function(status) {
+    $.getJSON('/status', function(status) {
         if(lastMod !== null && status.lastchange.modTime !== lastMod)
             location.reload(true);
         lastMod = status.lastchange.modTime;

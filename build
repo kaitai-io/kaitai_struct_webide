@@ -5,7 +5,7 @@ TSC=node_modules/.bin/tsc
 
 mkdir -p "$OUT_DIR/js"
 
-"$TSC" --outDir $OUT_DIR/js/ --sourcemap --target ES6 --noEmitOnError src/*.ts lib/ts-types/*.ts
+"$TSC" --outDir $OUT_DIR/js/ -m amd --target ES6 --noEmitOnError src/*.ts lib/ts-types/*.ts
 
 cp -r \
 	index.html \
