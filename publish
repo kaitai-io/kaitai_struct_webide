@@ -65,7 +65,7 @@ echo 'Cloning website repo...'
 git clone git@github.com:"$GH_USER"/"$GH_REPO_NAME".git
 
 echo 'Updating the files from out...'
-rsync --delete-after --exclude=.git --exclude=CNAME -r -v out/ "$GH_REPO_NAME"
+rsync --delete-after --exclude=.git --exclude=CNAME --exclude=.nojekyll -r -v out/ "$GH_REPO_NAME"
 
 cd "$GH_REPO_NAME"
 
