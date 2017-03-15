@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 GH_USER=kaitai-io
-GH_REPO_NAME=ide-devel-kaitai-io.github.io
+GH_REPO_NAME=ide-kaitai-io.github.io
 export GIT_AUTHOR_NAME='Kaitai Bot'
 export GIT_AUTHOR_EMAIL='kaitai-bot@kaitai.io'
 export GIT_COMMITTER_NAME='Kaitai Bot'
