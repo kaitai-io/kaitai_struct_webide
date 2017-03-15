@@ -1,0 +1,25 @@
+{
+  "name": "kaitai_struct_webide",
+  "version": "0.1.745",
+  "description": "Web IDE for Kaitai Struct",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "typescript": "^2.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaitai-io/kaitai_struct_webide.git"
+  },
+  "author": "",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/kaitai-io/kaitai_struct_webide/issues"
+  },
+  "homepage": "https://github.com/kaitai-io/kaitai_struct_webide#readme"
+}
