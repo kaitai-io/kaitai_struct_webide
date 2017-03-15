@@ -1,5 +1,7 @@
-﻿var lastErrWndSize = 100; // 34
-function showError(...args) {
+﻿import { ui, getLayoutNodeById, addEditorTab } from './app.layout';
+
+var lastErrWndSize = 100; // 34
+export function showError(...args) {
     console.log.apply(window, args);
     var errMsg = args.filter(x => x.toString() !== {}.toString()).join(' ');
     var container = getLayoutNodeById('mainArea');
@@ -19,7 +21,7 @@ function hideErrors() {
     }
 }
 
-function handleError(error) {
+export function handleError(error) {
     if (error)
         showError('Parse error' + (error.name ? ` (${error.name})` : '') + `: ${error.message}\nCall stack: ${error.stack}`, error);
     else

@@ -1,9 +1,19 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
 // /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 
-declare var YAML: any, io: any, jailed: any, IntervalTree: any, localforage: LocalForage, bigInt: any, kaitaiIde: any;
+import {ui, addEditorTab, isPracticeMode, practiceChallName, practiceChall } from "./app.layout";
+import {showError, handleError } from "./app.errors";
+import { IFsItem, fss, addKsyFile, staticFs, refreshFsNodes, localFs } from "./app.files";
+import {refreshSelectionInput} from "./app.selectionInput";
+import {parsedToTree, ParsedTreeNode } from "./parsedToTree";
+import {jailrun, jailReady, inputReady, jail } from "./app.jail";
+import { IDataProvider } from "./HexViewer";
+import {refreshConverterPanel} from "./app.converterPanel";
+import * as localforage from "localforage";
+import {initFileDrop} from "./FileDrop";
+declare var YAML: any, io: any, IntervalTree: any, bigInt: any, kaitaiIde: any;
 
-var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
+export var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 
 $.jstree.defaults.core.force_text = true;
 
@@ -13,7 +23,7 @@ interface IInterval {
     end: number;
 }
 
-class IntervalViewer {
+export class IntervalViewer {
     currentIdx: number;
     intervals: IInterval[];
     htmlCurr: JQuery;
@@ -44,12 +54,12 @@ class IntervalViewer {
     }
 }
 
-var dataProvider: IDataProvider;
-var itree;
+export var dataProvider: IDataProvider;
+export var itree;
 var ksySchema: KsySchema.IKsyFile;
-var ksyTypes: IKsyTypes;
+export var ksyTypes: IKsyTypes;
 
-interface IKsyTypes { [name: string]: KsySchema.IType };
+export interface IKsyTypes { [name: string]: KsySchema.IType };
 
 class JsImporter {
     importYaml(name, mode){
@@ -66,7 +76,7 @@ class JsImporter {
 
 var jsImporter = new JsImporter();
 
-function compile(srcYaml: string, kslang: string, debug: true | false | 'both'): Promise<any> {
+export function compile(srcYaml: string, kslang: string, debug: true | false | 'both'): Promise<any> {
     var compilerSchema;
     try {
         kaitaiIde.ksySchema = ksySchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
@@ -215,14 +225,14 @@ function reparse() {
                 }
             });
 
-            if (isPracticeMode)
-                practiceExportedChanged(exportedRoot);
+            //if (isPracticeMode)
+            //    practiceExportedChanged(exportedRoot);
         }, isPracticeMode || $("#disableLazyParsing").is(':checked'));
     });
 }
 
 var lastKsyContent, inputContent: ArrayBuffer, inputFsItem: IFsItem, lastKsyFsItem: IFsItem;
-function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
+export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
     if (!fsItem || fsItem.type !== 'file')
         return Promise.resolve();
 
@@ -252,7 +262,7 @@ function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
     });
 }
 
-function addNewFiles(files: IFileProcessItem[]) {
+export function addNewFiles(files: IFileProcessItem[]) {
     return Promise.all(files.map(file => {
         return (isKsyFile(file.file.name) ? <Promise<any>>file.read('text') : file.read('arrayBuffer')).then(content => {
             return localFs.put(file.file.name, content).then(fsItem => {
@@ -264,8 +274,8 @@ function addNewFiles(files: IFileProcessItem[]) {
 
 localStorage.setItem('lastVersion', kaitaiIde.version);
 
-if (isPracticeMode)
-    $.getScript('js/app.practiceMode.js');
+//if (isPracticeMode)
+//    $.getScript('js/app.practiceMode.js');
 
 $(() => {
     $('#webIdeVersion').text(kaitaiIde.version);

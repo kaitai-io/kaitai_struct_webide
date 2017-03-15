@@ -1,4 +1,4 @@
-var application, ioInput, root, parseError, KaitaiStream, exported, module, inputBuffer, MainClass;
+var application, ioInput, root, parseError, KaitaiStream, exported, module, inputBuffer, MainClass, ksyTypes;
 class IDebugInfo {
 }
 function isUndef(obj) { return typeof obj === "undefined"; }

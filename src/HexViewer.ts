@@ -57,12 +57,12 @@
     }
 }
 
-interface IDataProvider {
+export interface IDataProvider {
     length: number;
     get(offset: number, length: number);
 }
 
-class HexViewer {
+export class HexViewer {
     private rowHeight = 21;
     private bytesPerLine = 16;
 
