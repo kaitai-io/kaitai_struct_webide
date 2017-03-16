@@ -3,7 +3,7 @@ Online editor / visualizer for Kaitai Struct .ksy files
 
 ## features
 
-[See the Features wiki page](https://github.com/koczkatamas/kaitai_struct_webide/wiki/Features)
+[See the Features wiki page](https://github.com/kaitai-io/kaitai_struct_webide/wiki/Features)
 
 ## community
 
@@ -15,14 +15,15 @@ Online editor / visualizer for Kaitai Struct .ksy files
 
 ## run locally (without compiling / modifying the source code)
 
-- `git clone --recursive https://github.com/koczkatamas/kaitai_struct_webide`
-- serve on a webserver (ex. `python -mSimpleHTTPServer` or `python serve.py`)
+- Clone stable release: `git clone https://github.com/kaitai-io/ide-kaitai-io.github.io` or
+    - Devel release: `git clone https://github.com/kaitai-io/ide-devel-kaitai-io.github.io`
+- Serve on a webserver (ex. `python -mSimpleHTTPServer` or `python serve.py`)
 - Go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 ## compile and run locally
 
-- `git clone --recursive https://github.com/koczkatamas/kaitai_struct_webide`
-- `npm install -g typescript@2.0`
+- `git clone --recursive https://github.com/kaitai-io/kaitai_struct_webide`
+- `npm install`
 - `python serve.py --compile`
 - Go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
@@ -31,4 +32,4 @@ Online editor / visualizer for Kaitai Struct .ksy files
 ![Example screenshot of a .zip file](docs/zip_example.png)
 ![Example screenshot of a .png file](docs/png_example.png)
 
-For more screenshots [visit the Features wiki page](https://github.com/koczkatamas/kaitai_struct_webide/wiki/Features)
+For more screenshots [visit the Features wiki page](https://github.com/kaitai-io/kaitai_struct_webide/wiki/Features)
