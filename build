@@ -3,10 +3,9 @@
 OUT_DIR=out
 TSC=node_modules/.bin/tsc
 
+./genKaitaiFsFiles.py "$OUT_DIR"
+
 mkdir -p "$OUT_DIR/js"
-
-./genKaitaiFsFiles.py
-
 "$TSC" --outDir $OUT_DIR/js/ -m amd --target ES6 --noEmitOnError src/*.ts lib/ts-types/*.ts
 
 cp -r \
