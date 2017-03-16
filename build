@@ -16,6 +16,3 @@ cp -r \
 	samples \
 	lib \
 	"$OUT_DIR"
-
-# FIXME: probably should not be located in js/
-cp js/kaitaiFsFiles.js "$OUT_DIR/js"
