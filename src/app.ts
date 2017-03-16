@@ -1,16 +1,16 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
 // /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 
-import {ui, addEditorTab, isPracticeMode, practiceChallName, practiceChall } from "./app.layout";
-import {showError, handleError } from "./app.errors";
+import { ui, addEditorTab, isPracticeMode, practiceChallName, practiceChall } from "./app.layout";
+import { showError, handleError } from "./app.errors";
 import { IFsItem, fss, addKsyFile, staticFs, refreshFsNodes, localFs } from "./app.files";
-import {refreshSelectionInput} from "./app.selectionInput";
-import {parsedToTree, ParsedTreeNode } from "./parsedToTree";
-import {jailrun, jailReady, inputReady, jail } from "./app.jail";
+import { refreshSelectionInput } from "./app.selectionInput";
+import { parsedToTree, ParsedTreeNode } from "./parsedToTree";
+import { workerCall, workerEval } from "./app.worker";
 import { IDataProvider } from "./HexViewer";
-import {refreshConverterPanel} from "./app.converterPanel";
+import { refreshConverterPanel } from "./app.converterPanel";
 import * as localforage from "localforage";
-import {initFileDrop} from "./FileDrop";
+import { initFileDrop } from "./FileDrop";
 declare var YAML: any, io: any, IntervalTree: any, bigInt: any, kaitaiIde: any;
 
 export var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
@@ -143,12 +143,12 @@ export function compile(srcYaml: string, kslang: string, debug: true | false | '
         var ks = io.kaitai.struct.MainJs();
         var rReleasePromise = (debug === false || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, false) : Promise.resolve(null);
         var rDebugPromise = (debug === true || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, true) : Promise.resolve(null);
-        console.log('rReleasePromise', rReleasePromise, 'rDebugPromise', rDebugPromise);
+        //console.log('rReleasePromise', rReleasePromise, 'rDebugPromise', rDebugPromise);
         return Promise.all([rReleasePromise, rDebugPromise]).then(([rRelease, rDebug]) => {
-            console.log('rRelease', rRelease, 'rDebug', rDebug);
+            //console.log('rRelease', rRelease, 'rDebug', rDebug);
             return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
         }, compileErr => {
-            console.log(compileErr);
+            //console.log(compileErr);
             showError("KS compilation error: ", compileErr);
             return;
         });
@@ -187,28 +187,25 @@ function recompile() {
     });
 }
 
-var formatReady, selectedInTree = false, blockRecursive = false;
+var selectedInTree = false, blockRecursive = false;
 function reparse() {
     var jsTree = <any>ui.parsedDataTreeCont.getElement();
     jsTree.jstree("destroy");
 
-    return Promise.all([jailReady, inputReady, formatReady]).then(() => {
+    return Promise.all([inputReady, formatReady]).then(() => {
         var debugCode = ui.genCodeDebugViewer.getValue();
         var jsClassName = kaitaiIde.ksySchema.meta.id.split('_').map(x => x.ucFirst()).join('');
-        return jailrun(`function define(name, deps, getter){ this[name] = getter(); }; define.amd = true; ksyTypes = args.ksyTypes;\n${debugCode}\nMainClass = ${jsClassName};`, { ksyTypes });
+        return workerCall(<IWorkerMessage>{ type: 'eval', args: [`ksyTypes = args.ksyTypes;\n${debugCode}\nMainClass = ${jsClassName};void(0)`, { ksyTypes: ksyTypes }] });
     }).then(() => {
         //console.log('recompiled');
-
-        jail.remote.reparse((exportedRoot: IExportedValue, error) => {
+        workerCall({ type: "reparse", args: [isPracticeMode || $("#disableLazyParsing").is(':checked')] }).then((exportedRoot: IExportedValue) => {
             //console.log('reparse exportedRoot', exportedRoot);
 
             itree = new IntervalTree(dataProvider.length / 2);
 
-            handleError(error);
-
             kaitaiIde.root = exportedRoot;
 
-            ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, ksyTypes, e => handleError(error || e), () => ui.hexViewer.onSelectionChanged());
+            ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, ksyTypes, e => handleError(e), () => ui.hexViewer.onSelectionChanged());
             ui.parsedDataTree.on('select_node.jstree', function (e, selectNodeArgs) {
                 var node = <ParsedTreeNode>selectNodeArgs.node;
                 //console.log('node', node);
@@ -227,9 +224,11 @@ function reparse() {
 
             //if (isPracticeMode)
             //    practiceExportedChanged(exportedRoot);
-        }, isPracticeMode || $("#disableLazyParsing").is(':checked'));
+        }, error => handleError(error));
     });
 }
+
+(<any>window).kt = { workerEval: workerEval };
 
 var lastKsyContent, inputContent: ArrayBuffer, inputFsItem: IFsItem, lastKsyFsItem: IFsItem;
 export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
@@ -257,7 +256,7 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
             };
 
             ui.hexViewer.setDataProvider(dataProvider);
-            return jailrun('inputBuffer = args; void(0)', content).then(() => refreshGui ? reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
+            return workerCall({ type:'eval', args: ['inputBuffer = args; void(0)', content] }).then(() => refreshGui ? reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
         }
     });
 }
@@ -277,6 +276,7 @@ localStorage.setItem('lastVersion', kaitaiIde.version);
 //if (isPracticeMode)
 //    $.getScript('js/app.practiceMode.js');
 
+export var formatReady, inputReady;
 $(() => {
     $('#webIdeVersion').text(kaitaiIde.version);
     $('#compilerVersion').text(io.kaitai.struct.MainJs().version + " (" + io.kaitai.struct.MainJs().buildDate + ")");
@@ -323,7 +323,6 @@ $(() => {
         return localforage.getItem(cacheKey).then((fsItem: IFsItem) => loadFsItem(fsItem || <IFsItem>{ fsType: defFsType, fn: defSample, type: 'file' }, false));
     }
 
-    var formatReady, inputReady;
     if (isPracticeMode) {
         inputReady = loadFsItem(<IFsItem>{ fsType: 'kaitai', fn: practiceChall.inputFn, type: 'file' });
         var startKsyFn = `practice_${practiceChallName}.ksy`;
@@ -435,12 +434,11 @@ $(() => {
             return intervals;
         }
 
-        jail.remote.reparse((exportedRoot: IExportedValue, error) => {
+        workerCall({ type: 'reparse', args: [true] }).then((exportedRoot: IExportedValue) => {
             console.log('exported', exportedRoot);
             expToNative(exportedRoot);
             addEditorTab('json export', result, 'json');
-            //console.log('parsed intervals', getParsedIntervals(exportedRoot));
-        }, true);
+        }, error => handleError(error));
     };
 
     $("#exportToJson, #exportToJsonHex").on('click', e => kaitaiIde.exportToJson(e.target.id === "exportToJsonHex"));

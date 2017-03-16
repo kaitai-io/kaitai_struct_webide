@@ -1,4 +1,4 @@
-define(["require", "exports", "./app.layout", "./app", "./app.jail"], function (require, exports, app_layout_1, app_1, app_jail_1) {
+define(["require", "exports", "./app.layout", "./app", "./app.worker"], function (require, exports, app_layout_1, app_1, app_worker_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     ;
@@ -114,14 +114,7 @@ define(["require", "exports", "./app.layout", "./app", "./app.jail"], function (
                 throw new Error(`Unknown object type: ${exported.type}`);
         }
         function getProp(path) {
-            return new Promise((resolve, reject) => {
-                app_jail_1.jail.remote.get(path, (expProp, error) => {
-                    if (expProp && !error)
-                        resolve(expProp);
-                    else
-                        reject(error);
-                });
-            });
+            return app_worker_1.workerCall({ type: 'get', args: [path] });
         }
         function getNode(node, cb) {
             var isRoot = node.id === '#';

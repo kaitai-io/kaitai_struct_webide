@@ -24,14 +24,14 @@
     <script src="lib/date.format/date.format.js"></script>
 
     <script src="js/autorefresh.js"></script>
-
     <script src="js/config.js"></script>
+    
     <script src="js/utils.js"></script>
     <script src="js/entities.js"></script>
     <script src="js/kaitaiFsFiles.js"></script>
     <script>
         var paths = {};
-        ["bowser", "jstree", "jailed", "localforage", "goldenlayout"].forEach(
+        ["bowser", "jstree", "localforage", "goldenlayout"].forEach(
             name => paths[name] = `/lib/${name}/${name}`);
 
         requirejs.config({ baseUrl: 'js/', paths: paths });

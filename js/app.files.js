@@ -30,7 +30,7 @@ define(["require", "exports", "app.layout", "./app", "localforage"], function (r
         getRootNode() {
             if (this.root)
                 return Promise.resolve(this.root);
-            this.rootPromise = localforage.getItem(this.filesKey()).then(x => x || { fsType: 'local' }).then(r => this.root = r);
+            this.rootPromise = localforage.getItem(this.filesKey()).then(x => x || { fsType: 'local', type: 'folder', children: {} }).then(r => this.root = r);
             return this.rootPromise;
         }
         setRootNode(newRoot) {
@@ -80,7 +80,7 @@ define(["require", "exports", "app.layout", "./app", "localforage"], function (r
         };
     }
     function genChildNodes(obj) {
-        return Object.keys(obj.children).map(k => genChildNode(obj.children[k], k));
+        return Object.keys(obj.children || []).map(k => genChildNode(obj.children[k], k));
     }
     function refreshFsNodes() {
         var localStorageNode = app_layout_1.ui.fileTree.get_node('localStorage');

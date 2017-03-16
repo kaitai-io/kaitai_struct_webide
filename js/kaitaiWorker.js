@@ -61,49 +61,46 @@ function exportValue(obj, debug, path, noLazy) {
         console.log(`Unknown object type: ${result.type}`);
     return result;
 }
-application.setInterface({
-    run: function (code, args, cb) {
-        var result = { input: code, output: null, error: null };
-        try {
-            result.output = JSON.stringify(eval(code));
-        }
-        catch (e) {
-            console.log(e);
-            result.error = e.message;
-        }
-        cb(result);
-    },
-    reparse: function (cb, noLazy) {
+importScripts('entities.js');
+importScripts('../lib/kaitai_js_runtime/KaitaiStream.js');
+function define(name, deps, getter) { this[name] = getter(); }
+;
+define.amd = true;
+var apiMethods = {
+    eval: (code, args) => eval(code),
+    reparse: (eagerMode) => {
         ioInput = new KaitaiStream(inputBuffer, 0);
         parseError = null;
-        try {
-            root = new MainClass(ioInput);
-            root._read();
-        }
-        catch (e) {
-            parseError = { message: e.message, stack: e.stack };
-        }
-        exported = exportValue(root, { start: 0, end: inputBuffer.byteLength }, [], noLazy);
-        //console.log('[jail] root', root, 'exported', exported);
-        cb(exported, parseError);
+        root = new MainClass(ioInput);
+        root._read();
+        exported = exportValue(root, { start: 0, end: inputBuffer.byteLength }, [], eagerMode);
+        return exported;
     },
-    get: function (path, cb) {
+    get: (path) => {
         var obj = root;
         var parent = null;
-        try {
-            path.forEach(key => {
-                parent = obj;
-                obj = obj[key];
-            });
-        }
-        catch (e) {
-            parseError = { message: e.message, stack: e.stack };
-        }
+        path.forEach(key => { parent = obj; obj = obj[key]; });
         var debug = parent._debug['_m_' + path[path.length - 1]];
         exported = exportValue(obj, debug, path, false); //
-        //console.log('jail get', path.join('/'), 'ioOffset', exported.ioOffset, 'start', exported.start, 'end', exported.end, 'obj', obj, 'debug', debug, 'exported', exported, 'parent', parent);
-        //console.log('get original =', obj, ', exported =', exported);
-        cb(exported, parseError);
+        return exported;
     }
-});
-//# sourceMappingURL=kaitaiJail.js.map
+};
+self.onmessage = ev => {
+    var msg = ev.data;
+    //console.log('[Worker] Got msg', msg, ev);
+    if (apiMethods.hasOwnProperty(msg.type)) {
+        try {
+            msg.result = apiMethods[msg.type].apply(self, msg.args);
+        }
+        catch (error) {
+            console.log('[Worker] Error', error);
+            msg.error = error.toString();
+        }
+    }
+    else {
+        msg.error = "msg.type is unknown";
+    }
+    //console.log('[Worker] Send response', msg, ev);
+    self.postMessage(msg);
+};
+//# sourceMappingURL=kaitaiWorker.js.map

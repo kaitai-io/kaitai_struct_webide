@@ -53,7 +53,7 @@ class LocalStorageFs implements IFileSystem {
     getRootNode() {
         if (this.root)
             return Promise.resolve(this.root);
-        this.rootPromise = localforage.getItem<IFsItem>(this.filesKey()).then(x => x || <IFsItem>{ fsType: 'local' }).then(r => this.root = r);
+        this.rootPromise = localforage.getItem<IFsItem>(this.filesKey()).then(x => x || <IFsItem>{ fsType: 'local', type: 'folder', children: {} }).then(r => this.root = r);
         return this.rootPromise;
     }
 
@@ -114,7 +114,7 @@ function genChildNode(obj: IFsItem, fn: string) {
 }
 
 function genChildNodes(obj) {
-    return Object.keys(obj.children).map(k => genChildNode(obj.children[k], k));
+    return Object.keys(obj.children || []).map(k => genChildNode(obj.children[k], k));
 }
 
 export function refreshFsNodes() {

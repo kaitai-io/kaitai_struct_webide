@@ -1,6 +1,6 @@
 ﻿import {ui} from "./app.layout";
 import { itree, IKsyTypes } from "./app";
-import {jail} from "./app.jail";
+import { workerCall } from "./app.worker";
 declare var kaitaiIde;
 
 interface ParsedTreeNodeData { exported?: IExportedValue, instance?: IInstance, parent?: IExportedValue; };
@@ -137,14 +137,7 @@ export function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTyp
     }
 
     function getProp(path: string[]) {
-        return new Promise<IExportedValue>((resolve, reject) => {
-            jail.remote.get(path, (expProp: IExportedValue, error) => {
-                if (expProp && !error)
-                    resolve(expProp);
-                else
-                    reject(error);
-            });
-        });
+        return <Promise<IExportedValue>> workerCall({ type: 'get', args: [path] });
     }
 
     function getNode(node: ParsedTreeNode, cb: (items: ParsedTreeNode[]) => void) {
