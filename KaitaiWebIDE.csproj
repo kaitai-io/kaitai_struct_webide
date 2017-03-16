@@ -26,6 +26,8 @@
     <Content Include="css\HexViewer.css" />
     <Content Include="index.html" />
     <Content Include="js\autorefresh.js" />
+    <TypeScriptCompile Include="src\autorefresh.ts" />
+    <TypeScriptCompile Include="src\config.ts" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="lib\ts-types\ace.d.ts" />
@@ -50,6 +52,7 @@
     <TypeScriptCompile Include="src\parsedToJson.ts" />
     <TypeScriptCompile Include="src\parsedToTree.ts" />
     <TypeScriptCompile Include="src\practiceMode.ts" />
+    <TypeScriptCompile Include="src\practiceModeChecker.ts" />
     <TypeScriptCompile Include="src\utils.ts" />
     <TypeScriptCompile Include="src\HexViewer.ts" />
   </ItemGroup>

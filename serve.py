@@ -35,7 +35,7 @@ def statusHook(lastChange):
     currMod = lastChange['modTime'] if lastChange else None
     #print 'lastChange = %r, lastMod = %r, currMod = %r' % (lastChange, lastMod, currMod)
     if lastMod and currMod <> lastMod and not 'config.js' in lastChange['fn']:
-        configFn = 'js/config.js'
+        configFn = 'src/config.ts'
         packageJsonFn = 'package.json'
         with open(configFn, 'rt') as f: configJs = f.read()
         
