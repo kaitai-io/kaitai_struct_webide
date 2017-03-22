@@ -245,9 +245,10 @@ $(() => {
 
         fss[fsItem.fsType].get(fsItem.fn).then(content => {
             return compile(content, linkData.kslang, !!linkData.ksdebug).then(compiled => {
-                compiled.forEach((compItem, i) => {
-                    var title = fsItem.fn.split('/').last() + ' [' + $(e.target).text() + ']' + (compiled.length == 1 ? '' : ` ${i + 1}/${compiled.length}`);
-                    addEditorTab(title, compItem, linkData.acelang);
+                Object.keys(compiled).forEach(fileName => {
+                    //var title = fsItem.fn.split('/').last() + ' [' + $(e.target).text() + ']' + (compiled.length == 1 ? '' : ` ${i + 1}/${compiled.length}`);
+                    //addEditorTab(title, compItem, linkData.acelang);
+                    addEditorTab(fileName, compiled[fileName], linkData.acelang);
                 });
             });
         });
