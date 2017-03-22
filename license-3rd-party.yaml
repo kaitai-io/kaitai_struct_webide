@@ -36,11 +36,6 @@ interval-tree2:
     source: https://github.com/shinout/interval-tree2
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/shinout/interval-tree2/master/LICENSE
-jailed:
-    libDir: jailed
-    source: https://github.com/asvd/jailed
-    licenseName: MIT
-    licenseUrl: https://raw.githubusercontent.com/asvd/jailed/master/LICENSE
 jQuery:
     libDir: jquery
     website: https://jquery.com/

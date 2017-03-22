@@ -35,16 +35,20 @@ def statusHook(lastChange):
     currMod = lastChange['modTime'] if lastChange else None
     #print 'lastChange = %r, lastMod = %r, currMod = %r' % (lastChange, lastMod, currMod)
     if lastMod and currMod <> lastMod and not 'config.js' in lastChange['fn']:
-        configFn = 'js/config.js'
+        configFn = 'src/config.ts'
+        packageJsonFn = 'package.json'
         with open(configFn, 'rt') as f: configJs = f.read()
         
-        def chVersion(p1, p2):
-            newVersion = p1 + str(int(p2) + 1)
-            print "Changed: %r, new version: %r" % (lastChange, newVersion)
-            return newVersion
-            
-        configJs = re.sub(r'(kaitaiIde\.version\s*=\s*[\'"])(\d+\.\d+.\d+.)(\d+)', (lambda m: m.group(1) + chVersion(m.group(2), m.group(3))), configJs)
+        currVersion = re.search(r'kaitaiIde\.version\s*=\s*[\'"](\d+\.\d+\.\d+.\d+)', configJs).group(1)
+        vp = currVersion.split('.')
+        newVersion = '.'.join(vp[:-1] + [str(int(vp[-1]) + 1)])
+        print "Changed: %r, new version: %r" % (lastChange, newVersion)
+        configJs = configJs.replace(currVersion, newVersion)
         with open(configFn, 'wt') as f: f.write(configJs)
+        
+        #with open(packageJsonFn, 'rt') as f: packageJson = f.read()
+        #packageJson = re.sub(r'(version": ")(\d+\.\d+\.\d+)', (lambda m: m.group(1) + newVersion), packageJson) 
+        #with open(packageJsonFn, 'wt') as f: f.write(packageJson)
     lastMod = currMod
     
 class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):

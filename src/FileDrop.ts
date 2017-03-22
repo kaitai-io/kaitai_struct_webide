@@ -1,4 +1,4 @@
-﻿function initFileDrop(containerId, callback: IFileProcessCallback) {
+﻿export function initFileDrop(containerId, callback: IFileProcessCallback) {
     var dragLeaveClear;
     var body = $("body");
     var fileDropShadow = $("#" + containerId);

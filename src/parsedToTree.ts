@@ -1,6 +1,11 @@
-﻿interface ParsedTreeNodeData { exported?: IExportedValue, instance?: IInstance, parent?: IExportedValue; };
-interface JSTreeNode<TData> { id?: string, text?: string, icon?: string, children?: JSTreeNode<TData>[] | boolean, data?: TData };
-interface ParsedTreeNode extends JSTreeNode<{idx:number}> { }
+﻿import {ui} from "./app.layout";
+import { itree, IKsyTypes } from "./app";
+import { workerCall } from "./app.worker";
+declare var kaitaiIde;
+
+interface ParsedTreeNodeData { exported?: IExportedValue, instance?: IInstance, parent?: IExportedValue; };
+export interface JSTreeNode<TData> { id?: string, text?: string, icon?: string, children?: JSTreeNode<TData>[] | boolean, data?: TData };
+export interface ParsedTreeNode extends JSTreeNode<{idx:number}> { }
 
 interface JSTree {
     activatePath(path: string, cb?: (success: boolean) => void);
@@ -8,7 +13,7 @@ interface JSTree {
     getNodeData(node: ParsedTreeNode): ParsedTreeNodeData;
 }
 
-function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKsyTypes, handleError, cb) {
+export function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKsyTypes, handleError, cb) {
     function primitiveToText(exported: IExportedValue, detailed: boolean = true): string {
         if (exported.type === ObjectType.Primitive) {
             var value = exported.primitiveValue;
@@ -132,14 +137,7 @@ function parsedToTree(jsTreeElement, exportedRoot: IExportedValue, ksyTypes: IKs
     }
 
     function getProp(path: string[]) {
-        return new Promise<IExportedValue>((resolve, reject) => {
-            jail.remote.get(path, (expProp: IExportedValue, error) => {
-                if (expProp && !error)
-                    resolve(expProp);
-                else
-                    reject(error);
-            });
-        });
+        return <Promise<IExportedValue>> workerCall({ type: 'get', args: [path] });
     }
 
     function getNode(node: ParsedTreeNode, cb: (items: ParsedTreeNode[]) => void) {

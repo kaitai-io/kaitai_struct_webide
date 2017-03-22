@@ -65,11 +65,6 @@ Source: https://github.com/jquery/jquery
 
 License: MIT (https://raw.githubusercontent.com/jquery/jquery/master/LICENSE.txt)
 
-## jailed
-Source: https://github.com/asvd/jailed
-
-License: MIT (https://raw.githubusercontent.com/asvd/jailed/master/LICENSE)
-
 ## jsTree
 Website: https://www.jstree.com/
 

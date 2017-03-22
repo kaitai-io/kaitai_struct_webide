@@ -1,10 +1,11 @@
 module.exports = function convert(userObj, solObj) {
-    class ObjectType { }
-    ObjectType.Primitive = "Primitive";
-    ObjectType.Array = "Array";
-    ObjectType.TypedArray = "TypedArray";
-    ObjectType.Object = "Object";
-    ObjectType.Undefined = "Undefined";
+    class ObjectType {
+        static Primitive = "Primitive";
+        static Array = "Array";
+        static TypedArray = "TypedArray";
+        static Object = "Object";
+        static Undefined = "Undefined";
+    }
 
     function numConv(num) {
         return num % 1 > 10e-9 ? Math.round(num * 1000000) / 1000000 : num;
@@ -34,7 +35,7 @@ module.exports = function convert(userObj, solObj) {
     var padLen = 2;
     var json = "";
     var lines = [];
-    var currLine = { start: 0 };
+    var currLine: any = { start: 0 };
 
     function nl() {
         currLine.idx = lines.length;
@@ -44,7 +45,7 @@ module.exports = function convert(userObj, solObj) {
         return '\n';
     }
 
-    function reprPrimitive(obj) {
+    function reprPrimitive(obj): string {
         var type = getObjectType(obj);
         if (type === ObjectType.TypedArray) {
             var result = "[";
@@ -53,7 +54,7 @@ module.exports = function convert(userObj, solObj) {
             return result + "]";
         } else if (type === ObjectType.Primitive){
             if(typeof obj === "number")
-                return numConv(obj);
+                return `${numConv(obj)}`;
             else {
                 var strRepr = `${obj}`;
                 if(strRepr.length > 0 && strRepr.charCodeAt(0) === 0xFEFF) // removes BOM

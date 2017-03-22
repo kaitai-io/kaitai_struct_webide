@@ -5,10 +5,9 @@ sudo: false
 language: javascript
 
 install:
-  - npm install typescript@2.1
+  - npm install
 
 script:
-  - ./genKaitaiFsFiles.py
   - ./build
 
 after_success:

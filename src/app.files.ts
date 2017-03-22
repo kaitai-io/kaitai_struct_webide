@@ -1,4 +1,8 @@
-﻿declare var kaitaiFsFiles: string[];
+﻿import { ui, addEditorTab } from 'app.layout';
+import {compile, addNewFiles, loadFsItem } from "./app";
+import {JSTreeNode as JsTreeNode} from "./parsedToTree";
+import * as localforage from "localforage";
+declare var kaitaiFsFiles: string[];
 
 interface IFileSystem {
     getRootNode(): Promise<any>;
@@ -6,7 +10,7 @@ interface IFileSystem {
     put(fn, data): Promise<IFsItem>;
 }
 
-interface IFsItem {
+export interface IFsItem {
     fsType: string;
     type: 'file' | 'folder';
     fn?: string;
@@ -49,7 +53,7 @@ class LocalStorageFs implements IFileSystem {
     getRootNode() {
         if (this.root)
             return Promise.resolve(this.root);
-        this.rootPromise = localforage.getItem<IFsItem>(this.filesKey()).then(x => x || <IFsItem>{ fsType: 'local' }).then(r => this.root = r);
+        this.rootPromise = localforage.getItem<IFsItem>(this.filesKey()).then(x => x || <IFsItem>{ fsType: 'local', type: 'folder', children: {} }).then(r => this.root = r);
         return this.rootPromise;
     }
 
@@ -94,10 +98,10 @@ class StaticFs implements IFileSystem {
 var kaitaiRoot = <IFsItem>{ fsType: 'kaitai' };
 kaitaiFsFiles.forEach(fn => fsHelper.selectNode(kaitaiRoot, fn));
 var kaitaiFs = new KaitaiFs(kaitaiRoot);
-var staticFs = new StaticFs();
+export var staticFs = new StaticFs();
 
-var localFs = new LocalStorageFs("fs");
-var fss = { local: localFs, kaitai: kaitaiFs, static: staticFs };
+export var localFs = new LocalStorageFs("fs");
+export var fss = { local: localFs, kaitai: kaitaiFs, static: staticFs };
 
 function genChildNode(obj: IFsItem, fn: string) {
     var isFolder = obj.type === 'folder';
@@ -110,10 +114,10 @@ function genChildNode(obj: IFsItem, fn: string) {
 }
 
 function genChildNodes(obj) {
-    return Object.keys(obj.children).map(k => genChildNode(obj.children[k], k));
+    return Object.keys(obj.children || []).map(k => genChildNode(obj.children[k], k));
 }
 
-function refreshFsNodes() {
+export function refreshFsNodes() {
     var localStorageNode = ui.fileTree.get_node('localStorage');
     localFs.getRootNode().then(root => {
         ui.fileTree.delete_node(localStorageNode.children);
@@ -122,7 +126,7 @@ function refreshFsNodes() {
     });
 }
 
-function addKsyFile(parent, name, fsItem) {
+export function addKsyFile(parent, name, fsItem) {
     ui.fileTree.create_node(ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: 'glyphicon glyphicon-list-alt' }, "last", node => ui.fileTree.activate_node(node, null));
 }
 
@@ -241,9 +245,10 @@ $(() => {
 
         fss[fsItem.fsType].get(fsItem.fn).then(content => {
             return compile(content, linkData.kslang, !!linkData.ksdebug).then(compiled => {
-                compiled.forEach((compItem, i) => {
-                    var title = fsItem.fn.split('/').last() + ' [' + $(e.target).text() + ']' + (compiled.length == 1 ? '' : ` ${i + 1}/${compiled.length}`);
-                    addEditorTab(title, compItem, linkData.acelang);
+                Object.keys(compiled).forEach(fileName => {
+                    //var title = fsItem.fn.split('/').last() + ' [' + $(e.target).text() + ']' + (compiled.length == 1 ? '' : ` ${i + 1}/${compiled.length}`);
+                    //addEditorTab(title, compItem, linkData.acelang);
+                    addEditorTab(fileName, compiled[fileName], linkData.acelang);
                 });
             });
         });
@@ -252,7 +257,7 @@ $(() => {
     fileTreeCont.on('create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree', saveTree);
     fileTreeCont.on('move_node.jstree', (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
     fileTreeCont.on('select_node.jstree', (e, selectNodeArgs) => {
-        var fsItem = (<JSTreeNode<IFsItem>>selectNodeArgs.node).data;
+        var fsItem = (<JsTreeNode<IFsItem>>selectNodeArgs.node).data;
         [uiFiles.downloadFile, uiFiles.downloadItem].forEach(i => i.toggleClass('disabled', !(fsItem && fsItem.type === 'file')));
     });
 

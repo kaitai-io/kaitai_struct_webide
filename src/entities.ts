@@ -6,6 +6,14 @@
     public static Undefined = "Undefined";
 }
 
+interface IWorkerMessage {
+    type: 'eval' | 'reparse' | 'get';
+    msgId?: number;
+    args?: any[];
+    result?: any;
+    error?: any;
+}
+
 interface IInstance {
     path: string[];
     offset: number;

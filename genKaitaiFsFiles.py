@@ -3,6 +3,7 @@
 import os
 import glob
 import fnmatch
+import sys
 
 def recursive_glob(treeroot, pattern):
     results = []
@@ -16,6 +17,7 @@ files.sort()
 lines = ["    '" + x.replace('\\','/') + "'," for x in files]
 js = 'var kaitaiFsFiles = [\n' + '\n'.join(lines) + '\n];';
 
-with open('js/kaitaiFsFiles.js', 'wt') as f:
+outDir = sys.argv[1] + '/' if len(sys.argv) > 1 else ''
+with open(outDir + 'js/kaitaiFsFiles.js', 'wt') as f:
     f.write(js)
-print files
+#print js
