@@ -68,9 +68,9 @@ git clone git@github.com:"$GH_USER"/"$GH_REPO_NAME".git
 
 echo 'Updating the files from out...'
 if [ "$TRAVIS_BRANCH" = stable ]; then
-	rsync --delete-after --exclude=.git --exclude=CNAME --exclude=.nojekyll -r -v out/ "$GH_REPO_NAME"
+	rsync --delete-after -c --exclude=.git --exclude=CNAME --exclude=.nojekyll -r -v out/ "$GH_REPO_NAME"
 else
-	rsync --delete-after --exclude=.git --exclude=CNAME --exclude=.nojekyll -r -v out/ "$GH_REPO_NAME"/devel
+	rsync --delete-after -c --exclude=.git --exclude=CNAME --exclude=.nojekyll -r -v out/ "$GH_REPO_NAME"/devel
 fi
 
 cd "$GH_REPO_NAME"

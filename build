@@ -8,6 +8,8 @@ mkdir -p "$OUT_DIR/js"
 ./genKaitaiFsFiles.py "$OUT_DIR"
 
 "$TSC" --outDir $OUT_DIR/js/ -m amd --target ES6 --noEmitOnError src/*.ts lib/ts-types/*.ts
+echo '== js/config.js contents:'
+cat out/js/config.js
 
 cp -r \
 	index.html \
