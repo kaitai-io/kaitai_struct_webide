@@ -19,6 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 GH_USER=kaitai-io
+GH_SRC_REPO=kaitai_struct_webide
 GH_REPO_NAME=ide-kaitai-io.github.io
 
 export GIT_AUTHOR_NAME='Kaitai Bot'
@@ -76,7 +77,7 @@ cd "$GH_REPO_NAME"
 
 echo 'Adding and committing...'
 git add .
-git commit -m "Regen $TRAVIS_BRANCH ($TRAVIS_COMMIT)"
+git commit -m "Regen $TRAVIS_BRANCH ${GH_USER}/${GH_SRC_REPO}@$TRAVIS_COMMIT"
 
 echo 'Pushing...'
 git push
