@@ -19,11 +19,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 GH_USER=kaitai-io
-if [ "$TRAVIS_BRANCH" = stable ]; then
-	GH_REPO_NAME=ide-kaitai-io.github.io
-else
-	GH_REPO_NAME=ide-devel-kaitai-io.github.io
-fi
+GH_REPO_NAME=ide-kaitai-io.github.io
+
 export GIT_AUTHOR_NAME='Kaitai Bot'
 export GIT_AUTHOR_EMAIL='kaitai-bot@kaitai.io'
 export GIT_COMMITTER_NAME='Kaitai Bot'
@@ -69,13 +66,17 @@ echo 'Cloning website repo...'
 git clone git@github.com:"$GH_USER"/"$GH_REPO_NAME".git
 
 echo 'Updating the files from out...'
-rsync --delete-after --exclude=.git --exclude=CNAME --exclude=.nojekyll -r -v out/ "$GH_REPO_NAME"
+if [ "$TRAVIS_BRANCH" = stable ]; then
+	rsync --delete-after --exclude=.git --exclude=CNAME --exclude=.nojekyll -r -v out/ "$GH_REPO_NAME"
+else
+	rsync --delete-after -r -v out/ "$GH_REPO_NAME"/devel
+fi
 
 cd "$GH_REPO_NAME"
 
 echo 'Adding and committing...'
 git add .
-git commit -m Regen
+git commit -m "Regen $TRAVIS_BRANCH ($TRAVIS_COMMIT)"
 
 echo 'Pushing...'
 git push
