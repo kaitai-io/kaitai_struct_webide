@@ -69,7 +69,7 @@ echo 'Updating the files from out...'
 if [ "$TRAVIS_BRANCH" = stable ]; then
 	rsync --delete-after --exclude=.git --exclude=CNAME --exclude=.nojekyll -r -v out/ "$GH_REPO_NAME"
 else
-	rsync --delete-after -r -v out/ "$GH_REPO_NAME"/devel
+	rsync --delete-after --exclude=.git --exclude=CNAME --exclude=.nojekyll -r -v out/ "$GH_REPO_NAME"/devel
 fi
 
 cd "$GH_REPO_NAME"
