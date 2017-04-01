@@ -1,5 +1,5 @@
-﻿var application: any, ioInput: any, root: any, parseError: any, KaitaiStream: any, exported: any,
-    module: any, inputBuffer: any, MainClass: any, ksyTypes: any;
+﻿var wi = { ioInput: <any>null, root: <any>null, parseError: <any>null, exported: <any>null, inputBuffer: <any>null, MainClass: <any>null, ksyTypes: <any>null };
+var KaitaiStream: any, module: any;
 
 class IDebugInfo {
     start: number;
@@ -62,7 +62,7 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         }
 
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
-        var ksyType = ksyTypes[result.object.class];
+        var ksyType = wi.ksyTypes[result.object.class];
 
         Object.keys(obj).filter(x => x[0] !== '_').forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key), noLazy));
 
@@ -91,21 +91,23 @@ function define(name, deps, getter) { this[name] = getter(); };
 var apiMethods = {
     eval: (code, args) => eval(code),
     reparse: (eagerMode) => {
-        ioInput = new KaitaiStream(inputBuffer, 0);
-        parseError = null;
-        root = new MainClass(ioInput);
-        root._read();
-        exported = exportValue(root, <IDebugInfo>{ start: 0, end: inputBuffer.byteLength }, [], eagerMode);
-        return exported;
+        var start = performance.now();
+        wi.ioInput = new KaitaiStream(wi.inputBuffer, 0);
+        wi.parseError = null;
+        wi.root = new wi.MainClass(wi.ioInput);
+        wi.root._read();
+        wi.exported = exportValue(wi.root, <IDebugInfo>{ start: 0, end: wi.inputBuffer.byteLength }, [], eagerMode);
+        //console.log('parse before return', performance.now() - start, 'date', Date.now());
+        return wi.exported;
     },
     get: (path: string[]) => {
-        var obj = root;
+        var obj = wi.root;
         var parent = null;
         path.forEach(key => { parent = obj; obj = obj[key]; });
 
         var debug = <IDebugInfo>parent._debug['_m_' + path[path.length - 1]];
-        exported = exportValue(obj, debug, path, false); //
-        return exported;
+        wi.exported = exportValue(obj, debug, path, false); //
+        return wi.exported;
     }
 };
 

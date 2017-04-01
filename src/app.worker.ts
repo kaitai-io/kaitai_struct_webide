@@ -19,6 +19,8 @@ export function workerCall(request: IWorkerMessage): Promise<any> {
             }
             else
                 resolve(response.result);
+
+            //console.info(`[performance] [${(new Date()).format('H:i:s.u')}] Got worker response: ${Date.now()}.`);
         };
         worker.postMessage(request);
     });

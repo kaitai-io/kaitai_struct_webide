@@ -2,7 +2,7 @@
 
 var lastErrWndSize = 100; // 34
 export function showError(...args) {
-    console.log.apply(window, args);
+    console.error.apply(window, args);
     var errMsg = args.filter(x => x.toString() !== {}.toString()).join(' ');
     var container = getLayoutNodeById('mainArea');
     if (!ui.errorWindow) {

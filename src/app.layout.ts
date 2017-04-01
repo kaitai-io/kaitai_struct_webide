@@ -1,7 +1,7 @@
 ﻿import { IntervalViewer } from "./app";
 import * as GoldenLayout from "goldenlayout";
 import { HexViewer } from "HexViewer";
-
+import {ParsedTreeHandler} from "./parsedToTree";
 var practiceChallNameMatch = /practice=([a-z0-9]+)/.exec(location.href);
 export var practiceMode = null;
 export var practiceChallName = practiceChallNameMatch ? practiceChallNameMatch[1] : practiceMode && practiceMode.chall;
@@ -59,7 +59,7 @@ var ui = {
     genCodeDebugViewer: <AceAjax.Editor>null,
     //parsedDataViewer: <AceAjax.Editor>null,
     parsedDataTreeCont: <GoldenLayout.Container>null,
-    parsedDataTree: <JSTree>null,
+    parsedDataTreeHandler: <ParsedTreeHandler>null,
     hexViewer: <HexViewer>null,
     errorWindow: <GoldenLayout.Container>null,
     infoPanel: <GoldenLayout.Container>null,

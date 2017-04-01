@@ -5,12 +5,13 @@ import { ui, addEditorTab, isPracticeMode, practiceChallName, practiceChall } fr
 import { showError, handleError } from "./app.errors";
 import { IFsItem, fss, addKsyFile, staticFs, refreshFsNodes, localFs } from "./app.files";
 import { refreshSelectionInput } from "./app.selectionInput";
-import { parsedToTree, ParsedTreeNode } from "./parsedToTree";
+import { ParsedTreeHandler, ParsedTreeNode } from "./parsedToTree";
 import { workerCall, workerEval } from "./app.worker";
 import { IDataProvider } from "./HexViewer";
 import { refreshConverterPanel } from "./app.converterPanel";
 import * as localforage from "localforage";
 import { initFileDrop } from "./FileDrop";
+import {performanceHelper} from "./utils/PerformanceHelper";
 declare var YAML: any, io: any, IntervalTree: any, bigInt: any, kaitaiIde: any;
 
 export var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
@@ -77,6 +78,8 @@ class JsImporter {
 var jsImporter = new JsImporter();
 
 export function compile(srcYaml: string, kslang: string, debug: true | false | 'both'): Promise<any> {
+    var perfYamlParse = performanceHelper.measureAction("YAML parsing");
+
     var compilerSchema;
     try {
         kaitaiIde.ksySchema = ksySchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
@@ -135,23 +138,28 @@ export function compile(srcYaml: string, kslang: string, debug: true | false | '
         return;
     }
 
+    perfYamlParse.done();
+
     //console.log('ksySchema', ksySchema);
 
     if (kslang === 'json')
         return Promise.resolve();
     else {
+        var perfCompile = performanceHelper.measureAction("Compilation");
+
         var ks = io.kaitai.struct.MainJs();
         var rReleasePromise = (debug === false || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, false) : Promise.resolve(null);
         var rDebugPromise = (debug === true || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, true) : Promise.resolve(null);
         //console.log('rReleasePromise', rReleasePromise, 'rDebugPromise', rDebugPromise);
-        return Promise.all([rReleasePromise, rDebugPromise]).then(([rRelease, rDebug]) => {
-            //console.log('rRelease', rRelease, 'rDebug', rDebug);
-            return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
-        }, compileErr => {
-            //console.log(compileErr);
-            showError("KS compilation error: ", compileErr);
-            return;
-        });
+        return perfCompile.done(Promise.all([rReleasePromise, rDebugPromise]))
+            .then(([rRelease, rDebug]) => {
+                //console.log('rRelease', rRelease, 'rDebug', rDebug);
+                return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
+            })
+            .catch(compileErr => {
+                showError("KS compilation error: ", compileErr);
+                return;
+            });
     }
 }
 
@@ -189,27 +197,26 @@ function recompile() {
 
 var selectedInTree = false, blockRecursive = false;
 function reparse() {
-    var jsTree = <any>ui.parsedDataTreeCont.getElement();
-    jsTree.jstree("destroy");
-
-    return Promise.all([inputReady, formatReady]).then(() => {
+    return performanceHelper.measureAction("Parse initialization", Promise.all([inputReady, formatReady]).then(() => {
         var debugCode = ui.genCodeDebugViewer.getValue();
         var jsClassName = kaitaiIde.ksySchema.meta.id.split('_').map(x => x.ucFirst()).join('');
-        return workerCall(<IWorkerMessage>{ type: 'eval', args: [`ksyTypes = args.ksyTypes;\n${debugCode}\nMainClass = ${jsClassName};void(0)`, { ksyTypes: ksyTypes }] });
-    }).then(() => {
+        return workerCall(<IWorkerMessage>{ type: 'eval', args: [`wi.ksyTypes = args.ksyTypes;\n${debugCode}\nwi.MainClass = ${jsClassName};void(0)`, { ksyTypes: ksyTypes }] });
+    })).then(() => {
         //console.log('recompiled');
-        workerCall({ type: "reparse", args: [isPracticeMode || $("#disableLazyParsing").is(':checked')] }).then((exportedRoot: IExportedValue) => {
+        performanceHelper.measureAction("Parsing", workerCall({ type: "reparse", args: [isPracticeMode || $("#disableLazyParsing").is(':checked')] })).then((exportedRoot: IExportedValue) => {
             //console.log('reparse exportedRoot', exportedRoot);
 
             itree = new IntervalTree(dataProvider.length / 2);
 
             kaitaiIde.root = exportedRoot;
 
-            ui.parsedDataTree = parsedToTree(jsTree, exportedRoot, ksyTypes, e => handleError(e), () => ui.hexViewer.onSelectionChanged());
-            ui.parsedDataTree.on('select_node.jstree', function (e, selectNodeArgs) {
+            ui.parsedDataTreeHandler = new ParsedTreeHandler(<any>ui.parsedDataTreeCont.getElement(), exportedRoot, ksyTypes);
+            performanceHelper.measureAction("Tree / interval handling", ui.parsedDataTreeHandler.initNodeReopenHandling()).then(() => ui.hexViewer.onSelectionChanged(), e => handleError(e));
+
+            ui.parsedDataTreeHandler.jstree.on('select_node.jstree', function (e, selectNodeArgs) {
                 var node = <ParsedTreeNode>selectNodeArgs.node;
                 //console.log('node', node);
-                var exp = ui.parsedDataTree.getNodeData(node).exported;
+                var exp = ui.parsedDataTreeHandler.getNodeData(node).exported;
 
                 if (exp && exp.path)
                     $("#parsedPath").text(exp.path.join('/'));
@@ -256,7 +263,7 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
             };
 
             ui.hexViewer.setDataProvider(dataProvider);
-            return workerCall({ type:'eval', args: ['inputBuffer = args; void(0)', content] }).then(() => refreshGui ? reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
+            return workerCall({ type:'eval', args: ['wi.inputBuffer = args; void(0)', content] }).then(() => refreshGui ? reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
         }
     });
 }
@@ -301,7 +308,7 @@ $(() => {
             if (intervals.length > 0) {
                 //console.log('selected node', intervals[0].id);
                 blockRecursive = true;
-                ui.parsedDataTree.activatePath(JSON.parse(intervals[0].id).path, () => blockRecursive = false);
+                ui.parsedDataTreeHandler.activatePath(JSON.parse(intervals[0].id).path).then(() => blockRecursive = false);
             }
         }
 
