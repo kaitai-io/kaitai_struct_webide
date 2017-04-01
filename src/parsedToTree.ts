@@ -1,15 +1,21 @@
 ﻿import { ui } from "./app.layout";
-import { itree, IKsyTypes } from "./app";
+import { IKsyTypes } from "./app";
 import { workerCall } from "./app.worker";
-import {handleError} from "./app.errors";
+import { handleError } from "./app.errors";
+import { IInterval, IntervalHandler } from "./utils/IntervalHelper";
 declare var kaitaiIde;
 
 interface ParsedTreeNodeData { exported?: IExportedValue, instance?: IInstance, parent?: IExportedValue; };
 export interface JSTreeNode<TData> { id?: string, text?: string, icon?: string, children?: JSTreeNode<TData>[] | boolean, data?: TData };
 export interface ParsedTreeNode extends JSTreeNode<{idx:number}> { }
 
+interface IParsedTreeInterval extends IInterval {
+    exp: IExportedValue;
+}
+
 export class ParsedTreeHandler {
     public jstree: JSTree;
+    public intervalHandler: IntervalHandler<IParsedTreeInterval>;
 
     public constructor(public jsTreeElement, public exportedRoot: IExportedValue, public ksyTypes: IKsyTypes) {
         jsTreeElement.jstree("destroy");
@@ -17,6 +23,7 @@ export class ParsedTreeHandler {
         this.jstree.on = (...args) => this.jstree.element.on(...args);
         this.jstree.off = (...args) => this.jstree.element.off(...args);
         this.jstree.on('keyup.jstree', e => this.jstree.activate_node(e.target.id, null));
+        this.intervalHandler = new IntervalHandler<IParsedTreeInterval>();
     }
 
     private parsedTreeOpenedNodes = {};
@@ -211,27 +218,27 @@ export class ParsedTreeHandler {
 
                 var intId = 0;
 
-                function fillIntervals(exp: IExportedValue) {
+                var intervals: IParsedTreeInterval[] = [];
+                var fillIntervals = (exp: IExportedValue) => {
                     var objects = collectAllObjects(exp);
-                    var typedArrays = objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64);
-                    var intervals = objects.filter(exp => (exp.type === ObjectType.Primitive || exp.type === ObjectType.TypedArray) && exp.start < exp.end)
-                        .map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1, id: JSON.stringify({ id: intId++, path: exp.path.join('/') }) }))
-                        .sort((a, b) => a.start - b.start);
 
-                    var intervalsFiltered = [];
-                    if (intervals.length > 0) {
-                        intervalsFiltered = [intervals[0]];
-                        intervals.slice(1).forEach(int => {
-                            if (int.start > intervalsFiltered.last().end)
-                                intervalsFiltered.push(int);
-                        });
+                    var lastEnd = -1;
+                    for (let exp of objects) {
+                        if (!(exp.type === ObjectType.Primitive || exp.type === ObjectType.TypedArray)) continue;
+
+                        var start = exp.ioOffset + exp.start;
+                        var end = exp.ioOffset + exp.end - 1;
+                        if (start <= lastEnd || start > end) continue;
+                        lastEnd = end;
+
+                        intervals.push(<IParsedTreeInterval>{ start: start, end: end, exp: exp });
                     }
 
                     if (!isInstance) {
                         var nonParsed = [];
 
                         var lastEnd = -1;
-                        intervalsFiltered.forEach(i => {
+                        intervals.forEach(i => {
                             if (i.start !== lastEnd + 1)
                                 nonParsed.push({ start: lastEnd + 1, end: i.start - 1 });
 
@@ -239,18 +246,19 @@ export class ParsedTreeHandler {
                         });
 
                         ui.unparsedIntSel.setIntervals(nonParsed);
-                        ui.bytesIntSel.setIntervals(typedArrays.map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1 })));
+                        ui.bytesIntSel.setIntervals(objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64).
+                            map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1 })));
                     }
 
-                    if (intervalsFiltered.length > 400000)
-                        console.warn("Too much item for interval tree: " + intervalsFiltered.length);
+                    if (intervals.length > 400000)
+                        console.warn("Too much item for interval tree: " + intervals.length);
                     else
-                        intervalsFiltered.forEach(i => itree.add(i.start, i.end, i.id));
+                        this.intervalHandler.addSorted(intervals);
                 }
 
                 fillIntervals(exp);
 
-                ui.hexViewer.setIntervalTree(itree);
+                ui.hexViewer.setIntervals(this.intervalHandler);
             }
 
             function fillParents(value: IExportedValue, parent: IExportedValue) {
@@ -326,7 +334,7 @@ export class ParsedTreeHandler {
     }
 
     activatePath(path): Promise<boolean> {
-        var pathParts = path.split('/');
+        var pathParts = typeof path === "string" ? path.split('/') : path;
 
         var expandNodes = [];
         var pathStr = 'inputField';

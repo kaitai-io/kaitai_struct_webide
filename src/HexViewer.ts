@@ -1,4 +1,6 @@
-﻿class HexViewUtils {
+﻿import { IInterval, IIntervalLookup } from "./utils/IntervalHelper";
+
+class HexViewUtils {
     static zeroFill(str, padLen) {
         while (str.length < padLen)
             str = '0' + str;
@@ -66,7 +68,7 @@ export class HexViewer {
     private rowHeight = 21;
     private bytesPerLine = 16;
 
-    private intervalTree: any;
+    private intervals: IIntervalLookup<IInterval>;
     private rows = [];
     private topRow = 0;
     private maxLevel = 3;
@@ -133,7 +135,7 @@ export class HexViewer {
         this.content = $('<div class="content"></div>').appendTo(this.contentOuter).on('mousedown', e => this.cellMouseAction(e));
         $(document).mouseup(e => this.cellMouseAction(e));
 
-        this.intervalTree = null;
+        this.intervals = null;
 
         this.scrollbox.on('scroll', e => {
             var scrollTop = this.scrollbox.scrollTop();
@@ -199,9 +201,9 @@ export class HexViewer {
     public refresh() {
         if (!this.dataProvider) return false;
 
-        var intervals = this.intervalTree ? this.intervalTree.search(this.visibleOffsetStart, this.visibleOffsetEnd + this.bytesPerLine * 2) : [];
-
-        var intIdxBase = intervals.length === 0 ? 0 : JSON.parse(intervals[0].id).id;
+        var searchResult = this.intervals ? this.intervals.searchRange(this.visibleOffsetStart, this.visibleOffsetEnd + this.bytesPerLine * 2) : null;
+        var intervals = searchResult ? searchResult.items : [];
+        var intBaseIdx = searchResult ? searchResult.idx : 0;
         var intIdx = 0;
         //console.log('intervals', intervals);
 
@@ -242,7 +244,7 @@ export class HexViewer {
                     var intIn = int && int.start <= dataOffset && dataOffset <= int.end;
                     var intStart = intIn && int.start === dataOffset;
                     var intEnd = intIn && int.end === dataOffset;
-                    hexCell.levels[level].className = `l${this.maxLevel - 1 - level} ${((intIdxBase + intIdx) % 2 === 0) ? "even" : "odd"}` +
+                    hexCell.levels[level].className = `l${this.maxLevel - 1 - level} ${((intBaseIdx + intIdx) % 2 === 0) ? "even" : "odd"}` +
                         (intIn ? ` m${level}` : "") + (intStart ? " start" : "") + (intEnd ? " end" : "") + (isSelected ? " selected" : "");
 
                     if (intEnd)
@@ -254,8 +256,8 @@ export class HexViewer {
         }
     }
 
-    public setIntervalTree(itree) {
-        this.intervalTree = itree;
+    public setIntervals(intervals: IIntervalLookup<IInterval>) {
+        this.intervals = intervals;
         this.refresh();
     }
 

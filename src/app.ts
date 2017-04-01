@@ -56,7 +56,6 @@ export class IntervalViewer {
 }
 
 export var dataProvider: IDataProvider;
-export var itree;
 var ksySchema: KsySchema.IKsyFile;
 export var ksyTypes: IKsyTypes;
 
@@ -205,9 +204,6 @@ function reparse() {
         //console.log('recompiled');
         performanceHelper.measureAction("Parsing", workerCall({ type: "reparse", args: [isPracticeMode || $("#disableLazyParsing").is(':checked')] })).then((exportedRoot: IExportedValue) => {
             //console.log('reparse exportedRoot', exportedRoot);
-
-            itree = new IntervalTree(dataProvider.length / 2);
-
             kaitaiIde.root = exportedRoot;
 
             ui.parsedDataTreeHandler = new ParsedTreeHandler(<any>ui.parsedDataTreeCont.getElement(), exportedRoot, ksyTypes);
@@ -303,12 +299,12 @@ $(() => {
 
         refreshSelectionInput();
 
-        if (itree && hasSelection && !selectedInTree) {
-            var intervals = itree.search(ui.hexViewer.mouseDownOffset || start);
-            if (intervals.length > 0) {
+        if (ui.parsedDataTreeHandler && hasSelection && !selectedInTree) {
+            var intervals = ui.parsedDataTreeHandler.intervalHandler.searchRange(ui.hexViewer.mouseDownOffset || start);
+            if (intervals.items.length > 0) {
                 //console.log('selected node', intervals[0].id);
                 blockRecursive = true;
-                ui.parsedDataTreeHandler.activatePath(JSON.parse(intervals[0].id).path).then(() => blockRecursive = false);
+                ui.parsedDataTreeHandler.activatePath(intervals.items[0].exp.path).then(() => blockRecursive = false);
             }
         }
 
