@@ -5,8 +5,22 @@ import { handleError } from "./app.errors";
 import { IInterval, IntervalHandler } from "./utils/IntervalHelper";
 declare var kaitaiIde;
 
-interface ParsedTreeNodeData { exported?: IExportedValue, instance?: IInstance, parent?: IExportedValue; };
-export interface JSTreeNode<TData> { id?: string, text?: string, icon?: string, children?: JSTreeNode<TData>[] | boolean, data?: TData };
+interface ParsedTreeNodeData {
+    exported?: IExportedValue;
+    instance?: IInstance;
+    parent?: IExportedValue;
+    arrayStart?: number;
+    arrayEnd?: number;
+};
+
+export interface JSTreeNode<TData> {
+    id?: string;
+    text?: string;
+    icon?: string;
+    children?: JSTreeNode<TData>[] | boolean;
+    data?: TData;
+};
+
 export interface ParsedTreeNode extends JSTreeNode<{idx:number}> { }
 
 interface IParsedTreeInterval extends IInterval {
@@ -169,22 +183,40 @@ export class ParsedTreeHandler {
         return <ParsedTreeNode>{ text: text, children: isObject || isArray, data: this.addNodeData({ exported: item }) };
     }
 
-    exportedToNodes(exported: IExportedValue, showProp: boolean): ParsedTreeNode[] {
+    exportedToNodes(exported: IExportedValue, nodeData: ParsedTreeNodeData, showProp: boolean): ParsedTreeNode[] {
         if (exported.type === ObjectType.Undefined)
             return [];
         if (exported.type === ObjectType.Primitive || exported.type === ObjectType.TypedArray)
             return [this.childItemToNode(exported, showProp)];
         else if (exported.type === ObjectType.Array) {
-            const maxItemToDisplay = 3000;
-            //if (exported.arrayItems.length > 3000) {
-            //    console.warn("Too much array items to display.");
-            //    return [{ text: "Too much array items to display.", children: false, data: addNodeData({ exported: exported }) }];
-            //}
-            //else
-            var result = exported.arrayItems.slice(0, maxItemToDisplay).map((item, i) => this.childItemToNode(item, true));
-            if (exported.arrayItems.length > maxItemToDisplay)
-                result.push({ text: "Too much array items to display.", children: false, data: this.addNodeData(<any>{ exported: { path: [] } }) });
-            return result;
+            var arrStart = nodeData && nodeData.arrayStart || 0;
+            var arrEnd = nodeData && nodeData.arrayEnd || exported.arrayItems.length - 1;
+            var items = exported.arrayItems.slice(arrStart, arrEnd + 1);
+
+            const levelItemLimit = 100;
+
+            if (items.length > 1000) {
+                var childLevelItems = 1;
+                var currentLevelItems = items.length;
+                while (currentLevelItems > levelItemLimit) {
+                    childLevelItems *= levelItemLimit;
+                    currentLevelItems /= levelItemLimit;
+                }
+
+                var result = [];
+                for (var i = 0; i < currentLevelItems; i++) {
+                    var data = <ParsedTreeNodeData>{
+                        exported: exported,
+                        arrayStart: arrStart + i * childLevelItems,
+                        arrayEnd: Math.min(arrStart + (i + 1) * childLevelItems, exported.arrayItems.length) - 1
+                    };
+
+                    result.push(<ParsedTreeNode>{ text: `[${data.arrayStart} … ${data.arrayEnd}]`, children: true, data: this.addNodeData(data), id: this.getNodeId(data) });
+                }
+                return result;
+            }
+
+            return items.map((item, i) => this.childItemToNode(item, true));
         } else if (exported.type === ObjectType.Object){
             var obj = exported.object;
             return Object.keys(obj.fields).map(fieldName => this.childItemToNode(obj.fields[fieldName], true)).concat(
@@ -251,7 +283,7 @@ export class ParsedTreeHandler {
                     }
 
                     if (intervals.length > 400000)
-                        console.warn("Too much item for interval tree: " + intervals.length);
+                        console.warn("Too many items for interval tree: " + intervals.length);
                     else
                         this.intervalHandler.addSorted(intervals);
                 }
@@ -273,20 +305,23 @@ export class ParsedTreeHandler {
             if (!exp.parent)
                 fillParents(exp, nodeData && nodeData.parent);
 
-            var nodes = this.exportedToNodes(exp, true);
-            nodes.forEach(node => node.id = this.getNodeId(node));
+            var nodes = this.exportedToNodes(exp, nodeData, true);
+            nodes.forEach(node => node.id = node.id || this.getNodeId(node));
             return nodes;
         });
     }
 
-    getNodeId(node: ParsedTreeNode) {
-        var nodeData = this.getNodeData(node);
-        return 'inputField_' + (nodeData.exported ? nodeData.exported.path : nodeData.instance.path).join('_');
+    getNodeId(nodeOrNodeData: ParsedTreeNode | ParsedTreeNodeData) {
+        var nodeData = (<ParsedTreeNode>nodeOrNodeData).data ? this.getNodeData(<ParsedTreeNode>nodeOrNodeData) : <ParsedTreeNodeData>nodeOrNodeData;
+        var path = nodeData.exported ? nodeData.exported.path : nodeData.instance.path;
+        if (nodeData.arrayStart || nodeData.arrayEnd)
+            path = path.concat([`${nodeData.arrayStart || 0}`, `${nodeData.arrayEnd || 0}`]);
+        return 'inputField_' + path.join('_');
     }
 
     openNodes(nodesToOpen): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            var saveOpenedNodesDisabled = true;
+            this.saveOpenedNodesDisabled = true;
             var origAnim = this.jstree.settings.core.animation;
             this.jstree.settings.core.animation = 0;
             //console.log('saveOpenedNodesDisabled = true');
@@ -319,7 +354,7 @@ export class ParsedTreeHandler {
                     });
                 else if (openCallCounter === 0) {
                     //console.log('saveOpenedNodesDisabled = false');
-                    saveOpenedNodesDisabled = false;
+                    this.saveOpenedNodesDisabled = false;
                     e && this.jstree.off(e);
                     this.jstree.settings.core.animation = origAnim;
                     this.saveOpenedNodes();
