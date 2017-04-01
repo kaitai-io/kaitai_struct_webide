@@ -1,7 +1,7 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
 // /// <reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 
-import { ui, addEditorTab, isPracticeMode, practiceChallName, practiceChall } from "./app.layout";
+import { ui, addEditorTab, isPracticeMode, practiceChallName, practiceChall, getLayoutNodeById } from "./app.layout";
 import { showError, handleError } from "./app.errors";
 import { IFsItem, fss, addKsyFile, staticFs, refreshFsNodes, localFs } from "./app.files";
 import { refreshSelectionInput } from "./app.selectionInput";
@@ -244,6 +244,7 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
             lastKsyFsItem = fsItem;
             lastKsyContent = content;
             ui.ksyEditor.setValue(content, -1);
+            getLayoutNodeById("ksyEditor").container.setTitle(fsItem.fn);
             return Promise.resolve();
         }
         else {
@@ -259,6 +260,7 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
             };
 
             ui.hexViewer.setDataProvider(dataProvider);
+            getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
             return workerCall({ type:'eval', args: ['wi.inputBuffer = args; void(0)', content] }).then(() => refreshGui ? reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
         }
     });
@@ -374,6 +376,8 @@ $(() => {
         var newFn = `${inputFsItem.fn.split('/').last()}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
         saveFile(new Uint8Array(inputContent, start, end - start + 1), newFn);
     });
+
+    kaitaiIde.ui = ui;
 
     kaitaiIde.exportToJson = (useHex: boolean = false) => {
         var indentLen = 2;

@@ -21,13 +21,13 @@ var myLayout = new GoldenLayout({
                             { type: 'component', componentName: 'ksyEditor', title: '.ksy editor', isClosable: false },
                             { type: 'stack', activeItemIndex: 0, content: [
                                 //{ type: 'component', componentName: 'parsedDataViewer', title: 'parsed as JSON', isClosable: false },
-                                { type: 'component', componentName: 'parsedDataTree', title: 'parsed as tree', isClosable: false },
+                                { type: 'component', componentName: 'parsedDataTree', title: 'object tree', isClosable: false },
                             ]},
                         ]},
                         { type: 'stack', id: 'codeTab', activeItemIndex: 2, content: [
                             { type: 'component', componentName: 'genCodeViewer', title: 'JS code', isClosable: false },
                             { type: 'component', componentName: 'genCodeDebugViewer', title: 'JS code (debug)', isClosable: false },
-                            { type: 'column', isClosable: false, title: 'input binary', content: [
+                            { type: 'column', isClosable: false, id: "inputBinaryTab", title: 'input binary', content: [
                                 { type: 'component', componentName: 'hexViewer', title: 'hex viewer', isClosable: false },
                                 { type: 'row', isClosable: false, height: 35, content: [
                                     { type: 'component', componentName: 'infoPanel', title: 'info panel', isClosable: false, width: 40 },
@@ -43,7 +43,7 @@ var myLayout = new GoldenLayout({
 });
 
 export function getLayoutNodeById(id) {
-    return (<any>myLayout)._getAllContentItems().filter(x => x.config.id === id)[0];
+    return (<any>myLayout)._getAllContentItems().filter(x => x.config.id === id || x.componentName === id)[0];
 }
 
 var dynCompId = 1;
@@ -54,6 +54,7 @@ export function addEditorTab(title: string, data: string, lang: string = null, p
 }
 
 var ui = {
+    layout: myLayout,
     ksyEditor: <AceAjax.Editor>null,
     genCodeViewer: <AceAjax.Editor>null,
     genCodeDebugViewer: <AceAjax.Editor>null,
