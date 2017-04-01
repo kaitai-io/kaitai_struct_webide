@@ -31,11 +31,6 @@ GoldenLayout:
     source: https://github.com/deepstreamIO/golden-layout
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/deepstreamIO/golden-layout/master/LICENSE
-interval-tree2:
-    libDir: interval-tree2
-    source: https://github.com/shinout/interval-tree2
-    licenseName: MIT
-    licenseUrl: https://raw.githubusercontent.com/shinout/interval-tree2/master/LICENSE
 jQuery:
     libDir: jquery
     website: https://jquery.com/

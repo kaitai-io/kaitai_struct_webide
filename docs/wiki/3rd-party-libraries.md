@@ -53,11 +53,6 @@ Source: https://github.com/jacwright/date.format
 
 License: MIT (https://raw.githubusercontent.com/jacwright/date.format/master/LICENSE)
 
-## interval-tree2
-Source: https://github.com/shinout/interval-tree2
-
-License: MIT (https://raw.githubusercontent.com/shinout/interval-tree2/master/LICENSE)
-
 ## jQuery
 Website: https://jquery.com/
 
