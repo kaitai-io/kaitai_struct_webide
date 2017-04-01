@@ -217,7 +217,7 @@ export class ParsedTreeHandler {
             }
 
             return items.map((item, i) => this.childItemToNode(item, true));
-        } else if (exported.type === ObjectType.Object){
+        } else if (exported.type === ObjectType.Object) {
             var obj = exported.object;
             return Object.keys(obj.fields).map(fieldName => this.childItemToNode(obj.fields[fieldName], true)).concat(
                 Object.keys(obj.instances).map(propName => <ParsedTreeNode>{ text: s`${propName}`, children: true, data: this.addNodeData({ instance: obj.instances[propName], parent: exported }) }));
@@ -304,6 +304,8 @@ export class ParsedTreeHandler {
 
             if (!exp.parent)
                 fillParents(exp, nodeData && nodeData.parent);
+
+            this.jstree.set_text(node, this.childItemToNode(exp, true).text);
 
             var nodes = this.exportedToNodes(exp, nodeData, true);
             nodes.forEach(node => node.id = node.id || this.getNodeId(node));

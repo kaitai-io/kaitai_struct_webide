@@ -264,13 +264,11 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
 }
 
 export function addNewFiles(files: IFileProcessItem[]) {
-    return Promise.all(files.map(file => {
-        return (isKsyFile(file.file.name) ? <Promise<any>>file.read('text') : file.read('arrayBuffer')).then(content => {
-            return localFs.put(file.file.name, content).then(fsItem => {
-                return files.length == 1 ? loadFsItem(fsItem) : Promise.resolve(null);
-            });
+    return Promise.all(files.map(file => (isKsyFile(file.file.name) ? <Promise<any>>file.read('text') : file.read('arrayBuffer')).then(content => localFs.put(file.file.name, content))))
+        .then(fsItems => {
+            refreshFsNodes();
+            return fsItems.length === 1 ? loadFsItem(fsItems[0]) : Promise.resolve(null);
         });
-    })).then(refreshFsNodes);
 }
 
 localStorage.setItem('lastVersion', kaitaiIde.version);

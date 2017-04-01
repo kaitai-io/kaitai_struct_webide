@@ -119,7 +119,7 @@ function genChildNodes(obj) {
 
 export function refreshFsNodes() {
     var localStorageNode = ui.fileTree.get_node('localStorage');
-    localFs.getRootNode().then(root => {
+    return localFs.getRootNode().then(root => {
         ui.fileTree.delete_node(localStorageNode.children);
         if (root)
             genChildNodes(root).forEach(node => ui.fileTree.create_node(localStorageNode, node));
