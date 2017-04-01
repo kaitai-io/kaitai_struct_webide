@@ -68,7 +68,7 @@ git clone git@github.com:"$GH_USER"/"$GH_REPO_NAME".git
 
 echo 'Updating the files from out...'
 if [ "$TRAVIS_BRANCH" = stable ]; then
-	rsync --delete-after -c --exclude=.git --exclude=CNAME --exclude=.nojekyll -r -v out/ "$GH_REPO_NAME"
+	rsync --delete-after -c --exclude=.git --exclude=CNAME --exclude=.nojekyll --exclude=devel -r -v out/ "$GH_REPO_NAME"
 else
 	rsync --delete-after -c --exclude=.git --exclude=CNAME --exclude=.nojekyll -r -v out/ "$GH_REPO_NAME"/devel
 fi
@@ -76,7 +76,7 @@ fi
 cd "$GH_REPO_NAME"
 
 echo 'Adding and committing...'
-git add .
+git add --all .
 git commit -m "Regen $TRAVIS_BRANCH ${GH_USER}/${GH_SRC_REPO}@$TRAVIS_COMMIT"
 
 echo 'Pushing...'
