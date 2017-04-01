@@ -126,8 +126,12 @@ export function refreshFsNodes() {
     });
 }
 
-export function addKsyFile(parent, name, fsItem) {
-    ui.fileTree.create_node(ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: 'glyphicon glyphicon-list-alt' }, "last", node => ui.fileTree.activate_node(node, null));
+export function addKsyFile(parent: string, ksyFn: string, content: string) {
+    var name = ksyFn.split('/').last();
+    return fss.local.put(name, content).then(fsItem => {
+        ui.fileTree.create_node(ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: 'glyphicon glyphicon-list-alt' }, "last", node => ui.fileTree.activate_node(node, null));
+        return loadFsItem(fsItem, true);
+    });
 }
 
 var fileTreeCont;
@@ -248,6 +252,7 @@ $(() => {
                 Object.keys(compiled).forEach(fileName => {
                     //var title = fsItem.fn.split('/').last() + ' [' + $(e.target).text() + ']' + (compiled.length == 1 ? '' : ` ${i + 1}/${compiled.length}`);
                     //addEditorTab(title, compItem, linkData.acelang);
+
                     addEditorTab(fileName, compiled[fileName], linkData.acelang);
                 });
             });
@@ -291,10 +296,7 @@ $(() => {
         var ksyName = $('#newKsyName').val();
         var parentData = ui.fileTree.get_node(ksyParent).data;
 
-        fss[parentData.fsType].put((parentData.fn ? `${parentData.fn}/` : '') + `${ksyName}.ksy`, `meta:\n  id: ${ksyName}\n  file-extension: ${ksyName}\n`).then(fsItem => {
-            addKsyFile(ksyParent, `${ksyName}.ksy`, fsItem);
-            return loadFsItem(fsItem);
-        });
+        addKsyFile(ksyParent, (parentData.fn ? `${parentData.fn}/` : '') + `${ksyName}.ksy`, `meta:\n  id: ${ksyName}\n  file-extension: ${ksyName}\n`);
     });
 
     fileTreeCont.bind("dblclick.jstree", function (event) {
@@ -306,8 +308,6 @@ $(() => {
         var newFn = fsItem.fn.replace('.ksy', '_' + new Date().format('Ymd_His') + '.ksy');
         console.log('newFn', newFn);
 
-        fss[fsItem.fsType].get(fsItem.fn).then(content =>
-            fss[fsItem.fsType].put(newFn, content).then(fsItem =>
-                addKsyFile('localStorage', newFn.split('/').last(), fsItem)));
+        fss[fsItem.fsType].get(fsItem.fn).then(content => addKsyFile('localStorage', newFn, content));
     });
 })

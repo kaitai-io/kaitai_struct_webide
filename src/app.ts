@@ -171,14 +171,9 @@ function recompile() {
         var srcYaml = ui.ksyEditor.getValue();
         var changed = lastKsyContent !== srcYaml;
 
-        var copyPromise = Promise.resolve();
-        if (changed && (ksyFsItem.fsType === 'kaitai' || ksyFsItem.fsType === 'static')) {
-            var newFn = ksyFsItem.fn.split('/').last().replace('.ksy', '_modified.ksy');
-            copyPromise = fss.local.put(newFn, srcYaml).then(fsItem => {
-                ksyFsItem = fsItem;
-                return localforage.setItem(ksyFsItemName, fsItem);
-            }).then(() => addKsyFile('localStorage', newFn, ksyFsItem));
-        }
+        var copyPromise = <Promise<any>>Promise.resolve();
+        if (changed && (ksyFsItem.fsType === 'kaitai' || ksyFsItem.fsType === 'static'))
+            copyPromise = addKsyFile('localStorage', ksyFsItem.fn.replace('.ksy', '_modified.ksy'), srcYaml).then(fsItem => localforage.setItem(ksyFsItemName, fsItem));
 
         return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
             return compile(srcYaml, 'javascript', 'both').then(compiled => {
@@ -196,6 +191,7 @@ function recompile() {
 
 var selectedInTree = false, blockRecursive = false;
 function reparse() {
+    handleError(null);
     return performanceHelper.measureAction("Parse initialization", Promise.all([inputReady, formatReady]).then(() => {
         var debugCode = ui.genCodeDebugViewer.getValue();
         var jsClassName = kaitaiIde.ksySchema.meta.id.split('_').map(x => x.ucFirst()).join('');
@@ -243,7 +239,8 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
             localforage.setItem(ksyFsItemName, fsItem);
             lastKsyFsItem = fsItem;
             lastKsyContent = content;
-            ui.ksyEditor.setValue(content, -1);
+            if (ui.ksyEditor.getValue() !== content)
+                ui.ksyEditor.setValue(content, -1);
             getLayoutNodeById("ksyEditor").container.setTitle(fsItem.fn);
             return Promise.resolve();
         }
