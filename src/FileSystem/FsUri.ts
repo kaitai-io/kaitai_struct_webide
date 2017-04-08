@@ -1,12 +1,12 @@
-﻿/**
+﻿import { TestHelper } from '../utils/TestHelper';
+
+/**
  * Rules:
  *  - path format example: <providerName>://<providerData>/<folder>/<subfolder>/<file>
  *  - if type == 'directory' then path.endswith($`/{name}/`) === true
  *     - except for root where path === '/'
  *  - if type == 'file' then path.endswith($`/{name}`) === true
  */
-import {TestHelper} from './TestHelper';
-
 export class FsUri {
     providerName: string;
     providerData: string[];

@@ -29,9 +29,11 @@
     <Content Include="sandbox.html" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\config.ts" />
+    <TypeScriptCompile Include="src\FileSystem\GithubFs.ts" />
+    <TypeScriptCompile Include="src\FileSystem\Interfaces.ts" />
     <TypeScriptCompile Include="src\sandbox.ts" />
-    <TypeScriptCompile Include="src\utils\FsUri.ts" />
-    <TypeScriptCompile Include="src\utils\GithubClient.ts" />
+    <TypeScriptCompile Include="src\FileSystem\FsUri.ts" />
+    <TypeScriptCompile Include="src\FileSystem\GithubClient.ts" />
     <TypeScriptCompile Include="src\utils\IntervalHelper.ts" />
     <TypeScriptCompile Include="src\utils\PerformanceHelper.ts" />
     <TypeScriptCompile Include="src\utils\TestHelper.ts" />
