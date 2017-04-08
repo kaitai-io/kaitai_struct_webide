@@ -249,3 +249,5 @@ out/
 
 # Generated file
 js/
+files/
+.serve_files_secret
