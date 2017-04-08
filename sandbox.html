@@ -11,7 +11,11 @@
 <body>
 hello6
 <script>
-    requirejs.config({ baseUrl: 'js/' });
+    var paths = {};
+    ["bowser", "jstree", "localforage", "goldenlayout"].forEach(
+        name => paths[name] = `/lib/${name}/${name}`);
+
+    requirejs.config({ baseUrl: 'js/', paths: paths });
     require(['sandbox']);
 </script>
 </body>

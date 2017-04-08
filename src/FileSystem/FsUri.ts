@@ -29,6 +29,10 @@ export class FsUri {
         this.name = this.path.substring(split + 1, usableLen + 1);
         this.parentPath = this.path.substr(0, split + 1);
     }
+
+    changePath(newPath: string) {
+        return new FsUri(`${this.providerName}://${this.providerData.join('/')}${newPath}`, this.providerData.length);
+    }
 }
 
 export class FsUriTests {
