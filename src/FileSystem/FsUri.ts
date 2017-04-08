@@ -8,8 +8,8 @@
  *  - if type == 'file' then path.endswith($`/{name}`) === true
  */
 export class FsUri {
-    providerName: string;
-    providerData: string[];
+    fsScheme: string;
+    fsData: string[];
     path: string;
     parentPath: string;
     name: string;
@@ -17,10 +17,10 @@ export class FsUri {
 
     constructor(public uri: string, providerDataLen: number = 0) {
         var uriParts = uri.split('://', 2);
-        this.providerName = uriParts[0];
+        this.fsScheme = uriParts[0];
 
         var pathParts = uriParts[1].split('/');
-        this.providerData = pathParts.slice(0, providerDataLen);
+        this.fsData = pathParts.slice(0, providerDataLen);
         this.path = '/' + pathParts.slice(providerDataLen).join('/');
 
         this.type = this.path.endsWith('/') ? 'directory' : 'file';
@@ -31,7 +31,7 @@ export class FsUri {
     }
 
     changePath(newPath: string) {
-        return new FsUri(`${this.providerName}://${this.providerData.join('/')}${newPath}`, this.providerData.length);
+        return new FsUri(`${this.fsScheme}://${this.fsData.join('/')}${newPath}`, this.fsData.length);
     }
 }
 

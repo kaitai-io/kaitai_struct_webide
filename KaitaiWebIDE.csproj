@@ -29,6 +29,7 @@
     <Content Include="sandbox.html" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\config.ts" />
+    <TypeScriptCompile Include="src\FileSystem\FsSelector.ts" />
     <TypeScriptCompile Include="src\FileSystem\GithubFs.ts" />
     <TypeScriptCompile Include="src\FileSystem\Interfaces.ts" />
     <TypeScriptCompile Include="src\FileSystem\RemoteFs.ts" />

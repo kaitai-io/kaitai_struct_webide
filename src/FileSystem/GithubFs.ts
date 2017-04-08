@@ -8,7 +8,7 @@ export class GithubFsItem implements IFsItem {
 
     constructor(public fs: GithubFileSystem, uri: string, public entity?: Entities.IContent) {
         this.uri = new FsUri(uri, 2);
-        this.repo = this.fs.client.getRepo(this.uri.providerData[1], this.uri.providerData[0]);
+        this.repo = this.fs.client.getRepo(this.uri.fsData[1], this.uri.fsData[0]);
     }
 
     read(): Promise<ArrayBuffer> {
@@ -25,7 +25,6 @@ export class GithubFsItem implements IFsItem {
 
     list(): Promise<IFsItem[]> {
         return this.repo.getContents(this.uri.path).then(items => {
-            console.log(items);
             return items.filter(item => item.type === 'file' || item.type === 'dir')
                 .map(item => new GithubFsItem(this.fs, this.uri.uri + item.name + (item.type === 'dir' ? '/' : ''), item));
         });
@@ -33,6 +32,8 @@ export class GithubFsItem implements IFsItem {
 }
 
 export class GithubFileSystem implements IFileSystem {
+    scheme: string = 'github';
+
     constructor(public client: GithubClient) { }
 
     getFsItem(uri: string) {

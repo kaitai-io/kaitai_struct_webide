@@ -1,6 +1,7 @@
 ﻿import { FsUri } from './FsUri';
 
 export interface IFileSystem {
+    scheme: string;
     read(uri: string): Promise<ArrayBuffer>;
     write(uri: string, data: ArrayBuffer): Promise<void>;
     delete(uri: string): Promise<void>;

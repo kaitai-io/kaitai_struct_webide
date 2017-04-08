@@ -10,6 +10,8 @@ class RemoteFsItem implements IFsItem {
 }
 
 export class RemoteFileSystem implements IFileSystem {
+    scheme: string = 'remote';
+
     public mappings: { [path: string]: { secret: string } } = {};
 
     private getFsUri(uri: string) { return new FsUri(uri, 2); }
@@ -44,10 +46,10 @@ export class RemoteFileSystem implements IFileSystem {
 
     execute<T>(method: string, uri: string, binaryResponse: boolean = false, postData: ArrayBuffer = null): Promise<T> {
         var fsUri = this.getFsUri(uri);
-        var host = fsUri.providerData[0];
+        var host = fsUri.fsData[0];
         if (host.indexOf(':') === -1)
             host += '8001';
-        var mapping = fsUri.providerData[1] || 'default';
+        var mapping = fsUri.fsData[1] || 'default';
         var mappingConfig = this.mappings[`${host}/${mapping}`];
 
         var url = `http://${host}/files/${mapping}${fsUri.path}`;
