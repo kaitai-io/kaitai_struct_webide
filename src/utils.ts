@@ -4,10 +4,8 @@
     xhr.responseType = 'arraybuffer';
 
     return new Promise<ArrayBuffer>((resolve, reject) => {
-        xhr.onload = function (e) {
-            resolve((<any>this).response);
-        };
-
+        xhr.onload = e => resolve(xhr.response);
+        xhr.onerror = reject;
         xhr.send();
     });
 }

@@ -12,7 +12,7 @@ import subprocess
 import re
 
 PORT = 8000
-watchDirs = ['index.html', 'js/*', 'css/*']
+watchDirs = ['*.html', 'js/*', 'css/*']
 compileDirs = ['src/*.ts', 'lib/ts-types/*.ts']
 compileCmd = r'tsc --outDir js/ --sourcemap --target ES6 --noEmitOnError %s'
 

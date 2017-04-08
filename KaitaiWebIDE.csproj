@@ -26,10 +26,15 @@
     <Content Include="css\HexViewer.css" />
     <Content Include="index.html" />
     <Content Include="js\autorefresh.js" />
+    <Content Include="sandbox.html" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\config.ts" />
+    <TypeScriptCompile Include="src\sandbox.ts" />
+    <TypeScriptCompile Include="src\utils\FsUri.ts" />
+    <TypeScriptCompile Include="src\utils\GithubClient.ts" />
     <TypeScriptCompile Include="src\utils\IntervalHelper.ts" />
     <TypeScriptCompile Include="src\utils\PerformanceHelper.ts" />
+    <TypeScriptCompile Include="src\utils\TestHelper.ts" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="lib\ts-types\ace.d.ts" />
