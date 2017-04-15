@@ -27,6 +27,7 @@
     <Content Include="index.html" />
     <Content Include="js\autorefresh.js" />
     <Content Include="sandbox.html" />
+    <TypeScriptCompile Include="lib\ts-types\knockout.d.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\config.ts" />
     <TypeScriptCompile Include="src\FileSystem\FsSelector.ts" />

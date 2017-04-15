@@ -10,9 +10,29 @@
 </head>
 <body>
 hello6
+
+<script id="treeElement" type="text/html">
+    <li>
+        <!-- ko if: children().length > 0 -->
+        <span>hello</span>
+        <!-- /ko -->
+        <span data-bind="text: name, click: openCloseNode"></span>
+        <!-- ko if: isOpen -->
+        <ul data-bind="template: { name: 'treeElement', foreach: children }">
+        </ul>
+        <!-- /ko -->
+     </li>
+</script>
+
+<script id="tree" type="text/html">
+    <ul data-bind="template: { name: 'treeElement', foreach: $data.treeRoot }"></ul>
+</script>
+    
+<div data-bind="template: { name: 'tree'}"></div>
+    
 <script>
     var paths = {};
-    ["bowser", "jstree", "localforage", "goldenlayout"].forEach(
+    ["bowser", "jstree", "localforage", "goldenlayout", "knockout", "knockout-es5"].forEach(
         name => paths[name] = `/lib/${name}/${name}`);
 
     requirejs.config({ baseUrl: 'js/', paths: paths });
