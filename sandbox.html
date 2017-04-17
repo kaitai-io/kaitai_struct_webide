@@ -30,7 +30,7 @@ hello66
     }
 </style>
     
-<script type="text/x-template" id="treeView-template">
+<script type="text/x-template" id="TreeView-template">
     <ul>
         <template v-for="child in model.children">
             <tree-view-item :model="child"></tree-view-item>
@@ -38,7 +38,7 @@ hello66
     </ul>
 </script>
 
-<script type="text/x-template" id="treeViewItem-template">
+<script type="text/x-template" id="TreeViewItem-template">
     <li class="item">
         <div :class="{bold: isFolder}" @click="toggle">
             {{model.text}}

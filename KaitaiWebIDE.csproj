@@ -28,7 +28,6 @@
     <Content Include="js\autorefresh.js" />
     <Content Include="sandbox.html" />
     <TypeScriptCompile Include="lib\ts-types\knockout.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\vue-class-component.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\config.ts" />
@@ -44,6 +43,7 @@
     <TypeScriptCompile Include="src\utils\IntervalHelper.ts" />
     <TypeScriptCompile Include="src\utils\PerformanceHelper.ts" />
     <TypeScriptCompile Include="src\utils\TestHelper.ts" />
+    <TypeScriptCompile Include="src\ui\Component.ts" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="lib\ts-types\ace.d.ts" />

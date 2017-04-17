@@ -8,7 +8,7 @@ import { IFileSystem, IFsItem, FsItem } from './FileSystem/Common';
 import { FsUri } from './FileSystem/FsUri';
 import { FsSelector } from './FileSystem/FsSelector';
 import * as Vue from 'vue';
-import Component from 'vue-class-component';
+import Component from './ui/Component';
 declare var kaitaiFsFiles: string[];
 
 function fsTest() {
@@ -50,7 +50,7 @@ class FsTreeNode {
     }
 }
 
-@Component({ template: '#treeViewItem-template', props: { model: FsTreeNode } })
+@Component
 class TreeViewItem extends Vue {
     model: FsTreeNode;
 
@@ -65,7 +65,7 @@ class TreeViewItem extends Vue {
     }
 }
 
-@Component({ template: '#treeView-template', props: { model: FsTreeNode }, components: { TreeViewItem } })
+@Component
 class TreeView extends Vue {
     model: FsTreeNode;
 }
@@ -75,17 +75,16 @@ var data = new FsTreeNode(fsTreeHandler, '/').add([
     new FsTreeNode(fsTreeHandler, 'folder1').add([
         new FsTreeNode(fsTreeHandler, 'folder2').add([
             new FsTreeNode(fsTreeHandler, 'file1'),
-            new FsTreeNode(fsTreeHandler, 'file2'),
+            new FsTreeNode(fsTreeHandler, 'file2')
         ]),
         new FsTreeNode(fsTreeHandler, 'file1'),
-        new FsTreeNode(fsTreeHandler, 'file2'),
+        new FsTreeNode(fsTreeHandler, 'file2')
     ]),
     new FsTreeNode(fsTreeHandler, 'file1'),
-    new FsTreeNode(fsTreeHandler, 'file2'),
+    new FsTreeNode(fsTreeHandler, 'file2')
 ]);
 
 var demo = new Vue({
     el: '#tree',
-    data: { treeData: data },
-    components: { TreeView }
+    data: { treeData: data }
 });
