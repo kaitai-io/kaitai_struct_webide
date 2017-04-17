@@ -14,19 +14,47 @@ hello66
 
 <style>
     #tree {
-        background: red;
+        font-family: Arial;
+        font-size: 12px;
+        background: #333;
+        color: #999;
+        text-shadow: 1px 1px 0 rgba(0,0,0,.5);
         width: 200px;
+        user-select:none;
+        position:relative;
     }
-    #tree .item {
+    #tree li {
         cursor: pointer;
+    }
+    #tree li a {
+        display:inline-block;
+        position:relative;
+    }
+    #tree .selected>a {
+        color:white;
+    }
+    #tree .header:hover a {
+        color:white;
+    }
+    #tree .header:hover .wholerow {
+        background:#666;
+    }
+    #tree .header.selected>.wholerow {
+        background:rgba(95, 162, 219, 1);
+    }
+    #tree .wholerow {
+        position: absolute;
+        left: 0;
+        width:100%;
+        transition: background-color 0.15s, box-shadow 0.15s;
     }
     #tree .bold {
         font-weight: bold;
     }
     #tree ul {
-        padding-left: 1em;
+        padding-left: 10px;
         line-height: 1.5em;
-        list-style-type: dot;
+        list-style-type: none;
     }
 </style>
     
@@ -39,21 +67,24 @@ hello66
 </script>
 
 <script type="text/x-template" id="TreeViewItem-template">
-    <li class="item">
-        <div :class="{bold: isFolder}" @click="toggle">
-            {{model.text}}
-            <span v-if="isFolder">[{{model.open ? '-' : '+'}}]</span>
+    <li>
+        <div class="header" :class="{selected: selected}" @click="toggle">
+            <div class="wholerow">&nbsp;</div>
+            <a :class="{bold: model.isFolder}">
+                {{model.text}}
+                <span v-if="model.isFolder">[{{model.open ? '-' : '+'}}]</span>
+            </a>
         </div>
-        <template v-if="model.open">
+        <template v-if="open">
             <ul v-for="model in model.children">
-                <tree-view-item :model="model"></tree-view-item>
+                <tree-view-item :model="model" treeView="this"></tree-view-item>
             </ul>
         </template>
     </li>
 </script>
     
 <div id="tree">
-    <tree-view :model="treeData"></tree-view>    
+    <tree-view :model="treeData" ref="treeView"></tree-view>    
 </div>
 <div id="app"></div>
 

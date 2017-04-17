@@ -11,80 +11,138 @@ import * as Vue from 'vue';
 import Component from './ui/Component';
 declare var kaitaiFsFiles: string[];
 
-function fsTest() {
-    var queryParams: { access_token?: string; secret?: string } = {};
-    location.search.substr(1).split('&').map(x => x.split('=')).forEach(x => (<any>queryParams)[x[0]] = x[1]);
+var queryParams: { access_token?: string; secret?: string } = {};
+location.search.substr(1).split('&').map(x => x.split('=')).forEach(x => (<any>queryParams)[x[0]] = x[1]);
 
-    var fs = new FsSelector();
-    fs.addFs(new LocalFileSystem());
+var fs = new FsSelector();
+fs.addFs(new LocalFileSystem());
 
-    var remoteFs = new RemoteFileSystem();
-    remoteFs.mappings["127.0.0.1:8001/default"] = { secret: queryParams.secret };
-    fs.addFs(remoteFs);
+var remoteFs = new RemoteFileSystem();
+remoteFs.mappings["127.0.0.1:8001/default"] = { secret: queryParams.secret };
+fs.addFs(remoteFs);
 
-    var githubClient = new GithubClient(queryParams.access_token);
-    var githubFs = new GithubFileSystem(githubClient);
-    fs.addFs(githubFs);
+var githubClient = new GithubClient(queryParams.access_token);
+var githubFs = new GithubFileSystem(githubClient);
+fs.addFs(githubFs);
 
-    ['local:///folder/', 'remote://127.0.0.1:8001/default/folder/', 'github://koczkatamas/kaitai_struct_formats/archive/']
-        .forEach(uri => fs.list(uri).then(items => console.log(items.map(item => `${item.uri.uri} (${item.uri.type})`))));
-}
+//['local:///folder/', 'remote://127.0.0.1:8001/default/folder/', 'github://koczkatamas/kaitai_struct_formats/archive/']
+//    .forEach(uri => fs.list(uri).then(items => console.log(items.map(item => `${item.uri.uri} (${item.uri.type})`))));
 
 var staticFs = new StaticFileSystem();
 kaitaiFsFiles.forEach(fn => staticFs.write("static://" + fn, new ArrayBuffer(0)));
 
-staticFs.list("static://formats/").then(x => console.log(x.map(y => y.uri.uri)));
+interface IFsTreeNode {
+    text: string;
+    isFolder: boolean;
+    children: IFsTreeNode[];
+    loadChildren(): Promise<void>;
+}
 
-class FsTreeHandler { }
+@Component
+class TreeView<T extends IFsTreeNode> extends Vue {
+    model: T;
+    selectedItem: TreeViewItem<T> = null;
 
-class FsTreeNode {
-    public open = false;
-    public childrenLoading = true;
-    public children: FsTreeNode[] = [];
+    get children() { return <TreeViewItem<T>[]>this.$children; }
 
-    constructor(public handler: FsTreeHandler, public text: string) { }
+    created() {
+        this.model.loadChildren();
+    }
 
-    add(children: FsTreeNode[]) {
+    setSelected(newSelected: TreeViewItem<T>) {
+        if (this.selectedItem)
+            this.selectedItem.selected = false;
+        this.selectedItem = newSelected;
+        this.selectedItem.selected = true;
+    }
+}
+
+@Component
+class TreeViewItem<T extends IFsTreeNode> extends Vue {
+    model: T;
+    open = false;
+    selected = false;
+    childrenLoading = false;
+
+    get treeView() {
+        var res: Vue = this;
+        while (res) {
+            if (res instanceof TreeView)
+                return res;
+            res = res.$parent;
+        }
+        return null;
+    }
+
+    get children() { return <TreeViewItem<T>[]>this.$children; }
+
+    toggle() {
+        if (this.model.isFolder) {
+            this.open = !this.open;
+            if (this.open && !this.model.children) {
+                this.childrenLoading = true;
+                this.model.loadChildren().then(() => this.childrenLoading = false);
+            }
+        }
+        this.treeView.setSelected(this);
+    }
+}
+
+class DummyFsTreeNode implements IFsTreeNode {
+    public children: DummyFsTreeNode[] = [];
+
+    get isFolder() { return this.children && this.children.length > 0; }
+
+    constructor(public text: string) { }
+
+    add(children: DummyFsTreeNode[]) {
         this.children.push(...children);
         return this;
     }
+
+    loadChildren(): Promise<void> { return Promise.resolve(); }
 }
 
-@Component
-class TreeViewItem extends Vue {
-    model: FsTreeNode;
+class FsTreeNode implements IFsTreeNode {
+    text: string;
+    isFolder: boolean;
+    children: IFsTreeNode[] = null;
 
-    get isFolder() {
-        return this.model.children && this.model.children.length;
+    constructor(public fs: IFileSystem, public uri: FsUri) {
+        this.text = uri.name;
+        this.isFolder = uri.type === 'directory';
     }
 
-    toggle() {
-        console.log('toggle', this.model.text, this.model.open);
-        if (this.isFolder)
-            this.model.open = !this.model.open;
+    loadChildren(): Promise<void> {
+        return fs.list(this.uri.uri).then(children => {
+            this.children = children.map(fsItem => new FsTreeNode(this.fs, fsItem.uri));
+        });
     }
 }
 
-@Component
-class TreeView extends Vue {
-    model: FsTreeNode;
-}
-
-var fsTreeHandler = new FsTreeHandler();
-var data = new FsTreeNode(fsTreeHandler, '/').add([
-    new FsTreeNode(fsTreeHandler, 'folder1').add([
-        new FsTreeNode(fsTreeHandler, 'folder2').add([
-            new FsTreeNode(fsTreeHandler, 'file1'),
-            new FsTreeNode(fsTreeHandler, 'file2')
+var dummyData = new DummyFsTreeNode('/').add([
+    new DummyFsTreeNode('folder1').add([
+        new DummyFsTreeNode('folder2').add([
+            new DummyFsTreeNode('file1'),
+            new DummyFsTreeNode('file2')
         ]),
-        new FsTreeNode(fsTreeHandler, 'file1'),
-        new FsTreeNode(fsTreeHandler, 'file2')
+        new DummyFsTreeNode('file1'),
+        new DummyFsTreeNode('file2')
     ]),
-    new FsTreeNode(fsTreeHandler, 'file1'),
-    new FsTreeNode(fsTreeHandler, 'file2')
+    new DummyFsTreeNode('file1'),
+    new DummyFsTreeNode('file2')
 ]);
+
+var fsData = new FsTreeNode(fs, new FsUri('github://koczkatamas/kaitai_struct_formats/'));
+
+//data.children[0].open = true;
+//data.children[0].children[0].selected = true;
 
 var demo = new Vue({
     el: '#tree',
-    data: { treeData: data }
+    data: { treeData: fsData }
 });
+window['demo'] = demo;
+var treeView = <TreeView<IFsTreeNode>>demo.$refs['treeView'];
+//treeView.children[0].open = true;
+//Vue.nextTick(() => treeView.children[0].children[0].selected = true);
