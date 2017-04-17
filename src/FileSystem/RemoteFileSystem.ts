@@ -1,12 +1,8 @@
 ﻿import { FsUri } from './FsUri';
-import { IFileSystem, IFsItem } from './Interfaces';
+import { IFileSystem, IFsItem, FsItem } from './Common';
 
 interface IListResponse {
     files: [{ fn: string, isDir: boolean }];
-}
-
-class RemoteFsItem implements IFsItem {
-    constructor(public uri: FsUri) { }
 }
 
 export class RemoteFileSystem implements IFileSystem {
@@ -68,9 +64,9 @@ export class RemoteFileSystem implements IFileSystem {
         return this.execute('DELETE', uri).then(x => null);
     }
 
-    list(uri: string): Promise<RemoteFsItem[]> {
+    list(uri: string): Promise<FsItem[]> {
         return this.execute('GET', uri).then(response => {
-            return (<IListResponse>response).files.map(item => new RemoteFsItem(this.getFsUri(uri + item.fn + (item.isDir ? '/' : ''))));
+            return (<IListResponse>response).files.map(item => new FsItem(this.getFsUri(uri + item.fn + (item.isDir ? '/' : ''))));
         });
     }
 }

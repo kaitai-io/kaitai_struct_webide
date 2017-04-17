@@ -1,6 +1,6 @@
 ﻿import { GithubClient, Repository, Entities } from './GithubClient';
 import { FsUri } from './FsUri';
-import { IFileSystem, IFsItem } from './Interfaces';
+import { IFileSystem, IFsItem } from './Common';
 
 export class GithubFsItem implements IFsItem {
     public repo: Repository;

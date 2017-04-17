@@ -11,3 +11,7 @@ export interface IFileSystem {
 export interface IFsItem {
     uri: FsUri;
 }
+
+export class FsItem implements IFsItem {
+    constructor(public uri: FsUri) { }
+}

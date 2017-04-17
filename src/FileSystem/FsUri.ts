@@ -15,13 +15,13 @@ export class FsUri {
     name: string;
     type: 'file' | 'directory';
 
-    constructor(public uri: string, providerDataLen: number = 0) {
+    constructor(public uri: string, fsDataLen: number = 0) {
         var uriParts = uri.split('://', 2);
         this.fsScheme = uriParts[0];
 
         var pathParts = uriParts[1].split('/');
-        this.fsData = pathParts.slice(0, providerDataLen);
-        this.path = '/' + pathParts.slice(providerDataLen).join('/');
+        this.fsData = pathParts.slice(0, fsDataLen);
+        this.path = '/' + pathParts.slice(fsDataLen).join('/');
 
         this.type = this.path.endsWith('/') ? 'directory' : 'file';
         var usableLen = this.path.length - 1 - (this.type === 'directory' ? 1 : 0);
@@ -32,6 +32,22 @@ export class FsUri {
 
     changePath(newPath: string) {
         return new FsUri(`${this.fsScheme}://${this.fsData.join('/')}${newPath}`, this.fsData.length);
+    }
+
+    static getChildNames(flatPathList: string[], parentPath: string) {
+        var itemNames: { [name: string]: boolean } = {};
+        flatPathList.filter(x => x.startsWith(parentPath)).forEach(key => {
+            var keyParts = key.substr(parentPath.length).split('/');
+            var name = keyParts[0] + (keyParts.length === 1 ? '' : '/');
+            itemNames[name] = true;
+        });
+
+        return Object.keys(itemNames);
+    }
+
+    static getChildUris(flatPathList: string[], parentUri: FsUri) {
+        return this.getChildNames(flatPathList, parentUri.path)
+            .map(name => new FsUri(parentUri.uri + name, parentUri.fsData.length));
     }
 }
 

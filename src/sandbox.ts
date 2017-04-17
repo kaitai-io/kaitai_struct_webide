@@ -1,16 +1,17 @@
-﻿///<reference path="../lib/ts-types/vue/vue.d.ts" />
+///<reference path="../lib/ts-types/vue/vue.d.ts" />
 import { GithubClient } from './FileSystem/GithubClient';
-import { GithubFileSystem } from './FileSystem/GithubFs';
-import { IFileSystem, IFsItem } from './FileSystem/Interfaces';
+import { GithubFileSystem } from './FileSystem/GithubFileSystem';
+import { LocalFileSystem } from './FileSystem/LocalFileSystem';
+import { RemoteFileSystem } from './FileSystem/RemoteFileSystem';
+import { StaticFileSystem } from './FileSystem/StaticFileSystem';
+import { IFileSystem, IFsItem, FsItem } from './FileSystem/Common';
 import { FsUri } from './FileSystem/FsUri';
-import { LocalFileSystem } from './FileSystem/LocalFs';
-import { RemoteFileSystem } from './FileSystem/RemoteFs';
 import { FsSelector } from './FileSystem/FsSelector';
 import * as Vue from 'vue';
 declare var kaitaiFsFiles: string[];
 
 function fsTest() {
-    var queryParams: { access_token?: string, secret?: string } = {};
+    var queryParams: { access_token?: string; secret?: string } = {};
     location.search.substr(1).split('&').map(x => x.split('=')).forEach(x => (<any>queryParams)[x[0]] = x[1]);
 
     var fs = new FsSelector();
@@ -28,7 +29,13 @@ function fsTest() {
         .forEach(uri => fs.list(uri).then(items => console.log(items.map(item => `${item.uri.uri} (${item.uri.type})`))));
 }
 
-console.log(kaitaiFsFiles);
+
+
+var staticFs = new StaticFileSystem();
+kaitaiFsFiles.forEach(fn => staticFs.write("static://" + fn, new ArrayBuffer(0)));
+
+staticFs.list("static://formats/").then(x => console.log(x.map(y => y.uri.uri)));
+
 
 var data = {
     name: 'My Tree39',

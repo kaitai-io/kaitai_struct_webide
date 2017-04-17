@@ -36,10 +36,11 @@
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\config.ts" />
     <TypeScriptCompile Include="src\FileSystem\FsSelector.ts" />
-    <TypeScriptCompile Include="src\FileSystem\GithubFs.ts" />
-    <TypeScriptCompile Include="src\FileSystem\Interfaces.ts" />
-    <TypeScriptCompile Include="src\FileSystem\RemoteFs.ts" />
-    <TypeScriptCompile Include="src\FileSystem\LocalFs.ts" />
+    <TypeScriptCompile Include="src\FileSystem\GithubFileSystem.ts" />
+    <TypeScriptCompile Include="src\FileSystem\Common.ts" />
+    <TypeScriptCompile Include="src\FileSystem\RemoteFileSystem.ts" />
+    <TypeScriptCompile Include="src\FileSystem\LocalFileSystem.ts" />
+    <TypeScriptCompile Include="src\FileSystem\StaticFileSystem.ts" />
     <TypeScriptCompile Include="src\sandbox.ts" />
     <TypeScriptCompile Include="src\FileSystem\FsUri.ts" />
     <TypeScriptCompile Include="src\FileSystem\GithubClient.ts" />

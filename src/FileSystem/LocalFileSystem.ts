@@ -1,10 +1,6 @@
 ﻿import { FsUri } from './FsUri';
-import { IFileSystem, IFsItem } from './Interfaces';
+import { IFileSystem, IFsItem, FsItem } from './Common';
 import * as localforage from "localforage";
-
-class LocalFsItem implements IFsItem {
-    constructor(public uri: FsUri) { }
-}
 
 export class LocalFileSystem implements IFileSystem {
     scheme: string = 'local';
@@ -35,18 +31,9 @@ export class LocalFileSystem implements IFileSystem {
         return this.execute(uri, (lf, fsUri) => lf.removeItem(fsUri.path));
     }
 
-    list(uri: string): Promise<LocalFsItem[]> {
-        return this.execute(uri, (lf, fsUri) => {
-            return lf.keys().then(keys => {
-                var itemNames: { [name: string]: boolean } = {};
-                keys.filter(x => x.startsWith(fsUri.path)).forEach(key => {
-                    var keyParts = key.substr(fsUri.path.length).split('/');
-                    var name = keyParts[0] + (keyParts.length === 1 ? '' : '/');
-                    itemNames[name] = true;
-                });
-
-                return Object.keys(itemNames).map(name => new LocalFsItem(new FsUri(fsUri.uri + name, 1)));
-            });
-        });
+    list(uri: string): Promise<FsItem[]> {
+        return this.execute(uri,
+            (lf, fsUri) => lf.keys().then(
+                keys => FsUri.getChildUris(keys, fsUri).map(uri => new FsItem(uri))));
     }
 }
