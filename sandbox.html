@@ -7,32 +7,49 @@
     <script src="js/autorefresh.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.js"></script>
     <script src="js/utils.js"></script>
+    <script src="out/js/kaitaiFsFiles.js"></script>
 </head>
 <body>
-hello6
+hello66
 
-<script id="treeElement" type="text/html">
+<style>
+    #tree {
+        background: red;
+        width: 200px;
+    }
+    #tree .item {
+        cursor: pointer;
+    }
+    #tree .bold {
+        font-weight: bold;
+    }
+    #tree ul {
+        padding-left: 1em;
+        line-height: 1.5em;
+        list-style-type: dot;
+    }
+</style>
+
+<script type="text/x-template" id="item-template">
     <li>
-        <!-- ko if: children().length > 0 -->
-        <span>hello</span>
-        <!-- /ko -->
-        <span data-bind="text: name, click: openCloseNode"></span>
-        <!-- ko if: isOpen -->
-        <ul data-bind="template: { name: 'treeElement', foreach: children }">
+        <div :class="{bold: isFolder}" @click="toggle" @dblclick="changeType">
+            {{model.name}}
+            <span v-if="isFolder">[{{model.open ? '-' : '+'}}]</span>
+        </div>
+        <ul v-show="model.open" v-if="isFolder">
+            <item class="item" v-for="model in model.children" :model="model"></item>
+            <li class="add" @click="addChild">+</li>
         </ul>
-        <!-- /ko -->
-     </li>
+    </li>
 </script>
 
-<script id="tree" type="text/html">
-    <ul data-bind="template: { name: 'treeElement', foreach: $data.treeRoot }"></ul>
-</script>
-    
-<div data-bind="template: { name: 'tree'}"></div>
-    
+<ul id="tree">
+    <item class="item" :model="treeData"></item>
+</ul>
+
 <script>
     var paths = {};
-    ["bowser", "jstree", "localforage", "goldenlayout", "knockout", "knockout-es5"].forEach(
+    ["bowser", "jstree", "localforage", "goldenlayout", "knockout", "knockout-es5", "vue"].forEach(
         name => paths[name] = `/lib/${name}/${name}`);
 
     requirejs.config({ baseUrl: 'js/', paths: paths });

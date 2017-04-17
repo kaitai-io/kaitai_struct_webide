@@ -10,6 +10,9 @@ import threading
 import time
 import subprocess
 import re
+import time
+from SocketServer import ThreadingMixIn
+from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
 PORT = 8000
 watchDirs = ['*.html', 'js/*', 'css/*']
@@ -28,45 +31,38 @@ def getLastChange(dirs):
     files = sorted(files, key=lambda x: x['modTime'], reverse=True)
     return files[0] if len(files) > 0 else None
 
-lastMod = None
-
-def statusHook(lastChange):
-    global lastMod
-    currMod = lastChange['modTime'] if lastChange else None
-    #print 'lastChange = %r, lastMod = %r, currMod = %r' % (lastChange, lastMod, currMod)
-    if lastMod and currMod <> lastMod and not 'config.js' in lastChange['fn']:
-        configFn = 'src/config.ts'
-        packageJsonFn = 'package.json'
-        with open(configFn, 'rt') as f: configJs = f.read()
-        
-        currVersion = re.search(r'kaitaiIde\.version\s*=\s*[\'"](\d+\.\d+\.\d+.\d+)', configJs).group(1)
-        vp = currVersion.split('.')
-        newVersion = '.'.join(vp[:-1] + [str(int(vp[-1]) + 1)])
-        print "Changed: %r, new version: %r" % (lastChange, newVersion)
-        configJs = configJs.replace(currVersion, newVersion)
-        with open(configFn, 'wt') as f: f.write(configJs)
-        
-        #with open(packageJsonFn, 'rt') as f: packageJson = f.read()
-        #packageJson = re.sub(r'(version": ")(\d+\.\d+\.\d+)', (lambda m: m.group(1) + newVersion), packageJson) 
-        #with open(packageJsonFn, 'wt') as f: f.write(packageJson)
-    lastMod = currMod
+def bumpVersion():
+    configFn = 'src/config.ts'
+    packageJsonFn = 'package.json'
+    with open(configFn, 'rt') as f: configJs = f.read()
     
+    currVersion = re.search(r'kaitaiIde\.version\s*=\s*[\'"](\d+\.\d+\.\d+.\d+)', configJs).group(1)
+    vp = currVersion.split('.')
+    newVersion = '.'.join(vp[:-1] + [str(int(vp[-1]) + 1)])
+    print "Changed, new version: %r" % (newVersion)
+    configJs = configJs.replace(currVersion, newVersion)
+    with open(configFn, 'wt') as f: f.write(configJs)
+
 class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def resp(self, statusCode, result):
         self.send_response(statusCode)
         self.end_headers()
         self.wfile.write(json.dumps(result))
         
+    def close_request(self):
+        print "Close"
+        
     def do_GET(self):
-        if self.path == '/status':
+        if self.path == '/onchange':
             lastChange = getLastChange(watchDirs)
-            
-            try:
-                statusHook(lastChange)
-            except Exception as e:
-                print "Exception: %r" % e
-                
-            self.resp(200, {'lastchange': lastChange})
+            while True:
+                time.sleep(0.5)
+                currChange = getLastChange(watchDirs)
+                if currChange and lastChange and currChange['modTime'] <> lastChange['modTime'] and not 'config.js' in currChange['fn']:
+                    bumpVersion()
+                    self.resp(200, { 'changed': True })
+                    break
+                lastChange = currChange
         else:
             return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
@@ -114,4 +110,9 @@ if '--compile' in sys.argv:
     print "auto compile started"
 
 print "please use 127.0.0.1:%d on Windows (using localhost makes 1sec delay)" % PORT
-SocketServer.TCPServer(("", PORT), MyHandler).serve_forever()
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    daemon_threads = True
+    """Handle requests in a separate thread."""
+
+ThreadedHTTPServer(("", PORT), MyHandler).serve_forever()

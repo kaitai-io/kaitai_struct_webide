@@ -28,6 +28,11 @@
     <Content Include="js\autorefresh.js" />
     <Content Include="sandbox.html" />
     <TypeScriptCompile Include="lib\ts-types\knockout.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\vue\index.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\vue\options.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\vue\plugin.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\vue\vnode.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\vue\vue.d.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\config.ts" />
     <TypeScriptCompile Include="src\FileSystem\FsSelector.ts" />
@@ -69,7 +74,9 @@
     <TypeScriptCompile Include="src\utils.ts" />
     <TypeScriptCompile Include="src\HexViewer.ts" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="tsconfig.json" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>

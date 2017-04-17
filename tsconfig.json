@@ -1,15 +1,19 @@
 {
-    "compilerOptions": {
-        "module": "amd",
-        "noImplicitAny": true,
-        "removeComments": false,
-        "preserveConstEnums": true,
-        "sourceMap": true,
-        "target": "es2016",
-        "outDir": "js/",
-        "lib": ["es6", "dom"]
-    },
-    "include": [
-        "src/**/*"
-    ]
+  "compilerOptions": {
+    "module": "amd",
+    "noImplicitAny": true,
+    "removeComments": false,
+    "preserveConstEnums": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "target": "es2016",
+    "outDir": "js/",
+    "lib": [ "es6", "dom" ],
+    "typeRoots": [ "./lib/ts-types/" ],
+    "types": [ "vue" ]
+  },
+  "include": [
+    "src/**/*",
+    "./lib/ts-types/vue/*.ts"
+  ]
 }
