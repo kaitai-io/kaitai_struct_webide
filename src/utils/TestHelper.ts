@@ -1,5 +1,5 @@
 ﻿export class TestHelper {
-    static equals(value, compareTo): boolean {
+    static equals(value: any, compareTo: any): boolean {
         if (typeof value !== typeof compareTo)
             return false;
 
@@ -28,7 +28,7 @@
         return true;
     }
 
-    static assertEquals(value, compareTo) {
+    static assertEquals(value: any, compareTo: any) {
         if (!this.equals(value, compareTo))
             console.error("assertEquals fail", value, compareTo, JSON.stringify(value));
     }

@@ -38,7 +38,7 @@ export class LocalFileSystem implements IFileSystem {
     list(uri: string): Promise<LocalFsItem[]> {
         return this.execute(uri, (lf, fsUri) => {
             return lf.keys().then(keys => {
-                var itemNames = {};
+                var itemNames: { [name: string]: boolean } = {};
                 keys.filter(x => x.startsWith(fsUri.path)).forEach(key => {
                     var keyParts = key.substr(fsUri.path.length).split('/');
                     var name = keyParts[0] + (keyParts.length === 1 ? '' : '/');

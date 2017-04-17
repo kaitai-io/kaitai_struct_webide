@@ -9,11 +9,10 @@
     "target": "es2016",
     "outDir": "js/",
     "lib": [ "es6", "dom" ],
-    "typeRoots": [ "./lib/ts-types/" ],
-    "types": [ "vue" ]
+    "typeRoots": [ "./lib/ts-types/" ]
   },
   "include": [
     "src/**/*",
-    "./lib/ts-types/vue/*.ts"
+    "./lib/ts-types/*.ts"
   ]
 }

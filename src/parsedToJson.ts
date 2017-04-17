@@ -1,11 +1,11 @@
-﻿function parsedToJson(parsed) {
-    var intervals = [];
+﻿function parsedToJson(parsed: any) {
+    var intervals: any[] = [];
     var padLen = 2;
     var commentOffset = 60;
 
-    function commentPad(str) { return str.length < commentOffset ? str + ' '.repeat(commentOffset - str.length) : str; }
+    function commentPad(str: string) { return str.length < commentOffset ? str + ' '.repeat(commentOffset - str.length) : str; }
 
-    var lineInfo = { currLine: 0, lineStart: 0, lines: {} };
+    var lineInfo = { currLine: 0, lineStart: 0, lines: <any>{} };
     var json = "";
 
     function nl() {
@@ -14,14 +14,14 @@
         lineInfo.lineStart = json.length;
     }
 
-    function comment(str) {
+    function comment(str: string) {
         var padLen = commentOffset - (json.length - lineInfo.lineStart);
         if (padLen > 0)
             json += ' '.repeat(padLen);
         json += ` // ${str}`;
     }
 
-    function getLenComment(debug, addInterval = false) {
+    function getLenComment(debug: any, addInterval = false) {
         if (debug) {
             var len = debug.end - debug.start + 1;
             if (len > 0)
@@ -33,7 +33,7 @@
         return null;
     }
 
-    function toJson(obj, debug = null, pad = 0) {
+    function toJson(obj: any, debug: any = null, pad = 0) {
         //debug = debug || obj._debug;
         if (typeof obj === "object") {
             var objPad = " ".repeat((pad + 0) * padLen);

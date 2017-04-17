@@ -1,12 +1,12 @@
 ﻿import {IDataProvider as DataProvider} from "./HexViewer";
 
-declare var bigInt, TextDecoder;
+declare var bigInt: any, TextDecoder: any;
 
 export function refreshConverterPanel(panel: JQuery, dataProvider: DataProvider, offset: number) {
     if (dataProvider && offset != -1) {
         var data = dataProvider.get(offset, Math.min(dataProvider.length - offset, 64)).slice(0);
 
-        function numConv(len, signed, bigEndian) {
+        function numConv(len: number, signed: boolean, bigEndian: boolean) {
             if (len > data.length) return '';
 
             var arr = data.subarray(0, len);
@@ -39,7 +39,7 @@ export function refreshConverterPanel(panel: JQuery, dataProvider: DataProvider,
         panel.find(`.double .val`).text(data.length >= 8 ? new Float64Array(data.buffer.slice(0, 8))[0] : '');
         panel.find(`.unixts .val`).text(unixtsDate.format('Y-m-d H:i:s'));
 
-        function strDecode(enc) {
+        function strDecode(enc: string) {
             var str = new TextDecoder(enc).decode(data);
             for (var i = 0; i < str.length; i++)
                 if (str[i] === '\0')

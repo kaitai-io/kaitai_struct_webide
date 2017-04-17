@@ -1,4 +1,4 @@
-module.exports = function convert(userObj, solObj) {
+module.exports = function convert(userObj: any, solObj: any) {
     class ObjectType {
         static Primitive = "Primitive";
         static Array = "Array";
@@ -7,13 +7,13 @@ module.exports = function convert(userObj, solObj) {
         static Undefined = "Undefined";
     }
 
-    function numConv(num) {
+    function numConv(num: number) {
         return num % 1 > 10e-9 ? Math.round(num * 1000000) / 1000000 : num;
     }
 
-    function isUndef(obj) { return typeof obj === "undefined"; }
+    function isUndef(obj: any) { return typeof obj === "undefined"; }
 
-    function getObjectType(obj) {
+    function getObjectType(obj: any) {
         var objType;
         if (obj instanceof Uint8Array)
             objType = ObjectType.TypedArray;
@@ -34,7 +34,7 @@ module.exports = function convert(userObj, solObj) {
 
     var padLen = 2;
     var json = "";
-    var lines = [];
+    var lines: string[] = [];
     var currLine: any = { start: 0 };
 
     function nl() {
@@ -45,7 +45,7 @@ module.exports = function convert(userObj, solObj) {
         return '\n';
     }
 
-    function reprPrimitive(obj): string {
+    function reprPrimitive(obj: any): string {
         var type = getObjectType(obj);
         if (type === ObjectType.TypedArray) {
             var result = "[";
@@ -66,10 +66,10 @@ module.exports = function convert(userObj, solObj) {
             return null;
     }
 
-    function union(a, b) { return [...new Set([...a, ...b])]; }
+    function union(a: any[], b: any[]) { return [...new Set([...a, ...b])]; }
 
     var allMatch = true;
-    function toJson(obj, solObj, fieldName = null, pad = 0) {
+    function toJson(obj: any, solObj: any, fieldName: string = null, pad = 0) {
         var objPad = " ".repeat((pad + 0) * padLen);
         var childPad = " ".repeat((pad + 1) * padLen);
         var objType = getObjectType(obj);

@@ -33,7 +33,7 @@ export class IntervalViewer {
     htmlNext: JQuery;
 
     constructor(public htmlIdPrefix: string) {
-        ["Curr", "Total", "Prev", "Next"].forEach(control => this[`html${control}`] = $(`#${htmlIdPrefix}${control}`));
+        ["Curr", "Total", "Prev", "Next"].forEach(control => (<any>this)[`html${control}`] = $(`#${htmlIdPrefix}${control}`));
         this.htmlNext.on('click', () => this.move(+1));
         this.htmlPrev.on('click', () => this.move(-1));
     }
@@ -62,7 +62,7 @@ export var ksyTypes: IKsyTypes;
 export interface IKsyTypes { [name: string]: KsySchema.IType };
 
 class JsImporter {
-    importYaml(name, mode){
+    importYaml(name: string, mode: string){
         return new Promise(function (resolve, reject) {
             console.log(`import yaml: ${name}, mode: ${mode}`);
 
@@ -86,7 +86,7 @@ export function compile(srcYaml: string, kslang: string, debug: true | false | '
         function collectKsyTypes(schema: KsySchema.IKsyFile): IKsyTypes {
             var types: IKsyTypes = {};
 
-            function ksyNameToJsName(ksyName, isProp) { return ksyName.split('_').map((x,i) => i == 0 && isProp ? x : x.ucFirst()).join(''); }
+            function ksyNameToJsName(ksyName: string, isProp: boolean) { return ksyName.split('_').map((x,i) => i === 0 && isProp ? x : x.ucFirst()).join(''); }
 
             function collectTypes(parent: KsySchema.IType) {
                 if (parent.types) {
@@ -162,7 +162,7 @@ export function compile(srcYaml: string, kslang: string, debug: true | false | '
     }
 }
 
-function isKsyFile(fn) { return fn.toLowerCase().endsWith('.ksy'); }
+function isKsyFile(fn: string) { return fn.toLowerCase().endsWith('.ksy'); }
 
 var ksyFsItemName = isPracticeMode ? `ksyFsItem_practice_${practiceChallName}` : 'ksyFsItem';
 
@@ -194,7 +194,7 @@ function reparse() {
     handleError(null);
     return performanceHelper.measureAction("Parse initialization", Promise.all([inputReady, formatReady]).then(() => {
         var debugCode = ui.genCodeDebugViewer.getValue();
-        var jsClassName = kaitaiIde.ksySchema.meta.id.split('_').map(x => x.ucFirst()).join('');
+        var jsClassName = kaitaiIde.ksySchema.meta.id.split('_').map((x: string) => x.ucFirst()).join('');
         return workerCall(<IWorkerMessage>{ type: 'eval', args: [`wi.ksyTypes = args.ksyTypes;\n${debugCode}\nwi.MainClass = ${jsClassName};void(0)`, { ksyTypes: ksyTypes }] });
     })).then(() => {
         //console.log('recompiled');
@@ -229,12 +229,12 @@ function reparse() {
 
 (<any>window).kt = { workerEval: workerEval };
 
-var lastKsyContent, inputContent: ArrayBuffer, inputFsItem: IFsItem, lastKsyFsItem: IFsItem;
+var lastKsyContent: string, inputContent: ArrayBuffer, inputFsItem: IFsItem, lastKsyFsItem: IFsItem;
 export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
     if (!fsItem || fsItem.type !== 'file')
         return Promise.resolve();
 
-    return fss[fsItem.fsType].get(fsItem.fn).then(content => {
+    return fss[fsItem.fsType].get(fsItem.fn).then((content: any) => {
         if (isKsyFile(fsItem.fn)) {
             localforage.setItem(ksyFsItemName, fsItem);
             lastKsyFsItem = fsItem;
@@ -276,7 +276,7 @@ localStorage.setItem('lastVersion', kaitaiIde.version);
 //if (isPracticeMode)
 //    $.getScript('js/app.practiceMode.js');
 
-export var formatReady, inputReady;
+export var formatReady: Promise<any>, inputReady: Promise<any>;
 $(() => {
     $('#webIdeVersion').text(kaitaiIde.version);
     $('#compilerVersion').text(io.kaitai.struct.MainJs().version + " (" + io.kaitai.struct.MainJs().buildDate + ")");
@@ -313,7 +313,7 @@ $(() => {
     ui.genCodeDebugViewer.commands.addCommand({
         name: "compile",
         bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
-        exec: function (editor) { reparse(); }
+        exec: function (editor: any) { reparse(); }
     });
 
     if (!isPracticeMode)
@@ -350,7 +350,7 @@ $(() => {
         return false;
     });
 
-    function ctxAction(obj, callback) {
+    function ctxAction(obj: JQuery, callback: (e: JQueryEventObject) => void) {
         obj.find('a').on('click', e => {
             if (!obj.hasClass('disabled')) {
                 inputContextMenu.hide();

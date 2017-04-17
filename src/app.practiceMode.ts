@@ -1,5 +1,5 @@
 ﻿import {ui, practiceChall, practiceChallName } from "app.layout";
-var practiceDiff: AceAjax.Editor, aceRange: any, markers = [];
+var practiceDiff: AceAjax.Editor, aceRange: any, markers: any[] = [];
 
 interface ILine { start: number; end: number; idx: number; match: string; }
 
@@ -8,9 +8,9 @@ export function practiceExportedChanged(exportedRoot: IExportedValue) {
         return num % 1 > 10e-9 ? Math.round(num * 1000000) / 1000000 : num;
     }
 
-    function isUndef(obj) { return typeof obj === "undefined"; }
+    function isUndef(obj: any) { return typeof obj === "undefined"; }
 
-    function getObjectType(obj) {
+    function getObjectType(obj: any) {
         var objType;
         if (obj instanceof Uint8Array)
             objType = ObjectType.TypedArray;
@@ -42,7 +42,7 @@ export function practiceExportedChanged(exportedRoot: IExportedValue) {
         return '\n';
     }
 
-    function reprPrimitive(obj): any {
+    function reprPrimitive(obj: any): any {
         var type = getObjectType(obj);
         if (type === ObjectType.TypedArray) {
             var result = "[";
@@ -55,10 +55,10 @@ export function practiceExportedChanged(exportedRoot: IExportedValue) {
             return null;
     }
 
-    function union(a, b) { return [...new Set([...a, ...b])]; }
+    function union(a: any[], b: any[]) { return [...new Set([...a, ...b])]; }
 
     var win = true;
-    function toJson(obj, solObj, fieldName = null, pad = 0) {
+    function toJson(obj: any, solObj: any, fieldName: string = null, pad = 0) {
         var objPad = " ".repeat((pad + 0) * padLen);
         var childPad = " ".repeat((pad + 1) * padLen);
         var objType = getObjectType(obj);
@@ -120,7 +120,7 @@ export function practiceExportedChanged(exportedRoot: IExportedValue) {
         return false;
     }
 
-    function exportedToNative(exp: IExportedValue) {
+    function exportedToNative(exp: IExportedValue): any {
         if (exp.type === ObjectType.Primitive)
             return exp.primitiveValue;
         else if (exp.type === ObjectType.TypedArray)
@@ -128,7 +128,7 @@ export function practiceExportedChanged(exportedRoot: IExportedValue) {
         else if (exp.type === ObjectType.Array)
             return exp.arrayItems.map(x => exportedToNative(x));
         else if (exp.type === ObjectType.Object) {
-            var result = {};
+            var result: any = {};
             Object.keys(exp.object.fields).forEach(fieldName => { result[fieldName] = exportedToNative(exp.object.fields[fieldName]); });
             Object.keys(exp.object.instances).forEach(fieldName => {
                 result[fieldName] = exportedToNative(exp.object.fields[fieldName]);

@@ -1,5 +1,5 @@
-﻿export function initFileDrop(containerId, callback: IFileProcessCallback) {
-    var dragLeaveClear;
+﻿export function initFileDrop(containerId: string, callback: IFileProcessCallback) {
+    var dragLeaveClear: number;
     var body = $("body");
     var fileDropShadow = $("#" + containerId);
     body.on("dragover", function (event) {

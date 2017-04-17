@@ -1,4 +1,4 @@
-﻿var practiceMode = {
+﻿var practiceMode: any = {
     chall: 'url',
     serverCheckUrl: '/check',
     challs: {

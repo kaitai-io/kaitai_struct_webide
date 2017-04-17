@@ -1,4 +1,4 @@
-﻿function downloadFile(url) {
+﻿function downloadFile(url: string) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'arraybuffer';
@@ -10,7 +10,7 @@
     });
 }
 
-function saveFile(data: ArrayBuffer | Uint8Array, filename: string) {
+function saveFile(data: ArrayBuffer | Uint8Array | string, filename: string) {
     var a = document.createElement("a");
     document.body.appendChild(a);
     (<any>a).style = "display:none";
@@ -27,7 +27,7 @@ class Delayed {
 
     constructor(public delay: number) { }
 
-    public do(func) {
+    public do(func: () => void) {
         if (this.timeout)
             clearTimeout(this.timeout);
 
@@ -49,7 +49,7 @@ String.prototype.ucFirst = function () {
 }
 
 if (!String.prototype.repeat) {
-    String.prototype.repeat = function (count) {
+    String.prototype.repeat = function (count: number) {
         'use strict';
         if (this == null) {
             throw new TypeError('can\'t convert ' + this + ' to object');
@@ -93,7 +93,7 @@ if (!String.prototype.repeat) {
 }
 
 if (!String.prototype.endsWith) {
-    String.prototype.endsWith = function (searchString, position) {
+    String.prototype.endsWith = function (searchString: string, position: number) {
         var subjectString = this.toString();
         if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
             position = subjectString.length;
@@ -110,7 +110,7 @@ if (!Array.prototype.last) {
     Array.prototype.last = function () { return this[this.length - 1]; };
 }
 
-function asciiEncode(bytes) {
+function asciiEncode(bytes: Uint8Array) {
     var len = bytes.byteLength;
     var binary = '';
     for (var i = 0; i < len; i++)
@@ -118,7 +118,7 @@ function asciiEncode(bytes) {
     return binary;
 }
 
-function hexEncode(bytes) {
+function hexEncode(bytes: Uint8Array) {
     var len = bytes.byteLength;
     var binary = '0x';
     for (var i = 0; i < len; i++)
@@ -126,22 +126,22 @@ function hexEncode(bytes) {
     return binary;
 }
 
-function arrayBufferToBase64(buffer) {
+function arrayBufferToBase64(buffer: ArrayBuffer) {
     var bytes = new Uint8Array(buffer);
     var binary = asciiEncode(bytes);
     return window.btoa(binary);
 }
 
-function readBlob(blob, mode: "arrayBuffer" | "text" | "dataUrl", ...args) {
+function readBlob(blob: Blob, mode: "arrayBuffer" | "text" | "dataUrl", ...args: any[]) {
     return new Promise(function (resolve, reject) {
         var reader = new FileReader();
         reader.onload = function () { resolve(reader.result); };
         reader.onerror = function (e) { reject(e); };
-        reader['readAs' + mode[0].toUpperCase() + mode.substr(1)](blob, ...args);
+        (<any>reader)['readAs' + mode[0].toUpperCase() + mode.substr(1)](blob, ...args);
     });
 }
 
-function htmlescape(s) {
+function htmlescape(s: string) {
     return $("<div/>").text(s).html();
 }
 
@@ -157,14 +157,14 @@ interface IFileProcessItem {
 }
 
 interface IFileProcessCallback {
-    (files: IFileProcessItem[]);
+    (files: IFileProcessItem[]): void;
 };
 
-function processFiles(files) {
+function processFiles(files: FileList) {
     var resFiles = <IFileProcessItem[]>[];
     for (var i = 0; i < files.length; i++) {
         var file = files[i];
-        resFiles.push({ file: file, read: function (mode) { return readBlob(this.file, mode); } })
+        resFiles.push({ file: file, read: function (mode: "arrayBuffer" | "text" | "dataUrl") { return readBlob(this.file, mode); } });
     }
     return resFiles;
 }
@@ -176,22 +176,11 @@ function openFilesWithDialog(callback: IFileProcessCallback) {
     }).click();
 }
 
-function getAllNodes(tree) {
-    function collectNodes(node, result) {
-        result.push(node);
-        node.children.forEach(child => collectNodes(child, result));
-    }
-
-    var allNodes = [];
-    var json = tree.get_json().forEach(item => collectNodes(item, allNodes));
-    return allNodes;
-}
-
 interface Date {
     format(format: string): string;
 }
 
-function s(strings, ...values) {
+function s(strings: TemplateStringsArray, ...values: any[]) {
     var result = strings[0];
     for (var i = 1; i < strings.length; i++)
         result += htmlescape(values[i - 1]) + strings[i];
@@ -199,7 +188,7 @@ function s(strings, ...values) {
 }
 
 function collectAllObjects(root: IExportedValue): IExportedValue[] {
-    var objects = [];
+    var objects: IExportedValue[] = [];
 
     function process(value: IExportedValue) {
         objects.push(value);

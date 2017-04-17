@@ -6,8 +6,8 @@ declare var kaitaiFsFiles: string[];
 
 interface IFileSystem {
     getRootNode(): Promise<any>;
-    get(fn): Promise<string | ArrayBuffer>;
-    put(fn, data): Promise<IFsItem>;
+    get(fn: string): Promise<string | ArrayBuffer>;
+    put(fn: string, data: any): Promise<IFsItem>;
 }
 
 export interface IFsItem {
@@ -46,7 +46,7 @@ class LocalStorageFs implements IFileSystem {
     private root: IFsItem;
     private rootPromise: Promise<IFsItem>;
     private filesKey() { return `${this.prefix}_files`; }
-    private fileKey(fn) { return `${this.prefix}_file[${fn}]`; }
+    private fileKey(fn: string) { return `${this.prefix}_file[${fn}]`; }
 
     private save() { return localforage.setItem(this.filesKey(), this.root); }
 
@@ -57,14 +57,14 @@ class LocalStorageFs implements IFileSystem {
         return this.rootPromise;
     }
 
-    setRootNode(newRoot) {
+    setRootNode(newRoot: IFsItem) {
         this.root = newRoot;
         return this.save();
     }
 
-    get(fn) { return localforage.getItem<string|ArrayBuffer>(this.fileKey(fn)); }
+    get(fn: string): Promise<string | ArrayBuffer> { return localforage.getItem<string|ArrayBuffer>(this.fileKey(fn)); }
 
-    put(fn, data) {
+    put(fn: string, data: any): Promise<IFsItem> {
         return this.getRootNode().then(root => {
             var node = fsHelper.selectNode(root, fn);
             return Promise.all([localforage.setItem(this.fileKey(fn), data), this.save()]).then(x => node);
@@ -77,22 +77,22 @@ class KaitaiFs implements IFileSystem {
 
     getRootNode() { return Promise.resolve(this.files); }
 
-    get(fn): Promise<string|ArrayBuffer> {
+    get(fn: string): Promise<string|ArrayBuffer> {
         if (fn.toLowerCase().endsWith('.ksy'))
             return Promise.resolve<string>($.ajax({ url: fn }));
         else
             return downloadFile(fn);
     }
 
-    put(fn, data) { return Promise.reject('KaitaiFs.put is not implemented!'); }
+    put(fn: string, data: any) { return Promise.reject('KaitaiFs.put is not implemented!'); }
 }
 
 class StaticFs implements IFileSystem {
     public files: { [fn: string]:string };
     constructor() { this.files = {}; }
     getRootNode() { return Promise.resolve(Object.keys(this.files).map(fn => <IFsItem>{ fsType: 'static', type: 'file', fn })); }
-    get(fn) { return Promise.resolve(this.files[fn]); }
-    put(fn, data) { this.files[fn] = data; return Promise.resolve(null); }
+    get(fn: string) { return Promise.resolve(this.files[fn]); }
+    put(fn: string, data: any) { this.files[fn] = data; return Promise.resolve(null); }
 }
 
 var kaitaiRoot = <IFsItem>{ fsType: 'kaitai' };
@@ -101,9 +101,9 @@ var kaitaiFs = new KaitaiFs(kaitaiRoot);
 export var staticFs = new StaticFs();
 
 export var localFs = new LocalStorageFs("fs");
-export var fss = { local: localFs, kaitai: kaitaiFs, static: staticFs };
+export var fss: { [name: string]: IFileSystem } = { local: localFs, kaitai: kaitaiFs, static: staticFs };
 
-function genChildNode(obj: IFsItem, fn: string) {
+function genChildNode(obj: IFsItem, fn: string): any {
     var isFolder = obj.type === 'folder';
     return {
         text: fn,
@@ -113,7 +113,7 @@ function genChildNode(obj: IFsItem, fn: string) {
     };
 }
 
-function genChildNodes(obj) {
+function genChildNodes(obj: IFsItem): any {
     return Object.keys(obj.children || []).map(k => genChildNode(obj.children[k], k));
 }
 
@@ -122,19 +122,20 @@ export function refreshFsNodes() {
     return localFs.getRootNode().then(root => {
         ui.fileTree.delete_node(localStorageNode.children);
         if (root)
-            genChildNodes(root).forEach(node => ui.fileTree.create_node(localStorageNode, node));
+            genChildNodes(root).forEach((node: any) => ui.fileTree.create_node(localStorageNode, node));
     });
 }
 
-export function addKsyFile(parent: string, ksyFn: string, content: string) {
+export function addKsyFile(parent: string | Element, ksyFn: string, content: string) {
     var name = ksyFn.split('/').last();
-    return fss.local.put(name, content).then(fsItem => {
-        ui.fileTree.create_node(ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: 'glyphicon glyphicon-list-alt' }, "last", node => ui.fileTree.activate_node(node, null));
+    return fss.local.put(name, content).then((fsItem: IFsItem) => {
+        ui.fileTree.create_node(ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: 'glyphicon glyphicon-list-alt' },
+            "last", (node: any) => ui.fileTree.activate_node(node, null));
         return loadFsItem(fsItem, true);
     });
 }
 
-var fileTreeCont;
+var fileTreeCont: JQuery;
 
 $(() => {
     if (!ui.fileTreeCont) return;
@@ -143,7 +144,7 @@ $(() => {
 
     ui.fileTree = fileTreeCont.jstree({
         core: {
-            check_callback: function (operation, node, node_parent, node_position, more) {
+            check_callback: function (operation: string, node: any, node_parent: any, node_position: number, more: boolean) {
                 var result = true;
                 if (operation === "move_node")
                     result = !!node.data && node.data.fsType === "local" && !!node_parent.data && node_parent.data.fsType === "local" && node_parent.data.type === "folder";
@@ -180,10 +181,10 @@ $(() => {
         downloadFile: $('#downloadFile'),
     };
 
-    function convertTreeNode(treeNode) {
+    function convertTreeNode(treeNode: any) {
         var data = treeNode.data;
         data.children = {};
-        treeNode.children.forEach(child => data.children[child.text] = convertTreeNode(child));
+        treeNode.children.forEach((child: any) => data.children[child.text] = convertTreeNode(child));
         return data;
     }
 
@@ -191,7 +192,7 @@ $(() => {
         localFs.setRootNode(convertTreeNode(ui.fileTree.get_json()[1]));
     }
 
-    var contextMenuTarget = null;
+    var contextMenuTarget: string|Element = null;
 
     function getSelectedData() {
         var selected = ui.fileTree.get_selected();
@@ -211,7 +212,7 @@ $(() => {
         var isLocal = data && data.fsType === 'local';
         var isKsy = data && data.fn && data.fn.endsWith('.ksy') && !isFolder;
 
-        function setEnabled(item, isEnabled) { item.toggleClass('disabled', !isEnabled); }
+        function setEnabled(item: JQuery, isEnabled: boolean) { item.toggleClass('disabled', !isEnabled); }
 
         setEnabled(uiFiles.createFolder, isLocal && isFolder);
         setEnabled(uiFiles.createKsyFile, isLocal && isFolder);
@@ -222,7 +223,7 @@ $(() => {
         return false;
     });
 
-    function ctxAction(obj, callback) {
+    function ctxAction(obj: JQuery, callback: (e: JQueryEventObject) => void) {
         obj.find('a').on('click', e => {
             if (!obj.hasClass('disabled')) {
                 uiFiles.fileTreeContextMenu.hide();
@@ -233,21 +234,21 @@ $(() => {
 
     ctxAction(uiFiles.createFolder, e => {
         var parentData = getSelectedData();
-        ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), { data: { fsType: parentData.fsType, type: 'folder' }, icon: 'glyphicon glyphicon-folder-open' }, "last", node => {
+        ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), { data: { fsType: parentData.fsType, type: 'folder' }, icon: 'glyphicon glyphicon-folder-open' }, "last", (node: any) => {
             ui.fileTree.activate_node(node, null);
             setTimeout(function () { ui.fileTree.edit(node); }, 0);
         });
     });
 
-    ctxAction(uiFiles.deleteItem, e => ui.fileTree.delete_node(ui.fileTree.get_selected()));
-    ctxAction(uiFiles.openItem, e => $(contextMenuTarget).trigger('dblclick'));
+    ctxAction(uiFiles.deleteItem, () => ui.fileTree.delete_node(ui.fileTree.get_selected()));
+    ctxAction(uiFiles.openItem, () => $(contextMenuTarget).trigger('dblclick'));
 
     ctxAction(uiFiles.generateParser, e => {
         var fsItem = getSelectedData();
         var linkData = $(e.target).data();
         //console.log(fsItem, linkData);
 
-        fss[fsItem.fsType].get(fsItem.fn).then(content => {
+        fss[fsItem.fsType].get(fsItem.fn).then((content: string) => {
             return compile(content, linkData.kslang, !!linkData.ksdebug).then(compiled => {
                 Object.keys(compiled).forEach(fileName => {
                     //var title = fsItem.fn.split('/').last() + ' [' + $(e.target).text() + ']' + (compiled.length == 1 ? '' : ` ${i + 1}/${compiled.length}`);
@@ -266,8 +267,8 @@ $(() => {
         [uiFiles.downloadFile, uiFiles.downloadItem].forEach(i => i.toggleClass('disabled', !(fsItem && fsItem.type === 'file')));
     });
 
-    var ksyParent;
-    function showKsyModal(parent) {
+    var ksyParent: string|Element;
+    function showKsyModal(parent: string | Element) {
         ksyParent = parent;
         $('#newKsyName').val('');
         (<any>$('#newKsyModal')).modal();
@@ -308,6 +309,6 @@ $(() => {
         var newFn = fsItem.fn.replace('.ksy', '_' + new Date().format('Ymd_His') + '.ksy');
         console.log('newFn', newFn);
 
-        fss[fsItem.fsType].get(fsItem.fn).then(content => addKsyFile('localStorage', newFn, content));
+        fss[fsItem.fsType].get(fsItem.fn).then((content: string) => addKsyFile('localStorage', newFn, content));
     });
 })

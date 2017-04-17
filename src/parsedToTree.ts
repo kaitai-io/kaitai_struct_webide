@@ -3,7 +3,7 @@ import { IKsyTypes } from "./app";
 import { workerCall } from "./app.worker";
 import { handleError } from "./app.errors";
 import { IInterval, IntervalHandler } from "./utils/IntervalHelper";
-declare var kaitaiIde;
+declare var kaitaiIde: any;
 
 interface ParsedTreeNodeData {
     exported?: IExportedValue;
@@ -31,24 +31,25 @@ export class ParsedTreeHandler {
     public jstree: JSTree;
     public intervalHandler: IntervalHandler<IParsedTreeInterval>;
 
-    public constructor(public jsTreeElement, public exportedRoot: IExportedValue, public ksyTypes: IKsyTypes) {
+    public constructor(public jsTreeElement: any, public exportedRoot: IExportedValue, public ksyTypes: IKsyTypes) {
         jsTreeElement.jstree("destroy");
-        this.jstree = jsTreeElement.jstree({ core: { data: (node, cb) => this.getNode(node).then(x => cb(x), e => handleError(e)), themes: { icons: false }, multiple: false, force_text: false } }).jstree(true);
-        this.jstree.on = (...args) => this.jstree.element.on(...args);
-        this.jstree.off = (...args) => this.jstree.element.off(...args);
+        this.jstree = jsTreeElement.jstree({
+            core: {
+                data: (node: ParsedTreeNode, cb: any) =>
+                    this.getNode(node).then(x => cb(x), e => handleError(e)), themes: { icons: false }, multiple: false, force_text: false
+            }
+        }).jstree(true);
+        this.jstree.on = (...args: any[]) => this.jstree.element.on(...args);
+        this.jstree.off = (...args: any[]) => this.jstree.element.off(...args);
         this.jstree.on('keyup.jstree', e => this.jstree.activate_node(e.target.id, null));
         this.intervalHandler = new IntervalHandler<IParsedTreeInterval>();
     }
 
-    private parsedTreeOpenedNodes = {};
+    private parsedTreeOpenedNodes: { [id: string]: boolean } = {};
     private saveOpenedNodesDisabled = false;
 
     private saveOpenedNodes() {
         if (this.saveOpenedNodesDisabled) return;
-
-        //parsedTreeOpenedNodes = {};
-        //getAllNodes(ui.parsedDataTree).filter(x => x.state.opened).forEach(x => parsedTreeOpenedNodes[x.id] = true);
-        //console.log('saveOpenedNodes');
         localStorage.setItem('parsedTreeOpenedNodes', Object.keys(this.parsedTreeOpenedNodes).join(','));
     }
 
@@ -106,13 +107,13 @@ export class ParsedTreeHandler {
             throw new Error("primitiveToText: object is not primitive!");
     }
 
-    reprObject(obj: IExportedValue) {
+    reprObject(obj: IExportedValue): string {
         var repr = obj.object.ksyType && obj.object.ksyType["-webide-representation"];
         if (!repr) return "";
 
-        function ksyNameToJsName(ksyName) { return ksyName.split('_').map((x, i) => (i === 0 ? x : x.ucFirst())).join(''); }
+        function ksyNameToJsName(ksyName: string) { return ksyName.split('_').map((x, i) => (i === 0 ? x : x.ucFirst())).join(''); }
 
-        return htmlescape(repr).replace(/{(.*?)}/g, (g0, g1) => {
+        return htmlescape(repr).replace(/{(.*?)}/g, (g0, g1: string) => {
             var currItem = obj;
             var parts = g1.split(':');
 
@@ -267,7 +268,7 @@ export class ParsedTreeHandler {
                     }
 
                     if (!isInstance) {
-                        var nonParsed = [];
+                        var nonParsed: IInterval[] = [];
 
                         var lastEnd = -1;
                         intervals.forEach(i => {
@@ -321,7 +322,7 @@ export class ParsedTreeHandler {
         return 'inputField_' + path.join('_');
     }
 
-    openNodes(nodesToOpen): Promise<boolean> {
+    openNodes(nodesToOpen: string[]): Promise<boolean> {
         return new Promise((resolve, reject) => {
             this.saveOpenedNodesDisabled = true;
             var origAnim = this.jstree.settings.core.animation;
@@ -329,12 +330,12 @@ export class ParsedTreeHandler {
             //console.log('saveOpenedNodesDisabled = true');
 
             var openCallCounter = 1;
-            var openRound = (e) => {
+            var openRound = (e: any) => {
                 openCallCounter--;
                 //console.log('openRound', openCallCounter, nodesToOpen);
 
-                var newNodesToOpen = [];
-                var existingNodes = [];
+                var newNodesToOpen: string[] = [];
+                var existingNodes: string[] = [];
                 nodesToOpen.forEach(nodeId => {
                     var node = this.jstree.get_node(nodeId);
                     if (node) {
@@ -370,7 +371,7 @@ export class ParsedTreeHandler {
         });
     }
 
-    activatePath(path): Promise<boolean> {
+    activatePath(path: string|string[]): Promise<boolean> {
         var pathParts = typeof path === "string" ? path.split('/') : path;
 
         var expandNodes = [];

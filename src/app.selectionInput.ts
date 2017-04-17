@@ -1,11 +1,11 @@
 ﻿import {ui} from "./app.layout";
 import {dataProvider} from "./app";
 
-var inputSizeElement, $selStart, $selEnd;
+var inputSizeElement: JQuery, $selStart: JQuery, $selEnd: JQuery;
 var userChange = false;
 var useHexAddr = true;
 
-function resetInputWidth(target) {
+function resetInputWidth(target: JQuery | string | Element) {
     var value = $(target).val();
     inputSizeElement.text(value);
     var width = inputSizeElement.width();
@@ -13,7 +13,7 @@ function resetInputWidth(target) {
     //console.log('resetInputWidth', $(target).val(), width);
 }
 
-function selectionInputChanged(e) {
+function selectionInputChanged(e: JQueryEventObject) {
     resetInputWidth(e.target);
 
     useHexAddr = !$(e.target).val() || $(e.target).val().startsWith('0x');
@@ -26,7 +26,7 @@ function selectionInputChanged(e) {
     }
 }
 
-function setAddrInput(input, value) {
+function setAddrInput(input: JQuery, value: number) {
     if (value < 0) value = 0;
     if (dataProvider && value >= dataProvider.length) value = dataProvider.length - 1;
     input.val(value === null ? '' : useHexAddr ? `0x${value.toString(16)}` : value);

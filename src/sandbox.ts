@@ -6,12 +6,12 @@ import { FsUri } from './FileSystem/FsUri';
 import { LocalFileSystem } from './FileSystem/LocalFs';
 import { RemoteFileSystem } from './FileSystem/RemoteFs';
 import { FsSelector } from './FileSystem/FsSelector';
-import { Vue } from 'vue';
+import * as Vue from 'vue';
 declare var kaitaiFsFiles: string[];
 
 function fsTest() {
     var queryParams: { access_token?: string, secret?: string } = {};
-    location.search.substr(1).split('&').map(x => x.split('=')).forEach(x => queryParams[x[0]] = x[1]);
+    location.search.substr(1).split('&').map(x => x.split('=')).forEach(x => (<any>queryParams)[x[0]] = x[1]);
 
     var fs = new FsSelector();
     fs.addFs(new LocalFileSystem());

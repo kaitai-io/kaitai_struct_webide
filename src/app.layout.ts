@@ -3,7 +3,7 @@ import * as GoldenLayout from "goldenlayout";
 import { HexViewer } from "HexViewer";
 import {ParsedTreeHandler} from "./parsedToTree";
 var practiceChallNameMatch = /practice=([a-z0-9]+)/.exec(location.href);
-export var practiceMode = null;
+export var practiceMode: any = null;
 export var practiceChallName = practiceChallNameMatch ? practiceChallNameMatch[1] : practiceMode && practiceMode.chall;
 export var practiceChall = practiceMode && practiceChallName && practiceMode.challs[practiceChallName];
 export var isPracticeMode = !!practiceChall;
@@ -42,14 +42,14 @@ var myLayout = new GoldenLayout({
     ]
 });
 
-export function getLayoutNodeById(id) {
-    return (<any>myLayout)._getAllContentItems().filter(x => x.config.id === id || x.componentName === id)[0];
+export function getLayoutNodeById(id: string) {
+    return (<any>myLayout)._getAllContentItems().filter((x: any) => x.config.id === id || x.componentName === id)[0];
 }
 
 var dynCompId = 1;
 export function addEditorTab(title: string, data: string, lang: string = null, parent: string = 'codeTab') {
     var componentName = `dynComp${dynCompId++}`;
-    addEditor(componentName, lang, true, editor => editor.setValue(data, -1));
+    addEditor(componentName, lang, true, (editor: any) => editor.setValue(data, -1));
     getLayoutNodeById(parent).addChild({ type: 'component', componentName, title });
 }
 
@@ -72,29 +72,31 @@ var ui = {
     bytesIntSel: <IntervalViewer>null,
 };
 
-function addComponent(name: string, generatorCallback?) {
-    var editor;
+var uiAny = <any>ui;
 
-    myLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState) {
+function addComponent(name: string, generatorCallback?: (container: GoldenLayout.Container) => any) {
+    var editor: any;
+
+    myLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
         //console.log('addComponent id', name, container.getElement());
         container.getElement().attr('id', name);
         if (generatorCallback) {
             container.on('resize', () => { if (editor && editor.resize) editor.resize(); });
-            container.on('open', () => { ui[name] = editor = generatorCallback(container) || container; });
+            container.on('open', () => { uiAny[name] = editor = generatorCallback(container) || container; });
         } else
-            ui[name + 'Cont'] = container;
+            uiAny[name + 'Cont'] = container;
     });
 }
 
 function addExistingDiv(name: string) {
-    myLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState) {
-        ui[name + 'Cont'] = container;
-        ui[name] = $(`#${name}`).appendTo(container.getElement());
-        $(() => ui[name].show());
+    myLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
+        uiAny[name + 'Cont'] = container;
+        uiAny[name] = $(`#${name}`).appendTo(container.getElement());
+        $(() => uiAny[name].show());
     });
 }
 
-function addEditor(name: string, lang: string, isReadOnly: boolean = false, callback = null) {
+function addEditor(name: string, lang: string, isReadOnly: boolean = false, callback: ((editor: AceAjax.Editor) => void) = null) {
     addComponent(name, container => {
         var editor = ace.edit(container.getElement().get(0));
         editor.setTheme("ace/theme/monokai");

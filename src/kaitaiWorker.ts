@@ -1,5 +1,6 @@
 ﻿var wi = { ioInput: <any>null, root: <any>null, parseError: <any>null, exported: <any>null, inputBuffer: <any>null, MainClass: <any>null, ksyTypes: <any>null };
 var KaitaiStream: any, module: any;
+declare function importScripts(...urls: string[]): void;
 
 class IDebugInfo {
     start: number;
@@ -9,9 +10,9 @@ class IDebugInfo {
     enumName?: string;
 }
 
-function isUndef(obj) { return typeof obj === "undefined"; }
+function isUndef(obj: any) { return typeof obj === "undefined"; }
 
-function getObjectType(obj) {
+function getObjectType(obj: any) {
     if (obj instanceof Uint8Array)
         return ObjectType.TypedArray;
     else if (obj === null || typeof obj !== "object")
@@ -50,7 +51,7 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         }
     }
     else if (result.type === ObjectType.Array) {
-        result.arrayItems = obj.map((item, i) => exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy));
+        result.arrayItems = (<any[]>obj).map((item, i) => exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy));
     }
     else if (result.type === ObjectType.Object) {
         var childIoOffset = obj._io._byteOffset;
@@ -85,12 +86,12 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
 importScripts('entities.js');
 importScripts('../lib/kaitai_js_runtime/KaitaiStream.js');
 
-function define(name, deps, getter) { this[name] = getter(); };
+function define(name: string, deps: any, getter: any) { this[name] = getter(); };
 (<any>define).amd = true;
 
 var apiMethods = {
-    eval: (code, args) => eval(code),
-    reparse: (eagerMode) => {
+    eval: (code: string, args: any[]) => eval(code),
+    reparse: (eagerMode: boolean) => {
         var start = performance.now();
         wi.ioInput = new KaitaiStream(wi.inputBuffer, 0);
         wi.parseError = null;
@@ -102,7 +103,7 @@ var apiMethods = {
     },
     get: (path: string[]) => {
         var obj = wi.root;
-        var parent = null;
+        var parent: any = null;
         path.forEach(key => { parent = obj; obj = obj[key]; });
 
         var debug = <IDebugInfo>parent._debug['_m_' + path[path.length - 1]];

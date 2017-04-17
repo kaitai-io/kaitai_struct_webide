@@ -1,29 +1,47 @@
 ﻿import { IInterval, IIntervalLookup } from "./utils/IntervalHelper";
 
+interface IHexViewerCell extends HTMLSpanElement {
+    cell: IHexViewerCell;
+    levels: IHexViewerCell[];
+    dataOffset: number;
+}
+
+interface IHexViewerPart {
+    childNodes: IHexViewerCell[];
+}
+
+interface IHexViewerRow extends HTMLDivElement {    
+    addrPart: HTMLSpanElement;
+    hexPart: IHexViewerPart;
+    asciiPart: IHexViewerPart;
+}
+
 class HexViewUtils {
-    static zeroFill(str, padLen) {
+    static zeroFill(str: string, padLen: number) {
         while (str.length < padLen)
             str = '0' + str;
         return str;
     }
 
-    static addrHex(address) {
+    static addrHex(address: number) {
         //var addrHexLen = Math.ceil(Math.log(this.buffer.length) / Math.log(16));
         var addrHexLen = 8;
         return this.zeroFill(address.toString(16), addrHexLen);
     }
 
-    static byteAscii(bt) {
-        return bt == 32 ? '\u00a0' : bt < 32 || (0x7f <= bt && bt <= 0xa0) || bt == 0xad ? '.' : String.fromCharCode(bt);
+    static byteAscii(bt: number) {
+        return bt === 32 ? '\u00a0' :
+            bt < 32 || (0x7f <= bt && bt <= 0xa0) || bt === 0xad ? '.' :
+            String.fromCharCode(bt);
     }
 
-    static byteHex(bt) {
+    static byteHex(bt: number) {
         return this.zeroFill(bt.toString(16), 2);
     }
 
-    static generateRow(bytesPerLine, level) {
+    static generateRow(bytesPerLine: number, level: number): IHexViewerRow {
         level = level || 3;
-        function cr(tag, className): any {
+        function cr(tag: string, className: string): any {
             var elem = document.createElement(tag);
             elem.className = className;
             return elem;
@@ -61,7 +79,7 @@ class HexViewUtils {
 
 export interface IDataProvider {
     length: number;
-    get(offset: number, length: number);
+    get(offset: number, length: number): Uint8Array;
 }
 
 export class HexViewer {
@@ -69,7 +87,7 @@ export class HexViewer {
     private bytesPerLine = 16;
 
     private intervals: IIntervalLookup<IInterval>;
-    private rows = [];
+    private rows: IHexViewerRow[] = [];
     private topRow = 0;
     private maxLevel = 3;
     private rowCount: number;
@@ -86,35 +104,35 @@ export class HexViewer {
 
     public selectionStart: number = -1;
     public selectionEnd: number = -1;
-    public onSelectionChanged;
+    public onSelectionChanged: (() => void);
 
     private isRecursive: boolean;
 
-    private cellMouseAction(e) {
+    private cellMouseAction(e: any) {
         if (e.which !== 1) return; // only handle left mouse button actions
 
-        if (e.type == "mouseup")
+        if (e.type === "mouseup")
             this.content.unbind('mousemove');
 
         var cell = e.target;
         if (!('dataOffset' in cell)) {
             var cells = $(cell).find('.hexcell, .asciicell');
-            if (cells.length == 1)
+            if (cells.length === 1)
                 cell = cells.get(0);
         }
 
         if ('dataOffset' in cell) {
-            if (e.type == "mousedown") {
-                this.canDeselect = this.selectionStart == cell.dataOffset && this.selectionEnd == cell.dataOffset;
+            if (e.type === "mousedown") {
+                this.canDeselect = this.selectionStart === cell.dataOffset && this.selectionEnd === cell.dataOffset;
                 this.mouseDownOffset = cell.dataOffset;
                 this.content.on('mousemove', e => this.cellMouseAction(e));
                 this.setSelection(cell.dataOffset, cell.dataOffset);
             }
-            else if (e.type == "mousemove") {
+            else if (e.type === "mousemove") {
                 this.setSelection(this.mouseDownOffset, cell.dataOffset);
                 this.canDeselect = false;
             }
-            else if (e.type == "mouseup" && this.canDeselect && this.mouseDownOffset == cell.dataOffset)
+            else if (e.type === "mouseup" && this.canDeselect && this.mouseDownOffset === cell.dataOffset)
                 this.deselect();
 
             this.contentOuter.focus();
