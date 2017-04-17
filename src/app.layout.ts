@@ -1,6 +1,6 @@
 ﻿import { IntervalViewer } from "./app";
 import * as GoldenLayout from "goldenlayout";
-import { HexViewer } from "HexViewer";
+import { HexViewer } from "./HexViewer";
 import {ParsedTreeHandler} from "./parsedToTree";
 var practiceChallNameMatch = /practice=([a-z0-9]+)/.exec(location.href);
 export var practiceMode: any = null;

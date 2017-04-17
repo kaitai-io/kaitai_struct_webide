@@ -1,4 +1,4 @@
-﻿import { ui, addEditorTab } from 'app.layout';
+﻿import { ui, addEditorTab } from './app.layout';
 import {compile, addNewFiles, loadFsItem } from "./app";
 import {JSTreeNode as JsTreeNode} from "./parsedToTree";
 import * as localforage from "localforage";
@@ -101,7 +101,12 @@ var kaitaiFs = new KaitaiFs(kaitaiRoot);
 export var staticFs = new StaticFs();
 
 export var localFs = new LocalStorageFs("fs");
-export var fss: { [name: string]: IFileSystem } = { local: localFs, kaitai: kaitaiFs, static: staticFs };
+export var fss: {
+    [name: string]: IFileSystem;
+    local: LocalStorageFs;
+    kaitai: KaitaiFs;
+    static: StaticFs;
+} = { local: localFs, kaitai: kaitaiFs, static: staticFs };
 
 function genChildNode(obj: IFsItem, fn: string): any {
     var isFolder = obj.type === 'folder';

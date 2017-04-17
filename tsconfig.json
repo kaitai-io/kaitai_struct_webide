@@ -6,11 +6,11 @@
     "removeComments": false,
     "preserveConstEnums": true,
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
     "sourceMap": true,
     "target": "es2016",
     "outDir": "js/",
-    "lib": [ "es6", "dom" ],
-    "typeRoots": [ "./lib/ts-types/" ]
+    "lib": [ "es6", "dom" ]
   },
   "include": [
     "src/**/*",

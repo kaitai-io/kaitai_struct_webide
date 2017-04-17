@@ -1,4 +1,4 @@
-﻿import {ui, practiceChall, practiceChallName } from "app.layout";
+﻿import {ui, practiceChall, practiceChallName } from "./app.layout";
 var practiceDiff: AceAjax.Editor, aceRange: any, markers: any[] = [];
 
 interface ILine { start: number; end: number; idx: number; match: string; }

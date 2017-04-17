@@ -28,11 +28,9 @@
     <Content Include="js\autorefresh.js" />
     <Content Include="sandbox.html" />
     <TypeScriptCompile Include="lib\ts-types\knockout.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\vue\index.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\vue\options.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\vue\plugin.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\vue\vnode.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\vue\vue.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\vue-class-component.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\vue-property-decorator.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\config.ts" />
     <TypeScriptCompile Include="src\FileSystem\FsSelector.ts" />

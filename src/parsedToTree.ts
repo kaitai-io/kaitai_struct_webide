@@ -39,8 +39,8 @@ export class ParsedTreeHandler {
                     this.getNode(node).then(x => cb(x), e => handleError(e)), themes: { icons: false }, multiple: false, force_text: false
             }
         }).jstree(true);
-        this.jstree.on = (...args: any[]) => this.jstree.element.on(...args);
-        this.jstree.off = (...args: any[]) => this.jstree.element.off(...args);
+        this.jstree.on = (...args: any[]) => (<any>this.jstree).element.on(...args);
+        this.jstree.off = (...args: any[]) => (<any>this.jstree).jstree.element.off(...args);
         this.jstree.on('keyup.jstree', e => this.jstree.activate_node(e.target.id, null));
         this.intervalHandler = new IntervalHandler<IParsedTreeInterval>();
     }
@@ -325,8 +325,8 @@ export class ParsedTreeHandler {
     openNodes(nodesToOpen: string[]): Promise<boolean> {
         return new Promise((resolve, reject) => {
             this.saveOpenedNodesDisabled = true;
-            var origAnim = this.jstree.settings.core.animation;
-            this.jstree.settings.core.animation = 0;
+            var origAnim = (<any>this.jstree).settings.core.animation;
+            (<any>this.jstree).settings.core.animation = 0;
             //console.log('saveOpenedNodesDisabled = true');
 
             var openCallCounter = 1;
@@ -359,7 +359,7 @@ export class ParsedTreeHandler {
                     //console.log('saveOpenedNodesDisabled = false');
                     this.saveOpenedNodesDisabled = false;
                     e && this.jstree.off(e);
-                    this.jstree.settings.core.animation = origAnim;
+                    (<any>this.jstree).settings.core.animation = origAnim;
                     this.saveOpenedNodes();
 
                     resolve(nodesToOpen.length === 0);
