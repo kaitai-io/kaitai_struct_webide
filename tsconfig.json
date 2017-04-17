@@ -4,6 +4,7 @@
     "module": "amd",
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
+    "noEmitOnError": true,
     "removeComments": false,
     "preserveConstEnums": true,
     "allowSyntheticDefaultImports": true,
