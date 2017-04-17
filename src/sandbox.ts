@@ -7,7 +7,7 @@ import { StaticFileSystem } from './FileSystem/StaticFileSystem';
 import { IFileSystem, IFsItem, FsItem } from './FileSystem/Common';
 import { FsUri } from './FileSystem/FsUri';
 import { FsSelector } from './FileSystem/FsSelector';
-import Vue from 'vue';
+import * as Vue from 'vue';
 import Component from 'vue-class-component';
 declare var kaitaiFsFiles: string[];
 
@@ -35,13 +35,7 @@ kaitaiFsFiles.forEach(fn => staticFs.write("static://" + fn, new ArrayBuffer(0))
 
 staticFs.list("static://formats/").then(x => console.log(x.map(y => y.uri.uri)));
 
-class FsTreeHandler {
-    public root: FsTreeNode;
-
-    constructor() {
-        
-    }
-}
+class FsTreeHandler { }
 
 class FsTreeNode {
     public open = false;
@@ -54,16 +48,26 @@ class FsTreeNode {
         this.children.push(...children);
         return this;
     }
+}
 
-    isFolder() {
-        console.log('isFolder', this.text);
-        return this.children && this.children.length;
+@Component({ template: '#treeViewItem-template', props: { model: FsTreeNode } })
+class TreeViewItem extends Vue {
+    model: FsTreeNode;
+
+    get isFolder() {
+        return this.model.children && this.model.children.length;
     }
 
     toggle() {
+        console.log('toggle', this.model.text, this.model.open);
         if (this.isFolder)
-            this.open = !this.open;
+            this.model.open = !this.model.open;
     }
+}
+
+@Component({ template: '#treeView-template', props: { model: FsTreeNode }, components: { TreeViewItem } })
+class TreeView extends Vue {
+    model: FsTreeNode;
 }
 
 var fsTreeHandler = new FsTreeHandler();
@@ -80,55 +84,8 @@ var data = new FsTreeNode(fsTreeHandler, '/').add([
     new FsTreeNode(fsTreeHandler, 'file2'),
 ]);
 
-// define the item component
-Vue.component('treeViewItem', {
-    template: '#treeViewItem-template',
-    props: {
-        model: Object
-    },
-    computed: {
-        isFolder() { return (<any>this).model.isFolder(); }
-    },
-    methods: {
-        toggle() { (<any>this).model.toggle(); }
-    }
-});
-
-Vue.component('treeView', { template: '#treeView-template', props: { model: Object } });
-
-Vue.config.devtools = true;
-
-@Component({
-    props: { propMessage: String },
-    template: '#app-template'
-})
-export default class App extends Vue {
-    propMessage: string;
-    // inital data
-    msg: number = 123;
-    // use prop values for initial data
-    helloMsg: string = 'Hello, ' + this.propMessage;
-    // lifecycle hook
-    mounted() {
-        //this.greet();
-    }
-    // computed
-    get computedMsg() {
-        return 'computed ' + this.msg;
-    }
-    // method
-    greet() {
-        alert('greeting: ' + this.msg);
-    }
-}
-
-// boot up the demo
 var demo = new Vue({
     el: '#tree',
-    data: {
-        treeData: data
-    },
-    components: {
-        App
-    }
+    data: { treeData: data },
+    components: { TreeView }
 });

@@ -29,7 +29,6 @@
     <Content Include="sandbox.html" />
     <TypeScriptCompile Include="lib\ts-types\knockout.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\vue-class-component.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\vue-property-decorator.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\config.ts" />

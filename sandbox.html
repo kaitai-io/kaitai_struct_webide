@@ -5,7 +5,6 @@
 	<meta charset="utf-8" />
     <script src="lib/jquery/jquery-3.1.1.min.js"></script>
     <script src="js/autorefresh.js"></script>
-    <script src="lib/vue/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.js"></script>
     <script src="js/utils.js"></script>
     <script src="out/js/kaitaiFsFiles.js"></script>
@@ -47,26 +46,14 @@ hello66
         </div>
         <template v-if="model.open">
             <ul v-for="model in model.children">
-                <tree-view-item v-if="isFolder" :model="model"></tree-view-item>
+                <tree-view-item :model="model"></tree-view-item>
             </ul>
         </template>
     </li>
 </script>
     
-<script type="text/x-template" id="app-template">
-  <div>
-    <input v-model="msg">
-    <p>prop: {{propMessage}}</p>
-    <p>msg: {{msg}}</p>
-    <p>helloMsg: {{helloMsg}}</p>
-    <p>computed msg: {{computedMsg}}</p>
-    <button @click="greet">Greet</button>
-  </div>
-</script>
-    
 <div id="tree">
     <tree-view :model="treeData"></tree-view>    
-    <app prop-message="propmsg"></app>
 </div>
 <div id="app"></div>
 
