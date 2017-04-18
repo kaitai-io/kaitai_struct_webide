@@ -7,7 +7,7 @@
     <script src="js/autorefresh.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.js"></script>
     <script src="js/utils.js"></script>
-    <script src="out/js/kaitaiFsFiles.js"></script>
+    <script src="js/kaitaiFsFiles.js"></script>
 </head>
 <body>
 hello66
@@ -111,7 +111,7 @@ hello66
 <script>
     var paths = {};
     ["bowser", "jstree", "localforage", "goldenlayout", "knockout", "knockout-es5", "vue", "vue-class-component"].forEach(
-        name => paths[name] = `/lib/${name}/${name}`);
+        name => paths[name] = `../lib/${name}/${name}`);
 
     requirejs.config({ baseUrl: 'js/', paths: paths });
     require(['sandbox']);
