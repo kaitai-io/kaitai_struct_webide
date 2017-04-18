@@ -14,22 +14,23 @@ declare var kaitaiFsFiles: string[];
 var queryParams: { access_token?: string; secret?: string } = {};
 location.search.substr(1).split('&').map(x => x.split('=')).forEach(x => (<any>queryParams)[x[0]] = x[1]);
 
-var fs = new FsSelector();
-fs.addFs(new LocalFileSystem());
+var fss = new FsSelector();
+fss.addFs(new LocalFileSystem());
 
 var remoteFs = new RemoteFileSystem();
 remoteFs.mappings["127.0.0.1:8001/default"] = { secret: queryParams.secret };
-fs.addFs(remoteFs);
+fss.addFs(remoteFs);
 
 var githubClient = new GithubClient(queryParams.access_token);
 var githubFs = new GithubFileSystem(githubClient);
-fs.addFs(githubFs);
-
-//['local:///folder/', 'remote://127.0.0.1:8001/default/folder/', 'github://koczkatamas/kaitai_struct_formats/archive/']
-//    .forEach(uri => fs.list(uri).then(items => console.log(items.map(item => `${item.uri.uri} (${item.uri.type})`))));
+fss.addFs(githubFs);
 
 var staticFs = new StaticFileSystem();
 kaitaiFsFiles.forEach(fn => staticFs.write("static://" + fn, new ArrayBuffer(0)));
+fss.addFs(staticFs);
+
+//['local:///folder/', 'remote://127.0.0.1:8001/default/folder/', 'github://koczkatamas/kaitai_struct_formats/archive/']
+//    .forEach(uri => fs.list(uri).then(items => console.log(items.map(item => `${item.uri.uri} (${item.uri.type})`))));
 
 interface IFsTreeNode {
     text: string;
@@ -114,7 +115,7 @@ class FsTreeNode implements IFsTreeNode {
     }
 
     loadChildren(): Promise<void> {
-        return fs.list(this.uri.uri).then(children => {
+        return Promise.delay(this.uri.name === '/' ? 0 : 500).then(() => this.fs.list(this.uri.uri)).then(children => {
             this.children = children.map(fsItem => new FsTreeNode(this.fs, fsItem.uri));
         });
     }
@@ -133,10 +134,7 @@ var dummyData = new DummyFsTreeNode('/').add([
     new DummyFsTreeNode('file2')
 ]);
 
-var fsData = new FsTreeNode(fs, new FsUri('github://koczkatamas/kaitai_struct_formats/'));
-
-//data.children[0].open = true;
-//data.children[0].children[0].selected = true;
+var fsData = new FsTreeNode(fss, new FsUri('static:///'));
 
 var demo = new Vue({
     el: '#tree',
@@ -144,5 +142,7 @@ var demo = new Vue({
 });
 window['demo'] = demo;
 var treeView = <TreeView<IFsTreeNode>>demo.$refs['treeView'];
-//treeView.children[0].open = true;
-//Vue.nextTick(() => treeView.children[0].children[0].selected = true);
+setTimeout(() => {
+    treeView.children[0].toggle();
+    treeView.children[6].toggle();
+}, 50);

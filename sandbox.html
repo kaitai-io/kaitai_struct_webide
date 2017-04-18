@@ -56,6 +56,25 @@ hello66
         line-height: 1.5em;
         list-style-type: none;
     }
+    @keyframes loading-indicator-spin {
+	    from { transform: rotate(0deg); }
+	    to { transform: rotate(360deg); }
+    }
+    #tree .loading_icon {
+	    background-image: linear-gradient(transparent, transparent), url(css/loading.svg);
+	    background-size: 100%;
+	    animation-name: loading-indicator-spin;
+	    animation-duration: 0.75s;
+	    animation-iteration-count: infinite;
+	    animation-timing-function: linear;
+	    height: 13px;
+	    width: 13px;
+	    backface-visibility: hidden;
+        display:inline-block;
+        position:relative;
+        top:3px;
+        left:5px;
+    }
 </style>
     
 <script type="text/x-template" id="TreeView-template">
@@ -74,6 +93,7 @@ hello66
                 {{model.text}}
                 <span v-if="model.isFolder">[{{model.open ? '-' : '+'}}]</span>
             </a>
+            <div v-if="childrenLoading" class="loading_icon"></div>
         </div>
         <template v-if="open">
             <ul v-for="model in model.children">

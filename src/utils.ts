@@ -38,6 +38,14 @@ class Delayed {
     }
 }
 
+interface PromiseConstructor {
+    delay(timeoutMs: number): Promise<void>;
+}
+
+Promise.delay = function (timeoutMs: number) {
+    return new Promise<void>((resolve, reject) => setTimeout(resolve, timeoutMs));
+}
+
 interface String {
     repeat(count: number): string;
     endsWith(searchString: string, position: number): boolean;
