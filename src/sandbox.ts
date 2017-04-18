@@ -90,9 +90,8 @@ class TreeView<T extends IFsTreeNode> extends Vue {
                     while (selChildren.children && selChildren.children.length > 0)
                         selChildren = selChildren.children.last();
                     this.setSelected(selChildren);
-                } else if(node.parent.parent) {
+                } else if(node.parent.parent)
                     this.setSelected(node.parent);
-                }
             }
         }
     }
@@ -153,6 +152,9 @@ class TreeViewItem<T extends IFsTreeNode> extends Vue {
                 setTimeout(() => this.model.loadChildren().then(() => this.childrenLoading = false), 0);
             }
         }
+    }
+
+    select() {
         this.treeView.setSelected(this);
     }
 }

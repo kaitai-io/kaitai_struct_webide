@@ -98,7 +98,7 @@ hello66
 
 <script type="text/x-template" id="TreeViewItem-template">
     <li>
-        <div class="header" :class="{selected: selected}" @click="toggle">
+        <div class="header" :class="{selected: selected}" @click="select" @dblclick="toggle">
             <div class="wholerow">&nbsp;</div>
             <a :class="{bold: model.isFolder}">
                 {{model.text}}
