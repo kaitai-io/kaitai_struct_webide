@@ -50,11 +50,78 @@ class TreeView<T extends IFsTreeNode> extends Vue {
         this.model.loadChildren();
     }
 
+    openSelected() {
+        if (!this.selectedItem.open)
+            this.selectedItem.toggle();
+        else
+            this.selectNextNode();
+    }
+
+    closeSelected() {
+        if (this.selectedItem.open)
+            this.selectedItem.toggle();
+        else if (this.selectedItem.parent.toggle)
+            this.selectedItem.parent.toggle();
+    }
+
+    selectNode(node: TreeViewItem<T>, dir: "prev" | "next") {
+        if (dir === "next") {
+            if (node.children && node.children.length > 0)
+                this.setSelected(node.children[0]);
+            else {
+                while (node.parent) {
+                    var children = node.parent.children;
+                    var thisIdx = children.indexOf(node);
+
+                    if (thisIdx + 1 < children.length) {
+                        this.setSelected(children[thisIdx + 1]);
+                        break;
+                    } else
+                        node = node.parent;
+                }
+            }
+        } else if (dir === "prev") {
+            if (node.parent) {
+                var children = node.parent.children;
+                var thisIdx = children.indexOf(node);
+
+                if (thisIdx - 1 >= 0) {
+                    var selChildren = children[thisIdx - 1];
+                    while (selChildren.children && selChildren.children.length > 0)
+                        selChildren = selChildren.children.last();
+                    this.setSelected(selChildren);
+                } else if(node.parent.parent) {
+                    this.setSelected(node.parent);
+                }
+            }
+        }
+    }
+
+    selectNextNode(fromNode?: TreeViewItem<T>) {
+        this.selectNode(this.selectedItem, "next");
+    }
+
+    selectPrevNode() {
+        this.selectNode(this.selectedItem, "prev");
+    }
+
+    scrollSelectedIntoView() {
+        var target = this.selectedItem.$el;
+        var rect = target.getBoundingClientRect();
+        var parentRect = this.$el.getBoundingClientRect();
+
+        if (rect.bottom > parentRect.bottom)
+            target.scrollIntoView(false);
+        else if (rect.top < parentRect.top)
+            target.scrollIntoView();
+    }
+
     setSelected(newSelected: TreeViewItem<T>) {
         if (this.selectedItem)
             this.selectedItem.selected = false;
         this.selectedItem = newSelected;
         this.selectedItem.selected = true;
+        this.scrollSelectedIntoView();
     }
 }
 
@@ -76,32 +143,18 @@ class TreeViewItem<T extends IFsTreeNode> extends Vue {
     }
 
     get children() { return <TreeViewItem<T>[]>this.$children; }
+    get parent() { return <TreeViewItem<T>>this.$parent; }
 
     toggle() {
         if (this.model.isFolder) {
             this.open = !this.open;
             if (this.open && !this.model.children) {
                 this.childrenLoading = true;
-                this.model.loadChildren().then(() => this.childrenLoading = false);
+                setTimeout(() => this.model.loadChildren().then(() => this.childrenLoading = false), 0);
             }
         }
         this.treeView.setSelected(this);
     }
-}
-
-class DummyFsTreeNode implements IFsTreeNode {
-    public children: DummyFsTreeNode[] = [];
-
-    get isFolder() { return this.children && this.children.length > 0; }
-
-    constructor(public text: string) { }
-
-    add(children: DummyFsTreeNode[]) {
-        this.children.push(...children);
-        return this;
-    }
-
-    loadChildren(): Promise<void> { return Promise.resolve(); }
 }
 
 class FsTreeNode implements IFsTreeNode {
@@ -115,26 +168,14 @@ class FsTreeNode implements IFsTreeNode {
     }
 
     loadChildren(): Promise<void> {
-        return Promise.delay(this.uri.name === '/' ? 0 : 500).then(() => this.fs.list(this.uri.uri)).then(children => {
+        return this.fs.list(this.uri.uri).then(children => {
             this.children = children.map(fsItem => new FsTreeNode(this.fs, fsItem.uri));
         });
     }
 }
 
-var dummyData = new DummyFsTreeNode('/').add([
-    new DummyFsTreeNode('folder1').add([
-        new DummyFsTreeNode('folder2').add([
-            new DummyFsTreeNode('file1'),
-            new DummyFsTreeNode('file2')
-        ]),
-        new DummyFsTreeNode('file1'),
-        new DummyFsTreeNode('file2')
-    ]),
-    new DummyFsTreeNode('file1'),
-    new DummyFsTreeNode('file2')
-]);
-
 var fsData = new FsTreeNode(fss, new FsUri('static:///'));
+//var fsData = new FsTreeNode(fss, new FsUri('github://koczkatamas/kaitai_struct_formats/'));
 
 var demo = new Vue({
     el: '#tree',
@@ -143,6 +184,6 @@ var demo = new Vue({
 window['demo'] = demo;
 var treeView = <TreeView<IFsTreeNode>>demo.$refs['treeView'];
 setTimeout(() => {
-    treeView.children[0].toggle();
+    treeView.children[1].toggle();
     treeView.children[6].toggle();
-}, 50);
+}, 500);
