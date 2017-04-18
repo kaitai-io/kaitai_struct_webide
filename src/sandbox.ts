@@ -60,8 +60,8 @@ class TreeView<T extends IFsTreeNode> extends Vue {
     closeSelected() {
         if (this.selectedItem.open)
             this.selectedItem.toggle();
-        else if (this.selectedItem.parent.toggle)
-            this.selectedItem.parent.toggle();
+        else if (this.selectedItem.parent.parent)
+            this.setSelected(this.selectedItem.parent);
     }
 
     selectNode(node: TreeViewItem<T>, dir: "prev" | "next") {
