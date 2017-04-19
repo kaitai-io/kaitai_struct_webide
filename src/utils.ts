@@ -209,3 +209,12 @@ function collectAllObjects(root: IExportedValue): IExportedValue[] {
     process(root);
     return objects;
 }
+
+function precallHook(parent: any, name: string, callback: () => void) {
+    var original = parent[name];
+    parent[name] = function () {
+        callback();
+        original.apply(this, arguments);
+    }
+    parent[name].prototype = original.prototype;
+}

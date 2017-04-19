@@ -12,7 +12,7 @@ import { refreshConverterPanel } from "./app.converterPanel";
 import * as localforage from "localforage";
 import { initFileDrop } from "./FileDrop";
 import {performanceHelper} from "./utils/PerformanceHelper";
-declare var YAML: any, io: any, IntervalTree: any, bigInt: any, kaitaiIde: any;
+declare var YAML: any, io: any, IntervalTree: any, bigInt: any, kaitaiIde: any, ga: any;
 
 export var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 
@@ -133,6 +133,7 @@ export function compile(srcYaml: string, kslang: string, debug: true | false | '
 
         filterOutExtensions(compilerSchema);
     } catch (parseErr) {
+        ga('compile', 'error', `yaml: ${parseErr}`);
         showError("YAML parsing error: ", parseErr);
         return;
     }
@@ -152,10 +153,12 @@ export function compile(srcYaml: string, kslang: string, debug: true | false | '
         //console.log('rReleasePromise', rReleasePromise, 'rDebugPromise', rDebugPromise);
         return perfCompile.done(Promise.all([rReleasePromise, rDebugPromise]))
             .then(([rRelease, rDebug]) => {
+                ga('compile', 'success');
                 //console.log('rRelease', rRelease, 'rDebug', rDebug);
                 return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
             })
             .catch(compileErr => {
+                ga('compile', 'error', `kaitai: ${compileErr}`);
                 showError("KS compilation error: ", compileErr);
                 return;
             });
@@ -449,4 +452,7 @@ $(() => {
 
     ui.unparsedIntSel = new IntervalViewer("unparsed");
     ui.bytesIntSel = new IntervalViewer("bytes");
+
+    precallHook(kaitaiIde.ui.layout.constructor.__lm.controls, 'DragProxy', () => ga('layout', 'window_drag'));
+    $('body').on('mousedown', '.lm_drag_handle', () => { ga('layout', 'splitter_drag'); });
 });

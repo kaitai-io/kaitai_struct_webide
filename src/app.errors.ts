@@ -1,5 +1,7 @@
 ﻿import { ui, getLayoutNodeById, addEditorTab } from './app.layout';
 
+declare var ga: any;
+
 var lastErrWndSize = 100; // 34
 export function showError(...args: any[]) {
     console.error.apply(window, args);
@@ -10,7 +12,8 @@ export function showError(...args: any[]) {
         ui.errorWindow.setSize(0, lastErrWndSize);
     }
     ui.errorWindow.on('resize', () => lastErrWndSize = ui.errorWindow.getElement().outerHeight());
-    ui.errorWindow.on('close', () => { ui.errorWindow = null; });
+    ui.errorWindow.on('destroy', () => { ga('errorwnd', 'destroy'); });
+    ui.errorWindow.on('close', () => { ga('errorwnd', 'close'); ui.errorWindow = null; });
     ui.errorWindow.getElement().children().html(htmlescape(errMsg).replace(/\n|\\n/g, '<br>'));
 }
 

@@ -2,7 +2,7 @@
 import {compile, addNewFiles, loadFsItem } from "./app";
 import {JSTreeNode as JsTreeNode} from "./parsedToTree";
 import * as localforage from "localforage";
-declare var kaitaiFsFiles: string[];
+declare var kaitaiFsFiles: string[], ga: any;
 
 interface IFileSystem {
     getRootNode(): Promise<any>;
@@ -265,11 +265,21 @@ $(() => {
         });
     });
 
+    fileTreeCont.on('rename_node.jstree', () => ga('filetree', 'rename'));
+    fileTreeCont.on('move_node.jstree', () => ga('filetree', 'move'));
+
     fileTreeCont.on('create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree', saveTree);
     fileTreeCont.on('move_node.jstree', (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
     fileTreeCont.on('select_node.jstree', (e, selectNodeArgs) => {
         var fsItem = (<JsTreeNode<IFsItem>>selectNodeArgs.node).data;
         [uiFiles.downloadFile, uiFiles.downloadItem].forEach(i => i.toggleClass('disabled', !(fsItem && fsItem.type === 'file')));
+    });
+
+    var lastMultiSelectReport = 0;
+    fileTreeCont.on('select_node.jstree', (e, args) => {
+        if (e.timeStamp - lastMultiSelectReport > 1000 && args.selected.length > 1)
+            ga('filetree', 'multi_select');
+        lastMultiSelectReport = e.timeStamp;
     });
 
     var ksyParent: string|Element;

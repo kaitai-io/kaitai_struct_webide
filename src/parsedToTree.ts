@@ -40,7 +40,7 @@ export class ParsedTreeHandler {
             }
         }).jstree(true);
         this.jstree.on = (...args: any[]) => (<any>this.jstree).element.on(...args);
-        this.jstree.off = (...args: any[]) => (<any>this.jstree).jstree.element.off(...args);
+        this.jstree.off = (...args: any[]) => (<any>this.jstree).element.off(...args);
         this.jstree.on('keyup.jstree', e => this.jstree.activate_node(e.target.id, null));
         this.intervalHandler = new IntervalHandler<IParsedTreeInterval>();
     }
