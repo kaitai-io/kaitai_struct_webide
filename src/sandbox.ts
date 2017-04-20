@@ -1,4 +1,7 @@
 ///<reference path="../lib/ts-types/vue.d.ts"/>
+import * as Vue from "vue";
+import Component from "./ui/Component";
+
 import { GithubClient } from "./FileSystem/GithubClient";
 import { GithubFileSystem } from "./FileSystem/GithubFileSystem";
 import { LocalFileSystem } from "./FileSystem/LocalFileSystem";
@@ -7,8 +10,7 @@ import { StaticFileSystem } from "./FileSystem/StaticFileSystem";
 import { IFileSystem } from "./FileSystem/Common";
 import { FsUri } from "./FileSystem/FsUri";
 import { FsSelector } from "./FileSystem/FsSelector";
-import * as Vue from "vue";
-import Component from "./ui/Component";
+
 declare var kaitaiFsFiles: string[];
 
 var queryParams: { access_token?: string; secret?: string } = {};

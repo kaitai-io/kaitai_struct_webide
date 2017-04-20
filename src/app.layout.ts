@@ -1,5 +1,6 @@
-﻿import { IntervalViewer } from "./app";
-import * as GoldenLayout from "goldenlayout";
+﻿import * as GoldenLayout from "goldenlayout";
+
+import { IntervalViewer } from "./app";
 import { HexViewer } from "./HexViewer";
 import { ParsedTreeHandler } from "./parsedToTree";
 

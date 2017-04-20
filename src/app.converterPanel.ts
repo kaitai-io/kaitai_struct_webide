@@ -1,5 +1,6 @@
-﻿import { IDataProvider } from "./HexViewer";
-import * as bigInt from "bigInt";
+﻿import * as bigInt from "bigInt";
+
+import { IDataProvider } from "./HexViewer";
 
 export function refreshConverterPanel(panel: JQuery, dataProvider: IDataProvider, offset: number) {
     if (dataProvider && offset !== -1) {

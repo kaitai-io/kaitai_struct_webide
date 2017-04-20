@@ -1,8 +1,10 @@
-﻿import { ui, addEditorTab } from "./app.layout";
+﻿import * as localforage from "localforage";
+
+import { ui, addEditorTab } from "./app.layout";
 import { compile, addNewFiles, loadFsItem, ga } from "./app";
 import { IJSTreeNode } from "./parsedToTree";
-import * as localforage from "localforage";
 import { downloadFile, saveFile, openFilesWithDialog } from "./utils";
+
 declare var kaitaiFsFiles: string[];
 
 interface IFileSystem {
@@ -102,9 +104,9 @@ class StaticFs implements IFileSystem {
 var kaitaiRoot = <IFsItem>{ fsType: "kaitai" };
 kaitaiFsFiles.forEach(fn => fsHelper.selectNode(kaitaiRoot, fn));
 var kaitaiFs = new KaitaiFs(kaitaiRoot);
-export var staticFs = new StaticFs();
+var staticFs = new StaticFs();
 
-export var localFs = new LocalStorageFs("fs");
+var localFs = new LocalStorageFs("fs");
 /* tslint:disable */
 export var fss: {
     [name: string]: IFileSystem;

@@ -1,20 +1,19 @@
-﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
-"use strict";
+﻿"use strict";
+
+import * as localforage from "localforage";
 
 import { ui, addEditorTab, getLayoutNodeById } from "./app.layout";
 import { showError, handleError } from "./app.errors";
-import { IFsItem, fss, addKsyFile, refreshFsNodes, localFs } from "./app.files";
+import { IFsItem, fss, addKsyFile, refreshFsNodes } from "./app.files";
 import { refreshSelectionInput } from "./app.selectionInput";
 import { ParsedTreeHandler, IParsedTreeNode } from "./parsedToTree";
 import { workerMethods } from "./app.worker";
 import { IDataProvider } from "./HexViewer";
 import { refreshConverterPanel } from "./app.converterPanel";
-import * as localforage from "localforage";
 import { initFileDrop } from "./FileDrop";
 import { performanceHelper } from "./utils/PerformanceHelper";
 import { IFileProcessItem, saveFile, precallHook } from "./utils";
 import { Delayed } from "./utils";
-export var baseUrl = location.href.split("?")[0].split("/").slice(0, -1).join("/") + "/";
 
 $.jstree.defaults.core.force_text = true;
 
@@ -62,7 +61,7 @@ export class IntervalViewer {
 
 export var dataProvider: IDataProvider;
 var ksySchema: KsySchema.IKsyFile;
-export var ksyTypes: IKsyTypes;
+var ksyTypes: IKsyTypes;
 
 class JsImporter implements io.kaitai.struct.IYamlImporter {
     importYaml(name: string, mode: string) {
@@ -197,8 +196,10 @@ function recompile() {
     });
 }
 
-export var formatReady: Promise<any> = null, inputReady: Promise<any> = null;
-var selectedInTree = false, blockRecursive = false;
+var formatReady: Promise<any> = null;
+var inputReady: Promise<any> = null;
+var selectedInTree = false;
+var blockRecursive = false;
 function reparse() {
     handleError(null);
     return performanceHelper.measureAction("Parse initialization", Promise.all([inputReady, formatReady]).then(() => {
@@ -271,7 +272,7 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
 
 export function addNewFiles(files: IFileProcessItem[]) {
     return Promise.all(files.map(file => (isKsyFile(file.file.name) ? <Promise<any>>file.read("text") : file.read("arrayBuffer"))
-        .then(content => localFs.put(file.file.name, content))))
+        .then(content => fss.local.put(file.file.name, content))))
         .then(fsItems => {
             refreshFsNodes();
             return fsItems.length === 1 ? loadFsItem(fsItems[0]) : Promise.resolve(null);
