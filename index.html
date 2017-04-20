@@ -30,7 +30,6 @@
     <script src="lib/kaitai/yaml.js"></script>
     <script src="lib/kaitai/kaitai-struct-compiler-fastopt.js"></script>
     <script src="lib/ace/ace.js"></script>
-    <script src="lib/BigInteger/BigInteger.js"></script>
     <script src="lib/date.format/date.format.js"></script>
 
     <script src="js/autorefresh.js"></script>
@@ -43,6 +42,7 @@
         var paths = {};
         ["bowser", "jstree", "localforage", "goldenlayout"].forEach(
             name => paths[name] = `/lib/${name}/${name}`);
+        paths['bigInt'] = '/lib/BigInteger/BigInteger';
 
         requirejs.config({ baseUrl: 'js/', paths: paths });
         require(['jstree', 'app.unsupportedBrowser', 'app'], function () { });

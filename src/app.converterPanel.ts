@@ -1,12 +1,11 @@
-﻿import {IDataProvider as DataProvider} from "./HexViewer";
+﻿import { IDataProvider } from "./HexViewer";
+import * as bigInt from 'bigInt';
 
-declare var bigInt: any, TextDecoder: any;
-
-export function refreshConverterPanel(panel: JQuery, dataProvider: DataProvider, offset: number) {
-    if (dataProvider && offset != -1) {
+export function refreshConverterPanel(panel: JQuery, dataProvider: IDataProvider, offset: number) {
+    if (dataProvider && offset !== -1) {
         var data = dataProvider.get(offset, Math.min(dataProvider.length - offset, 64)).slice(0);
 
-        function numConv(len: number, signed: boolean, bigEndian: boolean) {
+        function numConv(len: number, signed: boolean, bigEndian: boolean): string {
             if (len > data.length) return '';
 
             var arr = data.subarray(0, len);
@@ -26,14 +25,17 @@ export function refreshConverterPanel(panel: JQuery, dataProvider: DataProvider,
             }
 
             //console.log('numConv', arr, len, signed ? 'signed' : 'unsigned', bigEndian ? 'big-endian' : 'little-endian', num, typeof num);
-            return num;
+            return num.toString();
         }
 
-        [1, 2, 4, 8].forEach(len => [false, true].forEach(signed => [false, true].forEach(bigEndian =>
-            panel.find(`.i${len * 8}${len == 1 ? '' : bigEndian ? 'be' : 'le'} .${signed ? 'signed' : 'unsigned'}`).text(numConv(len, signed, bigEndian).toString()))));
+        [1, 2, 4, 8].forEach(len => [false, true].forEach(signed => [false, true].forEach(bigEndian => {
+            var el = panel.find(`.i${len * 8}${len === 1 ? '' : bigEndian ? 'be' : 'le'} .${signed ? 'signed' : 'unsigned'}`);
+            var convRes = numConv(len, signed, bigEndian);
+            el.text(convRes);
+        })));
 
         var u32le = numConv(4, false, false);
-        var unixtsDate = new Date(u32le * 1000);
+        var unixtsDate = new Date(parseInt(u32le) * 1000);
 
         panel.find(`.float .val`).text(data.length >= 4 ? new Float32Array(data.buffer.slice(0, 4))[0] : '');
         panel.find(`.double .val`).text(data.length >= 8 ? new Float64Array(data.buffer.slice(0, 8))[0] : '');
