@@ -52,14 +52,8 @@ body { color:#333 }
 #converterPanel .str .val { overflow:hidden; line-height:16px; height:16px; display:block }
 #welcomeModalLabel { text-align:center }
 #aboutWebIde { position:absolute; bottom:10px; right:10px; font-size:12px }
-#practicePanel { color:#eee; padding:10px; display:none; height:100%; flex-flow: column; }
-#practicePanel .description { flex: 0 1 auto }
-#practiceDiff { flex: 1 1 auto }
 .marker_solution { background:rgba(255, 80, 80, 0.3); }
 .marker_user { background:rgba(80, 255, 80, 0.30); }
-#practiceStatus { margin-top:5px }
-#practiceStatus .inactive { opacity:0.5; color:#fff }
-#practiceStatus .acceptedByServer, #practiceStatus .declinedByServer { display:none }
 #welcomeModal .licenses { font-size:12px; margin-bottom:10px }
 #parsedDataTree .intVal, #parsedDataTree .enumDesc { color:#bbb }
 #parsedDataTree .propName { color: blue; }

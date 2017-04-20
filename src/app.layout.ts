@@ -2,18 +2,12 @@
 import * as GoldenLayout from "goldenlayout";
 import { HexViewer } from "./HexViewer";
 import {ParsedTreeHandler} from "./parsedToTree";
-var practiceChallNameMatch = /practice=([a-z0-9]+)/.exec(location.href);
-export var practiceMode: any = null;
-export var practiceChallName = practiceChallNameMatch ? practiceChallNameMatch[1] : practiceMode && practiceMode.chall;
-export var practiceChall = practiceMode && practiceChallName && practiceMode.challs[practiceChallName];
-export var isPracticeMode = !!practiceChall;
 
 var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },
     content: [
         { type: 'row', content: []
-            .concat(isPracticeMode ? [] : { type: 'component', componentName: 'fileTreeCont', title: 'files', isClosable: false, width:12 })
-            .concat(isPracticeMode ? { type: 'component', componentName: 'practicePanel', title: 'practice mode', isClosable: false, width: 25 } : [])
+            .concat({ type: 'component', componentName: 'fileTreeCont', title: 'files', isClosable: false, width:12 })
             .concat(
                 { type: 'column', id: 'mainArea', isClosable: false, content: [
                     { type: 'row', content: [
@@ -67,7 +61,6 @@ var ui = {
     fileTreeCont: <JQuery>null,
     fileTree: <JSTree>null,
     converterPanel: <JQuery>null,
-    practicePanelCont: <GoldenLayout.Container>null,
     unparsedIntSel: <IntervalViewer>null,
     bytesIntSel: <IntervalViewer>null,
 };
@@ -121,7 +114,6 @@ addComponent('parsedDataTree');
 addComponent('fileTreeCont', cont => cont.getElement().append($("#fileTreeCont").children()));
 addExistingDiv('infoPanel');
 addExistingDiv('converterPanel');
-addExistingDiv('practicePanel');
 
 myLayout.init();
 
