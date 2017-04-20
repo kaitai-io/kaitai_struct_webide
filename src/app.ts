@@ -37,7 +37,7 @@ export class IntervalViewer {
     htmlNext: JQuery;
 
     constructor(public htmlIdPrefix: string) {
-        ["Curr", "Total", "Prev", "Next"].forEach(control => (<any>this)[`html${control}`] = $(`#${htmlIdPrefix}${control}`));
+        ["Curr", "Total", "Prev", "Next"].forEach(control => this[`html${control}`] = $(`#${htmlIdPrefix}${control}`));
         this.htmlNext.on('click', () => this.move(+1));
         this.htmlPrev.on('click', () => this.move(-1));
     }
@@ -209,7 +209,7 @@ function reparse() {
             //console.log('reparse exportedRoot', exportedRoot);
             kaitaiIde.root = exportedRoot;
 
-            ui.parsedDataTreeHandler = new ParsedTreeHandler(<any>ui.parsedDataTreeCont.getElement(), exportedRoot, ksyTypes);
+            ui.parsedDataTreeHandler = new ParsedTreeHandler(ui.parsedDataTreeCont.getElement(), exportedRoot, ksyTypes);
             performanceHelper.measureAction("Tree / interval handling", ui.parsedDataTreeHandler.initNodeReopenHandling()).then(() => ui.hexViewer.onSelectionChanged(), e => handleError(e));
 
             ui.parsedDataTreeHandler.jstree.on('select_node.jstree', function (e, selectNodeArgs) {
@@ -231,8 +231,6 @@ function reparse() {
         }, error => handleError(error));
     });
 }
-
-(<any>window).kt = { workerEval: workerEval };
 
 var lastKsyContent: string, inputContent: ArrayBuffer, inputFsItem: IFsItem, lastKsyFsItem: IFsItem;
 export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {

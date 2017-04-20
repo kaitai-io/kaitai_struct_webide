@@ -5,7 +5,7 @@
 
     function commentPad(str: string) { return str.length < commentOffset ? str + ' '.repeat(commentOffset - str.length) : str; }
 
-    var lineInfo = { currLine: 0, lineStart: 0, lines: <any>{} };
+    var lineInfo = { currLine: 0, lineStart: 0, lines: {} };
     var json = "";
 
     function nl() {

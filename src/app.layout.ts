@@ -64,8 +64,6 @@ var ui = {
     bytesIntSel: <IntervalViewer>null,
 };
 
-var uiAny = <any>ui;
-
 function addComponent(name: string, generatorCallback?: (container: GoldenLayout.Container) => any) {
     var editor: any;
 
@@ -74,17 +72,17 @@ function addComponent(name: string, generatorCallback?: (container: GoldenLayout
         container.getElement().attr('id', name);
         if (generatorCallback) {
             container.on('resize', () => { if (editor && editor.resize) editor.resize(); });
-            container.on('open', () => { uiAny[name] = editor = generatorCallback(container) || container; });
+            container.on('open', () => { ui[name] = editor = generatorCallback(container) || container; });
         } else
-            uiAny[name + 'Cont'] = container;
+            ui[name + 'Cont'] = container;
     });
 }
 
 function addExistingDiv(name: string) {
     myLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
-        uiAny[name + 'Cont'] = container;
-        uiAny[name] = $(`#${name}`).appendTo(container.getElement());
-        $(() => uiAny[name].show());
+        ui[name + 'Cont'] = container;
+        ui[name] = $(`#${name}`).appendTo(container.getElement());
+        $(() => ui[name].show());
     });
 }
 

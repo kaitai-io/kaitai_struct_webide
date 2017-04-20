@@ -117,7 +117,7 @@ export class ParsedTreeHandler {
             var currItem = obj;
             var parts = g1.split(':');
 
-            var format = <any>{ sep: ', ' };
+            var format: { sep:string, str?:string, hex?:string, dec?:string } = { sep: ', ' };
             if (parts.length > 1)
                 parts[1].split(',').map(x => x.split('=')).forEach(kv => format[kv[0]] = kv.length > 1 ? kv[1] : true);
             parts[0].split('.').forEach(k => {

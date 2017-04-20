@@ -12,7 +12,7 @@ import Component from './ui/Component';
 declare var kaitaiFsFiles: string[];
 
 var queryParams: { access_token?: string; secret?: string } = {};
-location.search.substr(1).split('&').map(x => x.split('=')).forEach(x => (<any>queryParams)[x[0]] = x[1]);
+location.search.substr(1).split('&').map(x => x.split('=')).forEach(x => queryParams[x[0]] = x[1]);
 
 var fss = new FsSelector();
 fss.addFs(new LocalFileSystem());

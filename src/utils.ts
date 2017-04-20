@@ -13,13 +13,14 @@
 export function saveFile(data: ArrayBuffer | Uint8Array | string, filename: string) {
     var a = document.createElement("a");
     document.body.appendChild(a);
-    (<any>a).style = "display:none";
+    a.style.display = "none";
     var blob = new Blob([data], { type: "octet/stream" });
     var url = window.URL.createObjectURL(blob);
     a.href = url;
     a.download = filename;
     a.click();
     window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
 }
 
 export class Delayed {
@@ -65,7 +66,7 @@ export function readBlob(blob: Blob, mode: "arrayBuffer" | "text" | "dataUrl", .
         var reader = new FileReader();
         reader.onload = function () { resolve(reader.result); };
         reader.onerror = function (e) { reject(e); };
-        (<any>reader)['readAs' + mode[0].toUpperCase() + mode.substr(1)](blob, ...args);
+        reader['readAs' + mode[0].toUpperCase() + mode.substr(1)](blob, ...args);
     });
 }
 
