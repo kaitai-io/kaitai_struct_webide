@@ -19,3 +19,5 @@ cp -r \
 	samples \
 	lib \
 	"$OUT_DIR"
+
+./build.py "$OUT_DIR"

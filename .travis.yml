@@ -8,6 +8,7 @@ install:
   - npm install
 
 script:
+  - '[ "$TRAVIS_BRANCH" = stable ] && export GA_ID=UA-76299550-2 || export GA_ID=UA-76299550-3'
   - ./build
 
 after_success:
