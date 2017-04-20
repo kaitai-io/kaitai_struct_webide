@@ -12,10 +12,6 @@ GA_TEMPLATE = '''
 
         _ga('create', '#GA_ID#', 'auto');
         _ga('send', 'pageview');
-        function ga(category, action, label, value) {
-            console.log(`[GA Event] cat:${category} act:${action} lab:${label || ''}`);
-            _ga('send', 'event', category, action, label, value);
-        }
     </script>
     <!-- End Google Analytics -->
 '''
