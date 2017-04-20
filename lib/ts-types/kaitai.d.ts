@@ -13,3 +13,7 @@ declare namespace io.kaitai.struct {
         compile(kslang: string, compilerSchema: any, jsImporter: IYamlImporter, isDebug: boolean): any;
     }
 }
+
+declare class KaitaiStream {
+    constructor(inputBuffer: ArrayBuffer, offset: number);
+}

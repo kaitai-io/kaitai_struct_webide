@@ -7,7 +7,7 @@
 }
 
 interface IWorkerMessage {
-    type: 'eval' | 'reparse' | 'get';
+    type: 'initCode' | 'setInput' | 'reparse' | 'get';
     msgId?: number;
     args?: any[];
     result?: any;
@@ -44,3 +44,5 @@ interface IExportedValue {
 
     parent?: IExportedValue;
 }
+
+interface IKsyTypes { [name: string]: KsySchema.IType };

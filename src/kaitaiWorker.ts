@@ -1,5 +1,12 @@
-﻿var wi = { ioInput: <any>null, root: <any>null, parseError: <any>null, exported: <any>null, inputBuffer: <any>null, MainClass: <any>null, ksyTypes: <any>null };
-var KaitaiStream: any, module: any;
+﻿var wi = {
+    MainClass: <any>null,
+    ksyTypes: <IKsyTypes>null,
+    inputBuffer: <ArrayBuffer>null,
+    ioInput: <KaitaiStream>null,
+    root: <any>null,
+    exported: <IExportedValue>null,
+};
+
 declare function importScripts(...urls: string[]): void;
 
 class IDebugInfo {
@@ -90,11 +97,14 @@ function define(name: string, deps: any, getter: any) { this[name] = getter(); }
 (<any>define).amd = true;
 
 var apiMethods = {
-    eval: (code: string, args: any[]) => eval(code),
+    initCode: (sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes) => {
+        wi.ksyTypes = ksyTypes;
+        eval(`${sourceCode}\nwi.MainClass = ${mainClassName};`);
+    },
+    setInput: (inputBuffer: ArrayBuffer) => wi.inputBuffer = inputBuffer,
     reparse: (eagerMode: boolean) => {
         var start = performance.now();
         wi.ioInput = new KaitaiStream(wi.inputBuffer, 0);
-        wi.parseError = null;
         wi.root = new wi.MainClass(wi.ioInput);
         wi.root._read();
         wi.exported = exportValue(wi.root, <IDebugInfo>{ start: 0, end: wi.inputBuffer.byteLength }, [], eagerMode);
@@ -112,7 +122,7 @@ var apiMethods = {
     }
 };
 
-self.onmessage = ev => {
+self.onmessage = (ev: MessageEvent) => {
     var msg = <IWorkerMessage>ev.data;
     //console.log('[Worker] Got msg', msg, ev);
 

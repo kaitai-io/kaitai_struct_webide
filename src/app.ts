@@ -5,7 +5,7 @@ import { showError, handleError } from "./app.errors";
 import { IFsItem, fss, addKsyFile, staticFs, refreshFsNodes, localFs } from "./app.files";
 import { refreshSelectionInput } from "./app.selectionInput";
 import { ParsedTreeHandler, ParsedTreeNode } from "./parsedToTree";
-import { workerCall, workerEval } from "./app.worker";
+import { workerMethods } from "./app.worker";
 import { IDataProvider } from "./HexViewer";
 import { refreshConverterPanel } from "./app.converterPanel";
 import * as localforage from "localforage";
@@ -13,7 +13,6 @@ import { initFileDrop } from "./FileDrop";
 import { performanceHelper } from "./utils/PerformanceHelper";
 import { IFileProcessItem, saveFile, collectAllObjects, precallHook } from './utils';
 import { Delayed } from './utils';
-
 export var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 
 $.jstree.defaults.core.force_text = true;
@@ -62,8 +61,6 @@ export class IntervalViewer {
 export var dataProvider: IDataProvider;
 var ksySchema: KsySchema.IKsyFile;
 export var ksyTypes: IKsyTypes;
-
-export interface IKsyTypes { [name: string]: KsySchema.IType };
 
 class JsImporter implements io.kaitai.struct.IYamlImporter {
     importYaml(name: string, mode: string){
@@ -202,10 +199,10 @@ function reparse() {
     return performanceHelper.measureAction("Parse initialization", Promise.all([inputReady, formatReady]).then(() => {
         var debugCode = ui.genCodeDebugViewer.getValue();
         var jsClassName = kaitaiIde.ksySchema.meta.id.split('_').map((x: string) => x.ucFirst()).join('');
-        return workerCall(<IWorkerMessage>{ type: 'eval', args: [`wi.ksyTypes = args.ksyTypes;\n${debugCode}\nwi.MainClass = ${jsClassName};void(0)`, { ksyTypes: ksyTypes }] });
+        return workerMethods.initCode(debugCode, jsClassName, ksyTypes);
     })).then(() => {
         //console.log('recompiled');
-        performanceHelper.measureAction("Parsing", workerCall({ type: "reparse", args: [$("#disableLazyParsing").is(':checked')] })).then((exportedRoot: IExportedValue) => {
+        performanceHelper.measureAction("Parsing", workerMethods.reparse($("#disableLazyParsing").is(':checked')).then(exportedRoot => {
             //console.log('reparse exportedRoot', exportedRoot);
             kaitaiIde.root = exportedRoot;
 
@@ -228,7 +225,7 @@ function reparse() {
                 }
             });
 
-        }, error => handleError(error));
+        }, error => handleError(error)));
     });
 }
 
@@ -260,7 +257,7 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
 
             ui.hexViewer.setDataProvider(dataProvider);
             getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
-            return workerCall({ type:'eval', args: ['wi.inputBuffer = args; void(0)', content] }).then(() => refreshGui ? reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
+            return workerMethods.setInput(content).then(() => refreshGui ? reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
         }
     });
 }
@@ -427,7 +424,7 @@ $(() => {
             return intervals;
         }
 
-        workerCall({ type: 'reparse', args: [true] }).then((exportedRoot: IExportedValue) => {
+        workerMethods.reparse(true).then(exportedRoot => {
             console.log('exported', exportedRoot);
             expToNative(exportedRoot);
             addEditorTab('json export', result, 'json');

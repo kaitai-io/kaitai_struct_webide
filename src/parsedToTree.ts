@@ -1,9 +1,8 @@
 ﻿import { ui } from "./app.layout";
-import { IKsyTypes } from "./app";
-import { workerCall } from "./app.worker";
 import { handleError } from "./app.errors";
 import { IInterval, IntervalHandler } from "./utils/IntervalHelper";
 import { s, htmlescape, asciiEncode, hexEncode, collectAllObjects } from './utils';
+import { workerMethods } from './app.worker';
 
 interface ParsedTreeNodeData {
     exported?: IExportedValue;
@@ -227,7 +226,7 @@ export class ParsedTreeHandler {
     }
 
     getProp(path: string[]) {
-        return <Promise<IExportedValue>> workerCall({ type: 'get', args: [path] });
+        return workerMethods.get(path);
     }
 
     fillKsyTypes(val: IExportedValue) {
