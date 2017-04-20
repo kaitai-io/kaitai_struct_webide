@@ -13,11 +13,15 @@ import { initFileDrop } from "./FileDrop";
 import { performanceHelper } from "./utils/PerformanceHelper";
 import { IFileProcessItem, saveFile, collectAllObjects, precallHook } from './utils';
 import { Delayed } from './utils';
-declare var YAML: any, io: any, kaitaiIde: any, ga: any;
 
 export var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 
 $.jstree.defaults.core.force_text = true;
+
+export function ga(category: string, action: string, label?: string, value?: number) {
+    console.log(`[GA Event] cat:${category} act:${action} lab:${label || ''}`);
+    typeof window["_ga"] !== "undefined" && window["_ga"]('send', 'event', category, action, label, value);
+}
 
 interface IInterval {
     start: number;
@@ -61,7 +65,7 @@ export var ksyTypes: IKsyTypes;
 
 export interface IKsyTypes { [name: string]: KsySchema.IType };
 
-class JsImporter {
+class JsImporter implements io.kaitai.struct.IYamlImporter {
     importYaml(name: string, mode: string){
         return new Promise(function (resolve, reject) {
             console.log(`import yaml: ${name}, mode: ${mode}`);
@@ -147,7 +151,7 @@ export function compile(srcYaml: string, kslang: string, debug: true | false | '
     else {
         var perfCompile = performanceHelper.measureAction("Compilation");
 
-        var ks = io.kaitai.struct.MainJs();
+        var ks = new io.kaitai.struct.MainJs();
         var rReleasePromise = (debug === false || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, false) : Promise.resolve(null);
         var rDebugPromise = (debug === true || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, true) : Promise.resolve(null);
         //console.log('rReleasePromise', rReleasePromise, 'rDebugPromise', rDebugPromise);
@@ -276,7 +280,7 @@ localStorage.setItem('lastVersion', kaitaiIde.version);
 export var formatReady: Promise<any>, inputReady: Promise<any>;
 $(() => {
     $('#webIdeVersion').text(kaitaiIde.version);
-    $('#compilerVersion').text(io.kaitai.struct.MainJs().version + " (" + io.kaitai.struct.MainJs().buildDate + ")");
+    $('#compilerVersion').text(new io.kaitai.struct.MainJs().version + " (" + new io.kaitai.struct.MainJs().buildDate + ")");
 
     $('#welcomeDoNotShowAgain').click(() => localStorage.setItem('doNotShowWelcome', 'true'));
     if (localStorage.getItem('doNotShowWelcome') !== 'true')

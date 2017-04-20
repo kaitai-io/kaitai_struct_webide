@@ -28,6 +28,7 @@
     <Content Include="js\autorefresh.js" />
     <Content Include="sandbox.html" />
     <TypeScriptCompile Include="lib\ts-types\BigInteger.d.ts" />
+    <TypeScriptCompile Include="lib\ts-types\kaitai.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\knockout.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\text-encoding.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />

@@ -1,9 +1,9 @@
 ﻿import { ui, addEditorTab } from './app.layout';
-import { compile, addNewFiles, loadFsItem } from "./app";
+import { compile, addNewFiles, loadFsItem, ga } from "./app";
 import { JSTreeNode } from "./parsedToTree";
 import * as localforage from "localforage";
 import { downloadFile, saveFile, openFilesWithDialog } from './utils';
-declare var kaitaiFsFiles: string[], ga: any;
+declare var kaitaiFsFiles: string[];
 
 interface IFileSystem {
     getRootNode(): Promise<any>;

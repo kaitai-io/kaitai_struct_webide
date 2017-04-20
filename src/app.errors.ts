@@ -1,6 +1,6 @@
 ﻿import { ui, getLayoutNodeById, addEditorTab } from './app.layout';
 import { htmlescape } from './utils';
-declare var ga: any;
+import { ga } from './app';
 
 var lastErrWndSize = 100; // 34
 export function showError(...args: any[]) {
