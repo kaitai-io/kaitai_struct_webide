@@ -9,6 +9,7 @@
     "preserveConstEnums": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
+    "alwaysStrict": true,
     "sourceMap": true,
     "target": "es2016",
     "outDir": "js/",

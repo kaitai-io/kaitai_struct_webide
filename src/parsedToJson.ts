@@ -3,7 +3,7 @@
     var padLen = 2;
     var commentOffset = 60;
 
-    function commentPad(str: string) { return str.length < commentOffset ? str + ' '.repeat(commentOffset - str.length) : str; }
+    function commentPad(str: string) { return str.length < commentOffset ? str + " ".repeat(commentOffset - str.length) : str; }
 
     var lineInfo = { currLine: 0, lineStart: 0, lines: {} };
     var json = "";
@@ -17,7 +17,7 @@
     function comment(str: string) {
         var padLen = commentOffset - (json.length - lineInfo.lineStart);
         if (padLen > 0)
-            json += ' '.repeat(padLen);
+            json += " ".repeat(padLen);
         json += ` // ${str}`;
     }
 
@@ -72,7 +72,7 @@
                     json += (i == keys.length - 1 ? "" : ",");
 
                     if (!isObject)
-                        comment(' ' + getLenComment(childDebug, true));
+                        comment(" " + getLenComment(childDebug, true));
                 }
 
                 nl();
@@ -95,7 +95,7 @@
 // REMOVED CODE
 
     //var lineInfo = null;
-    //ui.parsedDataViewer.getSession().selection.on('changeCursor', (e1, e2) => {
+    //ui.parsedDataViewer.getSession().selection.on("changeCursor", (e1, e2) => {
     //    var lineIdx = e2.selectionLead.row;
     //    var debug = lineInfo ? lineInfo.lines[lineIdx] : null;
     //    if (debug && debug.start <= debug.end)

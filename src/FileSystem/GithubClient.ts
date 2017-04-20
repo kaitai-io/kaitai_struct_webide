@@ -1,4 +1,4 @@
-﻿import {downloadFile} from '../utils';
+﻿import {downloadFile} from "../utils";
 
 export namespace Entities {
     export interface IRepository {
@@ -33,7 +33,7 @@ export class Repository {
     public entity: Entities.IRepository;
 
     constructor(public client: GithubClient, public name: string, public owner?: string) {
-        var nameParts = name.split('/');
+        var nameParts = name.split("/");
         if (nameParts.length === 2) {
             this.owner = nameParts[0];
             this.name = nameParts[1];
@@ -46,7 +46,7 @@ export class Repository {
         return repo;
     }
 
-    getContents(path: string = '/') {
+    getContents(path: string = "/") {
         return this.client.req<Entities.IContent[]>(`/repos/${this.owner}/${this.name}/contents${path}`);
     }
 
@@ -63,7 +63,7 @@ export class GithubClient {
     }
 
     listRepos(): Promise<Repository[]> {
-        return this.req<Entities.IRepository[]>('/user/repos').then(repos => repos.map(entity => Repository.fromEntity(this, entity)));
+        return this.req<Entities.IRepository[]>("/user/repos").then(repos => repos.map(entity => Repository.fromEntity(this, entity)));
     }
 
     getRepo(name: string, owner?: string): Repository {

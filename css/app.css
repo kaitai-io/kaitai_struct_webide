@@ -3,7 +3,7 @@
 .lm_splitter.lm_vertical .lm_drag_handle { top:-5px; height:15px }
 #errorWindow { background: white; font-family: Courier,monospace; font-size: 12px; white-space: pre-wrap; overflow-y: scroll; }
 #errorWindow>div { margin: 5px; }
-#parsedDataTree { background: white; overflow: auto; font-size: 12px; font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace }
+#parsedDataTree { background: white; overflow: auto; font-size: 12px; font: 12px/normal "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace }
 #parsedDataTree .jstree-icon, #parsedDataTree .jstree-anchor { height: 16px; line-height: 16px }
 #parsedDataTree .jstree-node { min-height: 16px; line-height: 16px; min-width:18px; margin-left:14px }
 #parsedDataTree.jstree-default>.jstree-container-ul>.jstree-node { margin-left: 0 }
@@ -45,7 +45,7 @@ body { color:#333 }
 #noscript a, #unsupportedBrowser a { color: black; text-decoration: underline }
 #unsupportedBrowser .closeBtn { float:right; margin-top: 1px; cursor: pointer }
 #converterPanel { overflow-y: auto; height: 100% }
-#converterPanel table { font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace; }
+#converterPanel table { font: 12px/normal "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; }
 #converterPanel table th { padding-bottom:3px }
 #converterPanel .typeCol { min-width:54px }
 #converterPanel .typeValue { min-width:155px }

@@ -1,8 +1,8 @@
-﻿import { IFileSystem, FsItem } from './Common';
-import { FsUri } from './FsUri';
+﻿import { IFileSystem, FsItem } from "./Common";
+import { FsUri } from "./FsUri";
 
 export class StaticFileSystem implements IFileSystem {
-    scheme: string = 'static';
+    scheme: string = "static";
 
     constructor(public files: { [name: string]: ArrayBuffer } = {}) { }
 

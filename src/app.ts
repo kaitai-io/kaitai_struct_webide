@@ -1,8 +1,9 @@
 ﻿/// <reference path="../lib/ts-types/goldenlayout.d.ts" />
+"use strict";
 
 import { ui, addEditorTab, getLayoutNodeById } from "./app.layout";
 import { showError, handleError } from "./app.errors";
-import { IFsItem, fss, addKsyFile, staticFs, refreshFsNodes, localFs } from "./app.files";
+import { IFsItem, fss, addKsyFile, refreshFsNodes, localFs } from "./app.files";
 import { refreshSelectionInput } from "./app.selectionInput";
 import { ParsedTreeHandler, ParsedTreeNode } from "./parsedToTree";
 import { workerMethods } from "./app.worker";
@@ -11,15 +12,16 @@ import { refreshConverterPanel } from "./app.converterPanel";
 import * as localforage from "localforage";
 import { initFileDrop } from "./FileDrop";
 import { performanceHelper } from "./utils/PerformanceHelper";
-import { IFileProcessItem, saveFile, collectAllObjects, precallHook } from './utils';
-import { Delayed } from './utils';
-export var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
+import { IFileProcessItem, saveFile, precallHook } from "./utils";
+import { Delayed } from "./utils";
+export var baseUrl = location.href.split("?")[0].split("/").slice(0, -1).join("/") + "/";
 
 $.jstree.defaults.core.force_text = true;
 
 export function ga(category: string, action: string, label?: string, value?: number) {
-    console.log(`[GA Event] cat:${category} act:${action} lab:${label || ''}`);
-    typeof window["_ga"] !== "undefined" && window["_ga"]('send', 'event', category, action, label, value);
+    console.log(`[GA Event] cat:${category} act:${action} lab:${label || ""}`);
+    if (typeof window["_ga"] !== "undefined")
+        window["_ga"]("send", "event", category, action, label, value);
 }
 
 interface IInterval {
@@ -37,8 +39,8 @@ export class IntervalViewer {
 
     constructor(public htmlIdPrefix: string) {
         ["Curr", "Total", "Prev", "Next"].forEach(control => this[`html${control}`] = $(`#${htmlIdPrefix}${control}`));
-        this.htmlNext.on('click', () => this.move(+1));
-        this.htmlPrev.on('click', () => this.move(-1));
+        this.htmlNext.on("click", () => this.move(+1));
+        this.htmlPrev.on("click", () => this.move(-1));
     }
 
     move(direction: number) {
@@ -77,7 +79,7 @@ class JsImporter implements io.kaitai.struct.IYamlImporter {
 
 var jsImporter = new JsImporter();
 
-export function compile(srcYaml: string, kslang: string, debug: true | false | 'both'): Promise<any> {
+export function compile(srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
     var perfYamlParse = performanceHelper.measureAction("YAML parsing");
 
     var compilerSchema;
@@ -87,7 +89,7 @@ export function compile(srcYaml: string, kslang: string, debug: true | false | '
         function collectKsyTypes(schema: KsySchema.IKsyFile): IKsyTypes {
             var types: IKsyTypes = {};
 
-            function ksyNameToJsName(ksyName: string, isProp: boolean) { return ksyName.split('_').map((x,i) => i === 0 && isProp ? x : x.ucFirst()).join(''); }
+            function ksyNameToJsName(ksyName: string, isProp: boolean) { return ksyName.split("_").map((x,i) => i === 0 && isProp ? x : x.ucFirst()).join(""); }
 
             function collectTypes(parent: KsySchema.IType) {
                 if (parent.types) {
@@ -134,41 +136,41 @@ export function compile(srcYaml: string, kslang: string, debug: true | false | '
 
         filterOutExtensions(compilerSchema);
     } catch (parseErr) {
-        ga('compile', 'error', `yaml: ${parseErr}`);
+        ga("compile", "error", `yaml: ${parseErr}`);
         showError("YAML parsing error: ", parseErr);
         return;
     }
 
     perfYamlParse.done();
 
-    //console.log('ksySchema', ksySchema);
+    //console.log("ksySchema", ksySchema);
 
-    if (kslang === 'json')
+    if (kslang === "json")
         return Promise.resolve();
     else {
         var perfCompile = performanceHelper.measureAction("Compilation");
 
         var ks = new io.kaitai.struct.MainJs();
-        var rReleasePromise = (debug === false || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, false) : Promise.resolve(null);
-        var rDebugPromise = (debug === true || debug === 'both') ? ks.compile(kslang, compilerSchema, jsImporter, true) : Promise.resolve(null);
-        //console.log('rReleasePromise', rReleasePromise, 'rDebugPromise', rDebugPromise);
+        var rReleasePromise = (debug === false || debug === "both") ? ks.compile(kslang, compilerSchema, jsImporter, false) : Promise.resolve(null);
+        var rDebugPromise = (debug === true || debug === "both") ? ks.compile(kslang, compilerSchema, jsImporter, true) : Promise.resolve(null);
+        //console.log("rReleasePromise", rReleasePromise, "rDebugPromise", rDebugPromise);
         return perfCompile.done(Promise.all([rReleasePromise, rDebugPromise]))
             .then(([rRelease, rDebug]) => {
-                ga('compile', 'success');
-                //console.log('rRelease', rRelease, 'rDebug', rDebug);
+                ga("compile", "success");
+                //console.log("rRelease", rRelease, "rDebug", rDebug);
                 return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
             })
             .catch(compileErr => {
-                ga('compile', 'error', `kaitai: ${compileErr}`);
+                ga("compile", "error", `kaitai: ${compileErr}`);
                 showError("KS compilation error: ", compileErr);
                 return;
             });
     }
 }
 
-function isKsyFile(fn: string) { return fn.toLowerCase().endsWith('.ksy'); }
+function isKsyFile(fn: string) { return fn.toLowerCase().endsWith(".ksy"); }
 
-var ksyFsItemName = 'ksyFsItem';
+var ksyFsItemName = "ksyFsItem";
 
 function recompile() {
     return localforage.getItem<IFsItem>(ksyFsItemName).then(ksyFsItem => {
@@ -176,17 +178,18 @@ function recompile() {
         var changed = lastKsyContent !== srcYaml;
 
         var copyPromise = <Promise<any>>Promise.resolve();
-        if (changed && (ksyFsItem.fsType === 'kaitai' || ksyFsItem.fsType === 'static'))
-            copyPromise = addKsyFile('localStorage', ksyFsItem.fn.replace('.ksy', '_modified.ksy'), srcYaml).then(fsItem => localforage.setItem(ksyFsItemName, fsItem));
+        if (changed && (ksyFsItem.fsType === "kaitai" || ksyFsItem.fsType === "static"))
+            copyPromise = addKsyFile("localStorage", ksyFsItem.fn.replace(".ksy", "_modified.ksy"), srcYaml)
+                .then(fsItem => localforage.setItem(ksyFsItemName, fsItem));
 
         return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
-            return compile(srcYaml, 'javascript', 'both').then(compiled => {
+            return compile(srcYaml, "javascript", "both").then(compiled => {
                 if (!compiled) return;
                 var fileNames = Object.keys(compiled.release);
 
-                console.log('ksyFsItem', ksyFsItem);
-                ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(''), -1);
-                ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(''), -1);
+                console.log("ksyFsItem", ksyFsItem);
+                ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(""), -1);
+                ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(""), -1);
                 return reparse();
             });
         });
@@ -198,28 +201,29 @@ function reparse() {
     handleError(null);
     return performanceHelper.measureAction("Parse initialization", Promise.all([inputReady, formatReady]).then(() => {
         var debugCode = ui.genCodeDebugViewer.getValue();
-        var jsClassName = kaitaiIde.ksySchema.meta.id.split('_').map((x: string) => x.ucFirst()).join('');
+        var jsClassName = kaitaiIde.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
         return workerMethods.initCode(debugCode, jsClassName, ksyTypes);
     })).then(() => {
-        //console.log('recompiled');
-        performanceHelper.measureAction("Parsing", workerMethods.reparse($("#disableLazyParsing").is(':checked')).then(exportedRoot => {
-            //console.log('reparse exportedRoot', exportedRoot);
+        //console.log("recompiled");
+        performanceHelper.measureAction("Parsing", workerMethods.reparse($("#disableLazyParsing").is(":checked")).then(exportedRoot => {
+            //console.log("reparse exportedRoot", exportedRoot);
             kaitaiIde.root = exportedRoot;
 
             ui.parsedDataTreeHandler = new ParsedTreeHandler(ui.parsedDataTreeCont.getElement(), exportedRoot, ksyTypes);
-            performanceHelper.measureAction("Tree / interval handling", ui.parsedDataTreeHandler.initNodeReopenHandling()).then(() => ui.hexViewer.onSelectionChanged(), e => handleError(e));
+            performanceHelper.measureAction("Tree / interval handling", ui.parsedDataTreeHandler.initNodeReopenHandling())
+                .then(() => ui.hexViewer.onSelectionChanged(), e => handleError(e));
 
-            ui.parsedDataTreeHandler.jstree.on('select_node.jstree', function (e, selectNodeArgs) {
+            ui.parsedDataTreeHandler.jstree.on("select_node.jstree", function (e, selectNodeArgs) {
                 var node = <ParsedTreeNode>selectNodeArgs.node;
-                //console.log('node', node);
+                //console.log("node", node);
                 var exp = ui.parsedDataTreeHandler.getNodeData(node).exported;
 
                 if (exp && exp.path)
-                    $("#parsedPath").text(exp.path.join('/'));
+                    $("#parsedPath").text(exp.path.join("/"));
 
                 if (!blockRecursive && exp && exp.start < exp.end) {
                     selectedInTree = true;
-                    //console.log('setSelection', exp.ioOffset, exp.start);
+                    //console.log("setSelection", exp.ioOffset, exp.start);
                     ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
                     selectedInTree = false;
                 }
@@ -231,7 +235,7 @@ function reparse() {
 
 var lastKsyContent: string, inputContent: ArrayBuffer, inputFsItem: IFsItem, lastKsyFsItem: IFsItem;
 export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
-    if (!fsItem || fsItem.type !== 'file')
+    if (!fsItem || fsItem.type !== "file")
         return Promise.resolve();
 
     return fss[fsItem.fsType].get(fsItem.fn).then((content: any) => {
@@ -243,12 +247,11 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
                 ui.ksyEditor.setValue(content, -1);
             getLayoutNodeById("ksyEditor").container.setTitle(fsItem.fn);
             return Promise.resolve();
-        }
-        else {
+        } else {
             inputFsItem = fsItem;
             inputContent = content;
 
-            localforage.setItem('inputFsItem', fsItem);
+            localforage.setItem("inputFsItem", fsItem);
 
             dataProvider = {
                 length: content.byteLength,
@@ -263,39 +266,40 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
 }
 
 export function addNewFiles(files: IFileProcessItem[]) {
-    return Promise.all(files.map(file => (isKsyFile(file.file.name) ? <Promise<any>>file.read('text') : file.read('arrayBuffer')).then(content => localFs.put(file.file.name, content))))
+    return Promise.all(files.map(file => (isKsyFile(file.file.name) ? <Promise<any>>file.read("text") : file.read("arrayBuffer"))
+        .then(content => localFs.put(file.file.name, content))))
         .then(fsItems => {
             refreshFsNodes();
             return fsItems.length === 1 ? loadFsItem(fsItems[0]) : Promise.resolve(null);
         });
 }
 
-localStorage.setItem('lastVersion', kaitaiIde.version);
+localStorage.setItem("lastVersion", kaitaiIde.version);
 
 export var formatReady: Promise<any>, inputReady: Promise<any>;
 $(() => {
-    $('#webIdeVersion').text(kaitaiIde.version);
-    $('#compilerVersion').text(new io.kaitai.struct.MainJs().version + " (" + new io.kaitai.struct.MainJs().buildDate + ")");
+    $("#webIdeVersion").text(kaitaiIde.version);
+    $("#compilerVersion").text(new io.kaitai.struct.MainJs().version + " (" + new io.kaitai.struct.MainJs().buildDate + ")");
 
-    $('#welcomeDoNotShowAgain').click(() => localStorage.setItem('doNotShowWelcome', 'true'));
-    if (localStorage.getItem('doNotShowWelcome') !== 'true')
-        (<any>$('#welcomeModal')).modal();
-    $('#aboutWebIde').on('click', () => (<any>$('#welcomeModal')).modal());
+    $("#welcomeDoNotShowAgain").click(() => localStorage.setItem("doNotShowWelcome", "true"));
+    if (localStorage.getItem("doNotShowWelcome") !== "true")
+        (<any>$("#welcomeModal")).modal();
+    $("#aboutWebIde").on("click", () => (<any>$("#welcomeModal")).modal());
 
     ui.hexViewer.onSelectionChanged = () => {
-        //console.log('setSelection', ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
-        localStorage.setItem('selection', JSON.stringify({ start: ui.hexViewer.selectionStart, end: ui.hexViewer.selectionEnd }));
+        //console.log("setSelection", ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
+        localStorage.setItem("selection", JSON.stringify({ start: ui.hexViewer.selectionStart, end: ui.hexViewer.selectionEnd }));
 
-        var start = ui.hexViewer.selectionStart, end = ui.hexViewer.selectionEnd;
+        var start = ui.hexViewer.selectionStart;
         var hasSelection = start !== -1;
-        $('#infoPanel .selectionText').text(hasSelection ? `selection:` : 'no selection');
+        $("#infoPanel .selectionText").text(hasSelection ? `selection:` : "no selection");
 
         refreshSelectionInput();
 
         if (ui.parsedDataTreeHandler && hasSelection && !selectedInTree) {
             var intervals = ui.parsedDataTreeHandler.intervalHandler.searchRange(ui.hexViewer.mouseDownOffset || start);
             if (intervals.items.length > 0) {
-                //console.log('selected node', intervals[0].id);
+                //console.log("selected node", intervals[0].id);
                 blockRecursive = true;
                 ui.parsedDataTreeHandler.activatePath(intervals.items[0].exp.path).then(() => blockRecursive = false);
             }
@@ -312,51 +316,52 @@ $(() => {
         exec: function (editor: any) { reparse(); }
     });
 
-    initFileDrop('fileDrop', addNewFiles);
+    initFileDrop("fileDrop", addNewFiles);
 
     function loadCachedFsItem(cacheKey: string, defFsType: string, defSample: string) {
-        return localforage.getItem(cacheKey).then((fsItem: IFsItem) => loadFsItem(fsItem || <IFsItem>{ fsType: defFsType, fn: defSample, type: 'file' }, false));
+        return localforage.getItem(cacheKey).then((fsItem: IFsItem) =>
+            loadFsItem(fsItem || <IFsItem>{ fsType: defFsType, fn: defSample, type: "file" }, false));
     }
 
-    inputReady = loadCachedFsItem('inputFsItem', 'kaitai', 'samples/sample1.zip');
-    formatReady = loadCachedFsItem(ksyFsItemName, 'kaitai', 'formats/archive/zip.ksy');
+    inputReady = loadCachedFsItem("inputFsItem", "kaitai", "samples/sample1.zip");
+    formatReady = loadCachedFsItem(ksyFsItemName, "kaitai", "formats/archive/zip.ksy");
 
     inputReady.then(() => {
-        var storedSelection = JSON.parse(localStorage.getItem('selection'));
+        var storedSelection = JSON.parse(localStorage.getItem("selection"));
         if (storedSelection)
             ui.hexViewer.setSelection(storedSelection.start, storedSelection.end);
     });
 
     var editDelay = new Delayed(500);
-    ui.ksyEditor.on('change', () => editDelay.do(() => recompile()));
+    ui.ksyEditor.on("change", () => editDelay.do(() => recompile()));
 
-    var inputContextMenu = $('#inputContextMenu');
-    var downloadInput = $('#inputContextMenu .downloadItem');
-    $("#hexViewer").on('contextmenu', e => {
-        downloadInput.toggleClass('disabled', ui.hexViewer.selectionStart === -1);
+    var inputContextMenu = $("#inputContextMenu");
+    var downloadInput = $("#inputContextMenu .downloadItem");
+    $("#hexViewer").on("contextmenu", e => {
+        downloadInput.toggleClass("disabled", ui.hexViewer.selectionStart === -1);
         inputContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
         return false;
     });
 
     function ctxAction(obj: JQuery, callback: (e: JQueryEventObject) => void) {
-        obj.find('a').on('click', e => {
-            if (!obj.hasClass('disabled')) {
+        obj.find("a").on("click", e => {
+            if (!obj.hasClass("disabled")) {
                 inputContextMenu.hide();
                 callback(e);
             }
         });
     }
 
-    $(document).on('mouseup', e => {
-        if ($(e.target).parents('.dropdown-menu').length === 0)
-            $('.dropdown').hide();
+    $(document).on("mouseup", e => {
+        if ($(e.target).parents(".dropdown-menu").length === 0)
+            $(".dropdown").hide();
     });
 
     ctxAction(downloadInput, e => {
         var start = ui.hexViewer.selectionStart, end = ui.hexViewer.selectionEnd;
-        //var fnParts = /^(.*?)(\.[^.]+)?$/.exec(inputFsItem.fn.split('/').last());
+        //var fnParts = /^(.*?)(\.[^.]+)?$/.exec(inputFsItem.fn.split("/").last());
         //var newFn = `${fnParts[1]}_0x${start.toString(16)}-0x${end.toString(16)}${fnParts[2] || ""}`;
-        var newFn = `${inputFsItem.fn.split('/').last()}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
+        var newFn = `${inputFsItem.fn.split("/").last()}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
         saveFile(new Uint8Array(inputContent, start, end - start + 1), newFn);
     });
 
@@ -390,10 +395,9 @@ $(() => {
                 result += isArray ? "]" : "}";
             } else if (value.type === ObjectType.TypedArray) {
                 if (value.bytes.length <= 64)
-                    result += "[" + Array.from(value.bytes).join(', ') + "]";
-                else {
+                    result += "[" + Array.from(value.bytes).join(", ") + "]";
+                else
                     result += `{ "$start": ${value.ioOffset + value.start}, "$end": ${value.ioOffset + value.end - 1} }`;
-                }
             } else if (value.type === ObjectType.Primitive) {
                 if (value.enumStringValue)
                     result += `{ "name": ${JSON.stringify(value.enumStringValue)}, "value": ${value.primitiveValue} }`;
@@ -404,40 +408,20 @@ $(() => {
             }
         }
 
-        function getParsedIntervals(root: IExportedValue) {
-            var objects = collectAllObjects(root).slice(1);
-            //console.log('objects', objects);
-
-            var allInts = objects.map(x => ({ start: x.ioOffset + x.start, end: x.ioOffset + x.end - 1 })).filter(x => !isNaN(x.start) && !isNaN(x.end)).sort((a, b) => a.start - b.start);
-            //console.log('allInts', allInts);
-
-            var intervals = [];
-            intervals.push(allInts[0]);
-
-            for (var i = 1; i < allInts.length; i++) {
-                if (intervals.last().end < allInts[i].start)
-                    intervals.push(allInts[i]);
-                else
-                    intervals.last().end = Math.max(intervals.last().end, allInts[i].end);
-            }
-
-            return intervals;
-        }
-
         workerMethods.reparse(true).then(exportedRoot => {
-            console.log('exported', exportedRoot);
+            console.log("exported", exportedRoot);
             expToNative(exportedRoot);
-            addEditorTab('json export', result, 'json');
+            addEditorTab("json export", result, "json");
         }, error => handleError(error));
     };
 
-    $("#exportToJson, #exportToJsonHex").on('click', e => kaitaiIde.exportToJson(e.target.id === "exportToJsonHex"));
+    $("#exportToJson, #exportToJsonHex").on("click", e => kaitaiIde.exportToJson(e.target.id === "exportToJsonHex"));
 
-    $("#disableLazyParsing").on('click', reparse);
+    $("#disableLazyParsing").on("click", reparse);
 
     ui.unparsedIntSel = new IntervalViewer("unparsed");
     ui.bytesIntSel = new IntervalViewer("bytes");
 
-    precallHook(kaitaiIde.ui.layout.constructor.__lm.controls, 'DragProxy', () => ga('layout', 'window_drag'));
-    $('body').on('mousedown', '.lm_drag_handle', () => { ga('layout', 'splitter_drag'); });
+    precallHook(kaitaiIde.ui.layout.constructor.__lm.controls, "DragProxy", () => ga("layout", "window_drag"));
+    $("body").on("mousedown", ".lm_drag_handle", () => { ga("layout", "splitter_drag"); });
 });

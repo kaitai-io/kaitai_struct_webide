@@ -4,22 +4,22 @@
   *   (c) 2015-2017 Evan You
   *   @license MIT
   */
-import * as Vue from 'vue';
-import { ComponentOptions } from 'vue';
+import * as Vue from "vue";
+import { ComponentOptions } from "vue";
 
 export const $internalHooks = [
-    'data',
-    'beforeCreate',
-    'created',
-    'beforeMount',
-    'mounted',
-    'beforeDestroy',
-    'destroyed',
-    'beforeUpdate',
-    'updated',
-    'activated',
-    'deactivated',
-    'render'
+    "data",
+    "beforeCreate",
+    "created",
+    "beforeMount",
+    "mounted",
+    "beforeDestroy",
+    "destroyed",
+    "beforeUpdate",
+    "updated",
+    "activated",
+    "deactivated",
+    "render"
 ];
 
 export type VueClass = { new(): Vue } & typeof Vue;
@@ -37,7 +37,7 @@ export function componentFactory(
     // prototype props.
     const proto = Component.prototype;
     Object.getOwnPropertyNames(proto).forEach(function(key) {
-        if (key === 'constructor') {
+        if (key === "constructor") {
             return;
         }
         // hooks
@@ -46,7 +46,7 @@ export function componentFactory(
             return;
         }
         const descriptor = Object.getOwnPropertyDescriptor(proto, key)
-        if (typeof descriptor.value === 'function') {
+        if (typeof descriptor.value === "function") {
             // methods
             (options.methods || (options.methods = {}))[key] = descriptor.value
         } else if (descriptor.get || descriptor.set) {
@@ -58,7 +58,7 @@ export function componentFactory(
         }
     });
 
-    // add data hook to collect class properties as Vue instance's data
+    // add data hook to collect class properties as Vue instance"s data
     (options.mixins || (options.mixins = [])).push({
         data(this: Vue) {
             return collectDataFromConstructor(this, Component);
@@ -101,7 +101,7 @@ export function collectDataFromConstructor(vm: Vue, Component: VueClass) {
             }
         }
         keys.forEach(key => {
-            if (key.charAt(0) !== '_') {
+            if (key.charAt(0) !== "_") {
                 Object.defineProperty(this, key, {
                     get: () => vm[key],
                     set: value => vm[key] = value
@@ -129,7 +129,7 @@ function Component<V extends VueClass>(target: V): V;
 function Component<V extends VueClass, U extends Vue>(
     options: ComponentOptions<U> | V
 ): any {
-    if (typeof options === 'function') {
+    if (typeof options === "function") {
         return componentFactory(options);
     }
     return function (Component: V) {
@@ -156,7 +156,7 @@ export function createDecorator(
     factory: (options: ComponentOptions<Vue>, key: string, index: number) => void
 ): (target: Vue, key: string, index: any) => void {
     return (_, key, index) => {
-        if (typeof index !== 'number') {
+        if (typeof index !== "number") {
             index = undefined
         }
         $decoratorQueue.push(options => factory(options, key, index));
@@ -164,7 +164,7 @@ export function createDecorator(
 }
 
 export function warn(message: string): void {
-    if (typeof console !== 'undefined') {
-        console.warn('[vue-class-component] ' + message);
+    if (typeof console !== "undefined") {
+        console.warn("[vue-class-component] " + message);
     }
 } 

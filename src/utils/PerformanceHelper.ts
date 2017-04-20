@@ -26,7 +26,7 @@
 
     actionDone(action: PerformanceHelper.ActionMeasurement, failed?: boolean) {
         if (!this.logPerformance) return;
-        console.info(`[performance/${(new Date()).format('s.u')}] ${action.name} took ${Math.round(performance.now() - action.startTime)} milliseconds${failed ? " before it failed" : ""}.`);
+        console.info(`[performance/${(new Date()).format("s.u")}] ${action.name} took ${Math.round(performance.now() - action.startTime)} milliseconds${failed ? " before it failed" : ""}.`);
     }
 }
 

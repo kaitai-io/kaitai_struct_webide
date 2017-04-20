@@ -1,5 +1,5 @@
-﻿import { IFileSystem, IFsItem } from './Common';
-import { FsUri } from './FsUri';
+﻿import { IFileSystem, IFsItem } from "./Common";
+import { FsUri } from "./FsUri";
 
 export class FsSelector implements IFileSystem {
     scheme: string;
@@ -11,7 +11,7 @@ export class FsSelector implements IFileSystem {
     }
 
     getFs(uri: string): IFileSystem {
-        var scheme = uri.split('://')[0];
+        var scheme = uri.split("://")[0];
         var fs = this.filesystems[scheme];
         if (!fs)
             throw `FileSystem not found for uri: ${uri}`;

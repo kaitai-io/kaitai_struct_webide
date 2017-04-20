@@ -3,7 +3,7 @@
         if (typeof value !== typeof compareTo)
             return false;
 
-        if (typeof value === 'string' || typeof value === 'boolean' || typeof value === 'number' || typeof value === 'undefined')
+        if (typeof value === "string" || typeof value === "boolean" || typeof value === "number" || typeof value === "undefined")
             return value === compareTo;
 
         if (Array.isArray(value) && Array.isArray(compareTo)) {

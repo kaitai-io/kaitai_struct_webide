@@ -7,7 +7,7 @@
 }
 
 interface IWorkerMessage {
-    type: 'initCode' | 'setInput' | 'reparse' | 'get';
+    type: "initCode" | "setInput" | "reparse" | "get";
     msgId?: number;
     args?: any[];
     result?: any;

@@ -14,13 +14,13 @@ function workerCall(request: IWorkerMessage): Promise<any> {
         request.msgId = ++lastMsgId;
         msgHandlers[request.msgId] = response => {
             if (response.error) {
-                console.log('error', response.error);
+                console.log("error", response.error);
                 reject(response.error);
             }
             else
                 resolve(response.result);
 
-            //console.info(`[performance] [${(new Date()).format('H:i:s.u')}] Got worker response: ${Date.now()}.`);
+            //console.info(`[performance] [${(new Date()).format("H:i:s.u")}] Got worker response: ${Date.now()}.`);
         };
         worker.postMessage(request);
     });
@@ -28,15 +28,15 @@ function workerCall(request: IWorkerMessage): Promise<any> {
 
 export var workerMethods = {
     initCode: (sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes) => {
-        return workerCall({ type: 'initCode', args: [sourceCode, mainClassName, ksyTypes] });
+        return workerCall({ type: "initCode", args: [sourceCode, mainClassName, ksyTypes] });
     },
     setInput: (inputBuffer: ArrayBuffer) => {
-        return workerCall({ type: 'setInput', args: [inputBuffer] });
+        return workerCall({ type: "setInput", args: [inputBuffer] });
     },
     reparse: (eagerMode: boolean) => {
-        return <Promise<IExportedValue>>workerCall({ type: 'reparse', args: [eagerMode] });
+        return <Promise<IExportedValue>>workerCall({ type: "reparse", args: [eagerMode] });
     },
     get: (path: string[]) => {
-        return <Promise<IExportedValue>>workerCall({ type: 'get', args: [path] });
+        return <Promise<IExportedValue>>workerCall({ type: "get", args: [path] });
     }
 };

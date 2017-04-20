@@ -1,7 +1,7 @@
 ﻿export function downloadFile(url: string) {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.responseType = 'arraybuffer';
+    xhr.open("GET", url, true);
+    xhr.responseType = "arraybuffer";
 
     return new Promise<ArrayBuffer>((resolve, reject) => {
         xhr.onload = e => resolve(xhr.response);
@@ -41,7 +41,7 @@ export class Delayed {
 
 export function asciiEncode(bytes: Uint8Array) {
     var len = bytes.byteLength;
-    var binary = '';
+    var binary = "";
     for (var i = 0; i < len; i++)
         binary += String.fromCharCode(bytes[i]);
     return binary;
@@ -49,7 +49,7 @@ export function asciiEncode(bytes: Uint8Array) {
 
 export function hexEncode(bytes: Uint8Array) {
     var len = bytes.byteLength;
-    var binary = '0x';
+    var binary = "0x";
     for (var i = 0; i < len; i++)
         binary += bytes[i].toString(16);
     return binary;
@@ -66,7 +66,7 @@ export function readBlob(blob: Blob, mode: "arrayBuffer" | "text" | "dataUrl", .
         var reader = new FileReader();
         reader.onload = function () { resolve(reader.result); };
         reader.onerror = function (e) { reject(e); };
-        reader['readAs' + mode[0].toUpperCase() + mode.substr(1)](blob, ...args);
+        reader["readAs" + mode[0].toUpperCase() + mode.substr(1)](blob, ...args);
     });
 }
 
@@ -99,7 +99,7 @@ export function processFiles(files: FileList) {
 }
 
 export function openFilesWithDialog(callback: IFileProcessCallback) {
-    $('<input type="file" multiple />').on('change', e => {
+    $(`<input type="file" multiple />`).on("change", e => {
         var files = processFiles((<any>e.target).files);
         callback(files);
     }).click();

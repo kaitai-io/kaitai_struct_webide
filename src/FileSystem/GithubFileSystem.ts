@@ -1,6 +1,6 @@
-﻿import { GithubClient, Repository, Entities } from './GithubClient';
-import { FsUri } from './FsUri';
-import { IFileSystem, IFsItem } from './Common';
+﻿import { GithubClient, Repository, Entities } from "./GithubClient";
+import { FsUri } from "./FsUri";
+import { IFileSystem, IFsItem } from "./Common";
 
 export class GithubFsItem implements IFsItem {
     public repo: Repository;
@@ -25,14 +25,14 @@ export class GithubFsItem implements IFsItem {
 
     list(): Promise<IFsItem[]> {
         return this.repo.getContents(this.uri.path).then(items => {
-            return items.filter(item => item.type === 'file' || item.type === 'dir')
-                .map(item => new GithubFsItem(this.fs, this.uri.uri + item.name + (item.type === 'dir' ? '/' : ''), item));
+            return items.filter(item => item.type === "file" || item.type === "dir")
+                .map(item => new GithubFsItem(this.fs, this.uri.uri + item.name + (item.type === "dir" ? "/" : ""), item));
         });
     }
 }
 
 export class GithubFileSystem implements IFileSystem {
-    scheme: string = 'github';
+    scheme: string = "github";
 
     constructor(public client: GithubClient) { }
 

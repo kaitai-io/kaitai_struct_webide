@@ -1,8 +1,8 @@
 ﻿import { ui } from "./app.layout";
 import { handleError } from "./app.errors";
 import { IInterval, IntervalHandler } from "./utils/IntervalHelper";
-import { s, htmlescape, asciiEncode, hexEncode, collectAllObjects } from './utils';
-import { workerMethods } from './app.worker';
+import { s, htmlescape, asciiEncode, hexEncode, collectAllObjects } from "./utils";
+import { workerMethods } from "./app.worker";
 
 interface ParsedTreeNodeData {
     exported?: IExportedValue;
@@ -40,7 +40,7 @@ export class ParsedTreeHandler {
         }).jstree(true);
         this.jstree.on = (...args: any[]) => (<any>this.jstree).element.on(...args);
         this.jstree.off = (...args: any[]) => (<any>this.jstree).element.off(...args);
-        this.jstree.on('keyup.jstree', e => this.jstree.activate_node(e.target.id, null));
+        this.jstree.on("keyup.jstree", e => this.jstree.activate_node(e.target.id, null));
         this.intervalHandler = new IntervalHandler<IParsedTreeInterval>();
     }
 
@@ -49,22 +49,22 @@ export class ParsedTreeHandler {
 
     private saveOpenedNodes() {
         if (this.saveOpenedNodesDisabled) return;
-        localStorage.setItem('parsedTreeOpenedNodes', Object.keys(this.parsedTreeOpenedNodes).join(','));
+        localStorage.setItem("parsedTreeOpenedNodes", Object.keys(this.parsedTreeOpenedNodes).join(","));
     }
 
     public initNodeReopenHandling() {
-        var parsedTreeOpenedNodesStr = localStorage.getItem('parsedTreeOpenedNodes');
+        var parsedTreeOpenedNodesStr = localStorage.getItem("parsedTreeOpenedNodes");
         if (parsedTreeOpenedNodesStr)
-            parsedTreeOpenedNodesStr.split(',').forEach(x => this.parsedTreeOpenedNodes[x] = true);
+            parsedTreeOpenedNodesStr.split(",").forEach(x => this.parsedTreeOpenedNodes[x] = true);
 
         return new Promise((resolve, reject) => {
-            this.jstree.on('ready.jstree', e => {
+            this.jstree.on("ready.jstree", e => {
                 this.openNodes(Object.keys(this.parsedTreeOpenedNodes)).then(() => {
-                    this.jstree.on('open_node.jstree', (e, te) => {
+                    this.jstree.on("open_node.jstree", (e, te) => {
                         var node = <ParsedTreeNode>te.node;
                         this.parsedTreeOpenedNodes[this.getNodeId(node)] = true;
                         this.saveOpenedNodes();
-                    }).on('close_node.jstree', (e, te) => {
+                    }).on("close_node.jstree", (e, te) => {
                         var node = <ParsedTreeNode>te.node;
                         delete this.parsedTreeOpenedNodes[this.getNodeId(node)];
                         this.saveOpenedNodes();
@@ -81,25 +81,25 @@ export class ParsedTreeHandler {
             var value = exported.primitiveValue;
 
             if (Number.isInteger(value)) {
-                value = s`${value < 0 ? '-' : ''}0x${Math.abs(value).toString(16).toUpperCase()}` + (detailed ? s`<span class="intVal"> = ${value}</span>` : '');
+                value = s`${value < 0 ? "-" : ""}0x${Math.abs(value).toString(16).toUpperCase()}` + (detailed ? s`<span class="intVal"> = ${value}</span>` : "");
 
                 if (exported.enumStringValue)
-                    value = `${htmlescape(exported.enumStringValue)}` + (detailed ? ` <span class="enumDesc">(${value})</span>` : '');
+                    value = `${htmlescape(exported.enumStringValue)}` + (detailed ? ` <span class="enumDesc">(${value})</span>` : "");
             } else
                 value = s`${value}`;
 
             return `<span class="primitiveValue">${value}</span>`;
         }
         else if (exported.type === ObjectType.TypedArray) {
-            var text = '[';
+            var text = "[";
             for (var i = 0; i < exported.bytes.byteLength; i++) {
                 if (i === 8) {
                     text += ", ...";
                     break;
                 }
-                text += (i === 0 ? '' : ', ') + exported.bytes[i];
+                text += (i === 0 ? "" : ", ") + exported.bytes[i];
             }
-            text += ']';
+            text += "]";
 
             return s`${text}`;
         } else
@@ -110,22 +110,22 @@ export class ParsedTreeHandler {
         var repr = obj.object.ksyType && obj.object.ksyType["-webide-representation"];
         if (!repr) return "";
 
-        function ksyNameToJsName(ksyName: string) { return ksyName.split('_').map((x, i) => (i === 0 ? x : x.ucFirst())).join(''); }
+        function ksyNameToJsName(ksyName: string) { return ksyName.split("_").map((x, i) => (i === 0 ? x : x.ucFirst())).join(""); }
 
         return htmlescape(repr).replace(/{(.*?)}/g, (g0, g1: string) => {
             var currItem = obj;
-            var parts = g1.split(':');
+            var parts = g1.split(":");
 
-            var format: { sep:string, str?:string, hex?:string, dec?:string } = { sep: ', ' };
+            var format: { sep:string, str?:string, hex?:string, dec?:string } = { sep: ", " };
             if (parts.length > 1)
-                parts[1].split(',').map(x => x.split('=')).forEach(kv => format[kv[0]] = kv.length > 1 ? kv[1] : true);
-            parts[0].split('.').forEach(k => {
+                parts[1].split(",").map(x => x.split("=")).forEach(kv => format[kv[0]] = kv.length > 1 ? kv[1] : true);
+            parts[0].split(".").forEach(k => {
                 if (!currItem || !currItem.object)
                     currItem = null;
                 else {
                     var child = k === "_parent" ? currItem.parent : currItem.object.fields[ksyNameToJsName(k)];
                     //if (!child)
-                    //    console.log('[webrepr] child not found in object', currItem, k);
+                    //    console.log("[webrepr] child not found in object", currItem, k);
                     currItem = child;
                 }
             });
@@ -159,7 +159,7 @@ export class ParsedTreeHandler {
 
     getNodeData(node: ParsedTreeNode) {
         if (!node || !node.data) {
-            console.log('no node data', node);
+            console.log("no node data", node);
             return null;
         }
         return this.nodeDatas[node.data.idx];
@@ -175,10 +175,10 @@ export class ParsedTreeHandler {
             text = s`${propName}`;
         else if (isObject) {
             var repr = this.reprObject(item);
-            text = s`${propName} [<span class="className">${item.object.class}</span>]` + (repr ? `: ${repr}` : '');
+            text = s`${propName} [<span class="className">${item.object.class}</span>]` + (repr ? `: ${repr}` : "");
         }
         else
-            text = (showProp ? s`<span class="propName">${propName}</span> = ` : '') + this.primitiveToText(item);
+            text = (showProp ? s`<span class="propName">${propName}</span> = ` : "") + this.primitiveToText(item);
 
         return <ParsedTreeNode>{ text: text, children: isObject || isArray, data: this.addNodeData({ exported: item }) };
     }
@@ -238,7 +238,7 @@ export class ParsedTreeHandler {
     }
 
     getNode(node: ParsedTreeNode): Promise<ParsedTreeNode[]> {
-        var isRoot = node.id === '#';
+        var isRoot = node.id === "#";
         var nodeData = this.getNodeData(node);
         var expNode = isRoot ? this.exportedRoot : nodeData.exported;
 
@@ -294,7 +294,7 @@ export class ParsedTreeHandler {
             }
 
             function fillParents(value: IExportedValue, parent: IExportedValue) {
-                //console.log('fillParents', value.path.join('/'), value, parent);
+                //console.log("fillParents", value.path.join("/"), value, parent);
                 value.parent = parent;
                 if (value.type === ObjectType.Object) {
                     Object.keys(value.object.fields).forEach(fieldName => fillParents(value.object.fields[fieldName], value));
@@ -318,7 +318,7 @@ export class ParsedTreeHandler {
         var path = nodeData.exported ? nodeData.exported.path : nodeData.instance.path;
         if (nodeData.arrayStart || nodeData.arrayEnd)
             path = path.concat([`${nodeData.arrayStart || 0}`, `${nodeData.arrayEnd || 0}`]);
-        return 'inputField_' + path.join('_');
+        return "inputField_" + path.join("_");
     }
 
     openNodes(nodesToOpen: string[]): Promise<boolean> {
@@ -326,12 +326,12 @@ export class ParsedTreeHandler {
             this.saveOpenedNodesDisabled = true;
             var origAnim = (<any>this.jstree).settings.core.animation;
             (<any>this.jstree).settings.core.animation = 0;
-            //console.log('saveOpenedNodesDisabled = true');
+            //console.log("saveOpenedNodesDisabled = true");
 
             var openCallCounter = 1;
             var openRound = (e: any) => {
                 openCallCounter--;
-                //console.log('openRound', openCallCounter, nodesToOpen);
+                //console.log("openRound", openCallCounter, nodesToOpen);
 
                 var newNodesToOpen: string[] = [];
                 var existingNodes: string[] = [];
@@ -346,7 +346,7 @@ export class ParsedTreeHandler {
                 });
                 nodesToOpen = newNodesToOpen;
 
-                //console.log('existingNodes', existingNodes, 'openCallCounter', openCallCounter);
+                //console.log("existingNodes", existingNodes, "openCallCounter", openCallCounter);
 
                 if (existingNodes.length > 0)
                     existingNodes.forEach(node => {
@@ -355,7 +355,7 @@ export class ParsedTreeHandler {
                         this.jstree.open_node(node);
                     });
                 else if (openCallCounter === 0) {
-                    //console.log('saveOpenedNodesDisabled = false');
+                    //console.log("saveOpenedNodesDisabled = false");
                     this.saveOpenedNodesDisabled = false;
                     e && this.jstree.off(e);
                     (<any>this.jstree).settings.core.animation = origAnim;
@@ -365,24 +365,24 @@ export class ParsedTreeHandler {
                 }
             }
 
-            this.jstree.on('open_node.jstree', e => openRound(e));
+            this.jstree.on("open_node.jstree", e => openRound(e));
             openRound(null);
         });
     }
 
     activatePath(path: string|string[]): Promise<boolean> {
-        var pathParts = typeof path === "string" ? path.split('/') : path;
+        var pathParts = typeof path === "string" ? path.split("/") : path;
 
         var expandNodes = [];
-        var pathStr = 'inputField';
+        var pathStr = "inputField";
         for (var i = 0; i < pathParts.length; i++) {
-            pathStr += '_' + pathParts[i];
+            pathStr += "_" + pathParts[i];
             expandNodes.push(pathStr);
         }
         var activateId = expandNodes.pop();
 
         return this.openNodes(expandNodes).then(foundAll => {
-            //console.log('activatePath', foundAll, activateId);
+            //console.log("activatePath", foundAll, activateId);
             this.jstree.activate_node(activateId, null);
 
             if (foundAll) {
@@ -390,7 +390,7 @@ export class ParsedTreeHandler {
                 if (element)
                     element.scrollIntoView();
                 else {
-                    console.log('element not found', activateId);
+                    console.log("element not found", activateId);
                 }
             }
 

@@ -102,7 +102,7 @@ hello66
             <div class="wholerow">&nbsp;</div>
             <a :class="{bold: model.isFolder}">
                 {{model.text}}
-                <span v-if="model.isFolder">[{{open ? '-' : '+'}}]</span>
+                <span v-if="model.isFolder">[{{open ? "-" : "+"}}]</span>
             </a>
             <div v-if="childrenLoading" class="loading_icon"></div>
         </div>
@@ -124,8 +124,8 @@ hello66
     ["bowser", "jstree", "localforage", "goldenlayout", "knockout", "knockout-es5", "vue", "vue-class-component"].forEach(
         name => paths[name] = `../lib/${name}/${name}`);
 
-    requirejs.config({ baseUrl: 'js/', paths: paths });
-    require(['sandbox']);
+    requirejs.config({ baseUrl: "js/", paths: paths });
+    require(["sandbox"]);
 </script>
 </body>
 </html>

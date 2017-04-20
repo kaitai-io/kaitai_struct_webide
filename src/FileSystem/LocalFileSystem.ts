@@ -1,9 +1,9 @@
-﻿import { FsUri } from './FsUri';
-import { IFileSystem, IFsItem, FsItem } from './Common';
+﻿import { FsUri } from "./FsUri";
+import { IFileSystem, IFsItem, FsItem } from "./Common";
 import * as localforage from "localforage";
 
 export class LocalFileSystem implements IFileSystem {
-    scheme: string = 'local';
+    scheme: string = "local";
 
     private lfCache: { [name: string]: LocalForage } = {};
 
@@ -13,7 +13,7 @@ export class LocalFileSystem implements IFileSystem {
 
     execute<T>(uri: string, action: (localforage: LocalForage, fsUri: FsUri) => Promise<T>) {
         var fsUri = new FsUri(uri, 1);
-        var name = "kaitai_files" + (fsUri.fsData[0] ? '_' + fsUri.fsData[0] : '');
+        var name = "kaitai_files" + (fsUri.fsData[0] ? "_" + fsUri.fsData[0] : "");
         if (!this.lfCache[name])
             this.lfCache[name] = localforage.createInstance({ name: name });
         return action(this.lfCache[name], fsUri);

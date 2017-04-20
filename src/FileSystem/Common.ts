@@ -1,4 +1,4 @@
-﻿import { FsUri } from './FsUri';
+﻿import { FsUri } from "./FsUri";
 
 export interface IFileSystem {
     scheme: string;
