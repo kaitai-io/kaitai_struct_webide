@@ -6,6 +6,7 @@
     public static Undefined = "Undefined";
 }
 
+/* tslint:disable */
 interface IWorkerMessage {
     type: "initCode" | "setInput" | "reparse" | "get";
     msgId?: number;
@@ -13,6 +14,7 @@ interface IWorkerMessage {
     result?: any;
     error?: any;
 }
+/* tslint:enable */
 
 interface IInstance {
     path: string[];
@@ -45,4 +47,4 @@ interface IExportedValue {
     parent?: IExportedValue;
 }
 
-interface IKsyTypes { [name: string]: KsySchema.IType };
+interface IKsyTypes { [name: string]: KsySchema.IType; };

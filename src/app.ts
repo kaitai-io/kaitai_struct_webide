@@ -5,7 +5,7 @@ import { ui, addEditorTab, getLayoutNodeById } from "./app.layout";
 import { showError, handleError } from "./app.errors";
 import { IFsItem, fss, addKsyFile, refreshFsNodes, localFs } from "./app.files";
 import { refreshSelectionInput } from "./app.selectionInput";
-import { ParsedTreeHandler, ParsedTreeNode } from "./parsedToTree";
+import { ParsedTreeHandler, IParsedTreeNode } from "./parsedToTree";
 import { workerMethods } from "./app.worker";
 import { IDataProvider } from "./HexViewer";
 import { refreshConverterPanel } from "./app.converterPanel";
@@ -65,7 +65,7 @@ var ksySchema: KsySchema.IKsyFile;
 export var ksyTypes: IKsyTypes;
 
 class JsImporter implements io.kaitai.struct.IYamlImporter {
-    importYaml(name: string, mode: string){
+    importYaml(name: string, mode: string) {
         return new Promise(function (resolve, reject) {
             console.log(`import yaml: ${name}, mode: ${mode}`);
 
@@ -172,6 +172,7 @@ function isKsyFile(fn: string) { return fn.toLowerCase().endsWith(".ksy"); }
 
 var ksyFsItemName = "ksyFsItem";
 
+var lastKsyContent: string = null;
 function recompile() {
     return localforage.getItem<IFsItem>(ksyFsItemName).then(ksyFsItem => {
         var srcYaml = ui.ksyEditor.getValue();
@@ -196,6 +197,7 @@ function recompile() {
     });
 }
 
+export var formatReady: Promise<any> = null, inputReady: Promise<any> = null;
 var selectedInTree = false, blockRecursive = false;
 function reparse() {
     handleError(null);
@@ -214,7 +216,7 @@ function reparse() {
                 .then(() => ui.hexViewer.onSelectionChanged(), e => handleError(e));
 
             ui.parsedDataTreeHandler.jstree.on("select_node.jstree", function (e, selectNodeArgs) {
-                var node = <ParsedTreeNode>selectNodeArgs.node;
+                var node = <IParsedTreeNode>selectNodeArgs.node;
                 //console.log("node", node);
                 var exp = ui.parsedDataTreeHandler.getNodeData(node).exported;
 
@@ -233,7 +235,7 @@ function reparse() {
     });
 }
 
-var lastKsyContent: string, inputContent: ArrayBuffer, inputFsItem: IFsItem, lastKsyFsItem: IFsItem;
+var inputContent: ArrayBuffer, inputFsItem: IFsItem, lastKsyFsItem: IFsItem;
 export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
     if (!fsItem || fsItem.type !== "file")
         return Promise.resolve();
@@ -255,7 +257,9 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
 
             dataProvider = {
                 length: content.byteLength,
-                get(offset, length) { return new Uint8Array(content, offset, length) },
+                get(offset, length) {
+                    return new Uint8Array(content, offset, length);
+                }
             };
 
             ui.hexViewer.setDataProvider(dataProvider);
@@ -276,7 +280,6 @@ export function addNewFiles(files: IFileProcessItem[]) {
 
 localStorage.setItem("lastVersion", kaitaiIde.version);
 
-export var formatReady: Promise<any>, inputReady: Promise<any>;
 $(() => {
     $("#webIdeVersion").text(kaitaiIde.version);
     $("#compilerVersion").text(new io.kaitai.struct.MainJs().version + " (" + new io.kaitai.struct.MainJs().buildDate + ")");

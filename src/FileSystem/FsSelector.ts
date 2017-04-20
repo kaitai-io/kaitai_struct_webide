@@ -1,5 +1,4 @@
 ﻿import { IFileSystem, IFsItem } from "./Common";
-import { FsUri } from "./FsUri";
 
 export class FsSelector implements IFileSystem {
     scheme: string;

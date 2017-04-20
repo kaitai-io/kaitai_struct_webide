@@ -1,5 +1,5 @@
 ﻿import { FsUri } from "./FsUri";
-import { IFileSystem, IFsItem, FsItem } from "./Common";
+import { IFileSystem, FsItem } from "./Common";
 import * as localforage from "localforage";
 
 export class LocalFileSystem implements IFileSystem {

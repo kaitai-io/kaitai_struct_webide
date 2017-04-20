@@ -1,5 +1,5 @@
 ﻿import { FsUri } from "./FsUri";
-import { IFileSystem, IFsItem, FsItem } from "./Common";
+import { IFileSystem, FsItem } from "./Common";
 
 interface IListResponse {
     files: [{ fn: string, isDir: boolean }];
@@ -21,7 +21,8 @@ export class RemoteFileSystem implements IFileSystem {
 
             if(headers)
                 for (var hdrName in headers)
-                    xhr.setRequestHeader(hdrName, headers[hdrName]);
+                    if (headers.hasOwnProperty(hdrName))
+                        xhr.setRequestHeader(hdrName, headers[hdrName]);
 
             xhr.onload = e => {
                 if (200 <= xhr.status && xhr.status <= 299) {

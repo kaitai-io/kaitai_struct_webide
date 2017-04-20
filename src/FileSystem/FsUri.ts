@@ -64,10 +64,13 @@ export class FsUri {
 export class FsUriTests {
     static run() {
         TestHelper.assertEquals(new FsUri("github://user/repo/", 2),
-            { "uri": "github://user/repo/", "providerName": "github", "providerData": ["user", "repo"], "path": "/", "type": "directory", "name": "/", "parentPath": "/" });
+            { "uri": "github://user/repo/", "providerName": "github", "providerData": ["user", "repo"],
+                "path": "/", "type": "directory", "name": "/", "parentPath": "/" });
         TestHelper.assertEquals(new FsUri("github://user/repo/folder/", 2),
-            { "uri": "github://user/repo/folder/", "providerName": "github", "providerData": ["user", "repo"], "path": "/folder/", "type": "directory", "name": "folder", "parentPath": "/" });
+            { "uri": "github://user/repo/folder/", "providerName": "github", "providerData": ["user", "repo"],
+                "path": "/folder/", "type": "directory", "name": "folder", "parentPath": "/" });
         TestHelper.assertEquals(new FsUri("github://user/repo/folder/file", 2),
-            { "uri": "github://user/repo/folder/file", "providerName": "github", "providerData": ["user", "repo"], "path": "/folder/file", "type": "file", "name": "file", "parentPath": "/folder/" });        
+            { "uri": "github://user/repo/folder/file", "providerName": "github", "providerData": ["user", "repo"],
+                "path": "/folder/file", "type": "file", "name": "file", "parentPath": "/folder/" });
     }
 }

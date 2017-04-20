@@ -1,6 +1,6 @@
 ﻿import { ui, addEditorTab } from "./app.layout";
 import { compile, addNewFiles, loadFsItem, ga } from "./app";
-import { JSTreeNode } from "./parsedToTree";
+import { IJSTreeNode } from "./parsedToTree";
 import * as localforage from "localforage";
 import { downloadFile, saveFile, openFilesWithDialog } from "./utils";
 declare var kaitaiFsFiles: string[];
@@ -11,12 +11,14 @@ interface IFileSystem {
     put(fn: string, data: any): Promise<IFsItem>;
 }
 
+/* tslint:disable */
 export interface IFsItem {
     fsType: string;
     type: "file" | "folder";
     fn?: string;
     children?: { [key: string]: IFsItem; };
 }
+/* tslint:enable */
 
 var fsHelper = {
     selectNode(root: IFsItem, fn: string) {
@@ -28,18 +30,18 @@ var fsHelper = {
             currPath += (currPath ? "/" : "") + fnPart;
 
             if (!("children" in currNode)) {
-                currNode.children = { };
+                currNode.children = {};
                 currNode.type = "folder";
             }
-                
+
             if (!(fnPart in currNode.children))
                 currNode.children[fnPart] = { fsType: root.fsType, type: "file", fn: currPath };
 
             currNode = currNode.children[fnPart];
         }
-        return currNode;    
+        return currNode;
     }
-}
+};
 
 class LocalStorageFs implements IFileSystem {
     constructor(public prefix: string) { }
@@ -54,7 +56,8 @@ class LocalStorageFs implements IFileSystem {
     getRootNode() {
         if (this.root)
             return Promise.resolve(this.root);
-        this.rootPromise = localforage.getItem<IFsItem>(this.filesKey()).then(x => x || <IFsItem>{ fsType: "local", type: "folder", children: {} }).then(r => this.root = r);
+        this.rootPromise = localforage.getItem<IFsItem>(this.filesKey())
+            .then(x => x || <IFsItem>{ fsType: "local", type: "folder", children: {} }).then(r => this.root = r);
         return this.rootPromise;
     }
 
@@ -74,7 +77,7 @@ class LocalStorageFs implements IFileSystem {
 }
 
 class KaitaiFs implements IFileSystem {
-    constructor(public files: any){ }
+    constructor(public files: any) { }
 
     getRootNode() { return Promise.resolve(this.files); }
 
@@ -102,12 +105,14 @@ var kaitaiFs = new KaitaiFs(kaitaiRoot);
 export var staticFs = new StaticFs();
 
 export var localFs = new LocalStorageFs("fs");
+/* tslint:disable */
 export var fss: {
     [name: string]: IFileSystem;
     local: LocalStorageFs;
     kaitai: KaitaiFs;
     static: StaticFs;
 } = { local: localFs, kaitai: kaitaiFs, static: staticFs };
+/* tslint:enable */
 
 function genChildNode(obj: IFsItem, fn: string): any {
     var isFolder = obj.type === "folder";
@@ -153,7 +158,8 @@ $(() => {
             check_callback: function (operation: string, node: any, node_parent: any, node_position: number, more: boolean) {
                 var result = true;
                 if (operation === "move_node")
-                    result = !!node.data && node.data.fsType === "local" && !!node_parent.data && node_parent.data.fsType === "local" && node_parent.data.type === "folder";
+                    result = !!node.data && node.data.fsType === "local" &&
+                        !!node_parent.data && node_parent.data.fsType === "local" && node_parent.data.type === "folder";
                 return result;
             },
             themes: { name: "default-dark", dots: false, icons: true, variant: "small" },
@@ -163,11 +169,28 @@ $(() => {
                     icon: "glyphicon glyphicon-cloud",
                     state: { opened: true },
                     children: [
-                        { text: "formats", icon: "glyphicon glyphicon-book", children: genChildNodes(kaitaiRoot.children["formats"]), state: { opened: true } },
-                        { text: "samples", icon: "glyphicon glyphicon-cd", children: genChildNodes(kaitaiRoot.children["samples"]), state: { opened: true } },
+                        {
+                            text: "formats",
+                            icon: "glyphicon glyphicon-book",
+                            children: genChildNodes(kaitaiRoot.children["formats"]),
+                            state: { opened: true }
+                        },
+                        {
+                            text: "samples",
+                            icon: "glyphicon glyphicon-cd",
+                            children: genChildNodes(kaitaiRoot.children["samples"]),
+                            state: { opened: true }
+                        },
                     ]
                 },
-                { text: "Local storage", id: "localStorage", icon: "glyphicon glyphicon-hdd", state: { opened: true }, children: [], data: { fsType: "local", type: "folder" } }
+                {
+                    text: "Local storage",
+                    id: "localStorage",
+                    icon: "glyphicon glyphicon-hdd",
+                    state: { opened: true },
+                    children: [],
+                    data: { fsType: "local", type: "folder" }
+                }
             ],
         },
         plugins: ["wholerow", "dnd"]
@@ -240,7 +263,10 @@ $(() => {
 
     ctxAction(uiFiles.createFolder, e => {
         var parentData = getSelectedData();
-        ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), { data: { fsType: parentData.fsType, type: "folder" }, icon: "glyphicon glyphicon-folder-open" }, "last", (node: any) => {
+        ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), {
+            data: { fsType: parentData.fsType, type: "folder" },
+            icon: "glyphicon glyphicon-folder-open"
+        }, "last", (node: any) => {
             ui.fileTree.activate_node(node, null);
             setTimeout(function () { ui.fileTree.edit(node); }, 0);
         });
@@ -272,7 +298,7 @@ $(() => {
     fileTreeCont.on("create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree", saveTree);
     fileTreeCont.on("move_node.jstree", (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
     fileTreeCont.on("select_node.jstree", (e, selectNodeArgs) => {
-        var fsItem = (<JSTreeNode<IFsItem>>selectNodeArgs.node).data;
+        var fsItem = (<IJSTreeNode<IFsItem>>selectNodeArgs.node).data;
         [uiFiles.downloadFile, uiFiles.downloadItem].forEach(i => i.toggleClass("disabled", !(fsItem && fsItem.type === "file")));
     });
 
@@ -327,4 +353,4 @@ $(() => {
 
         fss[fsItem.fsType].get(fsItem.fn).then((content: string) => addKsyFile("localStorage", newFn, content));
     });
-})
+});

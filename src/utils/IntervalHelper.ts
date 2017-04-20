@@ -8,7 +8,7 @@ export interface IIntervalLookup<T> {
 }
 
 export class IntervalHandler<T extends IInterval> implements IIntervalLookup<T> {
-    constructor(public sortedItems: T[] = []){ }
+    constructor(public sortedItems: T[] = []) { }
 
     public indexOf(intervalStart: number) {
         var arr = this.sortedItems;
@@ -28,7 +28,7 @@ export class IntervalHandler<T extends IInterval> implements IIntervalLookup<T> 
             }
         }
 
-        return -low - 1;        
+        return -low - 1;
     }
 
     public searchRange(start: number, end?: number) {

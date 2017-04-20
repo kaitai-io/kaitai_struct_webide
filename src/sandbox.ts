@@ -4,7 +4,7 @@ import { GithubFileSystem } from "./FileSystem/GithubFileSystem";
 import { LocalFileSystem } from "./FileSystem/LocalFileSystem";
 import { RemoteFileSystem } from "./FileSystem/RemoteFileSystem";
 import { StaticFileSystem } from "./FileSystem/StaticFileSystem";
-import { IFileSystem, IFsItem, FsItem } from "./FileSystem/Common";
+import { IFileSystem } from "./FileSystem/Common";
 import { FsUri } from "./FileSystem/FsUri";
 import { FsSelector } from "./FileSystem/FsSelector";
 import * as Vue from "vue";

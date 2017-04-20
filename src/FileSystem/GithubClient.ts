@@ -6,14 +6,14 @@ export namespace Entities {
         name: string;
         full_name: string;
         owner: {
-          login: string;  
+          login: string;
         };
         private: boolean;
         permissions: {
             admin: boolean;
             push: boolean;
             pull: boolean;
-        }
+        };
     }
 
     export interface IContent {
@@ -25,7 +25,9 @@ export namespace Entities {
         html_url: string;
         git_url: string;
         download_url: string;
+        /* tslint:disable */
         type: "file" | "dir" | "symlink" | "submodule";
+        /* tslint:enable */
     }
 }
 
@@ -59,7 +61,8 @@ export class GithubClient {
     constructor(public accessToken: string, public owner?: string) { }
 
     req<T>(path: string): Promise<T> {
-        return new Promise((resolve, reject) => $.getJSON(`https://api.github.com${path}?access_token=${this.accessToken}`).then(json => resolve(<T>json), reject));
+        return new Promise((resolve, reject) => $.getJSON(`https://api.github.com${path}?access_token=${this.accessToken}`)
+            .then(json => resolve(<T>json), reject));
     }
 
     listRepos(): Promise<Repository[]> {

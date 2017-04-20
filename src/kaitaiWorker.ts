@@ -112,7 +112,7 @@ var apiMethods = {
     },
     setInput: (inputBuffer: ArrayBuffer) => wi.inputBuffer = inputBuffer,
     reparse: (eagerMode: boolean) => {
-        var start = performance.now();
+        //var start = performance.now();
         wi.ioInput = new KaitaiStream(wi.inputBuffer, 0);
         wi.root = new wi.MainClass(wi.ioInput);
         wi.root._read();
@@ -148,4 +148,4 @@ myself.onmessage = (ev: MessageEvent) => {
 
     //console.log("[Worker] Send response", msg, ev);
     myself.postMessage(msg);
-}
+};

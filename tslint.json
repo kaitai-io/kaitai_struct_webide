@@ -8,8 +8,7 @@
     ],
     "class-name": true,
     "comment-format": [
-      true,
-      "check-lowercase"
+      true
     ],
     "eofline": false,
     "forin": true,
@@ -20,11 +19,9 @@
     "label-undefined": true,
     "max-line-length": [ true, 160 ],
     "no-arg": true,
-    "no-bitwise": true,
     "no-console": [
       true,
       "debug",
-      "info",
       "time",
       "timeEnd",
       "trace"
@@ -34,8 +31,6 @@
     "no-duplicate-key": true,
     "no-duplicate-variable": true,
     "no-empty": true,
-    "no-eval": true,
-    "no-string-literal": true,
     "no-trailing-comma": true,
     "no-trailing-whitespace": true,
     "no-unused-expression": true,
@@ -46,11 +41,9 @@
       true,
       "check-open-brace",
       "check-catch",
-      "check-else",
       "check-whitespace"
     ],
     "quotemark": [ true, "double" ],
-    "radix": true,
     "semicolon": [ true, "always" ],
     "triple-equals": [ true, "allow-null-check" ],
     "typedef": [
@@ -60,11 +53,6 @@
       true,
       { "call-signature": "nospace" },
       { "index-signature": "space" }
-    ],
-    "use-strict": [
-      true,
-      "check-module",
-      "check-function"
     ],
     "variable-name": false,
     "whitespace": [

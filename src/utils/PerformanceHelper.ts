@@ -7,13 +7,12 @@
 
     public measureAction<T>(actionName: string, donePromiseOrAction?: Promise<T> | (() => T)): any {
         var actionMeasurement = new PerformanceHelper.ActionMeasurement(this, actionName, performance.now());
-        if (typeof donePromiseOrAction == "function") {
+        if (typeof donePromiseOrAction === "function") {
             try {
                 var result = (<(() => T)>donePromiseOrAction)();
                 this.actionDone(actionMeasurement, false);
                 return result;
-            }
-            catch(e) {
+            } catch(e) {
                 this.actionDone(actionMeasurement, true);
                 throw e;
             }
@@ -26,7 +25,8 @@
 
     actionDone(action: PerformanceHelper.ActionMeasurement, failed?: boolean) {
         if (!this.logPerformance) return;
-        console.info(`[performance/${(new Date()).format("s.u")}] ${action.name} took ${Math.round(performance.now() - action.startTime)} milliseconds${failed ? " before it failed" : ""}.`);
+        console.info(`[performance/${(new Date()).format("s.u")}] ${action.name} took `
+            + `${Math.round(performance.now() - action.startTime)} milliseconds${failed ? " before it failed" : ""}.`);
     }
 }
 

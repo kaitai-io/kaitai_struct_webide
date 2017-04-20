@@ -1,4 +1,4 @@
-﻿import { ui, getLayoutNodeById, addEditorTab } from "./app.layout";
+﻿import { ui, getLayoutNodeById } from "./app.layout";
 import { htmlescape } from "./utils";
 import { ga } from "./app";
 
@@ -19,7 +19,7 @@ export function showError(...args: any[]) {
 
 function hideErrors() {
     if (ui.errorWindow) {
-        try { ui.errorWindow.close(); } catch(e){ }
+        try { ui.errorWindow.close(); } catch(e){ /* nop */ }
         ui.errorWindow = null;
     }
 }

@@ -10,7 +10,7 @@ interface IHexViewerPart {
     childNodes: IHexViewerCell[];
 }
 
-interface IHexViewerRow extends HTMLDivElement {    
+interface IHexViewerRow extends HTMLDivElement {
     addrPart: HTMLSpanElement;
     hexPart: IHexViewerPart;
     asciiPart: IHexViewerPart;
@@ -225,7 +225,9 @@ export class HexViewer {
         var intIdx = 0;
         //console.log("intervals", intervals);
 
-        var viewData = this.dataProvider.get(this.visibleOffsetStart, Math.min(this.rowCount * this.bytesPerLine, this.dataProvider.length - this.visibleOffsetStart));
+        var viewData = this.dataProvider.get(this.visibleOffsetStart,
+            Math.min(this.rowCount * this.bytesPerLine, this.dataProvider.length - this.visibleOffsetStart));
+
         for (var iRow = 0; iRow < this.rowCount; iRow++) {
             var rowOffset = iRow * this.bytesPerLine;
             var row = this.rows[iRow];
@@ -268,7 +270,7 @@ export class HexViewer {
                     if (intEnd)
                         skipInt++;
                 }
-                
+
                 intIdx += skipInt;
             }
         }

@@ -29,7 +29,7 @@ export function initFileDrop(containerId: string, callback: IFileProcessCallback
         event.stopPropagation();
         fileDropShadow.hide();
         var files = (<DragEvent>event.originalEvent).dataTransfer.files;
-        var resFiles = processFiles(files);            
+        var resFiles = processFiles(files);
         callback(resFiles);
     });
 }

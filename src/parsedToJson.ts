@@ -1,9 +1,7 @@
-﻿function parsedToJson(parsed: any) {
+﻿export function parsedToJson(parsed: any) {
     var intervals: any[] = [];
     var padLen = 2;
     var commentOffset = 60;
-
-    function commentPad(str: string) { return str.length < commentOffset ? str + " ".repeat(commentOffset - str.length) : str; }
 
     var lineInfo = { currLine: 0, lineStart: 0, lines: {} };
     var json = "";
@@ -41,8 +39,8 @@
             if (obj instanceof Uint8Array) {
                 json += "[";
                 for (var i = 0; i < obj.length; i++) {
-                    json += i == 0 ? "" : ", ";
-                    if (i != 0 && (i % 8 == 0)) {
+                    json += i === 0 ? "" : ", ";
+                    if (i !== 0 && (i % 8 === 0)) {
                         nl();
                         json += childPad;
                     }
@@ -50,7 +48,7 @@
                 }
                 json += "]";
             } else {
-                var keys = Object.keys(obj).filter(x => x[0] != "_");
+                var keys = Object.keys(obj).filter(x => x[0] !== "_");
                 var isArray = Array.isArray(obj);
                 json += isArray ? `[` : `{`;
                 if (!isArray) {
@@ -69,7 +67,7 @@
                     var childDebug = isArray ? debug.arr[key] : obj._debug ? obj._debug[key] : null;
                     var isObject = toJson(obj[key], childDebug, pad + 1);
 
-                    json += (i == keys.length - 1 ? "" : ",");
+                    json += (i === keys.length - 1 ? "" : ",");
 
                     if (!isObject)
                         comment(" " + getLenComment(childDebug, true));

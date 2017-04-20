@@ -1,4 +1,4 @@
-function checkModifications(){
+function checkModifications() {
     $.getJSON("/onchange", () => location.reload(true))
         .fail(() => setTimeout(checkModifications, 750));
 }

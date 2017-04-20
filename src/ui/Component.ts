@@ -45,23 +45,23 @@ export function componentFactory(
             options[key] = proto[key];
             return;
         }
-        const descriptor = Object.getOwnPropertyDescriptor(proto, key)
+        const descriptor = Object.getOwnPropertyDescriptor(proto, key);
         if (typeof descriptor.value === "function") {
             // methods
-            (options.methods || (options.methods = {}))[key] = descriptor.value
+            (options.methods || (options.methods = {}))[key] = descriptor.value;
         } else if (descriptor.get || descriptor.set) {
             // computed properties
             (options.computed || (options.computed = {}))[key] = {
                 get: descriptor.get,
                 set: descriptor.set
-            }
+            };
         }
     });
 
     // add data hook to collect class properties as Vue instance"s data
     (options.mixins || (options.mixins = [])).push({
-        data(this: Vue) {
-            return collectDataFromConstructor(this, Component);
+        data(this2: Vue) {
+            return collectDataFromConstructor(this2, Component);
         }
     });
 
@@ -89,26 +89,26 @@ export function componentFactory(
 
 export function collectDataFromConstructor(vm: Vue, Component: VueClass) {
     // override _init to prevent to init as Vue instance
-    Component.prototype._init = function (this: Vue) {
+    Component.prototype._init = function (this2: Vue) {
         // proxy to actual vm
         const keys = Object.getOwnPropertyNames(vm);
         // 2.2.0 compat (props are no longer exposed as self properties)
         if (vm.$options.props) {
             for (const key in vm.$options.props) {
                 if (!vm.hasOwnProperty(key)) {
-                    keys.push(key)
+                    keys.push(key);
                 }
             }
         }
         keys.forEach(key => {
             if (key.charAt(0) !== "_") {
-                Object.defineProperty(this, key, {
+                Object.defineProperty(this2, key, {
                     get: () => vm[key],
                     set: value => vm[key] = value
-                })
+                });
             }
-        })
-    }
+        });
+    };
 
     // should be acquired class property values
     const data = new Component();
@@ -122,7 +122,7 @@ export function collectDataFromConstructor(vm: Vue, Component: VueClass) {
     });
 
     return plainData;
-} 
+}
 
 function Component<U extends Vue>(options: ComponentOptions<U>): <V extends VueClass>(target: V) => V;
 function Component<V extends VueClass>(target: V): V;
@@ -132,9 +132,9 @@ function Component<V extends VueClass, U extends Vue>(
     if (typeof options === "function") {
         return componentFactory(options);
     }
-    return function (Component: V) {
+    return function(Component: V) {
         return componentFactory(Component, options);
-    }
+    };
 }
 
 namespace Component {
@@ -144,7 +144,7 @@ namespace Component {
 }
 
 export default Component;
-export const noop = () => {};
+export const noop = () => { /* nop */ };
 
 export function createDecorator(
     factory: (options: ComponentOptions<Vue>, key: string) => void
@@ -157,14 +157,14 @@ export function createDecorator(
 ): (target: Vue, key: string, index: any) => void {
     return (_, key, index) => {
         if (typeof index !== "number") {
-            index = undefined
+            index = undefined;
         }
         $decoratorQueue.push(options => factory(options, key, index));
-    }
+    };
 }
 
 export function warn(message: string): void {
     if (typeof console !== "undefined") {
         console.warn("[vue-class-component] " + message);
     }
-} 
+};

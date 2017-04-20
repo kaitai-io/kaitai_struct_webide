@@ -13,9 +13,9 @@ interface String {
     endsWith(searchString: string, position: number): boolean;
 }
 
-String.prototype.ucFirst = function () {
+String.prototype.ucFirst = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
-}
+};
 
 if (!String.prototype.endsWith) {
     String.prototype.endsWith = function (searchString: string, position: number) {
@@ -30,7 +30,7 @@ if (!String.prototype.endsWith) {
 }
 
 if (!String.prototype.repeat) {
-    String.prototype.repeat = function (count: number) {
+    String.prototype.repeat = function(count: number) {
         "use strict";
         if (this == null) {
             throw new TypeError("can\"t convert " + this + " to object");
@@ -57,7 +57,7 @@ if (!String.prototype.repeat) {
             throw new RangeError("repeat count must not overflow maximum string size");
         }
         var rpt = "";
-        for (; ;) {
+        for (;;) {
             if ((count & 1) === 1) {
                 rpt += str;
             }
@@ -70,7 +70,7 @@ if (!String.prototype.repeat) {
         // Could we try:
         // return Array(count + 1).join(this);
         return rpt;
-    }
+    };
 }
 // #endregion
 
@@ -79,9 +79,9 @@ interface PromiseConstructor {
     delay(timeoutMs: number): Promise<void>;
 }
 
-Promise.delay = function (timeoutMs: number) {
+Promise.delay = function(timeoutMs: number) {
     return new Promise<void>((resolve, reject) => setTimeout(resolve, timeoutMs));
-}
+};
 // #endregion
 
 interface Date {

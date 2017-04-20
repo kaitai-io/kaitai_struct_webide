@@ -8,4 +8,4 @@ if (localStorage.getItem("hideUnsupported") === "true" || bowser.check({ chrome:
 $("#unsupportedBrowser .closeBtn").on("click", () => {
     localStorage.setItem("hideUnsupported", "true");
     $("#unsupportedBrowser").hide();
-});    
+});

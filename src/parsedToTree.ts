@@ -4,7 +4,7 @@ import { IInterval, IntervalHandler } from "./utils/IntervalHelper";
 import { s, htmlescape, asciiEncode, hexEncode, collectAllObjects } from "./utils";
 import { workerMethods } from "./app.worker";
 
-interface ParsedTreeNodeData {
+interface IParsedTreeNodeData {
     exported?: IExportedValue;
     instance?: IInstance;
     parent?: IExportedValue;
@@ -12,15 +12,15 @@ interface ParsedTreeNodeData {
     arrayEnd?: number;
 };
 
-export interface JSTreeNode<TData> {
+export interface IJSTreeNode<TData> {
     id?: string;
     text?: string;
     icon?: string;
-    children?: JSTreeNode<TData>[] | boolean;
+    children?: IJSTreeNode<TData>[] | boolean;
     data?: TData;
 };
 
-export interface ParsedTreeNode extends JSTreeNode<{idx:number}> { }
+export interface IParsedTreeNode extends IJSTreeNode<{idx:number}> { }
 
 interface IParsedTreeInterval extends IInterval {
     exp: IExportedValue;
@@ -34,7 +34,7 @@ export class ParsedTreeHandler {
         jsTreeElement.jstree("destroy");
         this.jstree = jsTreeElement.jstree({
             core: {
-                data: (node: ParsedTreeNode, cb: any) =>
+                data: (node: IParsedTreeNode, cb: any) =>
                     this.getNode(node).then(x => cb(x), e => handleError(e)), themes: { icons: false }, multiple: false, force_text: false
             }
         }).jstree(true);
@@ -61,11 +61,11 @@ export class ParsedTreeHandler {
             this.jstree.on("ready.jstree", e => {
                 this.openNodes(Object.keys(this.parsedTreeOpenedNodes)).then(() => {
                     this.jstree.on("open_node.jstree", (e, te) => {
-                        var node = <ParsedTreeNode>te.node;
+                        var node = <IParsedTreeNode>te.node;
                         this.parsedTreeOpenedNodes[this.getNodeId(node)] = true;
                         this.saveOpenedNodes();
                     }).on("close_node.jstree", (e, te) => {
-                        var node = <ParsedTreeNode>te.node;
+                        var node = <IParsedTreeNode>te.node;
                         delete this.parsedTreeOpenedNodes[this.getNodeId(node)];
                         this.saveOpenedNodes();
                     });
@@ -81,7 +81,8 @@ export class ParsedTreeHandler {
             var value = exported.primitiveValue;
 
             if (Number.isInteger(value)) {
-                value = s`${value < 0 ? "-" : ""}0x${Math.abs(value).toString(16).toUpperCase()}` + (detailed ? s`<span class="intVal"> = ${value}</span>` : "");
+                value = s`${value < 0 ? "-" : ""}0x${Math.abs(value).toString(16).toUpperCase()}`
+                    + (detailed ? s`<span class="intVal"> = ${value}</span>` : "");
 
                 if (exported.enumStringValue)
                     value = `${htmlescape(exported.enumStringValue)}` + (detailed ? ` <span class="enumDesc">(${value})</span>` : "");
@@ -149,15 +150,15 @@ export class ParsedTreeHandler {
         });
     }
 
-    public nodeDatas: ParsedTreeNodeData[] = [];
+    public nodeDatas: IParsedTreeNodeData[] = [];
 
-    addNodeData(data: ParsedTreeNodeData) {
+    addNodeData(data: IParsedTreeNodeData) {
         var idx = this.nodeDatas.length;
         this.nodeDatas.push(data);
         return { idx: idx };
     }
 
-    getNodeData(node: ParsedTreeNode) {
+    getNodeData(node: IParsedTreeNode) {
         if (!node || !node.data) {
             console.log("no node data", node);
             return null;
@@ -180,10 +181,10 @@ export class ParsedTreeHandler {
         else
             text = (showProp ? s`<span class="propName">${propName}</span> = ` : "") + this.primitiveToText(item);
 
-        return <ParsedTreeNode>{ text: text, children: isObject || isArray, data: this.addNodeData({ exported: item }) };
+        return <IParsedTreeNode>{ text: text, children: isObject || isArray, data: this.addNodeData({ exported: item }) };
     }
 
-    exportedToNodes(exported: IExportedValue, nodeData: ParsedTreeNodeData, showProp: boolean): ParsedTreeNode[] {
+    exportedToNodes(exported: IExportedValue, nodeData: IParsedTreeNodeData, showProp: boolean): IParsedTreeNode[] {
         if (exported.type === ObjectType.Undefined)
             return [];
         if (exported.type === ObjectType.Primitive || exported.type === ObjectType.TypedArray)
@@ -205,13 +206,18 @@ export class ParsedTreeHandler {
 
                 var result = [];
                 for (var i = 0; i < currentLevelItems; i++) {
-                    var data = <ParsedTreeNodeData>{
+                    var data = <IParsedTreeNodeData>{
                         exported: exported,
                         arrayStart: arrStart + i * childLevelItems,
                         arrayEnd: Math.min(arrStart + (i + 1) * childLevelItems, exported.arrayItems.length) - 1
                     };
 
-                    result.push(<ParsedTreeNode>{ text: `[${data.arrayStart} … ${data.arrayEnd}]`, children: true, data: this.addNodeData(data), id: this.getNodeId(data) });
+                    result.push(<IParsedTreeNode>{
+                        text: `[${data.arrayStart} … ${data.arrayEnd}]`,
+                        children: true,
+                        data: this.addNodeData(data),
+                        id: this.getNodeId(data)
+                    });
                 }
                 return result;
             }
@@ -220,7 +226,14 @@ export class ParsedTreeHandler {
         } else if (exported.type === ObjectType.Object) {
             var obj = exported.object;
             return Object.keys(obj.fields).map(fieldName => this.childItemToNode(obj.fields[fieldName], true)).concat(
-                Object.keys(obj.instances).map(propName => <ParsedTreeNode>{ text: s`${propName}`, children: true, data: this.addNodeData({ instance: obj.instances[propName], parent: exported }) }));
+                Object.keys(obj.instances).map(propName => <IParsedTreeNode>{
+                    text: s`${propName}`,
+                    children: true,
+                    data: this.addNodeData({
+                        instance: obj.instances[propName],
+                        parent: exported
+                    })
+                }));
         } else
             throw new Error(`Unknown object type: ${exported.type}`);
     }
@@ -237,7 +250,7 @@ export class ParsedTreeHandler {
             val.arrayItems.forEach(item => this.fillKsyTypes(item));
     }
 
-    getNode(node: ParsedTreeNode): Promise<ParsedTreeNode[]> {
+    getNode(node: IParsedTreeNode): Promise<IParsedTreeNode[]> {
         var isRoot = node.id === "#";
         var nodeData = this.getNodeData(node);
         var expNode = isRoot ? this.exportedRoot : nodeData.exported;
@@ -247,8 +260,6 @@ export class ParsedTreeHandler {
         return valuePromise.then(exp => {
             if (isRoot || isInstance) {
                 this.fillKsyTypes(exp);
-
-                var intId = 0;
 
                 var intervals: IParsedTreeInterval[] = [];
                 var fillIntervals = (exp: IExportedValue) => {
@@ -286,7 +297,7 @@ export class ParsedTreeHandler {
                         console.warn("Too many items for interval tree: " + intervals.length);
                     else
                         this.intervalHandler.addSorted(intervals);
-                }
+                };
 
                 fillIntervals(exp);
 
@@ -313,8 +324,8 @@ export class ParsedTreeHandler {
         });
     }
 
-    getNodeId(nodeOrNodeData: ParsedTreeNode | ParsedTreeNodeData) {
-        var nodeData = (<ParsedTreeNode>nodeOrNodeData).data ? this.getNodeData(<ParsedTreeNode>nodeOrNodeData) : <ParsedTreeNodeData>nodeOrNodeData;
+    getNodeId(nodeOrNodeData: IParsedTreeNode | IParsedTreeNodeData) {
+        var nodeData = (<IParsedTreeNode>nodeOrNodeData).data ? this.getNodeData(<IParsedTreeNode>nodeOrNodeData) : <IParsedTreeNodeData>nodeOrNodeData;
         var path = nodeData.exported ? nodeData.exported.path : nodeData.instance.path;
         if (nodeData.arrayStart || nodeData.arrayEnd)
             path = path.concat([`${nodeData.arrayStart || 0}`, `${nodeData.arrayEnd || 0}`]);
@@ -340,8 +351,7 @@ export class ParsedTreeHandler {
                     if (node) {
                         if (!node.state.opened)
                             existingNodes.push(node);
-                    }
-                    else
+                    } else
                         newNodesToOpen.push(nodeId);
                 });
                 nodesToOpen = newNodesToOpen;
@@ -357,13 +367,14 @@ export class ParsedTreeHandler {
                 else if (openCallCounter === 0) {
                     //console.log("saveOpenedNodesDisabled = false");
                     this.saveOpenedNodesDisabled = false;
-                    e && this.jstree.off(e);
+                    if (e)
+                        this.jstree.off(e);
                     (<any>this.jstree).settings.core.animation = origAnim;
                     this.saveOpenedNodes();
 
                     resolve(nodesToOpen.length === 0);
                 }
-            }
+            };
 
             this.jstree.on("open_node.jstree", e => openRound(e));
             openRound(null);

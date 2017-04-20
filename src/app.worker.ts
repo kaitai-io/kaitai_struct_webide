@@ -4,7 +4,8 @@ var msgHandlers: { [msgId: number]: (msg: IWorkerMessage) => void } = {};
 
 worker.onmessage = (ev: MessageEvent) => {
     var msg = <IWorkerMessage>ev.data;
-    msgHandlers[msg.msgId] && msgHandlers[msg.msgId](msg);
+    if (msgHandlers[msg.msgId])
+        msgHandlers[msg.msgId](msg);
     delete msgHandlers[msg.msgId];
 };
 
