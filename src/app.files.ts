@@ -1,6 +1,6 @@
 ﻿import { ui, addEditorTab } from './app.layout';
 import { compile, addNewFiles, loadFsItem } from "./app";
-import { JSTreeNode as JsTreeNode } from "./parsedToTree";
+import { JSTreeNode } from "./parsedToTree";
 import * as localforage from "localforage";
 import { downloadFile, saveFile, openFilesWithDialog } from './utils';
 declare var kaitaiFsFiles: string[], ga: any;
@@ -272,7 +272,7 @@ $(() => {
     fileTreeCont.on('create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree', saveTree);
     fileTreeCont.on('move_node.jstree', (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
     fileTreeCont.on('select_node.jstree', (e, selectNodeArgs) => {
-        var fsItem = (<JsTreeNode<IFsItem>>selectNodeArgs.node).data;
+        var fsItem = (<JSTreeNode<IFsItem>>selectNodeArgs.node).data;
         [uiFiles.downloadFile, uiFiles.downloadItem].forEach(i => i.toggleClass('disabled', !(fsItem && fsItem.type === 'file')));
     });
 
