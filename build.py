@@ -17,7 +17,7 @@ GA_TEMPLATE = '''
             _ga('send', 'event', category, action, label, value);
         }
     </script>
-    <!-- End Google Analytics --> 
+    <!-- End Google Analytics -->
 '''
 
 outDir = sys.argv[1] if len(sys.argv) > 1 else 'out'
@@ -27,7 +27,7 @@ def fileAction(fn, action):
     with open(fn, 'rt') as f: content = f.read()
     newContent = action(content)
     with open(fn, 'wt') as f: f.write(newContent)
-    
+
 def appendAfter(str, afterStr, appendStr):
     i = str.index(afterStr) + len(afterStr)
     return str[0:i] + appendStr + str[i:]
