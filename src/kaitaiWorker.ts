@@ -1,4 +1,7 @@
-﻿var wi = {
+﻿// issue: https://github.com/Microsoft/TypeScript/issues/582
+var myself = <Worker><any>self;
+
+var wi = {
     MainClass: <any>null,
     ksyTypes: <IKsyTypes>null,
     inputBuffer: <ArrayBuffer>null,
@@ -9,7 +12,7 @@
 
 declare function importScripts(...urls: string[]): void;
 
-class IDebugInfo {
+interface IDebugInfo {
     start: number;
     end: number;
     ioOffset: number;
@@ -122,7 +125,7 @@ var apiMethods = {
     }
 };
 
-self.onmessage = (ev: MessageEvent) => {
+myself.onmessage = (ev: MessageEvent) => {
     var msg = <IWorkerMessage>ev.data;
     //console.log('[Worker] Got msg', msg, ev);
 
@@ -138,5 +141,5 @@ self.onmessage = (ev: MessageEvent) => {
     }
 
     //console.log('[Worker] Send response', msg, ev);
-    (<any>self).postMessage(msg);
+    myself.postMessage(msg);
 }
