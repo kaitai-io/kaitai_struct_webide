@@ -1,5 +1,5 @@
 ﻿import { ui, getLayoutNodeById, addEditorTab } from './app.layout';
-
+import { htmlescape } from './utils';
 declare var ga: any;
 
 var lastErrWndSize = 100; // 34

@@ -1,7 +1,7 @@
 ﻿import { IntervalViewer } from "./app";
 import * as GoldenLayout from "goldenlayout";
 import { HexViewer } from "./HexViewer";
-import {ParsedTreeHandler} from "./parsedToTree";
+import { ParsedTreeHandler } from "./parsedToTree";
 
 var myLayout = new GoldenLayout({
     settings: { showCloseIcon: false, showPopoutIcon: false },

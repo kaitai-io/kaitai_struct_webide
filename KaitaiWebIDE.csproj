@@ -33,6 +33,7 @@
     <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\config.ts" />
+    <TypeScriptCompile Include="src\extensions.ts" />
     <TypeScriptCompile Include="src\FileSystem\FsSelector.ts" />
     <TypeScriptCompile Include="src\FileSystem\GithubFileSystem.ts" />
     <TypeScriptCompile Include="src\FileSystem\Common.ts" />

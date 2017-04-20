@@ -1,5 +1,5 @@
-﻿import {ui} from "./app.layout";
-import {dataProvider} from "./app";
+﻿import { ui } from "./app.layout";
+import { dataProvider } from "./app";
 
 var inputSizeElement: JQuery, $selStart: JQuery, $selEnd: JQuery;
 var userChange = false;

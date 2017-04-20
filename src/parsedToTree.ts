@@ -3,6 +3,7 @@ import { IKsyTypes } from "./app";
 import { workerCall } from "./app.worker";
 import { handleError } from "./app.errors";
 import { IInterval, IntervalHandler } from "./utils/IntervalHelper";
+import { s, htmlescape, asciiEncode, hexEncode, collectAllObjects } from './utils';
 declare var kaitaiIde: any;
 
 interface ParsedTreeNodeData {

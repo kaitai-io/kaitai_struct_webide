@@ -1,7 +1,8 @@
 ﻿import { ui, addEditorTab } from './app.layout';
-import {compile, addNewFiles, loadFsItem } from "./app";
-import {JSTreeNode as JsTreeNode} from "./parsedToTree";
+import { compile, addNewFiles, loadFsItem } from "./app";
+import { JSTreeNode as JsTreeNode } from "./parsedToTree";
 import * as localforage from "localforage";
+import { downloadFile, saveFile, openFilesWithDialog } from './utils';
 declare var kaitaiFsFiles: string[], ga: any;
 
 interface IFileSystem {

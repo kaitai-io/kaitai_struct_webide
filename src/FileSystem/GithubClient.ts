@@ -1,4 +1,6 @@
-﻿export namespace Entities {
+﻿import {downloadFile} from '../utils';
+
+export namespace Entities {
     export interface IRepository {
         id: number;
         name: string;

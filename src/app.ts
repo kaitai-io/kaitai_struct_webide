@@ -10,13 +10,14 @@ import { IDataProvider } from "./HexViewer";
 import { refreshConverterPanel } from "./app.converterPanel";
 import * as localforage from "localforage";
 import { initFileDrop } from "./FileDrop";
-import {performanceHelper} from "./utils/PerformanceHelper";
-declare var YAML: any, io: any, IntervalTree: any, bigInt: any, kaitaiIde: any, ga: any;
+import { performanceHelper } from "./utils/PerformanceHelper";
+import { IFileProcessItem, saveFile, collectAllObjects, precallHook } from './utils';
+import { Delayed } from './utils';
+declare var YAML: any, io: any, kaitaiIde: any, ga: any;
 
 export var baseUrl = location.href.split('?')[0].split('/').slice(0, -1).join('/') + '/';
 
 $.jstree.defaults.core.force_text = true;
-
 
 interface IInterval {
     start: number;
