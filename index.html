@@ -62,12 +62,7 @@
 </div>
     
 <div id="infoPanel">
-    <div>
-        <span class="selectionText">selection</span>
-        <span class="selGroup input-group">
-            <input type="text" class="selStart form-control"><span class="input-group-addon">-</span><input type="text" class="selEnd form-control">
-        </span>
-    </div>
+    <selection-input :start="selectionStart" :end="selectionEnd" @selectionChanged="selectionChanged"></selection-input>
     <div id="disableLazyParsingDiv">
         <input type="checkbox" id="disableLazyParsing" />
         <label for="disableLazyParsing">disable lazy parsing</label>

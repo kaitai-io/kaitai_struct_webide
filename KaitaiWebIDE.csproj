@@ -34,6 +34,7 @@
     <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\ui\Components\ConverterPanel.ts" />
+    <TypeScriptCompile Include="src\ui\Components\SelectionInput.ts" />
     <TypeScriptCompile Include="src\ui\Components\Stepper.ts" />
     <TypeScriptCompile Include="src\ui\ComponentLoader.ts" />
     <TypeScriptCompile Include="src\ui\Components\TreeView.ts" />
@@ -65,7 +66,6 @@
     <TypeScriptCompile Include="src\app.files.ts" />
     <TypeScriptCompile Include="src\app.worker.ts" />
     <TypeScriptCompile Include="src\app.layout.ts" />
-    <TypeScriptCompile Include="src\app.selectionInput.ts" />
     <TypeScriptCompile Include="src\app.ts" />
     <TypeScriptCompile Include="src\app.unsupportedBrowser.ts" />
     <TypeScriptCompile Include="src\entities.ts" />
@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="src\ui\Components\ConverterPanel.html" />
+    <Content Include="src\ui\Components\SelectionInput.html" />
     <Content Include="src\ui\Components\Stepper.html" />
     <Content Include="src\ui\Components\TreeView.html" />
     <Content Include="tsconfig.json" />

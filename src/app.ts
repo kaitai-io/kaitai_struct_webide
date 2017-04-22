@@ -4,7 +4,6 @@ import * as Vue from "vue";
 import { ui, addEditorTab, getLayoutNodeById } from "./app.layout";
 import { showError, handleError } from "./app.errors";
 import { IFsItem, fss, addKsyFile, refreshFsNodes } from "./app.files";
-import { refreshSelectionInput } from "./app.selectionInput";
 import { ParsedTreeHandler, IParsedTreeNode } from "./parsedToTree";
 import { workerMethods } from "./app.worker";
 import { IDataProvider } from "./HexViewer";
@@ -261,11 +260,18 @@ interface IInterval {
 
 @Component
 class App extends Vue {
-    unparsed: IInterval[] = new Array(100);
-    byteArrays: IInterval[] = new Array(200);
+    selectionStart: number = -1;
+    selectionEnd: number = -1;
+
+    unparsed: IInterval[] = [];
+    byteArrays: IInterval[] = [];
 
     public selectInterval(interval: IInterval) {
-        ui.hexViewer.setSelection(interval.start, interval.end);
+        this.selectionChanged(interval.start, interval.end);
+    }
+
+    public selectionChanged(start: number, end: number) {
+        ui.hexViewer.setSelection(start, end);
     }
 }
 
@@ -280,13 +286,15 @@ $(() => {
         (<any>$("#welcomeModal")).modal();
     $("#aboutWebIde").on("click", () => (<any>$("#welcomeModal")).modal());
 
-    componentLoader.load(["ConverterPanel"]).then(() => {
+    componentLoader.load(["ConverterPanel", "Stepper", "SelectionInput"]).then(() => {
         new Vue({ el: "#converterPanel", data: { model: converterPanelModel } });
-    });
-
-    componentLoader.load(["Stepper"]).then(() => {
         app.$mount("#infoPanel");
     });
+
+    function refreshSelectionInput() {
+        app.selectionStart = ui.hexViewer.selectionStart;
+        app.selectionEnd = ui.hexViewer.selectionEnd;
+    }
 
     ui.hexViewer.onSelectionChanged = () => {
         //console.log("setSelection", ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
@@ -294,7 +302,6 @@ $(() => {
 
         var start = ui.hexViewer.selectionStart;
         var hasSelection = start !== -1;
-        $("#infoPanel .selectionText").text(hasSelection ? `selection:` : "no selection");
 
         refreshSelectionInput();
 

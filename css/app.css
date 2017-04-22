@@ -35,11 +35,6 @@ body { color:#333 }
 .modal-footer, .modal-body { padding: 15px }
 .input-group-addon { padding: 8px 8px }
 #infoPanel { background: #222222; }
-#infoPanel .form-control { color: #eee; background-color: #464545; display:initial; width: initial; float:initial; height: 30px }
-#infoPanel .input-group { display:initial; margin-left:6px }
-#infoPanel .input-group-addon { display:inline-block; padding:0; vertical-align: top; height:30px; line-height:28px; width:initial }
-#infoPanel .selStart { padding-right:4px }
-#infoPanel .selEnd { padding-left:6px }
 #infoPanel { color: #eee; display:none; padding: 10px }
 #noscript, #unsupportedBrowser { background: #ffee00; z-index:999; position:fixed; left:0; right:0; padding:10px; text-align:center }
 #noscript a, #unsupportedBrowser a { color: black; text-decoration: underline }
