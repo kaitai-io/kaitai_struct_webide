@@ -33,6 +33,9 @@
     <TypeScriptCompile Include="lib\ts-types\text-encoding.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
+    <TypeScriptCompile Include="src\Components\ConverterPanel\ConverterPanel.ts" />
+    <TypeScriptCompile Include="src\Components\TemplateLoader.ts" />
+    <TypeScriptCompile Include="src\Components\TreeView\TreeView.ts" />
     <TypeScriptCompile Include="src\config.ts" />
     <TypeScriptCompile Include="src\extensions.ts" />
     <TypeScriptCompile Include="src\FileSystem\FsSelector.ts" />
@@ -47,7 +50,7 @@
     <TypeScriptCompile Include="src\utils\IntervalHelper.ts" />
     <TypeScriptCompile Include="src\utils\PerformanceHelper.ts" />
     <TypeScriptCompile Include="src\utils\TestHelper.ts" />
-    <TypeScriptCompile Include="src\ui\Component.ts" />
+    <TypeScriptCompile Include="src\Components\Component.ts" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="lib\ts-types\ace.d.ts" />
@@ -74,10 +77,15 @@
     <TypeScriptCompile Include="src\HexViewer.ts" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="src\Components\ConverterPanel\ConverterPanel.html" />
+    <Content Include="src\Components\TreeView\TreeView.html" />
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="tslint.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\ui\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
