@@ -18,7 +18,7 @@ class ComponentLoader {
                 /\s(\w+)="(\w+)"/g.matches(tagMatch[2]).forEach(attrMatch => attrs[attrMatch[1]] = attrMatch[2]);
 
                 if(tag === "template")
-                    module[attrs.id].options.template = content;
+                    module[attrs.id || name].options.template = content;
                 else if (tag === "style")
                     $("<style>").text(content).appendTo($(document.body));
             });

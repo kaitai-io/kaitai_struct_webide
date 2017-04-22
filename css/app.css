@@ -20,11 +20,11 @@ body { line-height:normal }
 #fileTree .jstree-icon { margin-left:3px; margin-right:5px }
 #fileTree .jstree-ocl { display:none }
 #fileTreeCont .footer { position:absolute; bottom:0; width:100%; padding-left:2px }
-#fileTreeCont .footer .btn { width:33.3%; border-radius:0px; font-size:13px; padding:3px 10px }
+#fileTreeCont .footer .btn { width:33.3%; border-radius:0; font-size:13px; padding:3px 10px }
 body { color:#333 }
 .dropdown { position: absolute; display:none; z-index:9999 }
 .dropdown-menu { z-index:9999 }
-.dropdown .dropdown-menu { font-size:13px; border-color:#375a7f; border-radius:0px }
+.dropdown .dropdown-menu { font-size:13px; border-color:#375a7f; border-radius:0 }
 .dropdown .glyphicon { margin-right:5px; }
 .dropdown .glyphicon-folder-open { margin-left:-1px; margin-right:6px }
 .dropdown .dropdown-menu>li>a { padding:3px 15px }
@@ -40,16 +40,10 @@ body { color:#333 }
 #infoPanel .input-group-addon { display:inline-block; padding:0; vertical-align: top; height:30px; line-height:28px; width:initial }
 #infoPanel .selStart { padding-right:4px }
 #infoPanel .selEnd { padding-left:6px }
-#infoPanel, #converterPanel { color: #eee; display:none; padding: 10px }
+#infoPanel { color: #eee; display:none; padding: 10px }
 #noscript, #unsupportedBrowser { background: #ffee00; z-index:999; position:fixed; left:0; right:0; padding:10px; text-align:center }
 #noscript a, #unsupportedBrowser a { color: black; text-decoration: underline }
 #unsupportedBrowser .closeBtn { float:right; margin-top: 1px; cursor: pointer }
-#converterPanel { overflow-y: auto; height: 100% }
-#converterPanel table { font: 12px/normal "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; }
-#converterPanel table th { padding-bottom:3px }
-#converterPanel .typeCol { min-width:54px }
-#converterPanel .typeValue { min-width:155px }
-#converterPanel .str .val { overflow:hidden; line-height:16px; height:16px; display:block }
 #welcomeModalLabel { text-align:center }
 #aboutWebIde { position:absolute; bottom:10px; right:10px; font-size:12px }
 .marker_solution { background:rgba(255, 80, 80, 0.3); }

@@ -1,6 +1,7 @@
 ﻿"use strict";
 
 import * as localforage from "localforage";
+import * as Vue from "vue";
 
 import { ui, addEditorTab, getLayoutNodeById } from "./app.layout";
 import { showError, handleError } from "./app.errors";
@@ -9,11 +10,12 @@ import { refreshSelectionInput } from "./app.selectionInput";
 import { ParsedTreeHandler, IParsedTreeNode } from "./parsedToTree";
 import { workerMethods } from "./app.worker";
 import { IDataProvider } from "./HexViewer";
-import { refreshConverterPanel } from "./app.converterPanel";
 import { initFileDrop } from "./FileDrop";
 import { performanceHelper } from "./utils/PerformanceHelper";
 import { IFileProcessItem, saveFile, precallHook } from "./utils";
 import { Delayed } from "./utils";
+import { componentLoader } from "./Components/TemplateLoader";
+import { ConverterPanelModel } from "./Components/ConverterPanel/ConverterPanel";
 
 $.jstree.defaults.core.force_text = true;
 
@@ -281,6 +283,8 @@ export function addNewFiles(files: IFileProcessItem[]) {
 
 localStorage.setItem("lastVersion", kaitaiIde.version);
 
+var converterPanelModel = new ConverterPanelModel();
+
 $(() => {
     $("#webIdeVersion").text(kaitaiIde.version);
     $("#compilerVersion").text(new io.kaitai.struct.MainJs().version + " (" + new io.kaitai.struct.MainJs().buildDate + ")");
@@ -309,8 +313,12 @@ $(() => {
             }
         }
 
-        refreshConverterPanel(ui.converterPanel, dataProvider, start);
+        converterPanelModel.update(dataProvider, start);
     };
+
+    componentLoader.load(["ConverterPanel"]).then(() => {
+        new Vue({ el: "#converterPanel", data: { converterPanelModel: converterPanelModel } });
+    });
 
     refreshSelectionInput();
 

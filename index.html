@@ -19,7 +19,7 @@
     <link rel="stylesheet" type="text/css" href="lib/jstree/themes/default-dark/style.min.css" />
     <link rel="stylesheet" type="text/css" href="lib/font-awesome/font-awesome.min.css" />
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.js"></script>
+    <script src="lib/requirejs/require.js"></script>
     <script src="lib/jquery/jquery-3.1.1.min.js"></script>
     <script src="lib/bootstrap/bootstrap.min.js"></script>
     <script src="lib/kaitai/yaml.js"></script>
@@ -35,7 +35,7 @@
     <script src="js/kaitaiFsFiles.js"></script>
     <script>
         var paths = {};
-        ["bowser", "jstree", "localforage", "goldenlayout"].forEach(
+        ["bowser", "jstree", "localforage", "goldenlayout", "vue"].forEach(
             name => paths[name] = `../lib/${name}/${name}`);
         paths["bigInt"] = "../lib/BigInteger/BigInteger";
 
@@ -93,26 +93,8 @@
         <a id="aboutWebIde" href="#">about webide</a>
     </div>
 </div>
-
-<div id="converterPanel">
-    <table>
-        <thead><tr><th class="typeCol">Type</th><th class="typeValue">Value (unsigned)</th><th>(signed)</th></tr></thead>
-        <tr class="i8      int"> <td>i8</td>      <td class="val unsigned"></td><td class="val signed"></td></tr>
-        <tr class="i16le   int"> <td>i16le</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
-        <tr class="i32le   int"> <td>i32le</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
-        <tr class="i64le   int"> <td>i64le</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
-        <tr class="i16be   int"> <td>i16be</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
-        <tr class="i32be   int"> <td>i32be</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
-        <tr class="i64be   int"> <td>i64be</td>   <td class="val unsigned"></td><td class="val signed"></td></tr>
-        <tr class="float">       <td>float</td>   <td class="val" colspan="2"></td></tr>
-        <tr class="double">      <td>double</td>  <td class="val" colspan="2"></td></tr>
-        <tr class="unixts">      <td>unixts</td>  <td class="val" colspan="2"></td></tr>
-        <tr class="ascii   str"> <td>ascii</td>   <td colspan="2"><div class="val"></div></td></tr>
-        <tr class="utf8    str"> <td>utf8</td>    <td colspan="2"><div class="val"></div></td></tr>
-        <tr class="utf16le str"> <td>utf16le</td> <td colspan="2"><div class="val"></div></td></tr>
-        <tr class="utf16be str"> <td>utf16be</td> <td colspan="2"><div class="val"></div></td></tr>
-    </table>
-</div>
+    
+<converter-panel id="converterPanel" :model="converterPanelModel"></converter-panel>
 
 <div id="fileTreeCont">
     <div id="fileTree" class="fileTree">

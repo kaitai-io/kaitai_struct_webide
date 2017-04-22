@@ -53,10 +53,7 @@ var fsData = new FsTreeNode(fss, new FsUri("static:///"));
 //var fsData = new FsTreeNode(fss, new FsUri("github://koczkatamas/kaitai_struct_formats/"));
 
 componentLoader.load(["TreeView"]).then(() => {
-    var demo = new Vue({
-        el: "#tree",
-        data: { treeData: fsData }
-    });
+    var demo = new Vue({ el: "#tree", data: { treeData: fsData } });
     window["demo"] = demo;
 });
 
