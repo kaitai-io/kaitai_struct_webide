@@ -6,9 +6,9 @@ import { StaticFileSystem } from "./FileSystem/StaticFileSystem";
 import { IFileSystem } from "./FileSystem/Common";
 import { FsUri } from "./FileSystem/FsUri";
 import { FsSelector } from "./FileSystem/FsSelector";
-import { TreeView, IFsTreeNode } from "./Components/TreeView/TreeView";
+import { TreeView, IFsTreeNode } from "./ui/Components/TreeView";
 import * as Vue from "vue";
-import { componentLoader } from "./Components/TemplateLoader";
+import { componentLoader } from "./ui/ComponentLoader";
 declare var kaitaiFsFiles: string[];
 
 var queryParams: { access_token?: string; secret?: string } = {};

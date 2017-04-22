@@ -1,6 +1,4 @@
-﻿"use strict";
-
-import * as localforage from "localforage";
+﻿import * as localforage from "localforage";
 import * as Vue from "vue";
 
 import { ui, addEditorTab, getLayoutNodeById } from "./app.layout";
@@ -14,9 +12,11 @@ import { initFileDrop } from "./FileDrop";
 import { performanceHelper } from "./utils/PerformanceHelper";
 import { IFileProcessItem, saveFile, precallHook } from "./utils";
 import { Delayed } from "./utils";
-import { componentLoader } from "./Components/TemplateLoader";
-import { ConverterPanelModel } from "./Components/ConverterPanel/ConverterPanel";
-
+import { componentLoader } from "./ui/ComponentLoader";
+import { ConverterPanelModel, ConverterPanel } from "./ui/Components/ConverterPanel";
+import { exportToJson } from "./ExportToJson";
+import { Stepper } from "./ui/Components/Stepper";
+import Component from "./ui/Component";
 $.jstree.defaults.core.force_text = true;
 
 export function ga(category: string, action: string, label?: string, value?: number) {
@@ -28,37 +28,6 @@ export function ga(category: string, action: string, label?: string, value?: num
 interface IInterval {
     start: number;
     end: number;
-}
-
-export class IntervalViewer {
-    currentIdx: number;
-    intervals: IInterval[];
-    htmlCurr: JQuery;
-    htmlTotal: JQuery;
-    htmlPrev: JQuery;
-    htmlNext: JQuery;
-
-    constructor(public htmlIdPrefix: string) {
-        ["Curr", "Total", "Prev", "Next"].forEach(control => this[`html${control}`] = $(`#${htmlIdPrefix}${control}`));
-        this.htmlNext.on("click", () => this.move(+1));
-        this.htmlPrev.on("click", () => this.move(-1));
-    }
-
-    move(direction: number) {
-        if (this.intervals.length === 0) return;
-        this.currentIdx = (this.intervals.length + this.currentIdx + direction) % this.intervals.length;
-        var curr = this.intervals[this.currentIdx];
-        ui.hexViewer.setSelection(curr.start, curr.end);
-        this.htmlCurr.text(this.currentIdx + 1);
-    }
-
-    setIntervals(intervals: IInterval[]) {
-        this.intervals = intervals;
-        this.currentIdx = -1;
-
-        this.htmlCurr.text("-");
-        this.htmlTotal.text(this.intervals.length);
-    }
 }
 
 export var dataProvider: IDataProvider;
@@ -285,6 +254,23 @@ localStorage.setItem("lastVersion", kaitaiIde.version);
 
 var converterPanelModel = new ConverterPanelModel();
 
+interface IInterval {
+    start: number;
+    end: number;
+}
+
+@Component
+class App extends Vue {
+    unparsed: IInterval[] = new Array(100);
+    byteArrays: IInterval[] = new Array(200);
+
+    public selectInterval(interval: IInterval) {
+        ui.hexViewer.setSelection(interval.start, interval.end);
+    }
+}
+
+export var app = new App();
+
 $(() => {
     $("#webIdeVersion").text(kaitaiIde.version);
     $("#compilerVersion").text(new io.kaitai.struct.MainJs().version + " (" + new io.kaitai.struct.MainJs().buildDate + ")");
@@ -293,6 +279,14 @@ $(() => {
     if (localStorage.getItem("doNotShowWelcome") !== "true")
         (<any>$("#welcomeModal")).modal();
     $("#aboutWebIde").on("click", () => (<any>$("#welcomeModal")).modal());
+
+    componentLoader.load(["ConverterPanel"]).then(() => {
+        new Vue({ el: "#converterPanel", data: { model: converterPanelModel } });
+    });
+
+    componentLoader.load(["Stepper"]).then(() => {
+        app.$mount("#infoPanel");
+    });
 
     ui.hexViewer.onSelectionChanged = () => {
         //console.log("setSelection", ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
@@ -315,10 +309,6 @@ $(() => {
 
         converterPanelModel.update(dataProvider, start);
     };
-
-    componentLoader.load(["ConverterPanel"]).then(() => {
-        new Vue({ el: "#converterPanel", data: { converterPanelModel: converterPanelModel } });
-    });
 
     refreshSelectionInput();
 
@@ -379,60 +369,9 @@ $(() => {
 
     kaitaiIde.ui = ui;
 
-    kaitaiIde.exportToJson = (useHex: boolean = false) => {
-        var indentLen = 2;
-        var result = "";
-
-        function expToNative(value: IExportedValue, padLvl: number = 0) {
-            var pad = " ".repeat((padLvl + 0) * indentLen);
-            var childPad = " ".repeat((padLvl + 1) * indentLen);
-
-            var isArray = value.type === ObjectType.Array;
-
-            if (value.type === ObjectType.Object || isArray) {
-                result += isArray ? "[" : "{";
-
-                var keys: any[] = isArray ? value.arrayItems : Object.keys(value.object.fields);
-                if (keys.length > 0) {
-                    result += `\n${childPad}`;
-                    keys.forEach((arrItem, i) => {
-                        result += (isArray ? "" : `"${arrItem}": `);
-                        expToNative(isArray ? arrItem : value.object.fields[arrItem], padLvl + 1);
-                        var lineCont = isArray && arrItem.type === ObjectType.Primitive && typeof arrItem.primitiveValue !== "string" && i % 16 !== 15;
-                        var last = i === keys.length - 1;
-                        result += last ? "\n" : "," + (lineCont ? " " : `\n${childPad}`);
-                    });
-                    result += `${pad}`;
-                }
-                result += isArray ? "]" : "}";
-            } else if (value.type === ObjectType.TypedArray) {
-                if (value.bytes.length <= 64)
-                    result += "[" + Array.from(value.bytes).join(", ") + "]";
-                else
-                    result += `{ "$start": ${value.ioOffset + value.start}, "$end": ${value.ioOffset + value.end - 1} }`;
-            } else if (value.type === ObjectType.Primitive) {
-                if (value.enumStringValue)
-                    result += `{ "name": ${JSON.stringify(value.enumStringValue)}, "value": ${value.primitiveValue} }`;
-                else if (typeof value.primitiveValue === "number")
-                    result += useHex ? `0x${value.primitiveValue.toString(16)}` : `${value.primitiveValue}`;
-                else
-                    result += `${JSON.stringify(value.primitiveValue)}`;
-            }
-        }
-
-        workerMethods.reparse(true).then(exportedRoot => {
-            console.log("exported", exportedRoot);
-            expToNative(exportedRoot);
-            addEditorTab("json export", result, "json");
-        }, error => handleError(error));
-    };
-
-    $("#exportToJson, #exportToJsonHex").on("click", e => kaitaiIde.exportToJson(e.target.id === "exportToJsonHex"));
+    $("#exportToJson, #exportToJsonHex").on("click", e => exportToJson(e.target.id === "exportToJsonHex"));
 
     $("#disableLazyParsing").on("click", reparse);
-
-    ui.unparsedIntSel = new IntervalViewer("unparsed");
-    ui.bytesIntSel = new IntervalViewer("bytes");
 
     precallHook(kaitaiIde.ui.layout.constructor.__lm.controls, "DragProxy", () => ga("layout", "window_drag"));
     $("body").on("mousedown", ".lm_drag_handle", () => { ga("layout", "splitter_drag"); });

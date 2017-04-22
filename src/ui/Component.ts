@@ -60,9 +60,6 @@ export function componentFactory(
         }
     });
 
-    if (!options.template)
-        options.template = `#${options.name}-template`;
-
     if (!options.props)
         options.props = {};
 

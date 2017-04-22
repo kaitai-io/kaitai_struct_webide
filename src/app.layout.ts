@@ -1,6 +1,5 @@
 ﻿import * as GoldenLayout from "goldenlayout";
 
-import { IntervalViewer } from "./app";
 import { HexViewer } from "./HexViewer";
 import { ParsedTreeHandler } from "./parsedToTree";
 
@@ -61,8 +60,6 @@ var ui = {
     fileTreeCont: <JQuery>null,
     fileTree: <JSTree>null,
     converterPanel: <JQuery>null,
-    unparsedIntSel: <IntervalViewer>null,
-    bytesIntSel: <IntervalViewer>null,
 };
 
 function addComponent(name: string, generatorCallback?: (container: GoldenLayout.Container) => any) {
@@ -113,6 +110,6 @@ addComponent("fileTreeCont", cont => cont.getElement().append($("#fileTreeCont")
 addExistingDiv("infoPanel");
 addExistingDiv("converterPanel");
 
-myLayout.init();
+ui.layout.init();
 
 export { ui };

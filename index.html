@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Kaitai Web IDE</title>
+    <title>Kaitai Web IDE</title>    
     <script>
         // HTTPS redirect
         var loc = location.toString();
         if (loc.indexOf("http://ide.kaitai.io/") === 0)
             location = "https" + loc.substring(4);
     </script>
+
     <link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="lib/bootstrap/contextmenu.css" />
     <link rel="stylesheet" type="text/css" href="lib/goldenlayout/goldenlayout-base.css" />
@@ -18,7 +19,7 @@
     <link rel="stylesheet" type="text/css" href="lib/jstree/themes/default/style.min.css" />
     <link rel="stylesheet" type="text/css" href="lib/jstree/themes/default-dark/style.min.css" />
     <link rel="stylesheet" type="text/css" href="lib/font-awesome/font-awesome.min.css" />
-    
+
     <script src="lib/requirejs/require.js"></script>
     <script src="lib/jquery/jquery-3.1.1.min.js"></script>
     <script src="lib/bootstrap/bootstrap.min.js"></script>
@@ -40,13 +41,11 @@
         paths["bigInt"] = "../lib/BigInteger/BigInteger";
 
         requirejs.config({ baseUrl: "js/", paths: paths });
-        require(["jstree", "app.unsupportedBrowser", "app"], function () { });
-
-        // index changed
+        require(["app.unsupportedBrowser"]);
+        require(["jstree", "app"]);
     </script>
 </head>
 <body>
-
 <div id="unsupportedBrowser">
     Your browser is not supported. Features may or may not working. <a href="http://outdatedbrowser.com/" target="_blank">Please use the latest Chrome or Firefox.</a>
     <i class="closeBtn glyphicon glyphicon-remove"></i>
@@ -61,7 +60,7 @@
         Drag &amp; drop a file here<br />to upload
     </div>
 </div>
-
+    
 <div id="infoPanel">
     <div>
         <span class="selectionText">selection</span>
@@ -75,15 +74,11 @@
     </div>
     <div id="unparsedDiv">
         Unparsed parts:
-        <a id="unparsedPrev" href="#">&lt;&lt;</a>
-        <span id="unparsedCurr">1</span> / <span id="unparsedTotal">1</span>
-        <a id="unparsedNext" href="#">&gt;&gt;</a>
+        <stepper :items="unparsed" @changed="selectInterval"></stepper>
     </div>
     <div id="bytesDiv">
         Byte arrays:
-        <a id="bytesPrev" href="#">&lt;&lt;</a>
-        <span id="bytesCurr">1</span> / <span id="bytesTotal">1</span>
-        <a id="bytesNext" href="#">&gt;&gt;</a>
+        <stepper :items="byteArrays" @changed="selectInterval"></stepper>
     </div>
     <div id="parsedPathDiv">Selected: <span id="parsedPath"></span></div>
     <div id="exportToJsonDiv">
@@ -94,7 +89,7 @@
     </div>
 </div>
     
-<converter-panel id="converterPanel" :model="converterPanelModel"></converter-panel>
+<converter-panel id="converterPanel" :model="model"></converter-panel>    
 
 <div id="fileTreeCont">
     <div id="fileTree" class="fileTree">
@@ -214,7 +209,6 @@
             </div>
         </div>
     </div>
-</div>
-
+</div>    
 </body>
 </html>

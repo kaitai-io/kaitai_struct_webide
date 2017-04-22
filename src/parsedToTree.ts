@@ -3,6 +3,7 @@ import { handleError } from "./app.errors";
 import { IInterval, IntervalHandler } from "./utils/IntervalHelper";
 import { s, htmlescape, asciiEncode, hexEncode, collectAllObjects } from "./utils";
 import { workerMethods } from "./app.worker";
+import {app} from "./app";
 
 interface IParsedTreeNodeData {
     exported?: IExportedValue;
@@ -288,9 +289,9 @@ export class ParsedTreeHandler {
                             lastEnd = i.end;
                         });
 
-                        ui.unparsedIntSel.setIntervals(nonParsed);
-                        ui.bytesIntSel.setIntervals(objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64).
-                            map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1 })));
+                        app.unparsed = nonParsed;
+                        app.byteArrays = objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64).
+                            map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1 }));
                     }
 
                     if (intervals.length > 400000)
