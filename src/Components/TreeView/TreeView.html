@@ -1,0 +1,57 @@
+﻿<style>
+    .treeView { font-family: Arial; font-size: 12px; background: #333; color: #999; text-shadow: 1px 1px 0 rgba(0,0,0,.5);
+        user-select:none; position:relative; overflow:auto; height:100%; width:100%; outline:0; }
+    .treeView li { cursor: pointer; }
+    .treeView li a { display:inline-block; position:relative; }
+    .treeView .selected>a { color:white; }
+    .treeView .header:hover a { color:white; }
+    .treeView .header:hover .wholerow { background:#666; }
+    .treeView .header.selected>.wholerow { background:rgba(95, 162, 219, 1); }
+    .treeView .wholerow { position: absolute; left: 0; width:100%; transition: background-color 0.15s, box-shadow 0.15s; }
+    .treeView .bold { font-weight: bold; }
+    .treeView, .treeView ul { padding-left: 10px; line-height: 1.5em; list-style-type: none; }
+    @keyframes loading-indicator-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .treeView .loading_icon {
+        background-image: linear-gradient(transparent, transparent), url(css/loading.svg);
+        background-size: 100%;
+        animation-name: loading-indicator-spin;
+        animation-duration: 0.75s;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+        backface-visibility: hidden;
+        display:inline-block; position:relative; top:3px; left:5px; height: 13px; width: 13px;
+    }
+</style>
+
+<template id="TreeView">
+    <ul class="treeView" tabindex="0"
+        @keydown.right.prevent="openSelected"
+        @keydown.left.prevent="closeSelected" 
+        @keydown.down.prevent="selectNextNode" 
+        @keydown.up.prevent="selectPrevNode">
+        <template v-for="child in model.children">
+            <tree-view-item :model="child"></tree-view-item>
+        </template>
+    </ul>
+</template>
+
+<template id="TreeViewItem">
+    <li>
+        <div class="header" :class="{selected: selected}" @click="select" @dblclick="toggle">
+            <div class="wholerow">&nbsp;</div>
+            <a :class="{bold: model.isFolder}">
+                {{model.text}}
+                <span v-if="model.isFolder">[{{open ? "-" : "+"}}]</span>
+            </a>
+            <div v-if="childrenLoading" class="loading_icon"></div>
+        </div>
+        <template v-if="open">
+            <ul v-for="model in model.children">
+                <tree-view-item :model="model" treeView="this"></tree-view-item>
+            </ul>
+        </template>
+    </li>
+</template>

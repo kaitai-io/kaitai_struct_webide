@@ -1,4 +1,4 @@
-﻿/**
+﻿/**warn
   * Original code:
   *   vue-class-component v5.0.1
   *   (c) 2015-2017 Evan You
@@ -23,11 +23,6 @@ export const $internalHooks = [
 ];
 
 export type VueClass = { new(): Vue } & typeof Vue;
-
-// Property, method and parameter decorators created by `createDecorator` helper
-// will enqueue functions that update component options for lazy processing.
-// They will be executed just before creating component constructor.
-export let $decoratorQueue: ((options: ComponentOptions<Vue>) => void)[] = [];
 
 export function componentFactory(
     Component: VueClass,
@@ -58,10 +53,10 @@ export function componentFactory(
         }
     });
 
-    // add data hook to collect class properties as Vue instance"s data
+    // add data hook to collect class properties as Vue instance's data
     (options.mixins || (options.mixins = [])).push({
-        data(this2: Vue) {
-            return collectDataFromConstructor(this2, Component);
+        data() {
+            return collectDataFromConstructor(this, Component);
         }
     });
 
@@ -74,11 +69,6 @@ export function componentFactory(
     if (!options.props["model"])
         options.props["model"] = Object;
 
-    // decorate options
-    $decoratorQueue.forEach(fn => fn(options));
-    // reset for other component decoration
-    $decoratorQueue = [];
-
     // find super
     const superProto = Object.getPrototypeOf(Component.prototype);
     const Super = superProto instanceof Vue ? superProto.constructor as VueClass : Vue;
@@ -89,7 +79,7 @@ export function componentFactory(
 
 export function collectDataFromConstructor(vm: Vue, Component: VueClass) {
     // override _init to prevent to init as Vue instance
-    Component.prototype._init = function (this2: Vue) {
+    Component.prototype._init = function () {
         // proxy to actual vm
         const keys = Object.getOwnPropertyNames(vm);
         // 2.2.0 compat (props are no longer exposed as self properties)
@@ -102,7 +92,7 @@ export function collectDataFromConstructor(vm: Vue, Component: VueClass) {
         }
         keys.forEach(key => {
             if (key.charAt(0) !== "_") {
-                Object.defineProperty(this2, key, {
+                Object.defineProperty(this, key, {
                     get: () => vm[key],
                     set: value => vm[key] = value
                 });
@@ -132,7 +122,7 @@ function Component<V extends VueClass, U extends Vue>(
     if (typeof options === "function") {
         return componentFactory(options);
     }
-    return function(Component: V) {
+    return function (Component: V) {
         return componentFactory(Component, options);
     };
 }
@@ -144,27 +134,3 @@ namespace Component {
 }
 
 export default Component;
-export const noop = () => { /* nop */ };
-
-export function createDecorator(
-    factory: (options: ComponentOptions<Vue>, key: string) => void
-): (target: Vue, key: string) => void
-export function createDecorator(
-    factory: (options: ComponentOptions<Vue>, key: string, index: number) => void
-): (target: Vue, key: string, index: number) => void
-export function createDecorator(
-    factory: (options: ComponentOptions<Vue>, key: string, index: number) => void
-): (target: Vue, key: string, index: any) => void {
-    return (_, key, index) => {
-        if (typeof index !== "number") {
-            index = undefined;
-        }
-        $decoratorQueue.push(options => factory(options, key, index));
-    };
-}
-
-export function warn(message: string): void {
-    if (typeof console !== "undefined") {
-        console.warn("[vue-class-component] " + message);
-    }
-};
