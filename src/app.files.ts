@@ -1,10 +1,9 @@
 ﻿import * as localforage from "localforage";
 
 import { ui, addEditorTab } from "./app.layout";
-import { compile, addNewFiles, loadFsItem, ga } from "./app";
+import { addNewFiles, loadFsItem, ga, appService } from "./app";
 import { IJSTreeNode } from "./parsedToTree";
 import { downloadFile, saveFile, openFilesWithDialog } from "./utils";
-
 declare var kaitaiFsFiles: string[];
 
 interface IFileSystem {
@@ -283,7 +282,7 @@ $(() => {
         //console.log(fsItem, linkData);
 
         fss[fsItem.fsType].get(fsItem.fn).then((content: string) => {
-            return compile(content, linkData.kslang, !!linkData.ksdebug).then(compiled => {
+            return appService.compilerService.compile(content, linkData.kslang, !!linkData.ksdebug).then(compiled => {
                 Object.keys(compiled).forEach(fileName => {
                     //var title = fsItem.fn.split("/").last() + " [" + $(e.target).text() + "]" + (compiled.length == 1 ? "" : ` ${i + 1}/${compiled.length}`);
                     //addEditorTab(title, compItem, linkData.acelang);

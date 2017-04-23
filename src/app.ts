@@ -1,8 +1,8 @@
 ﻿import * as localforage from "localforage";
 import * as Vue from "vue";
 
-import { ui, addEditorTab, getLayoutNodeById } from "./app.layout";
-import { showError, handleError } from "./app.errors";
+import { ui, getLayoutNodeById } from "./app.layout";
+import { handleError } from "./app.errors";
 import { IFsItem, fss, addKsyFile, refreshFsNodes } from "./app.files";
 import { ParsedTreeHandler, IParsedTreeNode } from "./parsedToTree";
 import { workerMethods } from "./app.worker";
@@ -12,10 +12,10 @@ import { performanceHelper } from "./utils/PerformanceHelper";
 import { IFileProcessItem, saveFile, precallHook } from "./utils";
 import { Delayed } from "./utils";
 import { componentLoader } from "./ui/ComponentLoader";
-import { ConverterPanelModel, ConverterPanel } from "./ui/Components/ConverterPanel";
+import { ConverterPanelModel } from "./ui/Components/ConverterPanel";
 import { exportToJson } from "./ExportToJson";
-import { Stepper } from "./ui/Components/Stepper";
 import Component from "./ui/Component";
+import { CompilerService } from "./KaitaiServices";
 $.jstree.defaults.core.force_text = true;
 
 export function ga(category: string, action: string, label?: string, value?: number) {
@@ -30,141 +30,42 @@ interface IInterval {
 }
 
 export var dataProvider: IDataProvider;
-var ksySchema: KsySchema.IKsyFile;
-var ksyTypes: IKsyTypes;
-
-class JsImporter implements io.kaitai.struct.IYamlImporter {
-    importYaml(name: string, mode: string) {
-        return new Promise(function (resolve, reject) {
-            console.log(`import yaml: ${name}, mode: ${mode}`);
-
-            return fss.kaitai.get(`formats/${name}.ksy`).then(ksyContent => {
-                var ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
-                return resolve(ksyModel);
-            });
-        });
-    }
-}
-
-var jsImporter = new JsImporter();
-
-export function compile(srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
-    var perfYamlParse = performanceHelper.measureAction("YAML parsing");
-
-    var compilerSchema;
-    try {
-        kaitaiIde.ksySchema = ksySchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
-
-        function collectKsyTypes(schema: KsySchema.IKsyFile): IKsyTypes {
-            var types: IKsyTypes = {};
-
-            function ksyNameToJsName(ksyName: string, isProp: boolean) { return ksyName.split("_").map((x,i) => i === 0 && isProp ? x : x.ucFirst()).join(""); }
-
-            function collectTypes(parent: KsySchema.IType) {
-                if (parent.types) {
-                    parent.typesByJsName = {};
-                    Object.keys(parent.types).forEach(name => {
-                        var jsName = ksyNameToJsName(name, false);
-                        parent.typesByJsName[jsName] = types[jsName] = parent.types[name];
-                        collectTypes(parent.types[name]);
-                    });
-                }
-
-                if (parent.instances) {
-                    parent.instancesByJsName = {};
-                    Object.keys(parent.instances).forEach(name => {
-                        var jsName = ksyNameToJsName(name, true);
-                        parent.instancesByJsName[jsName] = parent.instances[name];
-                    });
-                }
-            }
-
-            collectTypes(schema);
-            types[ksyNameToJsName(schema.meta.id, false)] = schema;
-
-            return types;
-        }
-
-        kaitaiIde.ksyTypes = ksyTypes = collectKsyTypes(ksySchema);
-
-        compilerSchema = <KsySchema.IKsyFile>YAML.parse(srcYaml); // we have to modify before sending into the compiler so we need a copy
-
-        function removeWebIdeKeys(obj: any) {
-            Object.keys(obj).filter(x => x.startsWith("-webide-")).forEach(keyName => delete obj[keyName]);
-        }
-
-        function filterOutExtensions(type: KsySchema.IType) {
-            removeWebIdeKeys(type);
-
-            if (type.types)
-                Object.keys(type.types).forEach(typeName => filterOutExtensions(type.types[typeName]));
-
-            if (type.instances)
-                Object.keys(type.instances).forEach(instanceName => removeWebIdeKeys(type.instances[instanceName]));
-        }
-
-        filterOutExtensions(compilerSchema);
-    } catch (parseErr) {
-        ga("compile", "error", `yaml: ${parseErr}`);
-        showError("YAML parsing error: ", parseErr);
-        return;
-    }
-
-    perfYamlParse.done();
-
-    //console.log("ksySchema", ksySchema);
-
-    if (kslang === "json")
-        return Promise.resolve();
-    else {
-        var perfCompile = performanceHelper.measureAction("Compilation");
-
-        var ks = new io.kaitai.struct.MainJs();
-        var rReleasePromise = (debug === false || debug === "both") ? ks.compile(kslang, compilerSchema, jsImporter, false) : Promise.resolve(null);
-        var rDebugPromise = (debug === true || debug === "both") ? ks.compile(kslang, compilerSchema, jsImporter, true) : Promise.resolve(null);
-        //console.log("rReleasePromise", rReleasePromise, "rDebugPromise", rDebugPromise);
-        return perfCompile.done(Promise.all([rReleasePromise, rDebugPromise]))
-            .then(([rRelease, rDebug]) => {
-                ga("compile", "success");
-                //console.log("rRelease", rRelease, "rDebug", rDebug);
-                return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
-            })
-            .catch(compileErr => {
-                ga("compile", "error", `kaitai: ${compileErr}`);
-                showError("KS compilation error: ", compileErr);
-                return;
-            });
-    }
-}
 
 function isKsyFile(fn: string) { return fn.toLowerCase().endsWith(".ksy"); }
 
 var ksyFsItemName = "ksyFsItem";
 
 var lastKsyContent: string = null;
-function recompile() {
-    return localforage.getItem<IFsItem>(ksyFsItemName).then(ksyFsItem => {
-        var srcYaml = ui.ksyEditor.getValue();
-        var changed = lastKsyContent !== srcYaml;
 
-        var copyPromise = <Promise<any>>Promise.resolve();
-        if (changed && (ksyFsItem.fsType === "kaitai" || ksyFsItem.fsType === "static"))
-            copyPromise = addKsyFile("localStorage", ksyFsItem.fn.replace(".ksy", "_modified.ksy"), srcYaml)
-                .then(fsItem => localforage.setItem(ksyFsItemName, fsItem));
+class AppService {
+    compilerService = new CompilerService();
 
-        return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
-            return compile(srcYaml, "javascript", "both").then(compiled => {
-                if (!compiled) return;
-                var fileNames = Object.keys(compiled.release);
+    recompile() {
+        return localforage.getItem<IFsItem>(ksyFsItemName).then(ksyFsItem => {
+            var srcYaml = ui.ksyEditor.getValue();
+            var changed = lastKsyContent !== srcYaml;
 
-                console.log("ksyFsItem", ksyFsItem);
-                ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(""), -1);
-                ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(""), -1);
-                return reparse();
+            var copyPromise = <Promise<any>>Promise.resolve();
+            if (changed && (ksyFsItem.fsType === "kaitai" || ksyFsItem.fsType === "static"))
+                copyPromise = addKsyFile("localStorage", ksyFsItem.fn.replace(".ksy", "_modified.ksy"), srcYaml)
+                    .then(fsItem => localforage.setItem(ksyFsItemName, fsItem));
+
+            return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
+                return this.compilerService.compile(srcYaml, "javascript", "both").then(compiled => {
+                    if (!compiled) return;
+                    var fileNames = Object.keys(compiled.release);
+
+                    console.log("ksyFsItem", ksyFsItem);
+                    ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(""), -1);
+                    ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(""), -1);
+                    return reparse();
+                });
             });
         });
-    });
+    }
 }
+
+export var appService = new AppService();
 
 var formatReady: Promise<any> = null;
 var inputReady: Promise<any> = null;
@@ -174,15 +75,15 @@ function reparse() {
     handleError(null);
     return performanceHelper.measureAction("Parse initialization", Promise.all([inputReady, formatReady]).then(() => {
         var debugCode = ui.genCodeDebugViewer.getValue();
-        var jsClassName = kaitaiIde.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
-        return workerMethods.initCode(debugCode, jsClassName, ksyTypes);
+        var jsClassName = appService.compilerService.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
+        return workerMethods.initCode(debugCode, jsClassName, appService.compilerService.ksyTypes);
     })).then(() => {
         //console.log("recompiled");
         performanceHelper.measureAction("Parsing", workerMethods.reparse(app.disableLazyParsing).then(exportedRoot => {
             //console.log("reparse exportedRoot", exportedRoot);
             kaitaiIde.root = exportedRoot;
 
-            ui.parsedDataTreeHandler = new ParsedTreeHandler(ui.parsedDataTreeCont.getElement(), exportedRoot, ksyTypes);
+            ui.parsedDataTreeHandler = new ParsedTreeHandler(ui.parsedDataTreeCont.getElement(), exportedRoot, appService.compilerService.ksyTypes);
             performanceHelper.measureAction("Tree / interval handling", ui.parsedDataTreeHandler.initNodeReopenHandling())
                 .then(() => ui.hexViewer.onSelectionChanged(), e => handleError(e));
 
@@ -341,7 +242,7 @@ $(() => {
     });
 
     var editDelay = new Delayed(500);
-    ui.ksyEditor.on("change", () => editDelay.do(() => recompile()));
+    ui.ksyEditor.on("change", () => editDelay.do(() => appService.recompile()));
 
     var inputContextMenu = $("#inputContextMenu");
     var downloadInput = $("#inputContextMenu .downloadItem");

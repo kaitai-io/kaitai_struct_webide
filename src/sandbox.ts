@@ -81,7 +81,7 @@ class App extends Vue {
 
     public openFile(file: FsTreeNode) {
         this.selectedUri = file.uri.uri;
-        console.log('openFile', file);
+        console.log("openFile", file);
     }
 }
 

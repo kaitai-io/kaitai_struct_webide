@@ -33,6 +33,7 @@
     <TypeScriptCompile Include="lib\ts-types\text-encoding.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
+    <TypeScriptCompile Include="src\KaitaiServices.ts" />
     <TypeScriptCompile Include="src\ui\Components\ConverterPanel.ts" />
     <TypeScriptCompile Include="src\ui\Components\SelectionInput.ts" />
     <TypeScriptCompile Include="src\ui\Components\Stepper.ts" />
