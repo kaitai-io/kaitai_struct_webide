@@ -10,6 +10,7 @@ import { TreeView, IFsTreeNode } from "./ui/Components/TreeView";
 import * as Vue from "vue";
 import { componentLoader } from "./ui/ComponentLoader";
 import Component from "./ui/Component";
+import * as View from "./ui/Components/TreeView";
 declare var kaitaiFsFiles: string[];
 
 var queryParams: { access_token?: string; secret?: string } = {};
@@ -36,7 +37,8 @@ fss.addFs(staticFs);
 class FsTreeNode implements IFsTreeNode {
     text: string;
     isFolder: boolean;
-    children: IFsTreeNode[] = null;
+    children: FsTreeNode[] = null;
+    icon: string = null;
 
     constructor(public fs: IFileSystem, public uri: FsUri) {
         this.text = uri.name;
@@ -50,12 +52,31 @@ class FsTreeNode implements IFsTreeNode {
     }
 }
 
-var fsData = new FsTreeNode(fss, new FsUri("static:///"));
+class FsRootNode implements IFsTreeNode {
+    text: string = "/";
+    isFolder: boolean = true;
+
+    constructor(public children: View.IFsTreeNode[] = []) { }
+    loadChildren(): Promise<void> { return Promise.resolve(); }
+}
+
+function addRootNode(text: string, icon: string, uri: string) {
+    var node = new FsTreeNode(fss, new FsUri(uri));
+    node.text = text;
+    node.icon = icon;
+    return node;
+}
+
+var fsData = new FsRootNode([
+    addRootNode("kaitai.io", "glyphicon-cloud", "static:///"),
+    addRootNode("koczkatamas/formats", "fa fa-github", "github://koczkatamas/kaitai_struct_formats/"),
+    addRootNode("browser", "glyphicon-cloud", "local:///"),
+]);
 //var fsData = new FsTreeNode(fss, new FsUri("github://koczkatamas/kaitai_struct_formats/"));
 
 @Component
 class App extends Vue {
-    fsTree: FsTreeNode = null;
+    fsTree: IFsTreeNode = null;
     selectedUri: string = null;
 
     public openFile(file: FsTreeNode) {
@@ -67,11 +88,13 @@ class App extends Vue {
 componentLoader.load(["TreeView"]).then(() => {
     var app = new App({ el: "#app" });
     app.fsTree = fsData;
+    console.log(fsData.children);
     window["app"] = app;
 
     var treeView = <TreeView<IFsTreeNode>>app.$refs["treeView"];
     setTimeout(() => {
-        treeView.children[3].dblclick();
+        treeView.children[0].dblclick();
+        //treeView.children[0].children[3].dblclick();
         //treeView.children[6].dblclick();
     }, 500);
 });

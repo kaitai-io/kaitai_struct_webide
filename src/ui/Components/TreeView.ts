@@ -78,7 +78,7 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
     }
 
     scrollSelectedIntoView() {
-        var target = this.selectedItem.$el;
+        var target = this.selectedItem.$el.children[0];
         var rect = target.getBoundingClientRect();
         var parentRect = this.$el.getBoundingClientRect();
 
@@ -103,6 +103,11 @@ export class TreeViewItem<T extends IFsTreeNode> extends Vue {
     open = false;
     selected = false;
     childrenLoading = false;
+
+    get icon() {
+        return this.model["icon"] ? this.model["icon"] :
+            this.model.isFolder ? (this.open ? "glyphicon-folder-open" : "glyphicon-folder-close") : "glyphicon-list-alt";
+    };
 
     get treeView() {
         var res: Vue = this;
