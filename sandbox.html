@@ -9,19 +9,19 @@
     <script src="js/extensions.js"></script>
     <script src="js/kaitaiFsFiles.js"></script>
     <style>
-        #tree {
-            height: 500px;
-            width: 200px;
-        }
+        #treeView { height:500px; width:200px; display:inline-block; margin:0; }
+        #info { display:inline-block; vertical-align:top; margin-left:5px }
     </style>
 </head>
 <body>
 hello66
 
-<div id="tree">
-    <tree-view :model="treeData" ref="treeView"></tree-view>    
+<div id="app">
+    <tree-view id="treeView" :model="fsTree" ref="treeView" @openFile="openFile"></tree-view>    
+    <div id="info">
+        {{selectedUri}}        
+    </div>
 </div>
-<div id="app"></div>
 
 <script>
     var paths = {};

@@ -9,6 +9,7 @@ import { FsSelector } from "./FileSystem/FsSelector";
 import { TreeView, IFsTreeNode } from "./ui/Components/TreeView";
 import * as Vue from "vue";
 import { componentLoader } from "./ui/ComponentLoader";
+import Component from "./ui/Component";
 declare var kaitaiFsFiles: string[];
 
 var queryParams: { access_token?: string; secret?: string } = {};
@@ -52,13 +53,25 @@ class FsTreeNode implements IFsTreeNode {
 var fsData = new FsTreeNode(fss, new FsUri("static:///"));
 //var fsData = new FsTreeNode(fss, new FsUri("github://koczkatamas/kaitai_struct_formats/"));
 
-componentLoader.load(["TreeView"]).then(() => {
-    var demo = new Vue({ el: "#tree", data: { treeData: fsData } });
-    window["demo"] = demo;
-});
+@Component
+class App extends Vue {
+    fsTree: FsTreeNode = null;
+    selectedUri: string = null;
 
-//var treeView = <TreeView<IFsTreeNode>>demo.$refs["treeView"];
-//setTimeout(() => {
-//    treeView.children[1].toggle();
-//    treeView.children[6].toggle();
-//}, 500);
+    public openFile(file: FsTreeNode) {
+        this.selectedUri = file.uri.uri;
+        console.log('openFile', file);
+    }
+}
+
+componentLoader.load(["TreeView"]).then(() => {
+    var app = new App({ el: "#app" });
+    app.fsTree = fsData;
+    window["app"] = app;
+
+    var treeView = <TreeView<IFsTreeNode>>app.$refs["treeView"];
+    setTimeout(() => {
+        treeView.children[3].dblclick();
+        //treeView.children[6].dblclick();
+    }, 500);
+});

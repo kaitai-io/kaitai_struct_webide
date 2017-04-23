@@ -17,19 +17,22 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
     get children() { return <TreeViewItem<T>[]>this.$children; }
 
     created() {
-        this.model.loadChildren();
+        this.$watch("model", () => {
+            if (this.model)
+                this.model.loadChildren();
+        });
     }
 
     openSelected() {
         if (!this.selectedItem.open)
-            this.selectedItem.toggle();
+            this.selectedItem.dblclick();
         else
             this.selectNextNode();
     }
 
     closeSelected() {
         if (this.selectedItem.open)
-            this.selectedItem.toggle();
+            this.selectedItem.dblclick();
         else if (this.selectedItem.parent.parent)
             this.setSelected(this.selectedItem.parent);
     }
@@ -114,17 +117,19 @@ export class TreeViewItem<T extends IFsTreeNode> extends Vue {
     get children() { return <TreeViewItem<T>[]>this.$children; }
     get parent() { return <TreeViewItem<T>>this.$parent; }
 
-    toggle() {
+    dblclick() {
         if (this.model.isFolder) {
             this.open = !this.open;
             if (this.open && !this.model.children) {
                 this.childrenLoading = true;
                 setTimeout(() => this.model.loadChildren().then(() => this.childrenLoading = false), 0);
             }
+        } else {
+            this.treeView.$emit("openfile", this.model);
         }
     }
 
-    select() {
+    click() {
         this.treeView.setSelected(this);
     }
 }
