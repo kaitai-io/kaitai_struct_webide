@@ -4,84 +4,68 @@ import Component from "../Component";
 
 @Component
 export class SelectionInputPart extends Vue {
-    value: string = "";
-    width: number = 30;
+    text = "";
     focused: boolean = false;
+    inputSizeEl: JQuery;
 
     get parent() { return <SelectionInput>this.$parent; }
+    get width() { return this.getTextWidth(this.text); }
 
-    created() {
-        this.$watch("value", () => this.parent.selectionInputChanged(this));
+    mounted() {
+        this.inputSizeEl = $("<span>").css({ display: 'none' }).appendTo(this.$parent.$el);
+        this.$watch("text", () => this.parent.inputChanged(this));
+    }
+
+    getTextWidth(text: string) {
+        return this.inputSizeEl ? this.inputSizeEl.text(text).width() : 0;
+    }
+
+    move(dir: number) { this.parent.move(this, dir); }
+
+    get value() {
+        var result = parseInt(this.text);
+        return isNaN(result) ? null : result;
     }
 }
 
 @Component({ props: ["start", "end" ]})
 export class SelectionInput extends Vue {
-    start: number = -1;
-    end: number = -1;
+    start: number;
+    end: number;
     maxLength = Infinity;
-    userChange = false;
+
     useHexAddr = true;
     hasSelection = false;
 
     get startPart() { return <SelectionInputPart>this.$refs["startPart"]; }
     get endPart() { return <SelectionInputPart>this.$refs["endPart"]; }
 
-    getTextWidth(text: string) {
-        var inputSizeElement = $(this.$refs["inputSizeElement"]);
-        inputSizeElement.text(text);
-        var width = inputSizeElement.width();
-        return width;
-    }
-
     mounted() {
-        this.$watch("start", () => this.refreshSelectionInput());
-        this.$watch("end", () => this.refreshSelectionInput());
-        this.resetInputWidth(this.startPart);
-        this.resetInputWidth(this.endPart);
+        this.$watch("start", () => this.sourceChanged());
+        this.$watch("end", () => this.sourceChanged());
     }
 
-    resetInputWidth(ctrl: SelectionInputPart) {
-        ctrl.width = this.getTextWidth(ctrl.value);
-    }
-
-    selectionInputChanged(ctrl: SelectionInputPart) {
-        this.resetInputWidth(ctrl);
-
-        this.useHexAddr = !ctrl.value || ctrl.value.startsWith("0x");
-
-        var start = parseInt(this.startPart.value), end = parseInt(this.endPart.value);
-        if (!isNaN(start)) {
-            this.userChange = true;
-            this.$emit("selectionchanged", start, isNaN(end) || end < start ? start : end);
-            this.userChange = false;
-        }
+    sourceChanged() {
+        this.hasSelection = this.start !== -1;
+        this.setAddrInput(this.startPart, this.hasSelection ? this.start : null);
+        this.setAddrInput(this.endPart, this.hasSelection && this.start !== this.end ? this.end : null);
     }
 
     setAddrInput(ctrl: SelectionInputPart, value: number) {
-        if (value < 0) value = 0;
-        if (value >= this.maxLength) value = this.maxLength - 1;
-        ctrl.value = value === null ? "" : this.useHexAddr ? `0x${value.toString(16)}` : `${value}`;
-        this.resetInputWidth(ctrl);
+        var newValue = value < 0 ? 0 : value >= this.maxLength ? this.maxLength - 1 : value;
+        ctrl.text = newValue === null ? "" : this.useHexAddr ? `0x${newValue.toString(16)}` : `${newValue}`;
     }
 
-    refreshSelectionInput() {
-        this.hasSelection = this.start !== -1;
-
-        if (!(this.userChange && this.startPart.focused))
-            this.setAddrInput(this.startPart, this.hasSelection ? this.start : null);
-
-        if (!(this.userChange && this.endPart.focused))
-            this.setAddrInput(this.endPart, this.hasSelection && this.start !== this.end ? this.end : null);
+    move(ctrl: SelectionInputPart, dir: number) {
+        this.setAddrInput(ctrl, (ctrl.value || this.startPart.value || 0) + dir);
     }
 
-    keydown(e: any) {
-        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-            var target = $(e.target);
-            this.setAddrInput(<any>target, (parseInt(target.val() || this.startPart.value) || 0) +
-                (e.key === "ArrowDown" ? -1 : +1));
-            //this.selectionInputChanged(e);
-            return false;
-        }
+    inputChanged(ctrl: SelectionInputPart) {
+        if (ctrl.value)
+            this.useHexAddr = ctrl.text.startsWith("0x");
+
+        var start = this.startPart.value;
+        var end = this.endPart.value;
+        this.$emit("selectionchanged", start || -1, (end === null || end < start ? start : end) || -1);
     }
 }

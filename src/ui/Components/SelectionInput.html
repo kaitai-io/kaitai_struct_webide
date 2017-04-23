@@ -5,19 +5,19 @@
     .selectionInput .selStart { padding-right:4px }
     .selectionInput .selEnd { padding-left:6px }
     .selectionInput input.form-control { width: 30px }
-    .selectionInput .inputSizeElement { display:none }
 </style>
 
 <template id="SelectionInputPart">
-    <input type="text" class="form-control" v-model="value" 
+    <input type="text" v-model="text"
+           class="form-control" :style="{ width: width + 20 + 'px' }"
            @focus="focused=true" @blur="focused=false"
-           :style="{ width: width + 20 + 'px' }">
+           @keydown.up.prevent="move(+1)" @keydown.down.prevent="move(-1)">
 </template>
 
 <template id="SelectionInput">
     <div class="selectionInput">
-        <span class="selectionText">{{ hasSelection ? "selection:" : "no selection" }}</span>
-        <span class="selGroup input-group">
+        <span>{{ hasSelection ? "selection:" : "no selection" }}</span>
+        <span class="input-group">
             <selection-input-part ref="startPart" class="selStart"></selection-input-part><!--nobr-->
             <span class="input-group-addon">-</span><!--nobr-->
             <selection-input-part ref="endPart" class="selEnd"></selection-input-part>
