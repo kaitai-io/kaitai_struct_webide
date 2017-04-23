@@ -289,8 +289,8 @@ export class ParsedTreeHandler {
                             lastEnd = i.end;
                         });
 
-                        app.unparsed = nonParsed;
-                        app.byteArrays = objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64).
+                        app.vm.unparsed = nonParsed;
+                        app.vm.byteArrays = objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64).
                             map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1 }));
                     }
 

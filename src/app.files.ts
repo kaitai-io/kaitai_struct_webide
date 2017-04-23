@@ -1,7 +1,7 @@
 ﻿import * as localforage from "localforage";
 
 import { ui, addEditorTab } from "./app.layout";
-import { addNewFiles, loadFsItem, ga, appService } from "./app";
+import { ga, app } from "./app";
 import { IJSTreeNode } from "./parsedToTree";
 import { downloadFile, saveFile, openFilesWithDialog } from "./utils";
 declare var kaitaiFsFiles: string[];
@@ -143,7 +143,7 @@ export function addKsyFile(parent: string | Element, ksyFn: string, content: str
     return fss.local.put(name, content).then((fsItem: IFsItem) => {
         ui.fileTree.create_node(ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: "glyphicon glyphicon-list-alt" },
             "last", (node: any) => ui.fileTree.activate_node(node, null));
-        return loadFsItem(fsItem, true);
+        return app.loadFsItem(fsItem, true);
     });
 }
 
@@ -282,7 +282,7 @@ $(() => {
         //console.log(fsItem, linkData);
 
         fss[fsItem.fsType].get(fsItem.fn).then((content: string) => {
-            return appService.compilerService.compile(content, linkData.kslang, !!linkData.ksdebug).then(compiled => {
+            return app.compilerService.compile(content, linkData.kslang, !!linkData.ksdebug).then(compiled => {
                 Object.keys(compiled).forEach(fileName => {
                     //var title = fsItem.fn.split("/").last() + " [" + $(e.target).text() + "]" + (compiled.length == 1 ? "" : ` ${i + 1}/${compiled.length}`);
                     //addEditorTab(title, compItem, linkData.acelang);
@@ -330,7 +330,7 @@ $(() => {
     ctxAction(uiFiles.downloadItem, () => downloadFiles());
     uiFiles.downloadFile.on("click", () => downloadFiles());
 
-    uiFiles.uploadFile.on("click", () => openFilesWithDialog(addNewFiles));
+    uiFiles.uploadFile.on("click", () => openFilesWithDialog(app.addNewFiles));
 
     $("#newKsyModal").on("shown.bs.modal", () => { $("#newKsyModal input").focus(); });
     $("#newKsyModal form").submit(function (event) {
@@ -344,7 +344,7 @@ $(() => {
     });
 
     fileTreeCont.bind("dblclick.jstree", function (event) {
-        loadFsItem(<IFsItem>ui.fileTree.get_node(event.target).data);
+        app.loadFsItem(<IFsItem>ui.fileTree.get_node(event.target).data);
     });
 
     ctxAction(uiFiles.cloneKsyFile, e => {

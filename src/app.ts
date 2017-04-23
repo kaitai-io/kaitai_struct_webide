@@ -29,138 +29,10 @@ interface IInterval {
     end: number;
 }
 
-export var dataProvider: IDataProvider;
-
-function isKsyFile(fn: string) { return fn.toLowerCase().endsWith(".ksy"); }
-
-var ksyFsItemName = "ksyFsItem";
-
-var lastKsyContent: string = null;
-
-class AppService {
-    compilerService = new CompilerService();
-
-    recompile() {
-        return localforage.getItem<IFsItem>(ksyFsItemName).then(ksyFsItem => {
-            var srcYaml = ui.ksyEditor.getValue();
-            var changed = lastKsyContent !== srcYaml;
-
-            var copyPromise = <Promise<any>>Promise.resolve();
-            if (changed && (ksyFsItem.fsType === "kaitai" || ksyFsItem.fsType === "static"))
-                copyPromise = addKsyFile("localStorage", ksyFsItem.fn.replace(".ksy", "_modified.ksy"), srcYaml)
-                    .then(fsItem => localforage.setItem(ksyFsItemName, fsItem));
-
-            return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
-                return this.compilerService.compile(srcYaml, "javascript", "both").then(compiled => {
-                    if (!compiled) return;
-                    var fileNames = Object.keys(compiled.release);
-
-                    console.log("ksyFsItem", ksyFsItem);
-                    ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(""), -1);
-                    ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(""), -1);
-                    return reparse();
-                });
-            });
-        });
-    }
-}
-
-export var appService = new AppService();
-
-var formatReady: Promise<any> = null;
-var inputReady: Promise<any> = null;
-var selectedInTree = false;
-var blockRecursive = false;
-function reparse() {
-    handleError(null);
-    return performanceHelper.measureAction("Parse initialization", Promise.all([inputReady, formatReady]).then(() => {
-        var debugCode = ui.genCodeDebugViewer.getValue();
-        var jsClassName = appService.compilerService.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
-        return workerMethods.initCode(debugCode, jsClassName, appService.compilerService.ksyTypes);
-    })).then(() => {
-        //console.log("recompiled");
-        performanceHelper.measureAction("Parsing", workerMethods.reparse(app.disableLazyParsing).then(exportedRoot => {
-            //console.log("reparse exportedRoot", exportedRoot);
-            kaitaiIde.root = exportedRoot;
-
-            ui.parsedDataTreeHandler = new ParsedTreeHandler(ui.parsedDataTreeCont.getElement(), exportedRoot, appService.compilerService.ksyTypes);
-            performanceHelper.measureAction("Tree / interval handling", ui.parsedDataTreeHandler.initNodeReopenHandling())
-                .then(() => ui.hexViewer.onSelectionChanged(), e => handleError(e));
-
-            ui.parsedDataTreeHandler.jstree.on("select_node.jstree", function (e, selectNodeArgs) {
-                var node = <IParsedTreeNode>selectNodeArgs.node;
-                //console.log("node", node);
-                var exp = ui.parsedDataTreeHandler.getNodeData(node).exported;
-
-                if (exp && exp.path)
-                    $("#parsedPath").text(exp.path.join("/"));
-
-                if (!blockRecursive && exp && exp.start < exp.end) {
-                    selectedInTree = true;
-                    //console.log("setSelection", exp.ioOffset, exp.start);
-                    ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
-                    selectedInTree = false;
-                }
-            });
-
-        }, error => handleError(error)));
-    });
-}
-
-var inputContent: ArrayBuffer, inputFsItem: IFsItem, lastKsyFsItem: IFsItem;
-export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
-    if (!fsItem || fsItem.type !== "file")
-        return Promise.resolve();
-
-    return fss[fsItem.fsType].get(fsItem.fn).then((content: any) => {
-        if (isKsyFile(fsItem.fn)) {
-            localforage.setItem(ksyFsItemName, fsItem);
-            lastKsyFsItem = fsItem;
-            lastKsyContent = content;
-            if (ui.ksyEditor.getValue() !== content)
-                ui.ksyEditor.setValue(content, -1);
-            getLayoutNodeById("ksyEditor").container.setTitle(fsItem.fn);
-            return Promise.resolve();
-        } else {
-            inputFsItem = fsItem;
-            inputContent = content;
-
-            localforage.setItem("inputFsItem", fsItem);
-
-            dataProvider = {
-                length: content.byteLength,
-                get(offset, length) {
-                    return new Uint8Array(content, offset, length);
-                }
-            };
-
-            ui.hexViewer.setDataProvider(dataProvider);
-            getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
-            return workerMethods.setInput(content).then(() => refreshGui ? reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
-        }
-    });
-}
-
-export function addNewFiles(files: IFileProcessItem[]) {
-    return Promise.all(files.map(file => (isKsyFile(file.file.name) ? <Promise<any>>file.read("text") : file.read("arrayBuffer"))
-        .then(content => fss.local.put(file.file.name, content))))
-        .then(fsItems => {
-            refreshFsNodes();
-            return fsItems.length === 1 ? loadFsItem(fsItems[0]) : Promise.resolve(null);
-        });
-}
-
-localStorage.setItem("lastVersion", kaitaiIde.version);
-
-var converterPanelModel = new ConverterPanelModel();
-
-interface IInterval {
-    start: number;
-    end: number;
-}
-
 @Component
-class App extends Vue {
+class AppVM extends Vue {
+    converterPanelModel = new ConverterPanelModel();
+
     selectionStart: number = -1;
     selectionEnd: number = -1;
 
@@ -175,7 +47,135 @@ class App extends Vue {
     public about() { (<any>$("#welcomeModal")).modal(); }
 }
 
-export var app = new App();
+class AppController {
+    compilerService = new CompilerService();
+    vm = new AppVM();
+
+    dataProvider: IDataProvider;
+    ksyFsItemName = "ksyFsItem";
+    lastKsyContent: string = null;
+    isKsyFile(fn: string) { return fn.toLowerCase().endsWith(".ksy"); }
+
+    recompile() {
+        return localforage.getItem<IFsItem>(this.ksyFsItemName).then(ksyFsItem => {
+            var srcYaml = ui.ksyEditor.getValue();
+            var changed = this.lastKsyContent !== srcYaml;
+
+            var copyPromise = <Promise<any>>Promise.resolve();
+            if (changed && (ksyFsItem.fsType === "kaitai" || ksyFsItem.fsType === "static"))
+                copyPromise = addKsyFile("localStorage", ksyFsItem.fn.replace(".ksy", "_modified.ksy"), srcYaml)
+                    .then(fsItem => localforage.setItem(this.ksyFsItemName, fsItem));
+
+            return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
+                return this.compilerService.compile(srcYaml, "javascript", "both").then(compiled => {
+                    if (!compiled) return;
+                    var fileNames = Object.keys(compiled.release);
+
+                    console.log("ksyFsItem", ksyFsItem);
+                    ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(""), -1);
+                    ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(""), -1);
+                    return this.reparse();
+                });
+            });
+        });
+    }
+
+    blockRecursive = false;
+    selectedInTree = false;
+    formatReady: Promise<any> = null;
+    inputReady: Promise<any> = null;
+
+    reparse() {
+        handleError(null);
+        return performanceHelper.measureAction("Parse initialization", Promise.all([this.inputReady, this.formatReady]).then(() => {
+            var debugCode = ui.genCodeDebugViewer.getValue();
+            var jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
+            return workerMethods.initCode(debugCode, jsClassName, this.compilerService.ksyTypes);
+        })).then(() => {
+            //console.log("recompiled");
+            performanceHelper.measureAction("Parsing", workerMethods.reparse(this.vm.disableLazyParsing).then(exportedRoot => {
+                //console.log("reparse exportedRoot", exportedRoot);
+                kaitaiIde.root = exportedRoot;
+
+                ui.parsedDataTreeHandler = new ParsedTreeHandler(ui.parsedDataTreeCont.getElement(), exportedRoot, this.compilerService.ksyTypes);
+                performanceHelper.measureAction("Tree / interval handling", ui.parsedDataTreeHandler.initNodeReopenHandling())
+                    .then(() => ui.hexViewer.onSelectionChanged(), e => handleError(e));
+
+                ui.parsedDataTreeHandler.jstree.on("select_node.jstree", function (e, selectNodeArgs) {
+                    var node = <IParsedTreeNode>selectNodeArgs.node;
+                    //console.log("node", node);
+                    var exp = ui.parsedDataTreeHandler.getNodeData(node).exported;
+
+                    if (exp && exp.path)
+                        $("#parsedPath").text(exp.path.join("/"));
+
+                    if (!this.blockRecursive && exp && exp.start < exp.end) {
+                        this.selectedInTree = true;
+                        //console.log("setSelection", exp.ioOffset, exp.start);
+                        ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
+                        this.selectedInTree = false;
+                    }
+                });
+
+            }, error => handleError(error)));
+        });
+    }
+
+    inputContent: ArrayBuffer;
+    inputFsItem: IFsItem;
+    lastKsyFsItem: IFsItem;
+
+    loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
+        if (!fsItem || fsItem.type !== "file")
+            return Promise.resolve();
+
+        return fss[fsItem.fsType].get(fsItem.fn).then((content: any) => {
+            if (this.isKsyFile(fsItem.fn)) {
+                localforage.setItem(this.ksyFsItemName, fsItem);
+                this.lastKsyFsItem = fsItem;
+                this.lastKsyContent = content;
+                if (ui.ksyEditor.getValue() !== content)
+                    ui.ksyEditor.setValue(content, -1);
+                getLayoutNodeById("ksyEditor").container.setTitle(fsItem.fn);
+                return Promise.resolve();
+            } else {
+                this.inputFsItem = fsItem;
+                this.inputContent = content;
+
+                localforage.setItem("inputFsItem", fsItem);
+
+                this.dataProvider = {
+                    length: content.byteLength,
+                    get(offset, length) {
+                        return new Uint8Array(content, offset, length);
+                    }
+                };
+
+                ui.hexViewer.setDataProvider(this.dataProvider);
+                getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
+                return workerMethods.setInput(content).then(() => refreshGui ? this.reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
+            }
+        });
+    }
+
+    addNewFiles(files: IFileProcessItem[]) {
+        return Promise.all(files.map(file => (this.isKsyFile(file.file.name) ? <Promise<any>>file.read("text") : file.read("arrayBuffer"))
+            .then(content => fss.local.put(file.file.name, content))))
+            .then(fsItems => {
+                refreshFsNodes();
+                return fsItems.length === 1 ? this.loadFsItem(fsItems[0]) : Promise.resolve(null);
+            });
+    }
+}
+
+export var app = new AppController();
+
+localStorage.setItem("lastVersion", kaitaiIde.version);
+
+interface IInterval {
+    start: number;
+    end: number;
+}
 
 $(() => {
     $("#webIdeVersion").text(kaitaiIde.version);
@@ -186,14 +186,15 @@ $(() => {
         (<any>$("#welcomeModal")).modal();
 
     componentLoader.load(["ConverterPanel", "Stepper", "SelectionInput"]).then(() => {
-        new Vue({ el: "#converterPanel", data: { model: converterPanelModel } });
-        app.$mount("#infoPanel");
-        app.$watch("disableLazyParsing", () => reparse());
+        console.log(app.vm);
+        new Vue({ el: "#converterPanel", data: { model: app.vm.converterPanelModel } });
+        app.vm.$mount("#infoPanel");
+        app.vm.$watch("disableLazyParsing", () => app.reparse());
     });
 
     function refreshSelectionInput() {
-        app.selectionStart = ui.hexViewer.selectionStart;
-        app.selectionEnd = ui.hexViewer.selectionEnd;
+        app.vm.selectionStart = ui.hexViewer.selectionStart;
+        app.vm.selectionEnd = ui.hexViewer.selectionEnd;
     }
 
     ui.hexViewer.onSelectionChanged = () => {
@@ -205,16 +206,16 @@ $(() => {
 
         refreshSelectionInput();
 
-        if (ui.parsedDataTreeHandler && hasSelection && !selectedInTree) {
+        if (ui.parsedDataTreeHandler && hasSelection && !app.selectedInTree) {
             var intervals = ui.parsedDataTreeHandler.intervalHandler.searchRange(ui.hexViewer.mouseDownOffset || start);
             if (intervals.items.length > 0) {
                 //console.log("selected node", intervals[0].id);
-                blockRecursive = true;
-                ui.parsedDataTreeHandler.activatePath(intervals.items[0].exp.path).then(() => blockRecursive = false);
+                app.blockRecursive = true;
+                ui.parsedDataTreeHandler.activatePath(intervals.items[0].exp.path).then(() => app.blockRecursive = false);
             }
         }
 
-        converterPanelModel.update(dataProvider, start);
+        app.vm.converterPanelModel.update(app.dataProvider, start);
     };
 
     refreshSelectionInput();
@@ -222,27 +223,27 @@ $(() => {
     ui.genCodeDebugViewer.commands.addCommand({
         name: "compile",
         bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
-        exec: function (editor: any) { reparse(); }
+        exec: function (editor: any) { app.reparse(); }
     });
 
-    initFileDrop("fileDrop", addNewFiles);
+    initFileDrop("fileDrop", app.addNewFiles);
 
     function loadCachedFsItem(cacheKey: string, defFsType: string, defSample: string) {
         return localforage.getItem(cacheKey).then((fsItem: IFsItem) =>
-            loadFsItem(fsItem || <IFsItem>{ fsType: defFsType, fn: defSample, type: "file" }, false));
+            app.loadFsItem(fsItem || <IFsItem>{ fsType: defFsType, fn: defSample, type: "file" }, false));
     }
 
-    inputReady = loadCachedFsItem("inputFsItem", "kaitai", "samples/sample1.zip");
-    formatReady = loadCachedFsItem(ksyFsItemName, "kaitai", "formats/archive/zip.ksy");
+    app.inputReady = loadCachedFsItem("inputFsItem", "kaitai", "samples/sample1.zip");
+    app.formatReady = loadCachedFsItem(app.ksyFsItemName, "kaitai", "formats/archive/zip.ksy");
 
-    inputReady.then(() => {
+    app.inputReady.then(() => {
         var storedSelection = JSON.parse(localStorage.getItem("selection"));
         if (storedSelection)
             ui.hexViewer.setSelection(storedSelection.start, storedSelection.end);
     });
 
     var editDelay = new Delayed(500);
-    ui.ksyEditor.on("change", () => editDelay.do(() => appService.recompile()));
+    ui.ksyEditor.on("change", () => editDelay.do(() => app.recompile()));
 
     var inputContextMenu = $("#inputContextMenu");
     var downloadInput = $("#inputContextMenu .downloadItem");
@@ -268,10 +269,8 @@ $(() => {
 
     ctxAction(downloadInput, e => {
         var start = ui.hexViewer.selectionStart, end = ui.hexViewer.selectionEnd;
-        //var fnParts = /^(.*?)(\.[^.]+)?$/.exec(inputFsItem.fn.split("/").last());
-        //var newFn = `${fnParts[1]}_0x${start.toString(16)}-0x${end.toString(16)}${fnParts[2] || ""}`;
-        var newFn = `${inputFsItem.fn.split("/").last()}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
-        saveFile(new Uint8Array(inputContent, start, end - start + 1), newFn);
+        var newFn = `${app.inputFsItem.fn.split("/").last()}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
+        saveFile(new Uint8Array(app.inputContent, start, end - start + 1), newFn);
     });
 
     kaitaiIde.ui = ui;
