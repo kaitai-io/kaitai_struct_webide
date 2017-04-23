@@ -178,7 +178,7 @@ function reparse() {
         return workerMethods.initCode(debugCode, jsClassName, ksyTypes);
     })).then(() => {
         //console.log("recompiled");
-        performanceHelper.measureAction("Parsing", workerMethods.reparse($("#disableLazyParsing").is(":checked")).then(exportedRoot => {
+        performanceHelper.measureAction("Parsing", workerMethods.reparse(app.disableLazyParsing).then(exportedRoot => {
             //console.log("reparse exportedRoot", exportedRoot);
             kaitaiIde.root = exportedRoot;
 
@@ -266,13 +266,12 @@ class App extends Vue {
     unparsed: IInterval[] = [];
     byteArrays: IInterval[] = [];
 
-    public selectInterval(interval: IInterval) {
-        this.selectionChanged(interval.start, interval.end);
-    }
+    disableLazyParsing: boolean = false;
 
-    public selectionChanged(start: number, end: number) {
-        ui.hexViewer.setSelection(start, end);
-    }
+    public selectInterval(interval: IInterval) { this.selectionChanged(interval.start, interval.end); }
+    public selectionChanged(start: number, end: number) { ui.hexViewer.setSelection(start, end); }
+    public exportToJson(hex: boolean) { exportToJson(hex); }
+    public about() { (<any>$("#welcomeModal")).modal(); }
 }
 
 export var app = new App();
@@ -284,11 +283,11 @@ $(() => {
     $("#welcomeDoNotShowAgain").click(() => localStorage.setItem("doNotShowWelcome", "true"));
     if (localStorage.getItem("doNotShowWelcome") !== "true")
         (<any>$("#welcomeModal")).modal();
-    $("#aboutWebIde").on("click", () => (<any>$("#welcomeModal")).modal());
 
     componentLoader.load(["ConverterPanel", "Stepper", "SelectionInput"]).then(() => {
         new Vue({ el: "#converterPanel", data: { model: converterPanelModel } });
         app.$mount("#infoPanel");
+        app.$watch("disableLazyParsing", () => reparse());
     });
 
     function refreshSelectionInput() {
@@ -375,10 +374,6 @@ $(() => {
     });
 
     kaitaiIde.ui = ui;
-
-    $("#exportToJson, #exportToJsonHex").on("click", e => exportToJson(e.target.id === "exportToJsonHex"));
-
-    $("#disableLazyParsing").on("click", reparse);
 
     precallHook(kaitaiIde.ui.layout.constructor.__lm.controls, "DragProxy", () => ga("layout", "window_drag"));
     $("body").on("mousedown", ".lm_drag_handle", () => { ga("layout", "splitter_drag"); });

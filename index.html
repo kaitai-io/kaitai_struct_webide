@@ -64,7 +64,7 @@
 <div id="infoPanel">
     <selection-input :start="selectionStart" :end="selectionEnd" @selectionChanged="selectionChanged"></selection-input>
     <div id="disableLazyParsingDiv">
-        <input type="checkbox" id="disableLazyParsing" />
+        <input type="checkbox" id="disableLazyParsing" v-model="disableLazyParsing" />
         <label for="disableLazyParsing">disable lazy parsing</label>
     </div>
     <div id="unparsedDiv">
@@ -77,10 +77,10 @@
     </div>
     <div id="parsedPathDiv">Selected: <span id="parsedPath"></span></div>
     <div id="exportToJsonDiv">
-        <a id="exportToJson" href="#">export to JSON</a> (<a id="exportToJsonHex" href="#">hex</a>)
+        <a @click="exportToJson(false)" href="#">export to JSON</a> (<a @click="exportToJson(true)" href="#">hex</a>)
     </div>
     <div>
-        <a id="aboutWebIde" href="#">about webide</a>
+        <a id="aboutWebIde" @click="about" href="#">about webide</a>
     </div>
 </div>
     
