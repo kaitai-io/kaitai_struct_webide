@@ -1,7 +1,5 @@
 ﻿import { fss } from "./app.files";
 import { performanceHelper } from "./utils/PerformanceHelper";
-import { ga } from "./app";
-import { showError } from "./app.errors";
 
 class SchemaUtils {
     static ksyNameToJsName(ksyName: string, isProp: boolean) {
@@ -51,6 +49,10 @@ class JsImporter implements io.kaitai.struct.IYamlImporter {
     }
 }
 
+export class CompilationError {
+    constructor(public type: "yaml"|"kaitai", public error: any) { }
+}
+
 export class CompilerService {
     jsImporter = new JsImporter();
     ksySchema: KsySchema.IKsyFile;
@@ -66,9 +68,7 @@ export class CompilerService {
             // we have to modify the schema (add typesByJsName for example) before sending into the compiler so we need a copy
             var compilerSchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
         } catch (parseErr) {
-            ga("compile", "error", `yaml: ${parseErr}`);
-            showError("YAML parsing error: ", parseErr);
-            return;
+            return Promise.reject(new CompilationError("yaml", parseErr));
         }
 
         perfYamlParse.done();
@@ -86,15 +86,9 @@ export class CompilerService {
             //console.log("rReleasePromise", rReleasePromise, "rDebugPromise", rDebugPromise);
             return perfCompile.done(Promise.all([rReleasePromise, rDebugPromise]))
                 .then(([rRelease, rDebug]) => {
-                    ga("compile", "success");
                     //console.log("rRelease", rRelease, "rDebug", rDebug);
                     return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
-                })
-                .catch(compileErr => {
-                    ga("compile", "error", `kaitai: ${compileErr}`);
-                    showError("KS compilation error: ", compileErr);
-                    return;
-                });
+                }).catch(compileErr => Promise.reject(new CompilationError("kaitai", compileErr)));
         }
     }
 }

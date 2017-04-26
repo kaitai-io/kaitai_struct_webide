@@ -1,9 +1,7 @@
-﻿import { ui } from "./app.layout";
-import { handleError } from "./app.errors";
-import { IInterval, IntervalHandler } from "./utils/IntervalHelper";
+﻿import { IInterval, IntervalHandler } from "./utils/IntervalHelper";
 import { s, htmlescape, asciiEncode, hexEncode, collectAllObjects } from "./utils";
 import { workerMethods } from "./app.worker";
-import {app} from "./app";
+import { app } from "./app";
 
 interface IParsedTreeNodeData {
     exported?: IExportedValue;
@@ -36,7 +34,7 @@ export class ParsedTreeHandler {
         this.jstree = jsTreeElement.jstree({
             core: {
                 data: (node: IParsedTreeNode, cb: any) =>
-                    this.getNode(node).then(x => cb(x), e => handleError(e)), themes: { icons: false }, multiple: false, force_text: false
+                    this.getNode(node).then(x => cb(x), e => app.errors.handle(e)), themes: { icons: false }, multiple: false, force_text: false
             }
         }).jstree(true);
         this.jstree.on = (...args: any[]) => (<any>this.jstree).element.on(...args);
@@ -302,7 +300,7 @@ export class ParsedTreeHandler {
 
                 fillIntervals(exp);
 
-                ui.hexViewer.setIntervals(this.intervalHandler);
+                app.ui.hexViewer.setIntervals(this.intervalHandler);
             }
 
             function fillParents(value: IExportedValue, parent: IExportedValue) {

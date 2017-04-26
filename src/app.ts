@@ -1,9 +1,8 @@
 ﻿import * as localforage from "localforage";
 import * as Vue from "vue";
 
-import { ui, getLayoutNodeById } from "./app.layout";
-import { handleError } from "./app.errors";
-import { IFsItem, fss, addKsyFile, refreshFsNodes } from "./app.files";
+import { UI } from "./app.layout";
+import { IFsItem, fss, addKsyFile, refreshFsNodes, initFileTree } from "./app.files";
 import { ParsedTreeHandler, IParsedTreeNode } from "./parsedToTree";
 import { workerMethods } from "./app.worker";
 import { IDataProvider } from "./HexViewer";
@@ -15,7 +14,8 @@ import { componentLoader } from "./ui/ComponentLoader";
 import { ConverterPanelModel } from "./ui/Components/ConverterPanel";
 import { exportToJson } from "./ExportToJson";
 import Component from "./ui/Component";
-import { CompilerService } from "./KaitaiServices";
+import { CompilerService, CompilationError } from "./KaitaiServices";
+import { ErrorWindowHandler } from "./app.errors";
 $.jstree.defaults.core.force_text = true;
 
 export function ga(category: string, action: string, label?: string, value?: number) {
@@ -31,6 +31,7 @@ interface IInterval {
 
 @Component
 class AppVM extends Vue {
+    ui: UI;
     converterPanelModel = new ConverterPanelModel();
 
     selectionStart: number = -1;
@@ -42,23 +43,43 @@ class AppVM extends Vue {
     disableLazyParsing: boolean = false;
 
     public selectInterval(interval: IInterval) { this.selectionChanged(interval.start, interval.end); }
-    public selectionChanged(start: number, end: number) { ui.hexViewer.setSelection(start, end); }
-    public exportToJson(hex: boolean) { exportToJson(hex); }
+    public selectionChanged(start: number, end: number) { this.ui.hexViewer.setSelection(start, end); }
+    public exportToJson(hex: boolean) { exportToJson(hex).then(json => this.ui.layout.addEditorTab("json export", json, "json")); }
     public about() { (<any>$("#welcomeModal")).modal(); }
 }
 
 class AppController {
     compilerService = new CompilerService();
+    ui = new UI();
     vm = new AppVM();
+    errors: ErrorWindowHandler = null;
+
+    init() {
+        this.vm.ui = this.ui;
+        this.ui.init();
+        this.errors = new ErrorWindowHandler(this.ui.layout.getLayoutNodeById("mainArea"));
+        initFileTree();
+    }
 
     dataProvider: IDataProvider;
     ksyFsItemName = "ksyFsItem";
     lastKsyContent: string = null;
     isKsyFile(fn: string) { return fn.toLowerCase().endsWith(".ksy"); }
 
+    compile(srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
+        return this.compilerService.compile(srcYaml, kslang, debug).then(result => {
+            ga("compile", "success");
+            return result;
+        }, (error: CompilationError) => {
+            ga("compile", "error", `${error.type}: ${error.error}`);
+            this.errors.handle(error.error);
+            return Promise.reject(error);
+        });
+    }
+
     recompile() {
         return localforage.getItem<IFsItem>(this.ksyFsItemName).then(ksyFsItem => {
-            var srcYaml = ui.ksyEditor.getValue();
+            var srcYaml = this.ui.ksyEditor.getValue();
             var changed = this.lastKsyContent !== srcYaml;
 
             var copyPromise = <Promise<any>>Promise.resolve();
@@ -67,13 +88,13 @@ class AppController {
                     .then(fsItem => localforage.setItem(this.ksyFsItemName, fsItem));
 
             return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
-                return this.compilerService.compile(srcYaml, "javascript", "both").then(compiled => {
+                return this.compile(srcYaml, "javascript", "both").then(compiled => {
                     if (!compiled) return;
                     var fileNames = Object.keys(compiled.release);
 
                     console.log("ksyFsItem", ksyFsItem);
-                    ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(""), -1);
-                    ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(""), -1);
+                    this.ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(""), -1);
+                    this.ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(""), -1);
                     return this.reparse();
                 });
             });
@@ -86,9 +107,9 @@ class AppController {
     inputReady: Promise<any> = null;
 
     reparse() {
-        handleError(null);
+        this.errors.handle(null);
         return performanceHelper.measureAction("Parse initialization", Promise.all([this.inputReady, this.formatReady]).then(() => {
-            var debugCode = ui.genCodeDebugViewer.getValue();
+            var debugCode = this.ui.genCodeDebugViewer.getValue();
             var jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
             return workerMethods.initCode(debugCode, jsClassName, this.compilerService.ksyTypes);
         })).then(() => {
@@ -97,14 +118,14 @@ class AppController {
                 //console.log("reparse exportedRoot", exportedRoot);
                 kaitaiIde.root = exportedRoot;
 
-                ui.parsedDataTreeHandler = new ParsedTreeHandler(ui.parsedDataTreeCont.getElement(), exportedRoot, this.compilerService.ksyTypes);
-                performanceHelper.measureAction("Tree / interval handling", ui.parsedDataTreeHandler.initNodeReopenHandling())
-                    .then(() => ui.hexViewer.onSelectionChanged(), e => handleError(e));
+                this.ui.parsedDataTreeHandler = new ParsedTreeHandler(this.ui.parsedDataTreeCont.getElement(), exportedRoot, this.compilerService.ksyTypes);
+                performanceHelper.measureAction("Tree / interval handling", this.ui.parsedDataTreeHandler.initNodeReopenHandling())
+                    .then(() => this.ui.hexViewer.onSelectionChanged(), e => this.errors.handle(e));
 
-                ui.parsedDataTreeHandler.jstree.on("select_node.jstree", function (e, selectNodeArgs) {
+                this.ui.parsedDataTreeHandler.jstree.on("select_node.jstree", (e, selectNodeArgs) => {
                     var node = <IParsedTreeNode>selectNodeArgs.node;
                     //console.log("node", node);
-                    var exp = ui.parsedDataTreeHandler.getNodeData(node).exported;
+                    var exp = this.ui.parsedDataTreeHandler.getNodeData(node).exported;
 
                     if (exp && exp.path)
                         $("#parsedPath").text(exp.path.join("/"));
@@ -112,12 +133,12 @@ class AppController {
                     if (!this.blockRecursive && exp && exp.start < exp.end) {
                         this.selectedInTree = true;
                         //console.log("setSelection", exp.ioOffset, exp.start);
-                        ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
+                        this.ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
                         this.selectedInTree = false;
                     }
                 });
 
-            }, error => handleError(error)));
+            }, error => this.errors.handle(error)));
         });
     }
 
@@ -134,9 +155,10 @@ class AppController {
                 localforage.setItem(this.ksyFsItemName, fsItem);
                 this.lastKsyFsItem = fsItem;
                 this.lastKsyContent = content;
-                if (ui.ksyEditor.getValue() !== content)
-                    ui.ksyEditor.setValue(content, -1);
-                getLayoutNodeById("ksyEditor").container.setTitle(fsItem.fn);
+                if (this.ui.ksyEditor.getValue() !== content)
+                    this.ui.ksyEditor.setValue(content, -1);
+                var ksyEditor = this.ui.layout.getLayoutNodeById("ksyEditor");
+                (<any>ksyEditor).container.setTitle(fsItem.fn);
                 return Promise.resolve();
             } else {
                 this.inputFsItem = fsItem;
@@ -151,9 +173,9 @@ class AppController {
                     }
                 };
 
-                ui.hexViewer.setDataProvider(this.dataProvider);
-                getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
-                return workerMethods.setInput(content).then(() => refreshGui ? this.reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
+                this.ui.hexViewer.setDataProvider(this.dataProvider);
+                this.ui.layout.getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
+                return workerMethods.setInput(content).then(() => refreshGui ? this.reparse().then(() => this.ui.hexViewer.resize()) : Promise.resolve());
             }
         });
     }
@@ -165,6 +187,32 @@ class AppController {
                 refreshFsNodes();
                 return fsItems.length === 1 ? this.loadFsItem(fsItems[0]) : Promise.resolve(null);
             });
+    }
+
+    refreshSelectionInput() {
+        this.vm.selectionStart = this.ui.hexViewer.selectionStart;
+        this.vm.selectionEnd = this.ui.hexViewer.selectionEnd;
+    }
+
+    onHexViewerSelectionChanged() {
+        //console.log("setSelection", ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
+        localStorage.setItem("selection", JSON.stringify({ start: this.ui.hexViewer.selectionStart, end: this.ui.hexViewer.selectionEnd }));
+
+        var start = this.ui.hexViewer.selectionStart;
+        var hasSelection = start !== -1;
+
+        this.refreshSelectionInput();
+
+        if (this.ui.parsedDataTreeHandler && hasSelection && !this.selectedInTree) {
+            var intervals = this.ui.parsedDataTreeHandler.intervalHandler.searchRange(this.ui.hexViewer.mouseDownOffset || start);
+            if (intervals.items.length > 0) {
+                //console.log("selected node", intervals[0].id);
+                this.blockRecursive = true;
+                this.ui.parsedDataTreeHandler.activatePath(intervals.items[0].exp.path).then(() => this.blockRecursive = false);
+            }
+        }
+
+        this.vm.converterPanelModel.update(this.dataProvider, start);
     }
 }
 
@@ -185,42 +233,18 @@ $(() => {
     if (localStorage.getItem("doNotShowWelcome") !== "true")
         (<any>$("#welcomeModal")).modal();
 
+    app.init();
     componentLoader.load(["ConverterPanel", "Stepper", "SelectionInput"]).then(() => {
-        console.log(app.vm);
-        new Vue({ el: "#converterPanel", data: { model: app.vm.converterPanelModel } });
+        new Vue({ data: { model: app.vm.converterPanelModel } }).$mount("#converterPanel");
         app.vm.$mount("#infoPanel");
         app.vm.$watch("disableLazyParsing", () => app.reparse());
     });
 
-    function refreshSelectionInput() {
-        app.vm.selectionStart = ui.hexViewer.selectionStart;
-        app.vm.selectionEnd = ui.hexViewer.selectionEnd;
-    }
+    app.ui.hexViewer.onSelectionChanged = () => app.onHexViewerSelectionChanged();
 
-    ui.hexViewer.onSelectionChanged = () => {
-        //console.log("setSelection", ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
-        localStorage.setItem("selection", JSON.stringify({ start: ui.hexViewer.selectionStart, end: ui.hexViewer.selectionEnd }));
+    app.refreshSelectionInput();
 
-        var start = ui.hexViewer.selectionStart;
-        var hasSelection = start !== -1;
-
-        refreshSelectionInput();
-
-        if (ui.parsedDataTreeHandler && hasSelection && !app.selectedInTree) {
-            var intervals = ui.parsedDataTreeHandler.intervalHandler.searchRange(ui.hexViewer.mouseDownOffset || start);
-            if (intervals.items.length > 0) {
-                //console.log("selected node", intervals[0].id);
-                app.blockRecursive = true;
-                ui.parsedDataTreeHandler.activatePath(intervals.items[0].exp.path).then(() => app.blockRecursive = false);
-            }
-        }
-
-        app.vm.converterPanelModel.update(app.dataProvider, start);
-    };
-
-    refreshSelectionInput();
-
-    ui.genCodeDebugViewer.commands.addCommand({
+    app.ui.genCodeDebugViewer.commands.addCommand({
         name: "compile",
         bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
         exec: function (editor: any) { app.reparse(); }
@@ -239,16 +263,16 @@ $(() => {
     app.inputReady.then(() => {
         var storedSelection = JSON.parse(localStorage.getItem("selection"));
         if (storedSelection)
-            ui.hexViewer.setSelection(storedSelection.start, storedSelection.end);
+            app.ui.hexViewer.setSelection(storedSelection.start, storedSelection.end);
     });
 
     var editDelay = new Delayed(500);
-    ui.ksyEditor.on("change", () => editDelay.do(() => app.recompile()));
+    app.ui.ksyEditor.on("change", () => editDelay.do(() => app.recompile()));
 
     var inputContextMenu = $("#inputContextMenu");
     var downloadInput = $("#inputContextMenu .downloadItem");
     $("#hexViewer").on("contextmenu", e => {
-        downloadInput.toggleClass("disabled", ui.hexViewer.selectionStart === -1);
+        downloadInput.toggleClass("disabled", app.ui.hexViewer.selectionStart === -1);
         inputContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
         return false;
     });
@@ -268,13 +292,13 @@ $(() => {
     });
 
     ctxAction(downloadInput, e => {
-        var start = ui.hexViewer.selectionStart, end = ui.hexViewer.selectionEnd;
+        var start = app.ui.hexViewer.selectionStart, end = app.ui.hexViewer.selectionEnd;
         var newFn = `${app.inputFsItem.fn.split("/").last()}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
         saveFile(new Uint8Array(app.inputContent, start, end - start + 1), newFn);
     });
 
-    kaitaiIde.ui = ui;
+    kaitaiIde.app = app;
 
-    precallHook(kaitaiIde.ui.layout.constructor.__lm.controls, "DragProxy", () => ga("layout", "window_drag"));
+    precallHook(app.ui.layout.layout.constructor["__lm"].controls, "DragProxy", () => ga("layout", "window_drag"));
     $("body").on("mousedown", ".lm_drag_handle", () => { ga("layout", "splitter_drag"); });
 });

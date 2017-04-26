@@ -1,6 +1,4 @@
 ﻿import { workerMethods } from "./app.worker";
-import { addEditorTab } from "./app.layout";
-import { handleError } from "./app.errors";
 
 export function exportToJson(useHex: boolean = false) {
     var indentLen = 2;
@@ -43,9 +41,9 @@ export function exportToJson(useHex: boolean = false) {
         }
     }
 
-    workerMethods.reparse(true).then(exportedRoot => {
+    return workerMethods.reparse(true).then(exportedRoot => {
         console.log("exported", exportedRoot);
         expToNative(exportedRoot);
-        addEditorTab("json export", result, "json");
-    }, error => handleError(error));
+        return result;
+    });
 };

@@ -1,6 +1,5 @@
 ﻿import * as localforage from "localforage";
 
-import { ui, addEditorTab } from "./app.layout";
 import { ga, app } from "./app";
 import { IJSTreeNode } from "./parsedToTree";
 import { downloadFile, saveFile, openFilesWithDialog } from "./utils";
@@ -130,31 +129,29 @@ function genChildNodes(obj: IFsItem): any {
 }
 
 export function refreshFsNodes() {
-    var localStorageNode = ui.fileTree.get_node("localStorage");
+    var localStorageNode = app.ui.fileTree.get_node("localStorage");
     return localFs.getRootNode().then(root => {
-        ui.fileTree.delete_node(localStorageNode.children);
+        app.ui.fileTree.delete_node(localStorageNode.children);
         if (root)
-            genChildNodes(root).forEach((node: any) => ui.fileTree.create_node(localStorageNode, node));
+            genChildNodes(root).forEach((node: any) => app.ui.fileTree.create_node(localStorageNode, node));
     });
 }
 
 export function addKsyFile(parent: string | Element, ksyFn: string, content: string) {
     var name = ksyFn.split("/").last();
     return fss.local.put(name, content).then((fsItem: IFsItem) => {
-        ui.fileTree.create_node(ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: "glyphicon glyphicon-list-alt" },
-            "last", (node: any) => ui.fileTree.activate_node(node, null));
+        app.ui.fileTree.create_node(app.ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: "glyphicon glyphicon-list-alt" },
+            "last", (node: any) => app.ui.fileTree.activate_node(node, null));
         return app.loadFsItem(fsItem, true);
     });
 }
 
 var fileTreeCont: JQuery;
 
-$(() => {
-    if (!ui.fileTreeCont) return;
+export function initFileTree() {
+    fileTreeCont = app.ui.fileTreeCont.find(".fileTree");
 
-    fileTreeCont = ui.fileTreeCont.find(".fileTree");
-
-    ui.fileTree = fileTreeCont.jstree({
+    app.ui.fileTree = fileTreeCont.jstree({
         core: {
             check_callback: function (operation: string, node: any, node_parent: any, node_position: number, more: boolean) {
                 var result = true;
@@ -219,23 +216,23 @@ $(() => {
     }
 
     function saveTree() {
-        localFs.setRootNode(convertTreeNode(ui.fileTree.get_json()[1]));
+        localFs.setRootNode(convertTreeNode(app.ui.fileTree.get_json()[1]));
     }
 
     var contextMenuTarget: string|Element = null;
 
     function getSelectedData() {
-        var selected = ui.fileTree.get_selected();
-        return selected.length >= 1 ? <IFsItem>ui.fileTree.get_node(selected[0]).data : null;
+        var selected = app.ui.fileTree.get_selected();
+        return selected.length >= 1 ? <IFsItem>app.ui.fileTree.get_node(selected[0]).data : null;
     }
 
     fileTreeCont.on("contextmenu", ".jstree-node", e => {
         contextMenuTarget = e.target;
 
-        var clickNodeId = ui.fileTree.get_node(contextMenuTarget).id;
-        var selectedNodeIds = ui.fileTree.get_selected();
+        var clickNodeId = app.ui.fileTree.get_node(contextMenuTarget).id;
+        var selectedNodeIds = app.ui.fileTree.get_selected();
         if ($.inArray(clickNodeId, selectedNodeIds) === -1)
-            ui.fileTree.activate_node(contextMenuTarget, null);
+            app.ui.fileTree.activate_node(contextMenuTarget, null);
 
         var data = getSelectedData();
         var isFolder = data && data.type === "folder";
@@ -264,16 +261,16 @@ $(() => {
 
     ctxAction(uiFiles.createFolder, e => {
         var parentData = getSelectedData();
-        ui.fileTree.create_node(ui.fileTree.get_node(contextMenuTarget), {
+        app.ui.fileTree.create_node(app.ui.fileTree.get_node(contextMenuTarget), {
             data: { fsType: parentData.fsType, type: "folder" },
             icon: "glyphicon glyphicon-folder-open"
         }, "last", (node: any) => {
-            ui.fileTree.activate_node(node, null);
-            setTimeout(function () { ui.fileTree.edit(node); }, 0);
+            app.ui.fileTree.activate_node(node, null);
+            setTimeout(function () { app.ui.fileTree.edit(node); }, 0);
         });
     });
 
-    ctxAction(uiFiles.deleteItem, () => ui.fileTree.delete_node(ui.fileTree.get_selected()));
+    ctxAction(uiFiles.deleteItem, () => app.ui.fileTree.delete_node(app.ui.fileTree.get_selected()));
     ctxAction(uiFiles.openItem, () => $(contextMenuTarget).trigger("dblclick"));
 
     ctxAction(uiFiles.generateParser, e => {
@@ -282,12 +279,12 @@ $(() => {
         //console.log(fsItem, linkData);
 
         fss[fsItem.fsType].get(fsItem.fn).then((content: string) => {
-            return app.compilerService.compile(content, linkData.kslang, !!linkData.ksdebug).then(compiled => {
+            return this.compile(content, linkData.kslang, !!linkData.ksdebug).then((compiled: any) => {
                 Object.keys(compiled).forEach(fileName => {
                     //var title = fsItem.fn.split("/").last() + " [" + $(e.target).text() + "]" + (compiled.length == 1 ? "" : ` ${i + 1}/${compiled.length}`);
                     //addEditorTab(title, compItem, linkData.acelang);
 
-                    addEditorTab(fileName, compiled[fileName], linkData.acelang);
+                    app.ui.layout.addEditorTab(fileName, compiled[fileName], linkData.acelang);
                 });
             });
         });
@@ -297,7 +294,7 @@ $(() => {
     fileTreeCont.on("move_node.jstree", () => ga("filetree", "move"));
 
     fileTreeCont.on("create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree", saveTree);
-    fileTreeCont.on("move_node.jstree", (e, data) => ui.fileTree.open_node(ui.fileTree.get_node(data.parent)));
+    fileTreeCont.on("move_node.jstree", (e, data) => app.ui.fileTree.open_node(app.ui.fileTree.get_node(data.parent)));
     fileTreeCont.on("select_node.jstree", (e, selectNodeArgs) => {
         var fsItem = (<IJSTreeNode<IFsItem>>selectNodeArgs.node).data;
         [uiFiles.downloadFile, uiFiles.downloadItem].forEach(i => i.toggleClass("disabled", !(fsItem && fsItem.type === "file")));
@@ -321,8 +318,8 @@ $(() => {
     uiFiles.createLocalKsyFile.on("click", () => showKsyModal("localStorage"));
 
     function downloadFiles() {
-        ui.fileTree.get_selected().forEach(nodeId => {
-            var fsItem = <IFsItem>ui.fileTree.get_node(nodeId).data;
+        app.ui.fileTree.get_selected().forEach(nodeId => {
+            var fsItem = <IFsItem>app.ui.fileTree.get_node(nodeId).data;
             fss[fsItem.fsType].get(fsItem.fn).then(content => saveFile(content, fsItem.fn.split("/").last()));
         });
     }
@@ -338,13 +335,13 @@ $(() => {
         (<any>$("#newKsyModal")).modal("hide");
 
         var ksyName = $("#newKsyName").val();
-        var parentData = ui.fileTree.get_node(ksyParent).data;
+        var parentData = app.ui.fileTree.get_node(ksyParent).data;
 
         addKsyFile(ksyParent, (parentData.fn ? `${parentData.fn}/` : "") + `${ksyName}.ksy`, `meta:\n  id: ${ksyName}\n  file-extension: ${ksyName}\n`);
     });
 
     fileTreeCont.bind("dblclick.jstree", function (event) {
-        app.loadFsItem(<IFsItem>ui.fileTree.get_node(event.target).data);
+        app.loadFsItem(<IFsItem>app.ui.fileTree.get_node(event.target).data);
     });
 
     ctxAction(uiFiles.cloneKsyFile, e => {
@@ -354,4 +351,4 @@ $(() => {
 
         fss[fsItem.fsType].get(fsItem.fn).then((content: string) => addKsyFile("localStorage", newFn, content));
     });
-});
+}
