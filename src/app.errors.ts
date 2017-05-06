@@ -9,13 +9,11 @@ export class ErrorWindowHandler {
 
     async show(...args: any[]) {
         console.error.apply(window, args);
-        console.log('errorWnd', this.errorWnd);
         var errMsg = args.filter(x => x.toString() !== {}.toString()).join(" ");
         if (!this.errorWnd) {
             var newPanel = app.ui.layout.addPanel();
             this.parentContainer.addChild({ type: "component", componentName: newPanel.componentName, title: "Errors" });
             this.errorWnd = await newPanel.donePromise;
-            console.log('errorWnd', this.errorWnd);
             this.errorWnd.setSize(0, this.lastErrWndSize);
             this.errorWnd.getElement().addClass('errorWindow');
         }

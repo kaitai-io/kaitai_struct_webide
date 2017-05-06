@@ -6,9 +6,8 @@
     
     <link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="lib/font-awesome/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="lib/mCustomScrollbar/jquery.mCustomScrollbar.min.css" />
 
-    <script src="lib/jquery/jquery-3.1.1.min.js"></script>
-    <script src="js/autorefresh.js"></script>
     <script src="lib/requirejs/require.js"></script>
     <script src="js/extensions.js"></script>
     <script src="js/kaitaiFsFiles.js"></script>
@@ -17,15 +16,16 @@
         a:hover { text-decoration:none; }
         #treeView { height:500px; width:200px; display:inline-block; margin:0; }
         #info { display:inline-block; vertical-align:top; margin-left:5px }
+        .mCSB_outside+.mCS-minimal.mCSB_scrollTools_vertical { margin: 6px 0}
     </style>
 </head>
 <body>
 hello66
 
 <div id="app">
-    <tree-view id="treeView" :model="fsTree" ref="treeView" @openFile="openFile"></tree-view>    
+    <tree-view id="treeView" :model="fsTree" ref="treeView" @openFile="openFile"></tree-view>
     <div id="info">
-        {{selectedUri}}        
+        {{selectedUri}}
     </div>
 </div>
 
@@ -33,9 +33,15 @@ hello66
     var paths = {};
     ["bowser", "jstree", "localforage", "goldenlayout", "vue"].forEach(
         name => paths[name] = `../lib/${name}/${name}`);
+    paths["jquery"] = "../lib/jquery/jquery-3.1.1.min";
+    paths["jquery.mousewheel"] = "../lib/mCustomScrollbar/jquery.mousewheel.min";
+    paths["jquery.mCustomScrollbar"] = "../lib/mCustomScrollbar/jquery.mCustomScrollbar.min";
 
-    requirejs.config({ baseUrl: "js/", paths: paths });
-    require(["sandbox"]);
+    requirejs.config({ baseUrl: "js/", paths: paths, shim : {
+        'jquery.mCustomScrollbar': { deps: ['jquery', "jquery.mousewheel"] },
+        'autorefresh': { deps: ['jquery'] }
+	} });
+    require(["jquery", "autorefresh", "sandbox"]);
 </script>
 </body>
 </html>

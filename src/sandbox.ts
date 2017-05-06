@@ -11,7 +11,12 @@ import * as Vue from "vue";
 import { componentLoader } from "./ui/ComponentLoader";
 import Component from "./ui/Component";
 import * as View from "./ui/Components/TreeView";
+
 declare var kaitaiFsFiles: string[];
+declare function require(deps: string[], callback: (obj: any[]) => void): void;
+
+for (var i = 0; i < 200; i++)
+    kaitaiFsFiles.push(`formats/archive/test_${i}.ksy`);
 
 var queryParams: { access_token?: string; secret?: string } = {};
 location.search.substr(1).split("&").map(x => x.split("=")).forEach(x => queryParams[x[0]] = x[1]);
@@ -92,8 +97,20 @@ componentLoader.load(["TreeView"]).then(() => {
     window["app"] = app;
 
     var treeView = <TreeView<IFsTreeNode>>app.$refs["treeView"];
+    require(["jquery.mCustomScrollbar"],
+        function (mcs) {
+            console.log('mcs', mcs);
+            $("#treeView").mCustomScrollbar({
+                theme: "minimal",
+                autoDraggerLength: false,
+                scrollInertia: 100,
+                mouseWheel: { enable: true, scrollAmount: 25 },
+                keyboard: { enable: false }
+            });
+        });
     setTimeout(() => {
         treeView.children[0].dblclick();
+        $("#treeView").mCustomScrollbar("update");
         //treeView.children[0].children[3].dblclick();
         //treeView.children[6].dblclick();
     }, 500);
