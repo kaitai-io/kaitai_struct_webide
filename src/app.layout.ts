@@ -4,13 +4,26 @@ import { HexViewer } from "./HexViewer";
 import { ParsedTreeHandler } from "./parsedToTree";
 
 export class LayoutManager<T> {
+    dynCompId = 1;
+
     constructor(public ui: T, public layout: GoldenLayout) { }
 
     getLayoutNodeById(id: string): GoldenLayout.ContentItem {
         return (<any>this.layout)._getAllContentItems().filter((x: any) => x.config.id === id || x.componentName === id)[0];
     }
 
-    dynCompId = 1;
+    addPanel() {
+        let componentName = `dynComp${this.dynCompId++}`;
+        return {
+            componentName,
+            donePromise: <Promise<GoldenLayout.Container>>new Promise((resolve, reject) => {
+                this.layout.registerComponent(componentName, function (container: GoldenLayout.Container, componentState: any) {
+                    resolve(container);
+                });
+            })
+        };
+    }
+
     addEditorTab(title: string, data: string, lang: string = null, parent: string = "codeTab") {
         var componentName = `dynComp${this.dynCompId++}`;
         this.addEditor(componentName, lang, true, (editor: any) => editor.setValue(data, -1));

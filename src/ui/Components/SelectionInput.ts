@@ -61,11 +61,11 @@ export class SelectionInput extends Vue {
     }
 
     inputChanged(ctrl: SelectionInputPart) {
-        if (ctrl.value)
+        if (ctrl.value !== null)
             this.useHexAddr = ctrl.text.startsWith("0x");
 
         var start = this.startPart.value;
         var end = this.endPart.value;
-        this.$emit("selectionchanged", start || -1, (end === null || end < start ? start : end) || -1);
+        this.$emit("selectionchanged", start !== null ? start : -1, end === null || end < start ? start : end);
     }
 }

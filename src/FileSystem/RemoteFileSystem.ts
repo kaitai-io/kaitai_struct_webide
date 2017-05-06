@@ -12,7 +12,7 @@ export class RemoteFileSystem implements IFileSystem {
 
     private getFsUri(uri: string) { return new FsUri(uri, 2); }
 
-    request(method: string, url: string, headers?: { [name: string]: string }, responseType?: string, requestData?: Blob|ArrayBuffer) {
+    request(method: string, url: string, headers?: { [name: string]: string }, responseType?: XMLHttpRequestResponseType, requestData?: Blob|ArrayBuffer) {
         return new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();
             xhr.open(method, url, true);

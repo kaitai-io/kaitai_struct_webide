@@ -1,2 +1,2 @@
 var kaitaiIde: any = kaitaiIde || {};
-kaitaiIde.version = "0.1.0.3029";
+kaitaiIde.version = "0.1.0.3042";

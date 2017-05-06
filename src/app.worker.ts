@@ -10,8 +10,8 @@ worker.onmessage = (ev: MessageEvent) => {
 };
 
 var lastMsgId = 0;
-function workerCall(request: IWorkerMessage): Promise<any> {
-    return new Promise((resolve, reject) => {
+function workerCall(request: IWorkerMessage) {
+    return new Promise<any>((resolve, reject) => {
         request.msgId = ++lastMsgId;
         msgHandlers[request.msgId] = response => {
             if (response.error) {
@@ -29,10 +29,10 @@ function workerCall(request: IWorkerMessage): Promise<any> {
 
 export var workerMethods = {
     initCode: (sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes) => {
-        return workerCall({ type: "initCode", args: [sourceCode, mainClassName, ksyTypes] });
+        return <Promise<void>>workerCall({ type: "initCode", args: [sourceCode, mainClassName, ksyTypes] });
     },
     setInput: (inputBuffer: ArrayBuffer) => {
-        return workerCall({ type: "setInput", args: [inputBuffer] });
+        return <Promise<void>>workerCall({ type: "setInput", args: [inputBuffer] });
     },
     reparse: (eagerMode: boolean) => {
         return <Promise<IExportedValue>>workerCall({ type: "reparse", args: [eagerMode] });

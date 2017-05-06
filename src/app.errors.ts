@@ -1,24 +1,28 @@
 ﻿import { htmlescape } from "./utils";
-import { ga } from "./app";
+import { app, ga } from "./app";
 
 export class ErrorWindowHandler {
     lastErrWndSize = 100; // 34
-    errorWnd: GoldenLayout.ContentItem = null;
+    errorWnd: GoldenLayout.Container = null;
 
     constructor(public parentContainer: GoldenLayout.ContentItem) { }
 
-    show(...args: any[]) {
+    async show(...args: any[]) {
         console.error.apply(window, args);
+        console.log('errorWnd', this.errorWnd);
         var errMsg = args.filter(x => x.toString() !== {}.toString()).join(" ");
         if (!this.errorWnd) {
-            this.errorWnd = this.parentContainer.layoutManager._$normalizeContentItem({ type: "component", componentName: "errorWindow", title: "Errors" }, this.parentContainer);
-            this.parentContainer.addChild(this.errorWnd);
-            <any>this.errorWnd.setSize(0, this.lastErrWndSize);
+            var newPanel = app.ui.layout.addPanel();
+            this.parentContainer.addChild({ type: "component", componentName: newPanel.componentName, title: "Errors" });
+            this.errorWnd = await newPanel.donePromise;
+            console.log('errorWnd', this.errorWnd);
+            this.errorWnd.setSize(0, this.lastErrWndSize);
+            this.errorWnd.getElement().addClass('errorWindow');
         }
         this.errorWnd.on("resize", () => this.lastErrWndSize = this.errorWnd.getElement().outerHeight());
-        this.errorWnd.on("destroy", () => { ga("errorwnd", "destroy"); });
+        this.errorWnd.on("destroy", () => { ga("errorwnd", "destroy"); this.errorWnd = null; });
         this.errorWnd.on("close", () => { ga("errorwnd", "close"); this.errorWnd = null; });
-        this.errorWnd.getElement().children().html(htmlescape(errMsg).replace(/\n|\\n/g, "<br>"));
+        this.errorWnd.getElement().empty().append($("<div>").html(htmlescape(errMsg).replace(/\n|\\n/g, "<br>")));
     }
 
     hide() {

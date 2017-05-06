@@ -87,7 +87,7 @@ class AppController {
                 copyPromise = addKsyFile("localStorage", ksyFsItem.fn.replace(".ksy", "_modified.ksy"), srcYaml)
                     .then(fsItem => localforage.setItem(this.ksyFsItemName, fsItem));
 
-            return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
+            return copyPromise.then<any>(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
                 return this.compile(srcYaml, "javascript", "both").then(compiled => {
                     if (!compiled) return;
                     var fileNames = Object.keys(compiled.release);
@@ -107,7 +107,6 @@ class AppController {
     inputReady: Promise<any> = null;
 
     reparse() {
-        this.errors.handle(null);
         return performanceHelper.measureAction("Parse initialization", Promise.all([this.inputReady, this.formatReady]).then(() => {
             var debugCode = this.ui.genCodeDebugViewer.getValue();
             var jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
@@ -138,6 +137,7 @@ class AppController {
                     }
                 });
 
+                this.errors.handle(null);
             }, error => this.errors.handle(error)));
         });
     }
@@ -175,7 +175,8 @@ class AppController {
 
                 this.ui.hexViewer.setDataProvider(this.dataProvider);
                 this.ui.layout.getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
-                return workerMethods.setInput(content).then(() => refreshGui ? this.reparse().then(() => this.ui.hexViewer.resize()) : Promise.resolve());
+                return workerMethods.setInput(content).then(() => <Promise<void>>(refreshGui ?
+                    this.reparse().then(() => this.ui.hexViewer.resize()) : Promise.resolve()));
             }
         });
     }
