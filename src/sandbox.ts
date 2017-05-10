@@ -11,6 +11,8 @@ import * as Vue from "vue";
 import { componentLoader } from "./ui/ComponentLoader";
 import Component from "./ui/Component";
 import * as View from "./ui/Components/TreeView";
+//import Scrollbar from 'smooth-scrollbar';
+declare var Scrollbar: any;
 
 declare var kaitaiFsFiles: string[];
 declare function require(deps: string[], callback: (obj: any[]) => void): void;
@@ -97,20 +99,21 @@ componentLoader.load(["TreeView"]).then(() => {
     window["app"] = app;
 
     var treeView = <TreeView<IFsTreeNode>>app.$refs["treeView"];
-    require(["jquery.mCustomScrollbar"],
-        function (mcs) {
-            console.log('mcs', mcs);
-            $("#treeView").mCustomScrollbar({
-                theme: "minimal",
-                autoDraggerLength: false,
-                scrollInertia: 100,
-                mouseWheel: { enable: true, scrollAmount: 25 },
-                keyboard: { enable: false }
-            });
-        });
+    //require(["jquery.mCustomScrollbar"],
+    //    function (mcs) {
+    //        console.log('mcs', mcs);
+    //        $("#treeView").mCustomScrollbar({
+    //            theme: "minimal",
+    //            autoDraggerLength: false,
+    //            scrollInertia: 100,
+    //            mouseWheel: { enable: true/*, scrollAmount: 110*/ },
+    //            keyboard: { enable: false }
+    //        });
+    //    });
     setTimeout(() => {
         treeView.children[0].dblclick();
-        $("#treeView").mCustomScrollbar("update");
+        Scrollbar.init(document.getElementById('treeView'));
+        //$("#treeView").mCustomScrollbar("update");
         //treeView.children[0].children[3].dblclick();
         //treeView.children[6].dblclick();
     }, 500);
