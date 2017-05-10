@@ -6,11 +6,13 @@
     .treeView a { white-space:nowrap; }
     .treeView .selected>a { color:white; }
     .treeView .header:hover a { color:white; }
+    .treeView .header a i { padding-left: 8px }
     .treeView .header:hover .wholerow { background:#666; }
     .treeView .header.selected>.wholerow { background:rgba(95, 162, 219, 1); }
     .treeView .wholerow { position: absolute; left: 0; width:100%; transition: background-color 0.15s, box-shadow 0.15s; }
     .treeView .bold { font-weight: bold; }
-    .treeView, .treeView ul { padding-left: 10px; line-height: 1.5em; list-style-type: none; }
+    .treeView, .treeView ul { padding-left:0; line-height: 1.5em; list-style-type: none; }
+    .treeView ul { padding-left: 10px }
     @keyframes loading-indicator-spin {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
