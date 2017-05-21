@@ -2,8 +2,8 @@
 import { IFileSystem, FsItem } from "./Common";
 import * as localforage from "localforage";
 
-export class LocalFileSystem implements IFileSystem {
-    scheme: string = "local";
+export class BrowserFileSystem implements IFileSystem {
+    scheme = ["browser"];
 
     private lfCache: { [name: string]: LocalForage } = {};
 

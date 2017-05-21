@@ -33,36 +33,7 @@
 hello66
 
 <div id="app">
-    <tree-view id="fsTree" :model="fsTree" ref="fsTree" @item-dblclick="openFile" 
-                @item-contextmenu="showContextMenu"></tree-view>
-    <context-menu ref="ctxMenu">
-        <template scope="_">
-            <menu-item icon="glyphicon-pencil" @click="openFile">Open</menu-item>
-            <menu-item icon="glyphicon-folder-open" @click="createFolder" :enabled="_.item.isFolder">Create folder</menu-item>
-            <menu-item icon="glyphicon-list-alt" @click="createKsyFile" :enabled="_.item.isFolder">Create .ksy file</menu-item>
-            <menu-item icon="fa fa-clone" @click="cloneKsyFile">Clone</menu-item>
-            <menu-item icon="glyphicon-flash">
-                Generate parser
-                <template slot="submenu">
-                    <menu-item @click="generateParser('cpp_stl', 'c_cpp')">CPP-STL</menu-item>
-                    <menu-item @click="generateParser('csharp')"          >C#</menu-item>
-                    <menu-item @click="generateParser('graphviz', 'dot')" >Graphiz</menu-item>
-                    <menu-item @click="generateParser('java')"            >Java</menu-item>
-                    <menu-item @click="generateParser('java', true)"      >Java (debug)</menu-item>
-                    <menu-item @click="generateParser('javascript')"      >JavaScript</menu-item>
-                    <menu-item @click="generateParser('javascript', true)">JavaScript(debug)</menu-item>
-                    <menu-item @click="generateParser('perl')"            >Perl</menu-item>
-                    <menu-item @click="generateParser('php')"             >PHP</menu-item>
-                    <menu-item @click="generateParser('python')"          >Python</menu-item>
-                    <menu-item @click="generateParser('ruby')"            >Ruby</menu-item>
-                    <menu-item @click="generateParser('ruby', true)"      >Ruby (debug)</menu-item>
-                    <menu-item @click="generateParser('json')"            >JSON</menu-item>
-                </template>
-            </menu-item>
-            <menu-item icon="glyphicon-cloud-download" @click="downloadFile">Download</menu-item>
-            <menu-item icon="glyphicon-remove" @click="deleteFile">Delete</menu-item>
-        </template>
-    </context-menu>
+    <file-tree ref="fileTree" @open-file="openFile" @generate-parser="generateParser"></file-tree>
     <div id="info">
         {{selectedUri}}
     </div>

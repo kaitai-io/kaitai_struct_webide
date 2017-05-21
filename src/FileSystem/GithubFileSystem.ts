@@ -36,7 +36,7 @@ export class GithubFsItem implements IFsItem {
 }
 
 export class GithubFileSystem implements IFileSystem {
-    scheme: string = "github";
+    scheme = ["github"];
 
     constructor(public client: GithubClient) { }
 

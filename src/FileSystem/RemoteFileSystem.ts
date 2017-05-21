@@ -1,44 +1,20 @@
 ﻿import { FsUri } from "./FsUri";
 import { IFileSystem, FsItem } from "./Common";
+import {WebHelper} from "../utils/WebHelper";
 
 interface IListResponse {
     files: [{ fn: string, isDir: boolean }];
 }
 
 export class RemoteFileSystem implements IFileSystem {
-    scheme: string = "remote";
+    scheme = ["remote"];
 
     public mappings: { [path: string]: { secret: string } } = {};
 
     private getFsUri(uri: string) { return new FsUri(uri, 2); }
 
     request(method: string, url: string, headers?: { [name: string]: string }, responseType?: XMLHttpRequestResponseType, requestData?: Blob|ArrayBuffer) {
-        return new Promise((resolve, reject) => {
-            var xhr = new XMLHttpRequest();
-            xhr.open(method, url, true);
-            if (responseType)
-                xhr.responseType = responseType;
-
-            if(headers)
-                for (var hdrName in headers)
-                    if (headers.hasOwnProperty(hdrName))
-                        xhr.setRequestHeader(hdrName, headers[hdrName]);
-
-            xhr.onload = e => {
-                if (200 <= xhr.status && xhr.status <= 299) {
-                    var contentType = xhr.getResponseHeader("content-type");
-                    if (contentType === "application/json" && !responseType)
-                        resolve(JSON.parse(xhr.response));
-                    else
-                        resolve(xhr.response);
-                }
-                else
-                    reject(xhr.response);
-            };
-
-            xhr.onerror = e => reject(e);
-            xhr.send(requestData);
-        });
+        return WebHelper.request(method, url, headers, responseType, requestData);
     }
 
     execute<T>(method: string, uri: string, binaryResponse: boolean = false, postData: ArrayBuffer = null): Promise<T> {

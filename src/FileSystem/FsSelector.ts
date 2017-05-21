@@ -1,12 +1,13 @@
 ﻿import { IFileSystem, IFsItem } from "./Common";
 
 export class FsSelector implements IFileSystem {
-    scheme: string;
+    scheme: string[] = [];
 
     public filesystems: { [scheme: string]: IFileSystem } = {};
 
     addFs(fs: IFileSystem) {
-        this.filesystems[fs.scheme] = fs;
+        for (var scheme of fs.scheme)
+            this.filesystems[scheme] = fs;
     }
 
     getFs(uri: string): IFileSystem {

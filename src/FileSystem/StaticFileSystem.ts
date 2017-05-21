@@ -2,11 +2,11 @@
 import { FsUri } from "./FsUri";
 
 export class StaticFileSystem implements IFileSystem {
-    scheme: string = "static";
+    scheme = ["static"];
 
     constructor(public files: { [name: string]: ArrayBuffer } = {}) { }
 
-    getUri(uri: string) { return new FsUri(uri, 0, this.scheme); }
+    getUri(uri: string) { return new FsUri(uri, 0, this.scheme[0]); }
 
     createFolder(uri: string): Promise<void> {
         this.files[this.getUri(uri).path] = null;
