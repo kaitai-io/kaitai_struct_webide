@@ -18,6 +18,10 @@ export class FsSelector implements IFileSystem {
         return fs;
     }
 
+    capabilities(uri: string) {
+        return this.getFs(uri).capabilities(uri);
+    };
+
     createFolder(uri: string): Promise<void> {
         return this.getFs(uri).createFolder(uri);
     }

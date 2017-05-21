@@ -7,6 +7,10 @@ export class HttpFileSystem implements IFileSystem {
 
     constructor(public fileUrls: { [name: string]: string } = {}) { }
 
+    capabilities(uri: string) {
+        return { write: false, delete: false };
+    };
+
     createFolder(uri: string): Promise<void> { throw new Error("Not implemented"); }
     write(uri: string, data: ArrayBuffer): Promise<void> { throw new Error("Not implemented"); }
     delete(uri: string): Promise<void> { throw new Error("Not implemented"); }

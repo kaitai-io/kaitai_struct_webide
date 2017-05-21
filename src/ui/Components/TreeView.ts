@@ -6,6 +6,8 @@ import UIHelper from "../UIHelper";
 export interface IFsTreeNode {
     text: string;
     isFolder: boolean;
+    canWrite: boolean;
+    canDelete: boolean;
     children: IFsTreeNode[];
     loadChildren(): Promise<void>;
 }

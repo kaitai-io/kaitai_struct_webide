@@ -1,7 +1,7 @@
 ﻿import { IFileSystem } from "./../../FileSystem/Common";
 import { GithubClient } from "./../../FileSystem/GithubClient";
 import { GithubFileSystem } from "./../../FileSystem/GithubFileSystem";
-import { BrowserFileSystem } from "./../../FileSystem/BrowserFileSystem";
+import { BrowserFileSystem, BrowserLegacyFileSystem } from "./../../FileSystem/BrowserFileSystem";
 import { RemoteFileSystem } from "./../../FileSystem/RemoteFileSystem";
 import { StaticFileSystem } from "./../../FileSystem/StaticFileSystem";
 import { HttpFileSystem } from "../../FileSystem/HttpFileSystem";
@@ -23,6 +23,7 @@ location.search.substr(1).split("&").map(x => x.split("=")).forEach(x => queryPa
 
 var fss = new FsSelector();
 fss.addFs(new BrowserFileSystem());
+fss.addFs(new BrowserLegacyFileSystem());
 
 var remoteFs = new RemoteFileSystem();
 remoteFs.mappings["127.0.0.1:8001/default"] = { secret: queryParams.secret };
@@ -52,6 +53,11 @@ export class FsTreeNode implements IFsTreeNode {
     children: FsTreeNode[] = null;
     icon: string = null;
 
+    get isKsy() { return this.uri.path.endsWith(".ksy"); }
+    get capabilities() { return this.fs.capabilities(this.uri.uri); }
+    get canWrite() { return this.capabilities.write; }
+    get canDelete() { return this.uri.path !== "/" && this.capabilities.delete; }
+
     constructor(public fs: IFileSystem, public uri: FsUri) {
         this.text = uri.name;
         this.isFolder = uri.type === "directory";
@@ -65,6 +71,8 @@ export class FsTreeNode implements IFsTreeNode {
 }
 
 class FsRootNode implements IFsTreeNode {
+    canWrite = false;
+    canDelete = false;
     text: string = "/";
     isFolder: boolean = true;
 
@@ -82,7 +90,8 @@ function addRootNode(text: string, icon: string, uri: string) {
 var fsData = new FsRootNode([
     addRootNode("kaitai.io", "glyphicon-cloud", getRelativeUrl("formats/")),
     addRootNode("koczkatamas/formats", "fa fa-github", "github://koczkatamas/kaitai_struct_formats/"),
-    addRootNode("browser", "glyphicon-cloud", "local:///"),
+    addRootNode("browser", "glyphicon-cloud", "browser:///"),
+    addRootNode("browser (legacy)", "glyphicon-cloud", "browser_legacy:///"),
 ]);
 
 @Component

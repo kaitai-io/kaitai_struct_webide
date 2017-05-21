@@ -44,6 +44,10 @@ export class GithubFileSystem implements IFileSystem {
         return new GithubFsItem(this, uri);
     }
 
+    capabilities(uri: string) {
+        return { write: true, delete: true };
+    };
+
     createFolder(uri: string): Promise<void> {
         return this.getFsItem(uri).createFolder();
     }

@@ -29,6 +29,10 @@ export class RemoteFileSystem implements IFileSystem {
         return this.request(method, url, { "Authorization": "MappingSecret " + mappingConfig.secret }, binaryResponse ? "arraybuffer" : null, postData);
     }
 
+    capabilities(uri: string) {
+        return { write: true, delete: true };
+    };
+
     createFolder(uri: string): Promise<void> {
         return this.execute("PUT", uri).then(x => null);
     }
