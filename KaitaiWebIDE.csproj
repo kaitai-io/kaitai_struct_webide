@@ -34,6 +34,7 @@
     <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\KaitaiServices.ts" />
+    <TypeScriptCompile Include="src\ui\Components\ContextMenu.ts" />
     <TypeScriptCompile Include="src\ui\Components\ConverterPanel.ts" />
     <TypeScriptCompile Include="src\ui\Components\SelectionInput.ts" />
     <TypeScriptCompile Include="src\ui\Components\Stepper.ts" />
@@ -51,6 +52,7 @@
     <TypeScriptCompile Include="src\sandbox.ts" />
     <TypeScriptCompile Include="src\FileSystem\FsUri.ts" />
     <TypeScriptCompile Include="src\FileSystem\GithubClient.ts" />
+    <TypeScriptCompile Include="src\ui\UIHelper.ts" />
     <TypeScriptCompile Include="src\utils\IntervalHelper.ts" />
     <TypeScriptCompile Include="src\utils\PerformanceHelper.ts" />
     <TypeScriptCompile Include="src\utils\TestHelper.ts" />
@@ -78,6 +80,7 @@
     <TypeScriptCompile Include="src\HexViewer.ts" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="src\ui\Components\ContextMenu.html" />
     <Content Include="src\ui\Components\ConverterPanel.html" />
     <Content Include="src\ui\Components\SelectionInput.html" />
     <Content Include="src\ui\Components\Stepper.html" />

@@ -10,7 +10,7 @@ import { TreeView, IFsTreeNode } from "./ui/Components/TreeView";
 import * as Vue from "vue";
 import { componentLoader } from "./ui/ComponentLoader";
 import Component from "./ui/Component";
-import * as View from "./ui/Components/TreeView";
+import {ContextMenu} from "./ui/Components/ContextMenu";
 //import Scrollbar from 'smooth-scrollbar';
 declare var Scrollbar: any;
 
@@ -63,7 +63,7 @@ class FsRootNode implements IFsTreeNode {
     text: string = "/";
     isFolder: boolean = true;
 
-    constructor(public children: View.IFsTreeNode[] = []) { }
+    constructor(public children: IFsTreeNode[] = []) { }
     loadChildren(): Promise<void> { return Promise.resolve(); }
 }
 
@@ -85,34 +85,59 @@ var fsData = new FsRootNode([
 class App extends Vue {
     fsTree: IFsTreeNode = null;
     selectedUri: string = null;
+    contextMenuNode: FsTreeNode; // selectedFsItem can be something else (eg. by pressing down)
 
-    public openFile(file: FsTreeNode) {
-        this.selectedUri = file.uri.uri;
-        console.log("openFile", file);
+    get ctxMenu() { return <ContextMenu>this.$refs["ctxMenu"]; }
+    get fsTreeView() { return <TreeView<FsTreeNode>>this.$refs["fsTree"]; }
+    get selectedFsItem() { return this.fsTreeView.selectedItem.model; }
+
+    public openFile() {
+        console.log('openFile', this.selectedFsItem);
+        this.selectedUri = this.selectedFsItem.uri.uri;
+    }
+
+    public showContextMenu(event: MouseEvent) {
+        this.contextMenuNode = this.selectedFsItem;
+        this.ctxMenu.open(event, this.contextMenuNode);
+    }
+
+    public createFolder() {
+        console.log('createFolder');
+    }
+
+    public createKsyFile() {
+        
+    }
+
+    public cloneKsyFile() {
+        
+    }
+
+    public downloadFile() {
+        
+    }
+
+    public deleteFile() {
+        
+    }
+
+    public generateParser(lang: string) {
+        console.log('generateParser', lang, this.contextMenuNode);
+    }
+
+    updated() {
+        Scrollbar.init(this.fsTreeView.$el);
     }
 }
 
-componentLoader.load(["TreeView"]).then(() => {
+componentLoader.load(["TreeView", "ContextMenu"]).then(() => {
     var app = new App({ el: "#app" });
     app.fsTree = fsData;
     console.log(fsData.children);
     window["app"] = app;
 
-    var treeView = <TreeView<IFsTreeNode>>app.$refs["treeView"];
-    //require(["jquery.mCustomScrollbar"],
-    //    function (mcs) {
-    //        console.log('mcs', mcs);
-    //        $("#treeView").mCustomScrollbar({
-    //            theme: "minimal",
-    //            autoDraggerLength: false,
-    //            scrollInertia: 100,
-    //            mouseWheel: { enable: true/*, scrollAmount: 110*/ },
-    //            keyboard: { enable: false }
-    //        });
-    //    });
     setTimeout(() => {
-        treeView.children[0].dblclick();
-        Scrollbar.init(document.getElementById('treeView'));
+        app.fsTreeView.children[0].dblclick();
         //$("#treeView").mCustomScrollbar("update");
         //treeView.children[0].children[3].dblclick();
         //treeView.children[6].dblclick();

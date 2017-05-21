@@ -5,41 +5,107 @@
 	<meta charset="utf-8" />
     
     <link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap/contextmenu.css" />
     <link rel="stylesheet" type="text/css" href="lib/font-awesome/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="lib/smooth-scrollbar/smooth-scrollbar.css">
     <script src="lib/smooth-scrollbar/smooth-scrollbar.js"></script>
-
+    
+    <script src="lib/jquery/jquery-3.1.1.min.js"></script>
+    <script src="lib/bootstrap/bootstrap.min.js"></script>
     <script src="lib/requirejs/require.js"></script>
     <script src="js/extensions.js"></script>
     <script src="js/kaitaiFsFiles.js"></script>
     <style>
         a { color:#d8d8d8 }
         a:hover { text-decoration:none; }
-        #treeView { height:500px; width:200px; display:inline-block; margin:0; margin-left:10px }
+        #fsTree { height:500px; width:200px; display:inline-block; margin:0; margin-left:10px }
         #info { display:inline-block; vertical-align:top; margin-left:5px }
-        .mCSB_outside+.mCS-minimal.mCSB_scrollTools_vertical { margin: 6px 0}
+
+        .dropdown { position: absolute; z-index:9999; top:0; left:0 }
+        .dropdown-menu { z-index:9999 }
+        .dropdown .dropdown-menu { font-size:13px; border-color:#375a7f; border-radius:0 }
+        .dropdown .glyphicon { margin-right:5px; }
+        .dropdown .glyphicon-folder-open { margin-left:-1px; margin-right:6px }
+        .dropdown .dropdown-menu>li>a { padding:3px 15px }
     </style>
 </head>
 <body>
 hello66
 
 <div id="app">
-    <tree-view id="treeView" :model="fsTree" ref="treeView" @openFile="openFile"></tree-view>
+    <tree-view id="fsTree" :model="fsTree" ref="fsTree" @item-dblclick="openFile" 
+                @item-contextmenu="showContextMenu"></tree-view>
+    <context-menu ref="ctxMenu">
+        <template scope="_">
+            <menu-item icon="glyphicon-pencil" @click="openFile">Open</menu-item>
+            <menu-item icon="glyphicon-folder-open" @click="createFolder" :enabled="_.item.isFolder">Create folder</menu-item>
+            <menu-item icon="glyphicon-list-alt" @click="createKsyFile" :enabled="_.item.isFolder">Create .ksy file</menu-item>
+            <menu-item icon="fa fa-clone" @click="cloneKsyFile">Clone</menu-item>
+            <menu-item icon="glyphicon-flash">
+                Generate parser
+                <template slot="submenu">
+                    <menu-item @click="generateParser('cpp_stl', 'c_cpp')">CPP-STL</menu-item>
+                    <menu-item @click="generateParser('csharp')"          >C#</menu-item>
+                    <menu-item @click="generateParser('graphviz', 'dot')" >Graphiz</menu-item>
+                    <menu-item @click="generateParser('java')"            >Java</menu-item>
+                    <menu-item @click="generateParser('java', true)"      >Java (debug)</menu-item>
+                    <menu-item @click="generateParser('javascript')"      >JavaScript</menu-item>
+                    <menu-item @click="generateParser('javascript', true)">JavaScript(debug)</menu-item>
+                    <menu-item @click="generateParser('perl')"            >Perl</menu-item>
+                    <menu-item @click="generateParser('php')"             >PHP</menu-item>
+                    <menu-item @click="generateParser('python')"          >Python</menu-item>
+                    <menu-item @click="generateParser('ruby')"            >Ruby</menu-item>
+                    <menu-item @click="generateParser('ruby', true)"      >Ruby (debug)</menu-item>
+                    <menu-item @click="generateParser('json')"            >JSON</menu-item>
+                </template>
+            </menu-item>
+            <menu-item icon="glyphicon-cloud-download" @click="downloadFile">Download</menu-item>
+            <menu-item icon="glyphicon-remove" @click="deleteFile">Delete</menu-item>
+        </template>
+    </context-menu>
     <div id="info">
         {{selectedUri}}
     </div>
 </div>
 
+<!--<div id="fileTreeContextMenu" class="dropdown clearfix">
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display:block;position:static;margin-bottom:5px;">
+        <li class="openItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-pencil"></i> Open</a></li>
+        <li class="createFolder"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-folder-open"></i> Create folder</a></li>
+        <li class="createKsyFile"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-list-alt"></i> Create .ksy file</a></li>
+        <li class="cloneKsyFile"><a tabindex="-1" href="#"><i class="glyphicon fa fa-clone"></i> Clone</a></li>
+        <li class="generateParser dropdown-submenu">
+            <a tabindex="-1" href="#"><i class="glyphicon glyphicon-flash"></i> Generate parser</a>
+            <ul class="dropdown-menu">
+                <li><a tabindex="-1" href="#" data-kslang="cpp_stl" data-acelang="c_cpp">CPP-STL</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="csharp" data-acelang="csharp">C#</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="graphviz" data-acelang="dot">Graphviz</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="java" data-acelang="java">Java</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="java" data-ksdebug="true" data-acelang="java">Java (debug)</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="javascript" data-acelang="javascript">JavaScript</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="javascript" data-ksdebug="true" data-acelang="javascript">JavaScript (debug)</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="perl" data-acelang="perl">Perl</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="php" data-acelang="php">PHP</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="python" data-acelang="python">Python</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="ruby" data-acelang="ruby">Ruby</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="ruby" data-ksdebug="true" data-acelang="ruby">Ruby (debug)</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="json" data-acelang="json">JSON</a></li>
+            </ul>
+        </li>
+        <li class="downloadItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-cloud-download"></i> Download</a></li>
+        <li class="deleteItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
+    </ul>
+</div>-->
 <script>
     var paths = {};
     ["bowser", "jstree", "localforage", "goldenlayout", "vue", "smooth-scrollbar"].forEach(
         name => paths[name] = `../lib/${name}/${name}`);
-    paths["jquery"] = "../lib/jquery/jquery-3.1.1.min";
+    //paths["jquery"] = "../lib/jquery/jquery-3.1.1.min";
 
     requirejs.config({ baseUrl: "js/", paths: paths, shim : {
-        'autorefresh': { deps: ['jquery'] }
+        //'autorefresh': { deps: ['jquery'] }
 	} });
-    require(["jquery", "autorefresh", "sandbox"]);
+    require(["autorefresh", "sandbox"]);
 </script>
 </body>
 </html>

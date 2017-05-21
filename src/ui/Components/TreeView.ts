@@ -1,6 +1,7 @@
 ﻿///<reference path="../../../lib/ts-types/vue.d.ts"/>
 import * as Vue from "vue";
 import Component from "../Component";
+import UIHelper from "../UIHelper";
 
 export interface IFsTreeNode {
     text: string;
@@ -28,6 +29,7 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
             this.selectedItem.dblclick();
         else
             this.selectNextNode();
+        this.scrollSelectedIntoView();
     }
 
     closeSelected() {
@@ -35,6 +37,7 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
             this.selectedItem.dblclick();
         else if (this.selectedItem.parent.parent)
             this.setSelected(this.selectedItem.parent);
+        this.scrollSelectedIntoView();
     }
 
     selectNode(node: TreeViewItem<T>, dir: "prev" | "next") {
@@ -109,15 +112,7 @@ export class TreeViewItem<T extends IFsTreeNode> extends Vue {
             this.model.isFolder ? (this.open ? "glyphicon-folder-open" : "glyphicon-folder-close") : "glyphicon-list-alt";
     };
 
-    get treeView() {
-        var res: Vue = this;
-        while (res) {
-            if (res instanceof TreeView)
-                return res;
-            res = res.$parent;
-        }
-        return null;
-    }
+    get treeView() { return UIHelper.findParent(this, TreeView); }
 
     get children() { return <TreeViewItem<T>[]>this.$children; }
     get parent() { return <TreeViewItem<T>>this.$parent; }
@@ -130,11 +125,16 @@ export class TreeViewItem<T extends IFsTreeNode> extends Vue {
                 setTimeout(() => this.model.loadChildren().then(() => this.childrenLoading = false), 0);
             }
         } else {
-            this.treeView.$emit("openfile", this.model);
+            this.treeView.$emit("item-dblclick", this.model);
         }
     }
 
     click() {
         this.treeView.setSelected(this);
+    }
+
+    contextmenu(event: MouseEvent) {
+        this.click();
+        this.treeView.$emit("item-contextmenu", event, this.model);
     }
 }

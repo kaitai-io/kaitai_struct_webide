@@ -1,0 +1,22 @@
+﻿<style>
+</style>
+
+<template id="ContextMenu">
+    <div class="dropdown clearfix" v-if="visible" v-bind:style="{ top: top, left: left }">
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display:block;position:static;margin-bottom:5px;">
+            <slot :item="item"></slot>
+        </ul>
+    </div>
+</template>
+
+<template id="MenuItem">
+    <li :class="{ disabled: !enabled, 'dropdown-submenu': this.$slots.submenu }">
+        <a tabindex="-1" href="#" @click="click">
+            <i class="glyphicon" :class="icon"></i>
+            <slot></slot>
+        </a>
+        <ul class="dropdown-menu" v-if="this.$slots.submenu">
+            <slot name="submenu"></slot>
+        </ul>
+    </li>
+</template>
