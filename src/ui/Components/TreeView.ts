@@ -80,15 +80,19 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
         this.selectNode(this.selectedItem, "prev");
     }
 
+    scrollIntoView(target: Element, alignToTop: boolean) {
+        target.scrollIntoView(false);
+    }
+
     scrollSelectedIntoView() {
         var target = this.selectedItem.$el.children[0];
         var rect = target.getBoundingClientRect();
         var parentRect = this.$el.getBoundingClientRect();
 
         if (rect.bottom > parentRect.bottom)
-            target.scrollIntoView(false);
+            this.scrollIntoView(target, false);
         else if (rect.top < parentRect.top)
-            target.scrollIntoView();
+            this.scrollIntoView(target, true);
     }
 
     setSelected(newSelected: TreeViewItem<T>) {

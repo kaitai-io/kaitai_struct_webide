@@ -126,7 +126,9 @@ class App extends Vue {
     }
 
     updated() {
-        Scrollbar.init(this.fsTreeView.$el);
+        var fsTreeScrollbar = Scrollbar.init(this.fsTreeView.$el);
+        this.fsTreeView.scrollIntoView = (el, alignToTop) => fsTreeScrollbar.scrollIntoView(el, { alignToTop: alignToTop });
+        console.log(this.fsTreeView);
     }
 }
 
