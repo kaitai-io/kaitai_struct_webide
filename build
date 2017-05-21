@@ -20,4 +20,6 @@ cp -r \
 	lib \
 	"$OUT_DIR"
 
+mkdir -p "$OUT_DIR/src/ui/Components"
+cp -r src/ui/Components/*.html "$OUT_DIR/src/ui/Components"
 ./build.py "$OUT_DIR"
