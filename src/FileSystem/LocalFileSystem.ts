@@ -19,6 +19,10 @@ export class LocalFileSystem implements IFileSystem {
         return action(this.lfCache[name], fsUri);
     }
 
+    createFolder(uri: string): Promise<void> {
+        return this.execute(uri, (lf, fsUri) => lf.setItem(fsUri.path, null)).then(x => null);
+    }
+
     read(uri: string): Promise<ArrayBuffer> {
         return this.execute(uri, (lf, fsUri) => lf.getItem(fsUri.path));
     }

@@ -2,6 +2,7 @@
 
 export interface IFileSystem {
     scheme: string;
+    createFolder(uri: string): Promise<void>;
     read(uri: string): Promise<ArrayBuffer>;
     write(uri: string, data: ArrayBuffer): Promise<void>;
     delete(uri: string): Promise<void>;

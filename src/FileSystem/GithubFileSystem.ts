@@ -11,6 +11,10 @@ export class GithubFsItem implements IFsItem {
         this.repo = this.fs.client.getRepo(this.uri.fsData[1], this.uri.fsData[0]);
     }
 
+    createFolder(): Promise<void> {
+        throw new Error("Not implemented");
+    }
+
     read(): Promise<ArrayBuffer> {
         return this.repo.downloadFile(this.uri.path);
     }
@@ -38,6 +42,10 @@ export class GithubFileSystem implements IFileSystem {
 
     getFsItem(uri: string) {
         return new GithubFsItem(this, uri);
+    }
+
+    createFolder(uri: string): Promise<void> {
+        return this.getFsItem(uri).createFolder();
     }
 
     read(uri: string): Promise<ArrayBuffer> {

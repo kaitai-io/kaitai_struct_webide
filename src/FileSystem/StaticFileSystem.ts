@@ -8,6 +8,11 @@ export class StaticFileSystem implements IFileSystem {
 
     getUri(uri: string) { return new FsUri(uri, 0, this.scheme); }
 
+    createFolder(uri: string): Promise<void> {
+        this.files[this.getUri(uri).path] = null;
+        return Promise.resolve();
+    }
+
     read(uri: string): Promise<ArrayBuffer> { return Promise.resolve(this.files[this.getUri(uri).path]); }
 
     write(uri: string, data: ArrayBuffer): Promise<void> {

@@ -53,6 +53,10 @@ export class RemoteFileSystem implements IFileSystem {
         return this.request(method, url, { "Authorization": "MappingSecret " + mappingConfig.secret }, binaryResponse ? "arraybuffer" : null, postData);
     }
 
+    createFolder(uri: string): Promise<void> {
+        return this.execute("PUT", uri).then(x => null);
+    }
+
     read(uri: string): Promise<ArrayBuffer> {
         return this.execute("GET", uri, true);
     }
