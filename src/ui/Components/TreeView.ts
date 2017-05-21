@@ -10,6 +10,9 @@ export interface IFsTreeNode {
     loadChildren(): Promise<void>;
 }
 
+Vue.config.keyCodes["pageup"] = 33;
+Vue.config.keyCodes["pagedown"] = 34;
+
 @Component
 export class TreeView<T extends IFsTreeNode> extends Vue {
     model: T;
@@ -28,7 +31,7 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
         if (!this.selectedItem.open)
             this.selectedItem.dblclick();
         else
-            this.selectNextNode();
+            this.selectNode("next");
         this.scrollSelectedIntoView();
     }
 
@@ -40,7 +43,7 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
         this.scrollSelectedIntoView();
     }
 
-    selectNode(node: TreeViewItem<T>, dir: "prev" | "next") {
+    selectRelativeNode(node: TreeViewItem<T>, dir: "prev" | "next") {
         if (dir === "next") {
             if (node.open && node.children && node.children.length > 0)
                 this.setSelected(node.children[0]);
@@ -72,12 +75,10 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
         }
     }
 
-    selectNextNode(fromNode?: TreeViewItem<T>) {
-        this.selectNode(this.selectedItem, "next");
-    }
-
-    selectPrevNode() {
-        this.selectNode(this.selectedItem, "prev");
+    selectNode(dir: "prev" | "next", pageJump = false) {
+        console.log('selectNode', dir, pageJump);
+        for(var i = 0; i < (pageJump ? 25 : 1); i++)
+            this.selectRelativeNode(this.selectedItem, dir);
     }
 
     scrollIntoView(target: Element, alignToTop: boolean) {

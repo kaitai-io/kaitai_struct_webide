@@ -32,11 +32,9 @@
 </style>
 
 <template id="TreeView">
-    <ul class="treeView" tabindex="0" v-if="model"
-        @keydown.right.prevent="openSelected"
-        @keydown.left.prevent="closeSelected" 
-        @keydown.down.prevent="selectNextNode" 
-        @keydown.up.prevent="selectPrevNode">
+    <ul class="treeView" tabindex="0" v-if="model" @keydown.right.prevent="openSelected" @keydown.left.prevent="closeSelected" 
+        @keydown.down.prevent="selectNode('next')" @keydown.up.prevent="selectNode('prev')"
+        @keydown.pagedown.prevent="selectNode('next', true)" @keydown.pageup.prevent="selectNode('prev', true)">
         <template v-for="child in model.children">
             <tree-view-item :model="child"></tree-view-item>
         </template>
