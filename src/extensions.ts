@@ -1,5 +1,13 @@
 ﻿// #region Array
-interface Array<T> { last(): T; }
+interface ThenBy<T> {
+    thenBy(selector: ((item: T) => any)): ThenBy<T>;
+    sort(): T[];
+}
+
+interface Array<T> {
+    last(): T;
+    sortBy(selector: ((item: T) => any)): ThenBy<T>;
+}
 
 if (!Array.prototype.last) {
     Array.prototype.last = function () { return this[this.length - 1]; };
