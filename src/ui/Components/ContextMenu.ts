@@ -15,8 +15,8 @@ export class ContextMenu extends Vue {
         this.top = event.pageY + "px";
         this.left = event.pageX + "px";
         this.visible = true;
-        window.addEventListener('click', this.clickHandler, true);
-        window.addEventListener('keyup', this.escapeHandler, true);
+        window.addEventListener("click", this.clickHandler, true);
+        window.addEventListener("keyup", this.escapeHandler, true);
     }
 
     escapeHandler(e: KeyboardEvent) {
@@ -30,8 +30,8 @@ export class ContextMenu extends Vue {
     }
 
     hide() {
-        window.removeEventListener('click', this.clickHandler, true);
-        window.removeEventListener('keyup', this.escapeHandler, true);
+        window.removeEventListener("click", this.clickHandler, true);
+        window.removeEventListener("keyup", this.escapeHandler, true);
         this.visible = false;
     }
 }
@@ -43,10 +43,10 @@ export class MenuItem extends Vue {
     get ctxMenu() { return UIHelper.findParent(this, ContextMenu); }
 
     public click(event: MouseEvent) {
-        if (!this.enabled || !('click' in this["_events"])) return;
+        if (!this.enabled || !("click" in this["_events"])) return;
 
         this.ctxMenu.visible = false;
-        this.$emit('click');
+        this.$emit("click");
         event.preventDefault();
     }
 }

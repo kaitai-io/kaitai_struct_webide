@@ -9,12 +9,12 @@ class App extends Vue {
     get fileTree() { return <FileTree>this.$refs["fileTree"]; }
 
     public openFile(fsItem: FsTreeNode, data: ArrayBuffer) {
-        console.log('openFile', fsItem, data);
+        console.log("openFile", fsItem, data);
         this.selectedUri = fsItem.uri.uri;
     }
 
     public generateParser() {
-        console.log('generateParser', arguments);
+        console.log("generateParser", arguments);
     }
 }
 

@@ -1,8 +1,12 @@
 ﻿export class WebHelper {
-    static request(method: string, url: string, headers?: { [name: string]: string }, responseType?: "arraybuffer", requestData?: Blob | ArrayBuffer): Promise<ArrayBuffer>;
-    static request(method: string, url: string, headers?: { [name: string]: string }, responseType?: XMLHttpRequestResponseType, requestData?: Blob | ArrayBuffer): Promise<any>;
+    static request(method: string, url: string, headers?: { [name: string]: string },
+        responseType?: "arraybuffer", requestData?: Blob | ArrayBuffer): Promise<ArrayBuffer>;
+    static request(method: string, url: string, headers?: { [name: string]: string },
+        responseType?: XMLHttpRequestResponseType, requestData?: Blob | ArrayBuffer): Promise<any>;
 
-    static request(method: string, url: string, headers?: { [name: string]: string }, responseType?: XMLHttpRequestResponseType, requestData?: Blob | ArrayBuffer): Promise<any> {
+    static request(method: string, url: string, headers?: { [name: string]: string },
+        responseType?: XMLHttpRequestResponseType, requestData?: Blob | ArrayBuffer): Promise<any>
+    {
         return new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();
             xhr.open(method, url, true);
@@ -29,5 +33,5 @@
             xhr.onerror = e => reject(e);
             xhr.send(requestData);
         });
-    }    
+    }
 }

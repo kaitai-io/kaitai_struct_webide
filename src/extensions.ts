@@ -1,12 +1,12 @@
 ﻿// #region Array
-interface ThenBy<T> {
-    thenBy(selector: ((item: T) => any)): ThenBy<T>;
+interface IThenBy<T> {
+    thenBy(selector: ((item: T) => any)): IThenBy<T>;
     sort(): T[];
 }
 
 interface Array<T> {
     last(): T;
-    sortBy(selector: ((item: T) => any)): ThenBy<T>;
+    sortBy(selector: ((item: T) => any)): IThenBy<T>;
 }
 
 if (!Array.prototype.last) {

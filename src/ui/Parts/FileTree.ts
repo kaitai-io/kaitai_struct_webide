@@ -9,7 +9,6 @@ import { FsUri } from "./../../FileSystem/FsUri";
 import { FsSelector } from "./../../FileSystem/FsSelector";
 import { TreeView, IFsTreeNode } from "./../Components/TreeView";
 import * as Vue from "vue";
-import { componentLoader } from "./../ComponentLoader";
 import Component from "./../Component";
 import { ContextMenu } from "./../Components/ContextMenu";
 declare var Scrollbar: any;
@@ -38,7 +37,7 @@ kaitaiFsFiles.forEach(fn => staticFs.write("static://" + fn, new ArrayBuffer(0))
 fss.addFs(staticFs);
 
 function getRelativeUrl(url: string) {
-    var a = document.createElement('a');
+    var a = document.createElement("a");
     a.href = url;
     return a.href;
 }
@@ -121,7 +120,7 @@ export class FileTree extends Vue {
 
     public openFile() {
         fss.read(this.selectedUri).then(data => {
-            this.$emit('open-file', this.selectedFsItem, data);
+            this.$emit("open-file", this.selectedFsItem, data);
         });
     }
 
@@ -130,7 +129,7 @@ export class FileTree extends Vue {
         var debug = typeof aceLangOrDebug === "boolean" ? aceLangOrDebug : false;
 
         fss.read(this.selectedUri).then(data => {
-            this.$emit('generate-parser', lang, aceLang, debug, data);
+            this.$emit("generate-parser", lang, aceLang, debug, data);
         });
     }
 
@@ -140,7 +139,7 @@ export class FileTree extends Vue {
     }
 
     public createFolder() {
-        console.log('createFolder');
+        console.log("createFolder");
     }
 
     public createKsyFile() {

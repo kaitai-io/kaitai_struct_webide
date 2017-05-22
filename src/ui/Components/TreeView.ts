@@ -78,7 +78,7 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
     }
 
     selectNode(dir: "prev" | "next", pageJump = false) {
-        console.log('selectNode', dir, pageJump);
+        console.log("selectNode", dir, pageJump);
         for(var i = 0; i < (pageJump ? 25 : 1); i++)
             this.selectRelativeNode(this.selectedItem, dir);
     }
