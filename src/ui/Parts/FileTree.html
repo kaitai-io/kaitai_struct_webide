@@ -6,7 +6,7 @@
         <tree-view id="fsTree" :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu"></tree-view>
         <context-menu ref="ctxMenu">
             <template scope="_">
-                <menu-item icon="glyphicon-pencil" @click="openFile">Open</menu-item>
+                <menu-item icon="glyphicon-pencil" @click="openNode">Open</menu-item>
                 <menu-item icon="glyphicon-folder-open" @click="createFolder" :enabled="_.item.isFolder && _.item.canWrite">Create folder</menu-item>
                 <menu-item icon="glyphicon-list-alt" @click="createKsyFile" :enabled="_.item.isFolder && _.item.canWrite">Create .ksy file</menu-item>
                 <menu-item icon="fa fa-clone" @click="cloneKsyFile" :enabled="!_.item.isFolder && _.item.canWrite">Clone</menu-item>

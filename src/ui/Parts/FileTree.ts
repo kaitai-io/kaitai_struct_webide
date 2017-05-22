@@ -114,6 +114,10 @@ export class FileTree extends Vue {
 
     }
 
+    public openNode() {
+        this.fsTreeView.selectedItem.dblclick();
+    }
+
     public openFile() {
         fss.read(this.selectedUri).then(data => {
             this.$emit('open-file', this.selectedFsItem, data);

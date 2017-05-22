@@ -27,6 +27,7 @@
         backface-visibility: hidden;
         display:inline-block; position:relative; top:3px; left:5px; height: 13px; width: 13px;
     }
+    .treeView i.loadingFailed { color:#ffd400; position:relative; top:1px; left:1px }
     .treeView .nodeText { margin-left:4px; }
     .treeView i { vertical-align: text-top; }
 </style>
@@ -51,6 +52,7 @@
                 <span v-if="model.isFolder">[{{open ? "-" : "+"}}]</span>
             </a>
             <div v-if="childrenLoading" class="loading_icon"></div>
+            <i v-if="loadingFailed" class="loadingFailed fa fa-exclamation-triangle"></i>
         </div>
         <ul v-for="model in model.children" v-show="open">
             <tree-view-item :model="model" treeView="this"></tree-view-item>
