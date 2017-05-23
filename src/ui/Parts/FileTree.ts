@@ -167,8 +167,12 @@ export class FileTree extends Vue {
             .then(() => this.contextMenuNode.loadChildren());
     }
 
-    public cloneKsyFile() {
-
+    public cloneFile() {
+        var newUri = this.contextMenuNode.uri.uri.replace(/\.(\w+)$/, `_${new Date().format("Ymd_His")}.$1`);
+        console.log('cloneKsyFile', newUri);
+        this.contextMenuNode.fs.read(this.contextMenuNode.uri.uri)
+            .then(content => this.contextMenuNode.fs.write(newUri, content))
+            .then(() => this.contextMenuNode.parent.loadChildren());
     }
 
     public downloadFile() {

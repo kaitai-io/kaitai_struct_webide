@@ -9,7 +9,7 @@
                 <menu-item icon="glyphicon-pencil" @click="openNode">Open</menu-item>
                 <menu-item icon="glyphicon-folder-open" @click="createFolderModal.show()" :enabled="_.item.isFolder && _.item.canWrite">Create folder</menu-item>
                 <menu-item icon="glyphicon-list-alt" @click="createKsyModal.show()" :enabled="_.item.isFolder && _.item.canWrite">Create .ksy file</menu-item>
-                <menu-item icon="fa fa-clone" @click="cloneKsyFile" :enabled="!_.item.isFolder && _.item.canWrite">Clone</menu-item>
+                <menu-item icon="fa fa-clone" @click="cloneFile" :enabled="!_.item.isFolder && _.item.canWrite">Clone</menu-item>
                 <menu-item icon="glyphicon-flash" :enabled="_.item.isKsy">
                     Generate parser
                     <template slot="submenu">
