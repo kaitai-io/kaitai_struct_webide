@@ -7,11 +7,20 @@ interface IThenBy<T> {
 interface Array<T> {
     last(): T;
     sortBy(selector: ((item: T) => any)): IThenBy<T>;
+    toDict(keySelector: ((item: T) => string)): { [key: string]: T; };
+    toDict<T2>(keySelector: ((item: T) => string), valueSelector: ((item: T) => T2)): { [key: string]: T2; };
 }
 
 if (!Array.prototype.last) {
     Array.prototype.last = function () { return this[this.length - 1]; };
 }
+
+Array.prototype.toDict = function <T, T2>(keySelector: ((item: T) => string), valueSelector?: ((item: T) => T2)) {
+    var result = {};
+    for (var item of this)
+        result[keySelector(item)] = valueSelector ? valueSelector(item) : item;
+    return result;
+};
 // #endregion
 
 // #region String

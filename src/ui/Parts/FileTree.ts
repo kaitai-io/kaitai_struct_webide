@@ -67,8 +67,18 @@ export class FsTreeNode implements IFsTreeNode {
 
     loadChildren(): Promise<void> {
         return this.fs.list(this.uri.uri).then(children => {
-            this.children = children.filter(x => x.uri.uri !== this.uri.uri).map(fsItem => new FsTreeNode(this, fsItem.uri))
+            var childCache = (this.children || []).toDict(x => x.uri.name);
+
+            this.children = children
+                .filter(x => x.uri.uri !== this.uri.uri)
+                .map(fsItem => new FsTreeNode(this, fsItem.uri))
                 .sortBy(x => x.isFolder ? 0 : 1).thenBy(x => x.uri.path).sort();
+
+            for (var item of this.children) {
+                var old = childCache[item.uri.name];
+                if (old)
+                    item.children = item.children || old.children;
+            }
         });
     }
 }
