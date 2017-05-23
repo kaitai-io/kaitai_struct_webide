@@ -7,8 +7,8 @@
         <context-menu ref="ctxMenu">
             <template scope="_">
                 <menu-item icon="glyphicon-pencil" @click="openNode">Open</menu-item>
-                <menu-item icon="glyphicon-folder-open" @click="createFolder" :enabled="_.item.isFolder && _.item.canWrite">Create folder</menu-item>
-                <menu-item icon="glyphicon-list-alt" @click="newKsyModal.show()" :enabled="_.item.isFolder && _.item.canWrite">Create .ksy file</menu-item>
+                <menu-item icon="glyphicon-folder-open" @click="createFolderModal.show()" :enabled="_.item.isFolder && _.item.canWrite">Create folder</menu-item>
+                <menu-item icon="glyphicon-list-alt" @click="createKsyModal.show()" :enabled="_.item.isFolder && _.item.canWrite">Create .ksy file</menu-item>
                 <menu-item icon="fa fa-clone" @click="cloneKsyFile" :enabled="!_.item.isFolder && _.item.canWrite">Clone</menu-item>
                 <menu-item icon="glyphicon-flash" :enabled="_.item.isKsy">
                     Generate parser
@@ -32,6 +32,7 @@
                 <menu-item icon="glyphicon-remove" @click="deleteFile" :enabled="_.item.canDelete">Delete</menu-item>
             </template>
         </context-menu>
-        <input-modal ref="newKsyModal" title="Create new .ksy format file" okText="Create" paramName="Name" @ok="createKsyFile"></input-modal>
+        <input-modal ref="createKsyModal" title="Create new .ksy format file" okText="Create" paramName="Name" @ok="createKsyFile"></input-modal>
+        <input-modal ref="createFolderModal" title="Create new folder" okText="Create" paramName="Name" @ok="createFolder"></input-modal>
     </span>
 </template>

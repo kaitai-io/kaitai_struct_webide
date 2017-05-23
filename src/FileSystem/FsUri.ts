@@ -39,6 +39,13 @@ export class FsUri {
         this.parentPath = this.path.substr(0, split + 1);
     }
 
+    addPath(childPath: string) {
+        if (this.type === "file")
+            throw new Error("You cannot add a child path to a file uri.");
+
+        return new FsUri(this.uri + childPath);
+    }
+
     changePath(newPath: string) {
         return new FsUri((this.fsScheme ? `${this.fsScheme}://` : "") +
             `${this.fsData.join("/")}${newPath}`, this.fsData.length);

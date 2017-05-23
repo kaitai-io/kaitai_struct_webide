@@ -12,6 +12,7 @@ import * as Vue from "vue";
 import Component from "./../Component";
 import { ContextMenu } from "./../Components/ContextMenu";
 import {InputModal} from "../Components/InputModal";
+import {saveFile, Convert } from "../../utils";
 declare var Scrollbar: any;
 declare var kaitaiFsFiles: string[];
 
@@ -58,14 +59,15 @@ export class FsTreeNode implements IFsTreeNode {
     get canWrite() { return this.capabilities.write; }
     get canDelete() { return this.uri.path !== "/" && this.capabilities.delete; }
 
-    constructor(public fs: IFileSystem, public uri: FsUri) {
+    constructor(public parent: FsTreeNode, public uri: FsUri, public fs: IFileSystem = null) {
+        this.fs = this.fs || parent.fs;
         this.text = uri.name;
         this.isFolder = uri.type === "directory";
     }
 
     loadChildren(): Promise<void> {
         return this.fs.list(this.uri.uri).then(children => {
-            this.children = children.map(fsItem => new FsTreeNode(this.fs, fsItem.uri))
+            this.children = children.filter(x => x.uri.uri !== this.uri.uri).map(fsItem => new FsTreeNode(this, fsItem.uri))
                 .sortBy(x => x.isFolder ? 0 : 1).thenBy(x => x.uri.path).sort();
         });
     }
@@ -82,7 +84,7 @@ class FsRootNode implements IFsTreeNode {
 }
 
 function addRootNode(text: string, icon: string, uri: string) {
-    var node = new FsTreeNode(fss, new FsUri(uri));
+    var node = new FsTreeNode(null, new FsUri(uri), fss);
     node.text = text;
     node.icon = icon;
     return node;
@@ -102,7 +104,8 @@ export class FileTree extends Vue {
 
     get ctxMenu() { return <ContextMenu>this.$refs["ctxMenu"]; }
     get fsTreeView() { return <TreeView<FsTreeNode>>this.$refs["fsTree"]; }
-    get newKsyModal() { return <InputModal>this.$refs["newKsyModal"]; }
+    get createKsyModal() { return <InputModal>this.$refs["createKsyModal"]; }
+    get createFolderModal() { return <InputModal>this.$refs["createFolderModal"]; }
 
     get selectedFsItem() { return this.fsTreeView.selectedItem.model; }
     get selectedUri() { return this.selectedFsItem.uri.uri; }
@@ -141,12 +144,17 @@ export class FileTree extends Vue {
         this.ctxMenu.open(event, this.contextMenuNode);
     }
 
-    public createFolder() {
-        console.log("createFolder");
+    public createFolder(name: string) {
+        var newUri = this.contextMenuNode.uri.addPath(`${name}/`).uri;
+        this.contextMenuNode.fs.createFolder(newUri)
+            .then(() => this.contextMenuNode.loadChildren());
     }
 
     public createKsyFile(name: string) {
-        console.log('new ksy file name:', name);
+        var newUri = this.contextMenuNode.uri.addPath(`${name}.ksy`).uri;
+        var content = `meta:\n  id: ${name}\n  file-extension: ${name}\n`;
+        this.contextMenuNode.fs.write(newUri, Convert.utf8StrToBytes(content).buffer)
+            .then(() => this.contextMenuNode.loadChildren());
     }
 
     public cloneKsyFile() {
@@ -154,11 +162,13 @@ export class FileTree extends Vue {
     }
 
     public downloadFile() {
-
+        this.contextMenuNode.fs.read(this.contextMenuNode.uri.uri)
+            .then(data => saveFile(data, this.contextMenuNode.uri.name));
     }
 
     public deleteFile() {
-
+        this.contextMenuNode.fs.delete(this.contextMenuNode.uri.uri)
+            .then(() => this.contextMenuNode.parent.loadChildren());
     }
 
     updated() {
@@ -168,6 +178,6 @@ export class FileTree extends Vue {
     }
 
     mounted() {
-        this.newKsyModal.show();
+        //this.createFolderModal.show();
     }
 }
