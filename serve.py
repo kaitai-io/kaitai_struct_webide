@@ -3,6 +3,7 @@
 import SocketServer
 import SimpleHTTPServer
 import json
+import fnmatch
 import glob
 import os
 import sys
@@ -21,8 +22,15 @@ compileCmd = r'tsc --outDir js/ --sourcemap --target ES6 --noEmitOnError %s'
 
 compileInProgress = False
 
+def recursive_glob(treeroot, pattern):
+    results = []
+    for base, dirs, files in os.walk(treeroot):
+        goodfiles = fnmatch.filter(files, pattern)
+        results.extend(os.path.join(base, f) for f in goodfiles)
+    return results
+
 def getFiles(dirs):
-    return [fn for pattern in dirs for fn in glob.glob(pattern)]
+    return [fn for pattern in dirs for fn in recursive_glob(*('./' + pattern).rsplit('/', 1))]
 
 def getLastChange(dirs):
     if compileInProgress:
