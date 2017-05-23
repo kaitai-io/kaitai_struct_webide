@@ -37,6 +37,7 @@
     <TypeScriptCompile Include="src\KaitaiServices.ts" />
     <TypeScriptCompile Include="src\ui\Components\ContextMenu.ts" />
     <TypeScriptCompile Include="src\ui\Components\ConverterPanel.ts" />
+    <TypeScriptCompile Include="src\ui\Components\InputModal.ts" />
     <TypeScriptCompile Include="src\ui\Components\SelectionInput.ts" />
     <TypeScriptCompile Include="src\ui\Components\Stepper.ts" />
     <TypeScriptCompile Include="src\ui\ComponentLoader.ts" />
@@ -85,6 +86,7 @@
   <ItemGroup>
     <Content Include="src\ui\Components\ContextMenu.html" />
     <Content Include="src\ui\Components\ConverterPanel.html" />
+    <Content Include="src\ui\Components\InputModal.html" />
     <Content Include="src\ui\Components\SelectionInput.html" />
     <Content Include="src\ui\Components\Stepper.html" />
     <Content Include="src\ui\Components\TreeView.html" />

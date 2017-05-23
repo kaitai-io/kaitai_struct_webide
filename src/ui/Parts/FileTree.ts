@@ -11,6 +11,7 @@ import { TreeView, IFsTreeNode } from "./../Components/TreeView";
 import * as Vue from "vue";
 import Component from "./../Component";
 import { ContextMenu } from "./../Components/ContextMenu";
+import {InputModal} from "../Components/InputModal";
 declare var Scrollbar: any;
 declare var kaitaiFsFiles: string[];
 
@@ -101,6 +102,8 @@ export class FileTree extends Vue {
 
     get ctxMenu() { return <ContextMenu>this.$refs["ctxMenu"]; }
     get fsTreeView() { return <TreeView<FsTreeNode>>this.$refs["fsTree"]; }
+    get newKsyModal() { return <InputModal>this.$refs["newKsyModal"]; }
+
     get selectedFsItem() { return this.fsTreeView.selectedItem.model; }
     get selectedUri() { return this.selectedFsItem.uri.uri; }
 
@@ -142,8 +145,8 @@ export class FileTree extends Vue {
         console.log("createFolder");
     }
 
-    public createKsyFile() {
-
+    public createKsyFile(name: string) {
+        console.log('new ksy file name:', name);
     }
 
     public cloneKsyFile() {
@@ -162,5 +165,9 @@ export class FileTree extends Vue {
         var fsTreeScrollbar = Scrollbar.init(this.fsTreeView.$el);
         this.fsTreeView.scrollIntoView = (el, alignToTop) => fsTreeScrollbar.scrollIntoView(el, { alignToTop: alignToTop });
         console.log(this.fsTreeView);
+    }
+
+    mounted() {
+        this.newKsyModal.show();
     }
 }
