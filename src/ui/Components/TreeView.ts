@@ -114,6 +114,7 @@ export class TreeViewItem<T extends IFsTreeNode> extends Vue {
     selected = false;
     childrenLoading = false;
     loadingFailed = false;
+    loadingErrorText = "";
 
     get icon() {
         return this.model["icon"] ? this.model["icon"] :
@@ -133,6 +134,7 @@ export class TreeViewItem<T extends IFsTreeNode> extends Vue {
                 this.loadingFailed = false;
                 setTimeout(() => this.model.loadChildren().catch(x => {
                     this.loadingFailed = true;
+                    this.loadingErrorText = `${x}`;
                 }).then(() => this.childrenLoading = false), 0);
             }
         } else {
