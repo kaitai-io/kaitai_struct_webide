@@ -30,16 +30,19 @@
     .treeView i.loadingFailed { color:#ffd400; position:relative; top:1px; left:1px }
     .treeView .nodeText { margin-left:4px; }
     .treeView i { vertical-align: text-top; }
+    ul.treeView { margin:0 }
 </style>
 
 <template id="TreeView">
-    <ul class="treeView" tabindex="0" v-if="model" @keydown.right.prevent="openSelected" @keydown.left.prevent="closeSelected" 
-        @keydown.down.prevent="selectNode('next')" @keydown.up.prevent="selectNode('prev')"
-        @keydown.pagedown.prevent="selectNode('next', true)" @keydown.pageup.prevent="selectNode('prev', true)">
-        <template v-for="child in model.children">
-            <tree-view-item :model="child"></tree-view-item>
-        </template>
-    </ul>
+    <div>
+        <ul class="treeView" tabindex="0" v-if="model" @keydown.right.prevent="openSelected" @keydown.left.prevent="closeSelected" 
+            @keydown.down.prevent="selectNode('next')" @keydown.up.prevent="selectNode('prev')"
+            @keydown.pagedown.prevent="selectNode('next', true)" @keydown.pageup.prevent="selectNode('prev', true)">
+            <template v-for="child in model.children">
+                <tree-view-item :model="child"></tree-view-item>
+            </template>
+        </ul>
+    </div>
 </template>
 
 <template id="TreeViewItem">
@@ -52,7 +55,7 @@
                 <span v-if="model.isFolder">[{{open ? "-" : "+"}}]</span>
             </a>
             <div v-if="childrenLoading" class="loading_icon"></div>
-            <i v-if="loadingFailed" class="loadingFailed fa fa-exclamation-triangle"
+            <i v-show="loadingFailed" class="loadingFailed fa fa-exclamation-triangle"
                :title="loadingErrorText" data-toggle="tooltip"></i>
         </div>
         <ul v-for="model in model.children" v-show="open">

@@ -2,6 +2,7 @@
 import * as Vue from "vue";
 import Component from "../Component";
 import UIHelper from "../UIHelper";
+declare var Scrollbar: any;
 
 export interface IFsTreeNode {
     text: string;
@@ -27,6 +28,11 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
             if (this.model)
                 this.model.loadChildren();
         });
+
+        if (Scrollbar) {
+            var scrollbar = Scrollbar.init(this.$el);
+            this.scrollIntoView = (el, alignToTop) => scrollbar.scrollIntoView(el, { alignToTop: alignToTop });
+        }
     }
 
     openSelected() {
