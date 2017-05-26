@@ -107,7 +107,7 @@ var fsData = new FsRootNode([
     addRootNode("browser (legacy)", "glyphicon-cloud", "browser_legacy:///"),
 ]);
 
-setTimeout(() => fsData.children.push(addRootNode("browser", "glyphicon-cloud", "browser:///")), 5000);
+//setTimeout(() => fsData.children.push(addRootNode("browser", "glyphicon-cloud", "browser:///")), 5000);
 
 @Component
 export class FileTree extends Vue {

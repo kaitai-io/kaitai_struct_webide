@@ -24,6 +24,7 @@
   <ItemGroup>
     <Content Include="css\app.css" />
     <Content Include="css\HexViewer.css" />
+    <Content Include="github_oauth.html" />
     <Content Include="index.html" />
     <Content Include="js\autorefresh.js" />
     <Content Include="sandbox.html" />
