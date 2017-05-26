@@ -2,6 +2,7 @@ import * as Vue from "vue";
 import { componentLoader } from "./ui/ComponentLoader";
 import Component from "./ui/Component";
 import { FileTree, FsTreeNode } from "./ui/Parts/FileTree";
+import * as $ from "jquery";
 
 @Component
 class App extends Vue {

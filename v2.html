@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+    
+    <link rel="stylesheet" type="text/css" href="lib/goldenlayout/goldenlayout-base.css" />
+    <link rel="stylesheet" type="text/css" href="lib/goldenlayout/goldenlayout-dark-theme.css" />
+
+    <script src="lib/requirejs/require.js"></script>
+    <script src="js/extensions.js"></script>
+    <script>
+        var paths = {};
+        ["bowser", "jstree", "localforage", "goldenlayout", "vue"].forEach(
+            name => paths[name] = `../lib/${name}/${name}`);
+        paths["bigInt"] = "../lib/BigInteger/BigInteger";
+        paths["jquery"] = "../lib/jquery/jquery-3.1.1.min";
+
+        requirejs.config({ baseUrl: "js/", paths: paths });
+        require(["autorefresh2", "v2"]);
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

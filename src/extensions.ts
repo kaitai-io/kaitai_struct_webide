@@ -6,6 +6,7 @@ interface IThenBy<T> {
 
 interface Array<T> {
     last(): T;
+    remove(item: T): void;
     sortBy(selector: ((item: T) => any)): IThenBy<T>;
     toDict(keySelector: ((item: T) => string)): { [key: string]: T; };
     toDict<T2>(keySelector: ((item: T) => string), valueSelector: ((item: T) => T2)): { [key: string]: T2; };
@@ -21,6 +22,14 @@ Array.prototype.toDict = function <T, T2>(keySelector: ((item: T) => string), va
         result[keySelector(item)] = valueSelector ? valueSelector(item) : item;
     return result;
 };
+
+Array.prototype.remove = function<T>(item: T) {
+    for (var i = this.length; i--;) {
+        if (this[i] === item) {
+            this.splice(i, 1);
+        }
+    }
+}
 // #endregion
 
 // #region String

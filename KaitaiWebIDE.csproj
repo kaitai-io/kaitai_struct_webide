@@ -33,6 +33,7 @@
     <TypeScriptCompile Include="lib\ts-types\knockout.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\text-encoding.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />
+    <TypeScriptCompile Include="src\autorefresh2.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\FileSystem\HttpFileSystem.ts" />
     <TypeScriptCompile Include="src\KaitaiServices.ts" />
@@ -62,6 +63,7 @@
     <TypeScriptCompile Include="src\utils\TestHelper.ts" />
     <TypeScriptCompile Include="src\ui\Component.ts" />
     <TypeScriptCompile Include="src\utils\WebHelper.ts" />
+    <TypeScriptCompile Include="src\v2.ts" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="lib\ts-types\ace.d.ts" />
@@ -92,6 +94,7 @@
     <Content Include="src\ui\Components\Stepper.html" />
     <Content Include="src\ui\Components\TreeView.html" />
     <Content Include="src\ui\Parts\FileTree.html" />
+    <Content Include="v2.html" />
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>

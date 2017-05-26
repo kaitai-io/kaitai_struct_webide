@@ -50,7 +50,7 @@ hello66
     var paths = {};
     ["bowser", "jstree", "localforage", "goldenlayout", "vue", "smooth-scrollbar"].forEach(
         name => paths[name] = `../lib/${name}/${name}`);
-    //paths["jquery"] = "../lib/jquery/jquery-3.1.1.min";
+    paths["jquery"] = "../lib/jquery/jquery-3.1.1.min";
 
     requirejs.config({ baseUrl: "js/", paths: paths, shim : {
         //'autorefresh': { deps: ['jquery'] }
