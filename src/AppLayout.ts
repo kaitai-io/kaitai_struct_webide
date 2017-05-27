@@ -23,7 +23,7 @@ Layout.manager.root
         .addVertical(errorArea => errorArea
             .addHorizontal(middleArea => middleArea
                 .addVertical(middleCol => middleCol
-                    .addComponent(c => Layout.ksy = c)
+                    .addComponent(".ksy editor", c => Layout.ksy = c)
                     .addComponent("object tree", c => Layout.objectTree = c))
                 .addVertical(rightCol => rightCol
                     .addTabs(files => Layout.files = files

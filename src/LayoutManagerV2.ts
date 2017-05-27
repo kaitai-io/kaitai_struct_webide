@@ -64,6 +64,11 @@ export class ClosableComponent {
 
 export type ContainerType = "row" | "column" | "stack";
 ﻿const fakeComponentName = "fakeComponent";
+﻿interface IComponentProps {
+    width?: number;
+    height?: number;
+    isClosable?: boolean;
+﻿}
 
 export class Container extends LayoutItem {
     
@@ -91,17 +96,12 @@ export class Container extends LayoutItem {
         this.contentItem.removeChild(item.contentItem);
     }
 
-    addComponent(): Component;
-    addComponent(cb: (c: Component) => void): Container;
-    addComponent(title?: string): Component;
-    addComponent(title?: string, cb?: (c: Component) => void): Container;
-    addComponent(title?: string, props?: any): Component;
-    addComponent(title?: string, props?: any, cb?: (c: Component) => void): Container;
-    addComponent(): Container | Component {
-        var args = Array.from(arguments);
-        var title = args.filter(x => typeof x === "string")[0] || "-";
-        var cb = args.filter(x => typeof x === "function")[0];
-        var props = args.filter(x => typeof x === "object")[0];
+    addComponent(title: string, props?: IComponentProps): Component;
+    addComponent(title: string, cb: (c: Component) => void): Container;
+    addComponent(title: string, props: IComponentProps, cb: (c: Component) => void): Container;
+    addComponent(title: string, cbOrProps?: IComponentProps | ((c: Component) => void), cb?: (c: Component) => void): Container | Component {
+        var props = typeof cbOrProps === "object" ? cbOrProps : null;
+        cb = cb || (typeof cbOrProps === "function" ? cbOrProps : undefined);
 
         return this.addChild(Component, Object.assign({ type: "component", componentName: fakeComponentName, title: title }, props), cb);
     }
