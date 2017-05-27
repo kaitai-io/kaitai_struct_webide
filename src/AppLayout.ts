@@ -32,6 +32,6 @@ Layout.manager.root
                     .addHorizontal(rightPanel => rightPanel
                         .addComponent("info panel", c => Layout.infoPanel = c)
                         .addComponent("converter", c => Layout.converterPanel = c))))
-            .addClosableComponent(c => c.addComponent("errors", { height: 100, isClosable: true }), c => Layout.errors = c)));
+            .addClosableComponent(c => c.addComponent("errors", { height: 100, isClosable: true }), false, c => Layout.errors = c)));
 
 Layout.manager.root.init();

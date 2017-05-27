@@ -35,8 +35,9 @@ export class ClosableComponent {
             this.hide();
     }
 
-    constructor(public parent: Container, public generator: (c: Container) => Component) {
-        this.show();
+    constructor(public parent: Container, public generator: (c: Container) => Component, show: boolean) {
+        if(show)
+            this.show();
     }
 
     show() {
@@ -106,8 +107,8 @@ export class Container extends LayoutItem {
         return this.addChild(Component, Object.assign({ type: "component", componentName: fakeComponentName, title: title }, props), cb);
     }
 
-    addClosableComponent(generator: (c: Container) => Component, cb: (c: ClosableComponent) => void): Container {
-        cb(new ClosableComponent(this, generator));
+    addClosableComponent(generator: (c: Container) => Component, show: boolean, cb: (c: ClosableComponent) => void): Container {
+        cb(new ClosableComponent(this, generator, show));
         return this;
     }
 
