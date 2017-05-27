@@ -5,7 +5,7 @@ layout.registerComponent("fakeComponent", function() { });
 layout.init();
 
 class LayoutItem {
-    constructor(public contentItem: GoldenLayout.ContentItem) { }
+    constructor(public parent: Container, public contentItem: GoldenLayout.ContentItem) { }
 
     init() { }
 }
@@ -21,14 +21,56 @@ class Component extends LayoutItem {
     }
 }
 
+class ClosableComponent {
+    lastHeight: number;
+    lastWidth: number;
+    component: Component = null;
+
+    get visible() { return this.component !== null; }
+    set visible(show: boolean) {
+        if (show === this.visible) return;
+
+        if (show)
+            this.show();
+        else
+            this.hide();
+    }
+
+    constructor(public parent: Container, public generator: (c: Container) => Component) {
+        this.show();
+    }
+
+    show() {
+        this.component = this.generator(this.parent);
+        if (this.lastHeight || this.lastWidth)
+            this.component.container.setSize(this.lastWidth, this.lastHeight);
+
+        this.component.container.on("resize", () => {
+            var element = <JQuery><any>this.component.contentItem.element;
+            this.lastHeight = element.outerHeight();
+            this.lastWidth = element.outerWidth();
+        });
+
+        for (var event of ["destroy", "close"])
+            this.component.container.on(event, () => {
+                this.component = null;
+                console.log('set');
+            });
+    }
+
+    hide() {
+        this.component.component.remove();
+    }
+}
+
 type ContainerType = "row" | "column" | "stack";
 
 class Container extends LayoutItem {
     public children: LayoutItem[] = [];
 
-    addChild<T extends LayoutItem>(creator: { new (c: GoldenLayout.ContentItem): T }, props: any, cb?: (c: T) => void) {
+    addChild<T extends LayoutItem>(creator: { new (parent: Container, c: GoldenLayout.ContentItem): T }, props: any, cb?: (c: T) => void) {
         this.contentItem.addChild(Object.assign({ isClosable: false, children: [] }, props));
-        var newItem = new creator(this.contentItem.contentItems.last());
+        var newItem = new creator(this, this.contentItem.contentItems.last());
         newItem.init();
         this.children.push(newItem);
         cb && cb(newItem);
@@ -63,6 +105,11 @@ class Container extends LayoutItem {
         return this.addChild(Component, Object.assign({ type: "component", componentName: "fakeComponent", title: title }, props), cb);
     }
 
+    addClosableComponent(generator: (c: Container) => Component, cb: (c: ClosableComponent) => void): Container {
+        cb(new ClosableComponent(this, generator));
+        return this;
+    }
+
     init() {
         for (var child of this.children)
             child.init();
@@ -81,10 +128,10 @@ class Layout {
     static converterPanel: Component;
     static jsCode: Component;
     static jsCodeDebug: Component;
-    static errors: Component;
+    static errors: ClosableComponent;
 }
 
-Layout.root = new Container(layout.root)
+Layout.root = new Container(null, layout.root)
     .addHorizontal(mainCols => mainCols
         .addComponent("files", { width: 200 }, c => Layout.fileTree = c)
         .addVertical(errorArea => Layout.errorArea = errorArea
@@ -98,10 +145,9 @@ Layout.root = new Container(layout.root)
                         .addComponent("JS code (debug)", c => Layout.jsCodeDebug = c))
                     .addHorizontal(rightPanel => rightPanel
                         .addComponent("info panel", c => Layout.infoPanel = c)
-                        .addComponent("converter", c => Layout.converterPanel = c))))));
+                        .addComponent("converter", c => Layout.converterPanel = c))))
+            .addClosableComponent(c => c.addComponent("errors", { height: 100, isClosable: true }), c => Layout.errors = c)));
 
-var newFile = Layout.files.addComponent("new file");
+var newFile = Layout.files.addComponent("new file", { isClosable: true });
 Layout.root.init();
-Layout.errorArea.addComponent("errors", { height: 100 }, c => Layout.errors = c);
-Layout.errorArea.remove(Layout.errors);
-Layout.errorArea.addComponent("errors", { height: 100 }, c => Layout.errors = c);
+window["layout"] = Layout;
