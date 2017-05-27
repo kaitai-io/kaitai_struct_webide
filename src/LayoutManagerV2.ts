@@ -63,8 +63,10 @@ export class ClosableComponent {
 }
 
 export type ContainerType = "row" | "column" | "stack";
+﻿const fakeComponentName = "fakeComponent";
 
 export class Container extends LayoutItem {
+    
     public children: LayoutItem[] = [];
 
     addChild<T extends LayoutItem>(creator: { new (parent: Container, c: GoldenLayout.ContentItem): T }, props: any, cb?: (c: T) => void) {
@@ -101,7 +103,7 @@ export class Container extends LayoutItem {
         var cb = args.filter(x => typeof x === "function")[0];
         var props = args.filter(x => typeof x === "object")[0];
 
-        return this.addChild(Component, Object.assign({ type: "component", componentName: "fakeComponent", title: title }, props), cb);
+        return this.addChild(Component, Object.assign({ type: "component", componentName: fakeComponentName, title: title }, props), cb);
     }
 
     addClosableComponent(generator: (c: Container) => Component, cb: (c: ClosableComponent) => void): Container {
@@ -121,7 +123,7 @@ export class LayoutManager {
 
     constructor() {
         this.goldenLayout = new GoldenLayout({ settings: { showCloseIcon: false, showPopoutIcon: false }, content: [] });
-        this.goldenLayout.registerComponent("fakeComponent", function () { });
+        this.goldenLayout.registerComponent(fakeComponentName, function () { });
         this.goldenLayout.init();
 
         this.root = new Container(null, this.goldenLayout.root);
