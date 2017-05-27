@@ -33,10 +33,12 @@
     <TypeScriptCompile Include="lib\ts-types\knockout.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\text-encoding.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />
+    <TypeScriptCompile Include="src\AppLayout.ts" />
     <TypeScriptCompile Include="src\autorefresh2.ts" />
     <TypeScriptCompile Include="src\autorefresh.ts" />
     <TypeScriptCompile Include="src\FileSystem\HttpFileSystem.ts" />
     <TypeScriptCompile Include="src\KaitaiServices.ts" />
+    <TypeScriptCompile Include="src\LayoutManagerV2.ts" />
     <TypeScriptCompile Include="src\ui\Components\ContextMenu.ts" />
     <TypeScriptCompile Include="src\ui\Components\ConverterPanel.ts" />
     <TypeScriptCompile Include="src\ui\Components\InputModal.ts" />
