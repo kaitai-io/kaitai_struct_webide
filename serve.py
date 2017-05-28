@@ -16,21 +16,26 @@ from SocketServer import ThreadingMixIn
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
 PORT = 8000
-watchDirs = ['*.html', 'js/*', 'css/*']
+watchDirs = ['*.html', 'js/*', 'css/*', 'src/*.html']
 compileDirs = ['src/*.ts', 'lib/ts-types/*.ts']
 compileCmd = r'tsc --outDir js/ --sourcemap --target ES6 --noEmitOnError %s'
 
 compileInProgress = False
 
 def recursive_glob(treeroot, pattern):
+    if treeroot == '.':
+        walkResult = [('.', None, os.listdir('.'),)]
+    else:
+        walkResult = list(os.walk(treeroot))
+
     results = []
-    for base, dirs, files in os.walk(treeroot):
+    for base, dirs, files in walkResult:
         goodfiles = fnmatch.filter(files, pattern)
         results.extend(os.path.join(base, f) for f in goodfiles)
     return results
 
 def getFiles(dirs):
-    return [fn for pattern in dirs for fn in recursive_glob(*('./' + pattern).rsplit('/', 1))]
+    return [fn for pattern in dirs for fn in recursive_glob(*(os.path.join('./', pattern).rsplit('/', 1)))]
 
 def getLastChange(dirs):
     if compileInProgress:
