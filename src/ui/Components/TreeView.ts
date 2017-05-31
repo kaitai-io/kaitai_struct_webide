@@ -28,7 +28,9 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
             if (this.model)
                 this.model.loadChildren();
         });
+    }
 
+    mounted() {
         if (Scrollbar) {
             var scrollbar = Scrollbar.init(this.$el);
             this.scrollIntoView = (el, alignToTop) => scrollbar.scrollIntoView(el, { alignToTop: alignToTop });
@@ -119,8 +121,7 @@ export class TreeViewItem<T extends IFsTreeNode> extends Vue {
     open = false;
     selected = false;
     childrenLoading = false;
-    loadingFailed = false;
-    loadingErrorText = "";
+    loadingError: string = null;
 
     get icon() {
         return this.model["icon"] ? this.model["icon"] :
@@ -137,10 +138,10 @@ export class TreeViewItem<T extends IFsTreeNode> extends Vue {
             this.open = !this.open;
             if (this.open && !this.model.children) {
                 this.childrenLoading = true;
-                this.loadingFailed = false;
+                this.loadingError = null;
                 setTimeout(() => this.model.loadChildren().catch(x => {
-                    this.loadingFailed = true;
-                    this.loadingErrorText = `${x}`;
+                    console.error(x);
+                    this.loadingError = `${x}`;
                 }).then(() => this.childrenLoading = false), 0);
             }
         } else {

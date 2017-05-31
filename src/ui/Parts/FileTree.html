@@ -2,8 +2,8 @@
 </style>
 
 <template>
-    <span>
-        <tree-view id="fsTree" :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu"></tree-view>
+    <div style="height:100%">
+        <tree-view id="fsTree" :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu" style="height: 100%; background: #333"></tree-view>
         <context-menu ref="ctxMenu">
             <template scope="_">
                 <menu-item icon="glyphicon-pencil" @click="openNode">Open</menu-item>
@@ -34,5 +34,5 @@
         </context-menu>
         <input-modal ref="createKsyModal" title="Create new .ksy format file" okText="Create" paramName="Name" @ok="createKsyFile"></input-modal>
         <input-modal ref="createFolderModal" title="Create new folder" okText="Create" paramName="Name" @ok="createFolder"></input-modal>
-    </span>
+    </div>
 </template>

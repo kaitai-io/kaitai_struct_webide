@@ -6,9 +6,16 @@
     
     <link rel="stylesheet" type="text/css" href="lib/goldenlayout/goldenlayout-base.css" />
     <link rel="stylesheet" type="text/css" href="lib/goldenlayout/goldenlayout-dark-theme.css" />
-
+    <link rel="stylesheet" type="text/css" href="lib/smooth-scrollbar/smooth-scrollbar.css">
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap/contextmenu.css" />
+    <link rel="stylesheet" type="text/css" href="lib/font-awesome/font-awesome.min.css" />
+    
+    <script src="lib/smooth-scrollbar/smooth-scrollbar.js"></script>
     <script src="lib/requirejs/require.js"></script>
+    <script src="lib/thenBy/thenBy.js"></script>
     <script src="js/extensions.js"></script>
+    <script src="js/kaitaiFsFiles.js"></script>
     <script>
         var paths = {};
         ["bowser", "jstree", "localforage", "goldenlayout", "vue"].forEach(
@@ -17,7 +24,7 @@
         paths["jquery"] = "../lib/jquery/jquery-3.1.1.min";
 
         requirejs.config({ baseUrl: "js/", paths: paths });
-        require(["autorefresh2", "v2"]);
+        require([/*"autorefresh2", */"v2"]);
     </script>
 </head>
 <body>
