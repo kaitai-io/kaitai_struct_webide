@@ -23,5 +23,5 @@ componentLoader.load(["Components/TreeView", "Components/ContextMenu", "Componen
     var app = new App({ el: "#app" });
     app.fileTree.init();
     window["app"] = app;
-    $('body').tooltip({ selector: '[data-toggle="tooltip"]', container: 'body', trigger: "click hover" });
+    //$('body').tooltip({ selector: '[data-toggle="tooltip"]', container: 'body', trigger: "click hover" });
 });
