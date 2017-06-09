@@ -196,6 +196,7 @@ export class FileTree extends Vue {
     mounted() {
         var scrollbar = Scrollbar.init(this.$el);
         this.fsTreeView.scrollIntoView = (el, alignToTop) => scrollbar.scrollIntoView(el, { alignToTop: alignToTop });
+        document.body.appendChild(this.ctxMenu.$el);
         console.log('FileTree mounted', this.fsTreeView);
         //this.createFolderModal.show();
     }
