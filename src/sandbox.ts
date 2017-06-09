@@ -19,7 +19,7 @@ class App extends Vue {
     }
 }
 
-componentLoader.load(["Components/TreeView", "Components/ContextMenu", "Components/InputModal", "Parts/FileTree"]).then(() => {
+componentLoader.load(["Components/TreeView", "Components/ContextMenu", "Components/InputModal", "Parts/FileTree", "Components/DummyComponent"]).then(() => {
     var app = new App({ el: "#app" });
     app.fileTree.init();
     window["app"] = app;

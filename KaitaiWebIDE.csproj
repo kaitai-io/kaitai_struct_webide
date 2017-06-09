@@ -41,6 +41,7 @@
     <TypeScriptCompile Include="src\LayoutManagerV2.ts" />
     <TypeScriptCompile Include="src\ui\Components\ContextMenu.ts" />
     <TypeScriptCompile Include="src\ui\Components\ConverterPanel.ts" />
+    <TypeScriptCompile Include="src\ui\Components\DummyComponent.ts" />
     <TypeScriptCompile Include="src\ui\Components\InputModal.ts" />
     <TypeScriptCompile Include="src\ui\Components\SelectionInput.ts" />
     <TypeScriptCompile Include="src\ui\Components\Stepper.ts" />
@@ -91,6 +92,7 @@
   <ItemGroup>
     <Content Include="src\ui\Components\ContextMenu.html" />
     <Content Include="src\ui\Components\ConverterPanel.html" />
+    <Content Include="src\ui\Components\DummyComponent.html" />
     <Content Include="src\ui\Components\InputModal.html" />
     <Content Include="src\ui\Components\SelectionInput.html" />
     <Content Include="src\ui\Components\Stepper.html" />
