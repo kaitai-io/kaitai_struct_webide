@@ -10,9 +10,13 @@ import { FsSelector } from "./../../FileSystem/FsSelector";
 import { TreeView, IFsTreeNode } from "./../Components/TreeView";
 import * as Vue from "vue";
 import Component from "./../Component";
+
 import { ContextMenu } from "./../Components/ContextMenu";
-import {InputModal} from "../Components/InputModal";
-import {saveFile, Convert } from "../../utils";
+import "../Components/ContextMenu";
+import { InputModal } from "../Components/InputModal";
+import "../Components/InputModal";
+
+import { saveFile, Convert } from "../../utils";
 declare var Scrollbar: any;
 declare var kaitaiFsFiles: string[];
 

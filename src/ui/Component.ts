@@ -6,7 +6,7 @@
   */
 import * as Vue from "vue";
 import { ComponentOptions } from "vue";
-
+import {componentLoader} from "./ComponentLoader";
 export const $internalHooks = [
     "data",
     "beforeCreate",
@@ -22,7 +22,9 @@ export const $internalHooks = [
     "render"
 ];
 
-export type VueClass = { new(): Vue } & typeof Vue;
+declare var requirejs: any;
+
+export type VueClass = { new (): Vue } & typeof Vue;
 
 export function componentFactory(
     Component: VueClass,
@@ -66,10 +68,25 @@ export function componentFactory(
     if (!options.props["model"])
         options.props["model"] = Object;
 
+    console.log('component factory', options.name, options.template);
+
     // find super
     const superProto = Object.getPrototypeOf(Component.prototype);
     const Super = superProto instanceof Vue ? superProto.constructor as VueClass : Vue;
     const result = Super.extend(options);
+
+    if (componentLoader.templates[options.name])
+        options.template = componentLoader.templates[options.name];
+    else if (requirejs) {
+        var modulePaths = Array.from(document.head.getElementsByTagName("script")).map(x => x.src);
+        var candidates = modulePaths.filter(x => x.endsWith(`/${options.name}.js`));
+        // if (candidates.length !== 1) console.error(`Could not found component's source path: ${options.name}!`, candidates, modulePaths);
+        componentLoader.onLoad(candidates[0]).then(() => {
+            options.template = componentLoader.templates[options.name];
+        });
+    }
+
+    //componentLoader.loadTemplate(options.name, this);
     Vue.component(options.name, result);
     return result;
 }
