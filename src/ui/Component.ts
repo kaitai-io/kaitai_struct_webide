@@ -69,6 +69,8 @@ export function componentFactory(
         options.props["model"] = Object;
 
     console.log('component factory', options.name, options.template);
+    console.log('currentScript', document.currentScript);
+    debugger;
 
     // find super
     const superProto = Object.getPrototypeOf(Component.prototype);
