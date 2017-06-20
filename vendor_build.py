@@ -28,7 +28,7 @@ def recursive_overwrite(src, dest):
         print '  copying %s to %s' % (src, destDir)
         shutil.copy(src, destDir)
 
-with open('vendor.yaml','rt') as f: vendor = yaml.load(f.read())
+with open('vendor.yaml','rt') as f: vendor = yaml.safe_load(f.read())
 
 for (libName, lib) in vendor['libs'].items():
     if 'npmDir' in lib and 'files' in lib:
@@ -40,3 +40,5 @@ for (libName, lib) in vendor['libs'].items():
 
 print 'Processing lib_src...'
 recursive_overwrite('lib_src', 'lib')
+
+import vendor_license

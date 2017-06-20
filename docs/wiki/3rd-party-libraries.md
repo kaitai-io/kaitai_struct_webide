@@ -43,6 +43,11 @@ Source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
 
 License: Apache-2.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE)
 
+## Vue.js
+Source: https://github.com/vuejs/vue
+
+License: MIT (https://raw.githubusercontent.com/vuejs/vue/dev/LICENSE)
+
 ## bowser
 Source: https://github.com/ded/bowser
 
@@ -77,7 +82,17 @@ Source: https://github.com/floatdrop/require-from-string
 
 License: MIT (https://raw.githubusercontent.com/floatdrop/require-from-string/master/LICENSE)
 
+## smooth-scrollbar
+Source: https://github.com/idiotWu/smooth-scrollbar
+
+License: MIT (https://raw.githubusercontent.com/idiotWu/smooth-scrollbar/develop/LICENSE)
+
 ## text-encoding
 Source: https://github.com/inexorabletash/text-encoding
 
 License: Unlicense (https://raw.githubusercontent.com/inexorabletash/text-encoding/master/LICENSE.md)
+
+## thenBy.js
+Source: https://github.com/Teun/thenBy.js
+
+License: Apache-2.0 (https://raw.githubusercontent.com/Teun/thenBy.js/master/LICENSE.TXT)

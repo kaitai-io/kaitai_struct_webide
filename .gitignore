@@ -250,4 +250,6 @@ out/
 # Generated file
 js/
 files/
+lib/
+*.pyc
 .serve_files_secret
