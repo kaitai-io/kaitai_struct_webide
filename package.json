@@ -5,11 +5,27 @@
     "doc": "docs"
   },
   "dependencies": {
+    "ace-builds": "^1.2.6",
+    "big-integer": "^1.6.23",
+    "bootstrap": "^3.3.7",
+    "bowser": "^1.7.0",
+    "font-awesome": "^4.7.0",
+    "golden-layout": "^1.5.8",
+    "jquery": "^3.2.1",
+    "jstree": "^3.3.4",
+    "localforage": "^1.5.0",
+    "require-from-string": "^1.2.1",
+    "smooth-scrollbar": "^7.3.1",
+    "text-encoding": "^0.6.4",
+    "thenby": "^1.2.3",
+    "vue": "^2.3.4"
+  },
+  "devDependencies": {
     "typescript": "^2.3"
   },
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "python vendor_build.py"
   },
   "repository": {
     "type": "git",

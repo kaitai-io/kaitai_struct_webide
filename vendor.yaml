@@ -1,0 +1,132 @@
+libs:
+  Ace:
+    website: https://ace.c9.io/
+    source: https://github.com/ajaxorg/ace
+    licenseName: BSD-3-Clause
+    licenseUrl: https://raw.githubusercontent.com/ajaxorg/ace/master/LICENSE
+    distDir: ace
+    npmDir: ace-builds
+    files: [LICENSE, src/ace.js, src/ext-searchbox.js, src/mode-c_cpp.js, src/mode-csharp.js, src/mode-dot.js, src/mode-java.js, src/mode-javascript.js, src/mode-json.js, src/mode-perl.js, src/mode-php.js, src/mode-python.js, src/mode-ruby.js, src/mode-yaml.js, src/theme-monokai.js, src/worker-javascript.js, src/worker-json.js] 
+
+  BigInteger.js:
+    source: https://github.com/peterolson/BigInteger.js
+    licenseName: Unlicense
+    licenseUrl: https://raw.githubusercontent.com/peterolson/BigInteger.js/master/LICENSE
+    distDir: BigInteger
+    npmDir: big-integer
+    files: [LICENSE, BigInteger.js]
+
+  Bootstrap:
+    website: http://getbootstrap.com/
+    source: https://github.com/twbs/bootstrap
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE
+    npmDir: bootstrap
+    files: [LICENSE, dist/js/bootstrap.min.js, dist/css/bootstrap.min.css]
+
+  bowser:
+    source: https://github.com/ded/bowser
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/ded/bowser/master/LICENSE
+    npmDir: bowser
+    files: [LICENSE, bowser.js]
+
+  date.format:
+    source: https://github.com/jacwright/date.format
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/jacwright/date.format/master/LICENSE
+    distDir: date.format
+    
+  Font Awesome:
+    website: http://fontawesome.io/
+    source: https://github.com/FortAwesome/Font-Awesome
+    licenseUrl: http://fontawesome.io/license/
+    npmDir: font-awesome
+    files: [css/font-awesome.min.css]
+    
+  GoldenLayout:
+    website: https://www.golden-layout.com/
+    source: https://github.com/deepstreamIO/golden-layout
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/deepstreamIO/golden-layout/master/LICENSE
+    distDir: goldenlayout
+    npmDir: golden-layout
+    files: [LICENSE, dist/goldenlayout.js, src/css/goldenlayout-base.css, src/css/goldenlayout-dark-theme.css]
+
+  jQuery:
+    website: https://jquery.com/
+    source: https://github.com/jquery/jquery
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/jquery/jquery/master/LICENSE.txt
+    npmDir: jquery
+    files: [LICENSE.txt, dist/jquery.min.js]
+
+  jsTree:
+    website: https://www.jstree.com/
+    source: https://github.com/vakata/jstree
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/vakata/jstree/master/LICENSE-MIT
+    npmDir: jstree
+    files: [LICENSE-MIT, dist]
+
+  Kaitai Struct Compiler:
+    website: http://kaitai.io/
+    source: https://github.com/kaitai-io/kaitai_struct_compiler
+    licenseName: GPL-3.0
+    licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE
+    distDir: kaitai
+
+  Kaitai Struct JS Runtime:
+    source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
+    licenseName: Apache-2.0
+    licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE
+    distDir: kaitai_js_runtime
+
+  localForage:
+    source: https://github.com/localForage/localForage
+    licenseName: Apache-2.0
+    licenseUrl: https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
+    npmDir: localForage
+    files: [LICENSE, dist/localforage.js]
+
+  require-from-string:
+    source: https://github.com/floatdrop/require-from-string
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/floatdrop/require-from-string/master/LICENSE
+    npmDir: require-from-string
+    files: [license, index.js]
+
+  smooth-scrollbar:
+    source: https://github.com/idiotWu/smooth-scrollbar
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/idiotWu/smooth-scrollbar/develop/LICENSE
+    npmDir: smooth-scrollbar
+    files: [LICENSE, dist]
+    
+  text-encoding:
+    source: https://github.com/inexorabletash/text-encoding
+    licenseName: Unlicense
+    licenseUrl: https://raw.githubusercontent.com/inexorabletash/text-encoding/master/LICENSE.md
+    npmDir: text-encoding
+    files: [LICENSE.md, index.js]
+
+  thenBy.js:
+    source: https://github.com/Teun/thenBy.js
+    licenseName: Apache-2.0
+    licenseUrl: https://raw.githubusercontent.com/Teun/thenBy.js/master/LICENSE.TXT
+    distDir: thenBy
+    npmDir: thenby
+    files: [LICENSE.TXT, thenBy.min.js, thenBy.module.js]
+    
+  Vue.js:
+    source: https://github.com/vuejs/vue
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/vuejs/vue/dev/LICENSE
+    npmDir: vue
+    files: [LICENSE, dist/vue.js, dist/vue.min.js]
+
+  DefinitelyTyped:
+    source: https://github.com/DefinitelyTyped/DefinitelyTyped
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/LICENSE
+    distDir: ts-types
