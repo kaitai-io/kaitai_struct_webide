@@ -5,6 +5,7 @@ sudo: false
 language: javascript
 
 install:
+  - pip install -r requirements.txt
   - npm install
 
 script:
