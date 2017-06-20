@@ -86,7 +86,8 @@ libs:
     source: https://github.com/localForage/localForage
     licenseName: Apache-2.0
     licenseUrl: https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
-    npmDir: localForage
+    distDir: localForage
+    npmDir: localforage
     files: [LICENSE, dist/localforage.js]
 
   require-from-string:
