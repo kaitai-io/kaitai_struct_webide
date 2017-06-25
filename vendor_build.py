@@ -33,12 +33,19 @@ with open('vendor.yaml','rt') as f: vendor = yaml.safe_load(f.read())
 for (libName, lib) in vendor['libs'].items():
     if 'npmDir' in lib and 'files' in lib:
         print 'Processing: %s' % libName
-        distDir = './lib/%s/' % (lib['distDir'] if 'distDir' in lib else lib['npmDir'])
+        distDir = './lib/_npm/%s/' % (lib['distDir'] if 'distDir' in lib else lib['npmDir'])
         for file in lib['files']:
+            allFilesInDir = file.endswith('/*')
+            if allFilesInDir:
+                file = file.replace('/*', '')
+                
             srcPattern = './node_modules/%s/%s' % (lib['npmDir'], file)
-            recursive_overwrite(srcPattern, distDir)
+            if os.path.isdir(srcPattern) and not allFilesInDir:
+                recursive_overwrite(srcPattern, distDir + file + '/')
+            else:
+                recursive_overwrite(srcPattern, distDir)            
 
-print 'Processing lib_src...'
-recursive_overwrite('lib_src', 'lib')
+#print 'Processing lib_src...'
+#recursive_overwrite('lib_src', 'lib')
 
 import vendor_license

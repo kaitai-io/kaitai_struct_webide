@@ -22,7 +22,7 @@ libs:
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE
     npmDir: bootstrap
-    files: [LICENSE, dist/js/bootstrap.min.js, dist/css/bootstrap.min.css]
+    files: [LICENSE, dist/*]
 
   bowser:
     source: https://github.com/ded/bowser
@@ -42,7 +42,7 @@ libs:
     source: https://github.com/FortAwesome/Font-Awesome
     licenseUrl: http://fontawesome.io/license/
     npmDir: font-awesome
-    files: [css/font-awesome.min.css]
+    files: [css, fonts]
     
   GoldenLayout:
     website: https://www.golden-layout.com/
@@ -67,7 +67,7 @@ libs:
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/vakata/jstree/master/LICENSE-MIT
     npmDir: jstree
-    files: [LICENSE-MIT, dist]
+    files: [LICENSE-MIT, dist/*]
 
   Kaitai Struct Compiler:
     website: http://kaitai.io/
@@ -102,7 +102,7 @@ libs:
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/idiotWu/smooth-scrollbar/develop/LICENSE
     npmDir: smooth-scrollbar
-    files: [LICENSE, dist]
+    files: [LICENSE, dist/*]
     
   text-encoding:
     source: https://github.com/inexorabletash/text-encoding

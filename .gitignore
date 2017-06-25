@@ -250,6 +250,6 @@ out/
 # Generated file
 js/
 files/
-lib/
+lib/_npm/
 *.pyc
 .serve_files_secret
