@@ -30,13 +30,6 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
         });
     }
 
-    mounted() {
-        //if (Scrollbar) {
-        //    var scrollbar = Scrollbar.init(this.$el);
-        //    this.scrollIntoView = (el, alignToTop) => scrollbar.scrollIntoView(el, { alignToTop: alignToTop });
-        //}
-    }
-
     openSelected() {
         if (!this.selectedItem.open)
             this.selectedItem.dblclick();
