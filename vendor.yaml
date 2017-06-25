@@ -95,7 +95,6 @@ libs:
     source: https://github.com/localForage/localForage
     licenseName: Apache-2.0
     licenseUrl: https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
-    distDir: localForage
     npmDir: localforage
     files: [LICENSE, dist/localforage.js]
     
