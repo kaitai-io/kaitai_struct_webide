@@ -19,6 +19,13 @@ Source: https://github.com/twbs/bootstrap
 
 License: MIT (https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE)
 
+## Bootswatch
+Website: https://bootswatch.com/
+
+Source: https://github.com/thomaspark/bootswatch
+
+License: MIT (https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE)
+
 ## DefinitelyTyped
 Source: https://github.com/DefinitelyTyped/DefinitelyTyped
 

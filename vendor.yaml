@@ -23,6 +23,15 @@ libs:
     licenseUrl: https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE
     npmDir: bootstrap
     files: [LICENSE, dist/*]
+    
+  Bootswatch:
+    website: https://bootswatch.com/
+    source: https://github.com/thomaspark/bootswatch
+    licenseName: MIT
+    licenseUrl: https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE
+    npmDir: bootswatch
+    distDir: bootstrap/css/
+    files: [LICENSE, darkly/bootstrap.min.css]
 
   bowser:
     source: https://github.com/ded/bowser
