@@ -107,7 +107,7 @@ function addRootNode(text: string, icon: string, uri: string) {
 
 var fsData = new FsRootNode([
     addRootNode("kaitai.io", "glyphicon-cloud", getRelativeUrl("formats/")),
-    addRootNode("koczkatamas/formats", "fa fa-github", "github://koczkatamas/kaitai_struct_formats/"),
+    addRootNode("kaitai-io/formats", "fa fa-github", "github://kaitai-io/kaitai_struct_formats/"),
     addRootNode("browser", "glyphicon-cloud", "browser:///"),
     addRootNode("browser (legacy)", "glyphicon-cloud", "browser_legacy:///"),
 ]);

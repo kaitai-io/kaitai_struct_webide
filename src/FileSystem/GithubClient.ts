@@ -1,4 +1,5 @@
-﻿import {downloadFile} from "../utils";
+﻿import * as $ from "jquery";
+import {downloadFile} from "../utils";
 
 export namespace Entities {
     export interface IRepository {
