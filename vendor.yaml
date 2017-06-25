@@ -89,6 +89,13 @@ libs:
     distDir: localForage
     npmDir: localforage
     files: [LICENSE, dist/localforage.js]
+    
+  require.js:
+    source: https://github.com/requirejs/requirejs
+    licenseName: jQuery license
+    licenseUrl: https://jquery.org/license/
+    npmDir: requirejs
+    files: [require.js]
 
   require-from-string:
     source: https://github.com/floatdrop/require-from-string

@@ -74,8 +74,8 @@ export function componentFactory(
 
     if (componentLoader.templates[options.name])
         options.template = componentLoader.templates[options.name];
-    else
-        console.error(`Missing template for component: ${options.name}`);
+    //else
+    //    console.error(`Missing template for component: ${options.name}`);
     
     // find super
     const superProto = Object.getPrototypeOf(Component.prototype);

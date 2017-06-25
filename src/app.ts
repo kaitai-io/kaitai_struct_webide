@@ -235,7 +235,7 @@ $(() => {
         (<any>$("#welcomeModal")).modal();
 
     app.init();
-    componentLoader.load(["ConverterPanel", "Stepper", "SelectionInput"]).then(() => {
+    componentLoader.load(["Components/ConverterPanel", "Components/Stepper", "Components/SelectionInput"]).then(() => {
         new Vue({ data: { model: app.vm.converterPanelModel } }).$mount("#converterPanel");
         app.vm.$mount("#infoPanel");
         app.vm.$watch("disableLazyParsing", () => app.reparse());

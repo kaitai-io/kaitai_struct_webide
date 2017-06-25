@@ -55,7 +55,8 @@ class ComponentLoader {
 
         for (var componentName of Object.keys(module)) {
             if (!this.templates[componentName])
-                throw new Error(`Template not found for component: ${componentName}`);
+                continue;
+                //throw new Error(`Template not found for component: ${componentName}`);
             module[componentName].options.template = this.templates[componentName];
         }
     }
