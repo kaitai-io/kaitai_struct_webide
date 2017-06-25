@@ -1,6 +1,7 @@
 ﻿///<reference path="../../../lib/ts-types/vue.d.ts"/>
 import * as Vue from "vue";
 import Component from "../Component";
+import * as $ from "jquery";
 
 @Component({ props: { title: {}, okText: { default: "OK" }, paramName: { } } })
 export class InputModal extends Vue {

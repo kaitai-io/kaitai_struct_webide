@@ -50,7 +50,7 @@ class AmdLoader {
     }
 
     async onModuleLoaded(moduleDesc: AmdModule, value: any){
-        console.log('onModuleLoaded', moduleDesc.url);
+        //console.log('onModuleLoaded', moduleDesc.url);
         moduleDesc.exports = value;
         if (this.moduleLoadedHook)
             await this.moduleLoadedHook(moduleDesc);
@@ -59,13 +59,13 @@ class AmdLoader {
     }
 
     async onScriptLoaded(module: AmdModule){
-        console.log('script loaded', module.url);
-        if (!module.exports)
-            module.exports = window["module"].exports;
-        if (!module.loaded){
-            module.loadPromiseResolve(module);
-            module.loaded = true;
-        }
+        //console.log('script loaded', module.url);
+        //if (!module.exports)
+        //    module.exports = window["module"].exports;
+        //if (!module.loaded){
+        //    module.loadPromiseResolve(module);
+        //    module.loaded = true;
+        //}
         
         // let self = this;
         // let moduleObj = { 
