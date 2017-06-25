@@ -17,6 +17,7 @@
     <script src="js/extensions.js"></script>
     <script src="js/kaitaiFsFiles.js"></script>
     <script src="js/AmdLoader.js"></script>
+    <script src="lib/thenBy.js"></script>
     <script>
         async function init(){
             var paths = {};
@@ -24,7 +25,6 @@
                 name => loader.paths[name] = `../lib/_npm/${name}/${name}`);
             loader.paths["bigInt"] = "../lib/_npm/BigInteger/BigInteger";
             loader.paths["jquery"] = "../lib/_npm/jquery/jquery.min";
-            loader.paths["thenBy"] = "../lib/_npm/thenBy/thenBy.module";
 
             let componentLoader = (await loader.getLoadedModule('ui/ComponentLoader')).exports.componentLoader;
             //console.log('componentLoader', componentLoader);
