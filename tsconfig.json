@@ -1,7 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "module": "system",
+    "module": "amd",
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "noEmitOnError": true,
