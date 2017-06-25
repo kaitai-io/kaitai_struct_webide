@@ -192,15 +192,11 @@ export class FileTree extends Vue {
             .then(() => this.contextMenuNode.parent.loadChildren());
     }
 
-    updated() {
-        //var fsTreeScrollbar = Scrollbar.init(this.fsTreeView.$el);
-        //this.fsTreeView.scrollIntoView = (el, alignToTop) => fsTreeScrollbar.scrollIntoView(el, { alignToTop: alignToTop });
-        console.log('FileTree updated', this.fsTreeView);
-    }
-
     mounted() {
         var scrollbar = Scrollbar.init(this.$el);
-        this.fsTreeView.scrollIntoView = (el, alignToTop) => scrollbar.scrollIntoView(el, { alignToTop: alignToTop });
+        this.fsTreeView.getParentBoundingRect = () => scrollbar.bounding;
+        this.fsTreeView.scrollIntoView = (el: Element, alignToTop: boolean) =>
+            scrollbar.scrollIntoView(el, { alignToTop: alignToTop, onlyScrollIfNeeded: true });
         document.body.appendChild(this.ctxMenu.$el);
         console.log('FileTree mounted', this.fsTreeView);
         //this.createFolderModal.show();
