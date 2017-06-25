@@ -8,12 +8,11 @@
     <link rel="stylesheet" type="text/css" href="lib/_npm/goldenlayout/goldenlayout-dark-theme.css" />
     <link rel="stylesheet" type="text/css" href="lib/_npm/smooth-scrollbar/smooth-scrollbar.css">
     <link rel="stylesheet" type="text/css" href="lib/_npm/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="css/contextmenu.css" />
     <link rel="stylesheet" type="text/css" href="lib/_npm/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/contextmenu.css" />
+    <link rel="stylesheet" type="text/css" href="css/v2.css" />
     
     <script src="lib/_npm/smooth-scrollbar/smooth-scrollbar.js"></script>
-    <!--<script src="lib/systemjs/system.src.js"></script>-->
-    <!--<script src="lib/requirejs/require.js"></script>-->
     <script src="js/extensions.js"></script>
     <script src="js/kaitaiFsFiles.js"></script>
     <script src="js/AmdLoader.js"></script>
@@ -37,6 +36,7 @@
                 }
             };
 
+            require("autorefresh2");
             require("v2");
         };
         init();
