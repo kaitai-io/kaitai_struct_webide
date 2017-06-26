@@ -70,8 +70,9 @@ export class GithubClient {
             }));
     }
 
-    listRepos(): Promise<Repository[]> {
-        return this.req<Entities.IRepository[]>("/user/repos").then(repos => repos.map(entity => Repository.fromEntity(this, entity)));
+    async listRepos(): Promise<Repository[]> {
+        let repos = await this.req<Entities.IRepository[]>("/user/repos");
+        return repos.map(entity => Repository.fromEntity(this, entity));
     }
 
     getRepo(name: string, owner?: string): Repository {

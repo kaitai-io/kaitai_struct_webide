@@ -70,21 +70,20 @@ export class FsTreeNode implements IFsTreeNode {
         this.isFolder = uri.type === "directory";
     }
 
-    loadChildren(): Promise<void> {
-        return this.fs.list(this.uri.uri).then(children => {
-            var childCache = (this.children || []).toDict(x => x.uri.name);
+    async loadChildren(): Promise<void> {
+        let children = await this.fs.list(this.uri.uri);
+        var childCache = (this.children || []).toDict(x => x.uri.name);
 
-            this.children = children
-                .filter(x => x.uri.uri !== this.uri.uri)
-                .map(fsItem => new FsTreeNode(this, fsItem.uri))
-                .sortBy(x => x.isFolder ? 0 : 1).thenBy(x => x.uri.path).sort();
+        this.children = children
+            .filter(x => x.uri.uri !== this.uri.uri)
+            .map(fsItem => new FsTreeNode(this, fsItem.uri))
+            .sortBy(x => x.isFolder ? 0 : 1).thenBy(x => x.uri.path).sort();
 
-            for (var item of this.children) {
-                var old = childCache[item.uri.name];
-                if (old)
-                    item.children = item.children || old.children;
-            }
-        });
+        for (var item of this.children) {
+            var old = childCache[item.uri.name];
+            if (old)
+                item.children = item.children || old.children;
+        }
     }
 }
 
@@ -141,19 +140,17 @@ export class FileTree extends Vue {
         this.fsTreeView.selectedItem.dblclick();
     }
 
-    public openFile() {
-        fss.read(this.selectedUri).then(data => {
-            this.$emit("open-file", this.selectedFsItem, data);
-        });
+    public async openFile() {
+        let data = await fss.read(this.selectedUri)
+        this.$emit("open-file", this.selectedFsItem, data);
     }
 
-    public generateParser(lang: string, aceLangOrDebug?: any) {
+    public async generateParser(lang: string, aceLangOrDebug?: any) {
         var aceLang = typeof aceLangOrDebug === "string" ? aceLangOrDebug : lang;
         var debug = typeof aceLangOrDebug === "boolean" ? aceLangOrDebug : false;
 
-        fss.read(this.selectedUri).then(data => {
-            this.$emit("generate-parser", lang, aceLang, debug, data);
-        });
+        let data = await fss.read(this.selectedUri)
+        this.$emit("generate-parser", lang, aceLang, debug, data);
     }
 
     public showContextMenu(event: MouseEvent) {
@@ -161,35 +158,35 @@ export class FileTree extends Vue {
         this.ctxMenu.open(event, this.contextMenuNode);
     }
 
-    public createFolder(name: string) {
+    public async createFolder(name: string) {
         var newUri = this.contextMenuNode.uri.addPath(`${name}/`).uri;
-        this.contextMenuNode.fs.createFolder(newUri)
-            .then(() => this.contextMenuNode.loadChildren());
+        await this.contextMenuNode.fs.createFolder(newUri);
+        await this.contextMenuNode.loadChildren();
     }
 
-    public createKsyFile(name: string) {
+    public async createKsyFile(name: string) {
         var newUri = this.contextMenuNode.uri.addPath(`${name}.ksy`).uri;
         var content = `meta:\n  id: ${name}\n  file-extension: ${name}\n`;
-        this.contextMenuNode.fs.write(newUri, Convert.utf8StrToBytes(content).buffer)
-            .then(() => this.contextMenuNode.loadChildren());
+        await this.contextMenuNode.fs.write(newUri, Convert.utf8StrToBytes(content).buffer);
+        await this.contextMenuNode.loadChildren();
     }
 
-    public cloneFile() {
+    public async cloneFile() {
         var newUri = this.contextMenuNode.uri.uri.replace(/\.(\w+)$/, `_${new Date().format("Ymd_His")}.$1`);
         console.log('cloneKsyFile', newUri);
-        this.contextMenuNode.fs.read(this.contextMenuNode.uri.uri)
-            .then(content => this.contextMenuNode.fs.write(newUri, content))
-            .then(() => this.contextMenuNode.parent.loadChildren());
+        let content = await this.contextMenuNode.fs.read(this.contextMenuNode.uri.uri);
+        await this.contextMenuNode.fs.write(newUri, content);
+        await this.contextMenuNode.parent.loadChildren();
     }
 
-    public downloadFile() {
-        this.contextMenuNode.fs.read(this.contextMenuNode.uri.uri)
-            .then(data => saveFile(data, this.contextMenuNode.uri.name));
+    public async downloadFile() {
+        let data = await this.contextMenuNode.fs.read(this.contextMenuNode.uri.uri);
+        await saveFile(data, this.contextMenuNode.uri.name);
     }
 
-    public deleteFile() {
-        this.contextMenuNode.fs.delete(this.contextMenuNode.uri.uri)
-            .then(() => this.contextMenuNode.parent.loadChildren());
+    public async deleteFile() {
+        await this.contextMenuNode.fs.delete(this.contextMenuNode.uri.uri);
+        await this.contextMenuNode.parent.loadChildren();
     }
 
     mounted() {

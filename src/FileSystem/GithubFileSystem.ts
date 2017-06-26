@@ -27,11 +27,10 @@ export class GithubFsItem implements IFsItem {
         throw new Error("Not implemented");
     }
 
-    list(): Promise<IFsItem[]> {
-        return this.repo.getContents(this.uri.path).then(items => {
-            return items.filter(item => item.type === "file" || item.type === "dir")
-                .map(item => new GithubFsItem(this.fs, this.uri.uri + item.name + (item.type === "dir" ? "/" : ""), item));
-        });
+    async list(): Promise<IFsItem[]> {
+        let items = await this.repo.getContents(this.uri.path);
+        return items.filter(item => item.type === "file" || item.type === "dir")
+            .map(item => new GithubFsItem(this.fs, this.uri.uri + item.name + (item.type === "dir" ? "/" : ""), item));
     }
 }
 

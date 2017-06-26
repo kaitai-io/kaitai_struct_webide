@@ -33,25 +33,24 @@ export class RemoteFileSystem implements IFileSystem {
         return { write: true, delete: true };
     };
 
-    createFolder(uri: string): Promise<void> {
-        return this.execute("PUT", uri).then(x => null);
+    async createFolder(uri: string): Promise<void> {
+        await this.execute("PUT", uri);
     }
 
-    read(uri: string): Promise<ArrayBuffer> {
-        return this.execute("GET", uri, true);
+    async read(uri: string): Promise<ArrayBuffer> {
+        return await this.execute<ArrayBuffer>("GET", uri, true);
     }
 
-    write(uri: string, data: ArrayBuffer): Promise<void> {
-        return this.execute("PUT", uri, false, data).then(x => null);
+    async write(uri: string, data: ArrayBuffer): Promise<void> {
+        await this.execute("PUT", uri, false, data);
     }
 
-    delete(uri: string): Promise<void> {
-        return this.execute("DELETE", uri).then(x => null);
+    async delete(uri: string): Promise<void> {
+        await this.execute("DELETE", uri);
     }
 
-    list(uri: string): Promise<FsItem[]> {
-        return this.execute("GET", uri).then(response => {
-            return (<IListResponse>response).files.map(item => new FsItem(this.getFsUri(uri + item.fn + (item.isDir ? "/" : ""))));
-        });
+    async list(uri: string): Promise<FsItem[]> {
+        let response = await this.execute("GET", uri);
+        return (<IListResponse>response).files.map(item => new FsItem(this.getFsUri(uri + item.fn + (item.isDir ? "/" : ""))));
     }
 }

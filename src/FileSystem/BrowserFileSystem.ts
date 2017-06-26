@@ -16,25 +16,27 @@ export class BrowserFileSystem implements IFileSystem {
         return action(this.lfCache[name], fsUri);
     }
 
-    createFolder(uri: string): Promise<void> {
-        return this.execute(uri, (lf, fsUri) => lf.setItem(fsUri.path, null)).then(x => null);
+    async createFolder(uri: string): Promise<void> {
+        await this.execute(uri, (lf, fsUri) => lf.setItem(fsUri.path, null));
     }
 
     read(uri: string): Promise<ArrayBuffer> {
         return this.execute(uri, (lf, fsUri) => lf.getItem(fsUri.path));
     }
 
-    write(uri: string, data: ArrayBuffer): Promise<void> {
-        return this.execute(uri, (lf, fsUri) => lf.setItem(fsUri.path, data)).then(x => null);
+    async write(uri: string, data: ArrayBuffer): Promise<void> {
+        await this.execute(uri, (lf, fsUri) => lf.setItem(fsUri.path, data));
     }
 
-    delete(uri: string): Promise<void> {
-        return this.execute(uri, (lf, fsUri) => lf.removeItem(fsUri.path));
+    async delete(uri: string): Promise<void> {
+        await this.execute(uri, (lf, fsUri) => lf.removeItem(fsUri.path));
     }
 
     list(uri: string): Promise<FsItem[]> {
-        return this.execute(uri, (lf, fsUri) => lf.keys().then(
-            keys => FsUri.getChildUris(keys, fsUri).map(uri => new FsItem(uri))));
+        return this.execute(uri, async (lf, fsUri) => {
+            let keys = await lf.keys();
+            return FsUri.getChildUris(keys, fsUri).map(uri => new FsItem(uri));
+        });
     }
 }
 
@@ -55,10 +57,9 @@ export class BrowserLegacyFileSystem implements IFileSystem {
         return localforage.removeItem(this.uriKey(uri));
     }
 
-    list(uri: string): Promise<FsItem[]> {
-        return localforage.keys().then(keys => {
-            var fsKeys = keys.filter(x => x.startsWith("fs_file[")).map(x => "/" + x.substr(8, x.length - 9));
-            return FsUri.getChildUris(fsKeys, new FsUri(uri)).map(uri => new FsItem(uri));
-        });
+    async list(uri: string): Promise<FsItem[]> {
+        let keys = await localforage.keys();
+        var fsKeys = keys.filter(x => x.startsWith("fs_file[")).map(x => "/" + x.substr(8, x.length - 9));
+        return FsUri.getChildUris(fsKeys, new FsUri(uri)).map(uri => new FsItem(uri));
     }
 }
