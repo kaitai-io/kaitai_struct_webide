@@ -23,4 +23,8 @@ cp -r \
 
 mkdir -p "$OUT_DIR/src/ui/Components"
 cp -r src/ui/Components/*.html "$OUT_DIR/src/ui/Components"
+
+mkdir -p "$OUT_DIR/src/ui/Parts"
+cp -r src/ui/Parts/*.html "$OUT_DIR/src/ui/Parts"
+
 ./build.py "$OUT_DIR"
