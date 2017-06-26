@@ -1,22 +1,23 @@
 ﻿import { Layout } from "./AppLayout";
 import { FileTree } from "./ui/Parts/FileTree";
 import { componentLoader } from "./ui/ComponentLoader";
+import { Component } from "./ui/LayoutManagerV2";
+import * as ace from "ace/ace";
+
 window["layout"] = Layout;
-
-// <file-tree ref="fileTree" @open-file="openFile" @generate-parser="generateParser"></file-tree>
-// "Components/TreeView", "Components/ContextMenu", "Components/InputModal", "Parts/FileTree"
-
-console.log('load done?', Object.keys(componentLoader.templatePromises));
 
 var filetree = new FileTree();
 filetree.init();
 filetree.$mount(Layout.fileTree.element);
 
+function addEditor(parent: Component, lang: string){
+    var editor = ace.edit(parent.element);
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode(`ace/mode/${lang}`);
+    if (lang === "yaml")
+        editor.setOption("tabSize", 2);
+    editor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
+    parent.container.on("resize", () => editor.resize());
+}
 
-//componentLoader.load([]).then(() => {
-//    var filetree = new FileTree();
-//    filetree.init();
-//    filetree.$mount(Layout.fileTree.element);
-//});
-
-console.log('fileTree container', Layout.fileTree.element);
+addEditor(Layout.ksyEditor, 'yaml');

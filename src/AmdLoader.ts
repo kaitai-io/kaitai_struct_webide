@@ -1,10 +1,13 @@
 class AmdModule {
+    amdLoading: boolean = false;
     loaded: boolean = false;
     loadPromise: Promise<AmdModule> = null;
     loadPromiseResolve: any = null;
     exports: any;
 
-    constructor(public url: string){ }
+    constructor(public url: string){
+        //console.log('create module url', url);
+     }
 }
 
 window["module"] = { exports: null };
@@ -14,6 +17,7 @@ class AmdLoader {
     paths: { [name: string]: string } = {};
     moduleLoadedHook: (module: AmdModule) => Promise<void> = null;
     beforeLoadHook: (module: AmdModule) => Promise<void> = null;
+    requireBase: string = null;
 
     loadWithScriptTag(src: string): Promise<HTMLScriptElement> {
         return new Promise((resolve, reject) => {
@@ -25,17 +29,37 @@ class AmdLoader {
         });
     }
 
-    async getLoadedModule(name: string): Promise<AmdModule>{
-        let isRelative = name.startsWith('./') || name.startsWith('../');            
+    getUrlFromName(name: string, baseUrl?: string): string {
+        if (typeof name !== "string") debugger;
+
+        let isRelative = name.startsWith('./') || name.startsWith('../');
+        let pathMatches = Object.keys(this.paths).filter(path => name === path || name.startsWith(path + '/'));
+        if (pathMatches.length > 1)
+            throw Error(`Module '${name}' can be loaded from multiple paths: ${pathMatches.join(', ')}`)
+
         let url = 
-            isRelative ? new URL(`${name}.js`, document.currentScript["src"] || window.location).href :
-            name in this.paths ? new URL(`${this.paths[name]}.js`, window.location.href).href :
+            isRelative ? new URL(`${name}.js`, baseUrl || document.currentScript["src"] || window.location).href :
+            pathMatches.length > 0 ? new URL(`${this.paths[pathMatches[0]]}${name.substr(pathMatches[0].length)}.js`, window.location.href).href :
             new URL(`js/${name}.js`, window.location.href).href;
+
+        return url;
+    }
+
+    getModule(name: string): AmdModule {
+        var url = this.getUrlFromName(name);
         var module = this.modules[url] || (this.modules[url] = new AmdModule(url));
+        return module;
+    }
+
+    async getLoadedModule(name: string): Promise<AmdModule> {
+        var module = this.getModule(name);
+        if (module.exports)
+            return module;
+
         if (!module.loadPromise){
             //console.log('getDep', url);
             // console.log('baseURI', document.currentScript.baseURI, 'src',document.currentScript.src);
-            var loadPromiseReject;
+            var loadPromiseReject: (arg: any) => void;
             module.loadPromise = new Promise<AmdModule>((resolve, reject) => {
                 module.loadPromiseResolve = resolve;
                 loadPromiseReject = reject;
@@ -44,7 +68,8 @@ class AmdLoader {
             if (this.beforeLoadHook)
                 await this.beforeLoadHook(module);
 
-            this.loadWithScriptTag(url).then(x => this.onScriptLoaded(module), loadPromiseReject);
+            //console.log('will load ', module.url, 'exports', module.exports, 'module', module);
+            this.loadWithScriptTag(module.url).then(x => this.onScriptLoaded(module), x => loadPromiseReject(module.url));
         }
         return module.loadPromise;
     }
@@ -54,7 +79,8 @@ class AmdLoader {
         moduleDesc.exports = value;
         if (this.moduleLoadedHook)
             await this.moduleLoadedHook(moduleDesc);
-        moduleDesc.loadPromiseResolve(moduleDesc);
+        if (moduleDesc.loadPromiseResolve)
+            moduleDesc.loadPromiseResolve(moduleDesc);
         moduleDesc.loaded = true;        
     }
 
@@ -62,10 +88,8 @@ class AmdLoader {
         //console.log('script loaded', module.url);
         //if (!module.exports)
         //    module.exports = window["module"].exports;
-        //if (!module.loaded){
-        //    module.loadPromiseResolve(module);
-        //    module.loaded = true;
-        //}
+        if (!module.loaded && !module.amdLoading)
+            this.onModuleLoaded(module, window["module"].exports);
         
         // let self = this;
         // let moduleObj = { 
@@ -81,31 +105,79 @@ class AmdLoader {
         // }
     }
 
-    async define(deps: string[], callback: any){
-        let currScript = document.currentScript;
-        //console.log('define', currScript, deps, callback);
-        let exports = {};
+    parseArgs(argumentsObj: IArguments, isDefine: boolean){
+        let args = Array.from(argumentsObj);
+        let callback = args.filter(x => typeof x === "function")[0];
+        let name = args.filter(x => typeof x === "string")[0];
+        let deps = args.filter(x => Array.isArray(x))[0] || [];        
+        if (isDefine)
+            return [name, deps, callback];
+        else
+            return [deps.concat(name ? [name] : []), callback];
+    }
+
+    requireLoaded(name: string){
+        var url = this.getUrlFromName(name, this.requireBase);
+        if (!(url in this.modules))
+            throw Error(`Tried to sync require a not yet loaded module '${name}' (requireBase = '${this.requireBase}).`);
+        return this.modules[url].exports;
+    }
+
+    async require(deps: string[], callback?: any, module?: AmdModule){
+        //console.log('require', deps, callback);
+
+        let moduleObj = { exports: {} };
+        //console.log('require before DEPS', deps);
         let depRes = await Promise.all(deps.map(dep => 
-            dep === "exports" ? exports : 
-            dep === "require" ? {} :
+            dep === "exports" ? moduleObj.exports :
+            dep === "module" ? moduleObj :
+            dep === "require" ? require :
             this.getLoadedModule(dep).then(x => x.exports)));
-        //console.log('define depRes', currScript && currScript.src, depRes);
-        if (currScript && currScript["src"]){
-            let moduleDesc = this.modules[currScript["src"]];
-            let callbackResult = callback(...depRes);
-            this.onModuleLoaded(moduleDesc, callbackResult || exports);
-        }
+        //console.log('require AFTER DEPS', deps);
+
+        this.requireBase = module && module.url;
+        let callbackResult = callback && callback(...depRes);
+        return callbackResult || moduleObj.exports;
+    }
+
+    async define(name: string, deps: string[], callback: any){
+        let currScript = document.currentScript;
+        //console.log('define', currScript, name, deps, callback);
+
+        let moduleDesc = name ? this.getModule(name) : currScript && currScript["src"] && this.modules[currScript["src"]];
+        if (moduleDesc)
+            moduleDesc.amdLoading = true;
+
+        var promise = async () => {
+            //console.log('define before REQUIRE', name, deps);
+            let moduleValue = await this.require(deps, callback, moduleDesc);
+
+            //console.log('define depRes', currScript && currScript.src, depRes);
+            if (moduleDesc)
+                await this.onModuleLoaded(moduleDesc, moduleValue);
+
+            //console.log('define ENDED', currScript, name, deps, callback);
+            return moduleDesc;
+        };
+
+        if (!moduleDesc.loadPromise)
+            moduleDesc.loadPromise = promise();
+        else
+            promise();
     }
 }
 
 let loader = new AmdLoader;
 
-function require(name: string){ loader.getLoadedModule(name); }
+function require(){
+    if(arguments.length === 1 && typeof arguments[0] === "string")
+        return loader.requireLoaded(arguments[0]);
+    return loader.require.apply(loader, loader.parseArgs(arguments, false));
+}
+
 function define(){
-    let args = Array.from(arguments);
-    let callback = args.filter(x => typeof x === "function")[0];
-    let deps = args.filter(x => Array.isArray(x))[0] || [];
-    loader.define(deps, callback);    
+    return loader.define.apply(loader, loader.parseArgs(arguments, true));
 }
 
 define["amd"] = true;
+window["requirejs"] = require; // hack to bypass requirejs detections

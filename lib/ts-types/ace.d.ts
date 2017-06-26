@@ -2980,4 +2980,9 @@ declare namespace AceAjax {
     }
 }
 
+declare module "ace/ace" {
+    var ace: AceAjax.Ace;
+    export = ace;
+}
+
 declare var ace: AceAjax.Ace;
