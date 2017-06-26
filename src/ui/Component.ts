@@ -68,10 +68,6 @@ export function componentFactory(
     if (!options.props["model"])
         options.props["model"] = Object;
 
-    //console.log('component factory', options.name, options.template);
-    //console.log('currentScript', document.currentScript);
-    //debugger;
-
     if (componentLoader.templates[options.name])
         options.template = componentLoader.templates[options.name];
     //else
@@ -81,16 +77,7 @@ export function componentFactory(
     const superProto = Object.getPrototypeOf(Component.prototype);
     const Super = superProto instanceof Vue ? superProto.constructor as VueClass : Vue;
     const result = Super.extend(options);
-    // else if (requirejs) {
-    //     var modulePaths = Array.from(document.head.getElementsByTagName("script")).map(x => x.src);
-    //     var candidates = modulePaths.filter(x => x.endsWith(`/${options.name}.js`));
-    //     // if (candidates.length !== 1) console.error(`Could not found component's source path: ${options.name}!`, candidates, modulePaths);
-    //     componentLoader.onLoad(candidates[0]).then(() => {
-    //         options.template = componentLoader.templates[options.name];
-    //     });
-    // }
 
-    //componentLoader.loadTemplate(options.name, this);
     Vue.component(options.name, result);
     return result;
 }

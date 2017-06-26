@@ -49,8 +49,6 @@ export class SandboxHandler {
             let request = <IRpcRequest>{ method: method, arguments: args, messageId: `${++this.lastMsgId}`, useWorker: useWorker };
 
             this.msgHandlers[request.messageId] = response => {
-                console.log('response', response);
-
                 if (response.success)
                     resolve(response.result);
                 else
