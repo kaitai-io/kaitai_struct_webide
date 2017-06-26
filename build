@@ -13,6 +13,7 @@ cat out/js/config.js
 
 cp -r \
 	index.html \
+	v2.html \
 	sandbox.html \
 	css \
 	formats \
