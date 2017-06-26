@@ -21,10 +21,10 @@
         async function init(){
             var paths = {};
             ["bowser", "jstree", "localforage", "goldenlayout", "vue"].forEach(
-                name => loader.paths[name] = `../lib/_npm/${name}/${name}`);
-            loader.paths["bigInt"] = "../lib/_npm/BigInteger/BigInteger";
-            loader.paths["jquery"] = "../lib/_npm/jquery/jquery.min";
-            loader.paths["ace"] = "../lib/_npm/ace";
+                name => loader.paths[name] = `lib/_npm/${name}/${name}`);
+            loader.paths["bigInt"] = "lib/_npm/BigInteger/BigInteger";
+            loader.paths["jquery"] = "lib/_npm/jquery/jquery.min";
+            loader.paths["ace"] = "lib/_npm/ace";
 
             let componentLoader = (await loader.getLoadedModule('ui/ComponentLoader')).exports.componentLoader;
             //console.log('componentLoader', componentLoader);
