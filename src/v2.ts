@@ -17,6 +17,7 @@ function setupEditor(parent: Component, lang: string) {
     editor.getSession().setMode(`ace/mode/${lang}`);
     if (lang === "yaml")
         editor.setOption("tabSize", 2);
+    editor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
     parent.container.on("resize", () => editor.resize());
     return editor;
 }
@@ -34,6 +35,6 @@ filetree.$on("open-file", (treeNode: FsTreeNode, data: ArrayBuffer) => {
         loadScript(src: string): Promise<void>;
     }
 
-    var sandbox = SandboxHandler.create<ISandboxMethods>(location.origin === "http://localhost:8000" ? "http://localhost:8001" : "https://webide-usercontent.kaitai.io");
-    console.log('eval result', await sandbox.eval("5"));
+    var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
+    await sandbox.eval("console.log('hello from sandbox', location)");
 })();
