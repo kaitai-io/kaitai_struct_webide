@@ -16,7 +16,6 @@ function addEditor(parent: Component, lang: string){
     editor.getSession().setMode(`ace/mode/${lang}`);
     if (lang === "yaml")
         editor.setOption("tabSize", 2);
-    editor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
     parent.container.on("resize", () => editor.resize());
 }
 

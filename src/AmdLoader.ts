@@ -17,7 +17,6 @@ class AmdLoader {
     paths: { [name: string]: string } = {};
     moduleLoadedHook: (module: AmdModule) => Promise<void> = null;
     beforeLoadHook: (module: AmdModule) => Promise<void> = null;
-    requireBase: string = null;
 
     loadWithScriptTag(src: string): Promise<HTMLScriptElement> {
         return new Promise((resolve, reject) => {
@@ -86,26 +85,11 @@ class AmdLoader {
 
     async onScriptLoaded(module: AmdModule){
         //console.log('script loaded', module.url);
-        //if (!module.exports)
-        //    module.exports = window["module"].exports;
         if (!module.loaded && !module.amdLoading)
             this.onModuleLoaded(module, window["module"].exports);
-        
-        // let self = this;
-        // let moduleObj = { 
-        //     set exports(value: any){
-        //         console.log('exports set triggered', module.url);
-        //         self.onModuleLoaded(module, value);
-        //     }
-        // };
-        // window["module"] = moduleObj;
-        // if(!module.loaded){
-        //     module.loadPromiseResolve(module);
-        //     module.loaded = true;
-        // }
     }
 
-    parseArgs(argumentsObj: IArguments, isDefine: boolean){
+    parseArgs(argumentsObj: IArguments|any[], isDefine: boolean) {
         let args = Array.from(argumentsObj);
         let callback = args.filter(x => typeof x === "function")[0];
         let name = args.filter(x => typeof x === "string")[0];
@@ -116,11 +100,17 @@ class AmdLoader {
             return [deps.concat(name ? [name] : []), callback];
     }
 
-    requireLoaded(name: string){
-        var url = this.getUrlFromName(name, this.requireBase);
+    requireLoaded(name: string, requireBase?: string){
+        var url = this.getUrlFromName(name, requireBase);
         if (!(url in this.modules))
-            throw Error(`Tried to sync require a not yet loaded module '${name}' (requireBase = '${this.requireBase}).`);
+            throw Error(`Tried to sync require a not yet loaded module '${name}' (requireBase = '${requireBase}).`);
         return this.modules[url].exports;
+    }
+
+    internalRequire(args: any[], requireBase: string){
+        if(args.length === 1 && typeof args[0] === "string")
+            return this.requireLoaded(args[0], requireBase);
+        return this.require.apply(this, this.parseArgs(args, false));
     }
 
     async require(deps: string[], callback?: any, module?: AmdModule){
@@ -131,11 +121,10 @@ class AmdLoader {
         let depRes = await Promise.all(deps.map(dep => 
             dep === "exports" ? moduleObj.exports :
             dep === "module" ? moduleObj :
-            dep === "require" ? require :
+            dep === "require" ? (...args: any[]) => { return this.internalRequire(args, module && module.url); } :
             this.getLoadedModule(dep).then(x => x.exports)));
         //console.log('require AFTER DEPS', deps);
 
-        this.requireBase = module && module.url;
         let callbackResult = callback && callback(...depRes);
         return callbackResult || moduleObj.exports;
     }

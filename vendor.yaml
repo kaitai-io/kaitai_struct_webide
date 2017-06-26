@@ -6,7 +6,25 @@ libs:
     licenseUrl: https://raw.githubusercontent.com/ajaxorg/ace/master/LICENSE
     distDir: ace
     npmDir: ace-builds
-    files: [LICENSE, src/ace.js, src/ext-searchbox.js, src/mode-c_cpp.js, src/mode-csharp.js, src/mode-dot.js, src/mode-java.js, src/mode-javascript.js, src/mode-json.js, src/mode-perl.js, src/mode-php.js, src/mode-python.js, src/mode-ruby.js, src/mode-yaml.js, src/theme-monokai.js, src/worker-javascript.js, src/worker-json.js] 
+    files: 
+        - LICENSE
+        - src/ace.js
+        - src/ext-searchbox.js
+        - src/mode-c_cpp.js
+        - src/mode-csharp.js
+        - src/mode-dot.js
+        - src/mode-java.js
+        - src/mode-javascript.js
+        - src/mode-json.js
+        - src/mode-perl.js
+        - src/mode-php.js
+        - src/mode-python.js
+        - src/mode-ruby.js
+        - src/mode-yaml.js
+        - src/theme-monokai.js
+        - src/theme-textmate.js
+        - src/worker-javascript.js
+        - src/worker-json.js
 
   BigInteger.js:
     source: https://github.com/peterolson/BigInteger.js
