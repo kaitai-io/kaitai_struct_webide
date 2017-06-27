@@ -10,7 +10,7 @@ declare namespace io.kaitai.struct {
     class MainJs {
         version: string;
         buildDate: string;
-        compile(kslang: string, compilerSchema: any, jsImporter: IYamlImporter, isDebug: boolean): any;
+        compile(kslang: string, compilerSchema: any, jsImporter: IYamlImporter, isDebug: boolean): Promise<{ [filename: string]: string }>;
     }
 }
 

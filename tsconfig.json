@@ -13,7 +13,7 @@
     "sourceMap": true,
     "target": "es2016",
     "outDir": "js/",
-    "lib": [ "es6", "dom" ]
+    "lib": [ "es2017", "dom" ]
   },
   "include": [
     "src/**/*",

@@ -7,7 +7,7 @@ export class LayoutItem {
 }
 
 export class Component extends LayoutItem {
-    get component() { return <GoldenLayout.Component>this.contentItem.contentItems[0]; }
+    get component() { return <GoldenLayout.Component>(this.contentItem.isComponent ? this.contentItem : this.contentItem.contentItems[0]); }
     get container() { return this.component.container; }
     get element() { return this.container.getElement().get(0); }
 
@@ -65,12 +65,12 @@ export class ClosableComponent {
 }
 
 export type ContainerType = "row" | "column" | "stack";
-﻿const fakeComponentName = "fakeComponent";
-﻿interface IComponentProps {
+const fakeComponentName = "fakeComponent";
+interface IComponentProps {
     width?: number;
     height?: number;
     isClosable?: boolean;
-﻿}
+}
 
 export class Container extends LayoutItem {
     

@@ -27,7 +27,7 @@ for (var i = 0; i < 200; i++)
 var queryParams: { access_token?: string; secret?: string } = {};
 location.search.substr(1).split("&").map(x => x.split("=")).forEach(x => queryParams[x[0]] = x[1]);
 
-var fss = new FsSelector();
+export var fss = new FsSelector();
 fss.addFs(new BrowserFileSystem());
 fss.addFs(new BrowserLegacyFileSystem());
 
@@ -141,8 +141,7 @@ export class FileTree extends Vue {
     }
 
     public async openFile() {
-        let data = await fss.read(this.selectedUri)
-        this.$emit("open-file", this.selectedFsItem, data);
+        this.$emit("open-file", this.selectedFsItem);
     }
 
     public async generateParser(lang: string, aceLangOrDebug?: any) {

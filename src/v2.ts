@@ -1,9 +1,10 @@
 ﻿import { Layout } from "./AppLayout";
-import { FileTree, FsTreeNode } from "./ui/Parts/FileTree";
+import { FileTree, FsTreeNode, fss } from "./ui/Parts/FileTree";
 import { componentLoader } from "./ui/ComponentLoader";
 import { Component } from "./LayoutManagerV2";
 import * as ace from "ace/ace";
 import { SandboxHandler } from "./SandboxHandler";
+import { FsUri } from "./FileSystem/FsUri";
 
 window["layout"] = Layout;
 
@@ -23,23 +24,36 @@ function setupEditor(parent: Component, lang: string) {
 }
 
 var ksyEditor = setupEditor(Layout.ksyEditor, 'yaml');
+var jsCode = setupEditor(Layout.jsCode, 'javascript');
+var jsCodeDebug = setupEditor(Layout.jsCodeDebug, 'javascript');
 
-filetree.$on("open-file", (treeNode: FsTreeNode, data: ArrayBuffer) => {
-    if (treeNode.isKsy){
-        var str = new TextDecoder().decode(new Uint8Array(data));
-        ksyEditor.setValue(str, -1);
-    }
+filetree.$on("open-file", (treeNode: FsTreeNode) => {
     console.log(treeNode);
+    openFile(treeNode.uri.uri);
 });
+
+var ksyContent: string;
+
+async function openFile(uri: string){
+    let content = await fss.read(uri);
+    if(uri.endsWith(".ksy")){
+        ksyContent = new TextDecoder().decode(new Uint8Array(content));
+        ksyEditor.setValue(ksyContent, -1);
+    }
+}
 
 (async function(){
     interface ISandboxMethods {
         eval(code: string): Promise<any>;
         loadScript(src: string): Promise<void>;
-        compile(code: string): Promise<void>;
+        compile(code: string): Promise<{ releaseCode: { [fileName:string]: string }, debugCode: { [fileName:string]: string } }>;
     }
 
     var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
     await sandbox.loadScript(new URL('js/KaitaiWorkerV2.js', location.href).href);
-    await sandbox.compile('test');
+    await openFile("https:///formats/archive/zip.ksy");
+    var compilationResult = await sandbox.compile(ksyContent);
+    console.log('compilationResult', compilationResult);
+    jsCode.setValue(Object.values(compilationResult.releaseCode)[0], -1);
+    jsCodeDebug.setValue(Object.values(compilationResult.debugCode)[0], -1);
 })();
