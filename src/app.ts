@@ -251,7 +251,7 @@ $(() => {
         exec: function (editor: any) { app.reparse(); }
     });
 
-    initFileDrop("fileDrop", app.addNewFiles);
+    initFileDrop("fileDrop", files => app.addNewFiles(files));
 
     function loadCachedFsItem(cacheKey: string, defFsType: string, defSample: string) {
         return localforage.getItem(cacheKey).then((fsItem: IFsItem) =>

@@ -327,7 +327,7 @@ export function initFileTree() {
     ctxAction(uiFiles.downloadItem, () => downloadFiles());
     uiFiles.downloadFile.on("click", () => downloadFiles());
 
-    uiFiles.uploadFile.on("click", () => openFilesWithDialog(app.addNewFiles));
+    uiFiles.uploadFile.on("click", () => openFilesWithDialog(files => app.addNewFiles(files)));
 
     $("#newKsyModal").on("shown.bs.modal", () => { $("#newKsyModal input").focus(); });
     $("#newKsyModal form").submit(function (event) {
