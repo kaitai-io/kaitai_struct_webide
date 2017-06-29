@@ -74,7 +74,9 @@ class JsImporter {
                 fnParts.pop();
                 loadFn = fnParts.join('/') + '/' + name;
             }
-            loadFn = loadFn.substr(1);
+            
+            if (loadFn.startsWith("/"))
+                loadFn = loadFn.substr(1);
 
             console.log(`import yaml: ${name}, mode: ${mode}, loadFn: ${loadFn}, root:`, this.rootFsItem);
 
