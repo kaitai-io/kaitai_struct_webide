@@ -67,7 +67,8 @@ class JsImporter {
     importYaml(name: string, mode: string){
         return new Promise((resolve, reject) => {
             var loadFn;
-            if (name.startsWith('/'))
+
+            if (mode === "abs")
                 loadFn = name;
             else {
                 var fnParts = this.rootFsItem.fn.split('/');
@@ -79,6 +80,9 @@ class JsImporter {
                 loadFn = loadFn.substr(1);
 
             console.log(`import yaml: ${name}, mode: ${mode}, loadFn: ${loadFn}, root:`, this.rootFsItem);
+
+            if (this.rootFsItem.fsType === "kaitai" && mode === "abs")
+                loadFn = "/formats/" + loadFn;
 
             return fss[this.rootFsItem.fsType].get(`${loadFn}.ksy`).then(ksyContent => {
                 var ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
