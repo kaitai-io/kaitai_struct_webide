@@ -23,7 +23,7 @@
     "vue": "^2.3.4"
   },
   "devDependencies": {
-    "typescript": "^2.3"
+    "typescript": "2.3.4"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
