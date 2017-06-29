@@ -62,11 +62,23 @@ export var ksyTypes: IKsyTypes;
 export interface IKsyTypes { [name: string]: KsySchema.IType };
 
 class JsImporter {
-    importYaml(name: string, mode: string){
-        return new Promise(function (resolve, reject) {
-            console.log(`import yaml: ${name}, mode: ${mode}`);
+    rootFsItem: IFsItem;
 
-            return fss.kaitai.get(`formats/${name}.ksy`).then(ksyContent => {
+    importYaml(name: string, mode: string){
+        return new Promise((resolve, reject) => {
+            var loadFn;
+            if (name.startsWith('/'))
+                loadFn = name;
+            else {
+                var fnParts = this.rootFsItem.fn.split('/');
+                fnParts.pop();
+                loadFn = fnParts.join('/') + '/' + name;
+            }
+            loadFn = loadFn.substr(1);
+
+            console.log(`import yaml: ${name}, mode: ${mode}, loadFn: ${loadFn}, root:`, this.rootFsItem);
+
+            return fss[this.rootFsItem.fsType].get(`${loadFn}.ksy`).then(ksyContent => {
                 var ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
                 return resolve(ksyModel);
             });
@@ -76,8 +88,10 @@ class JsImporter {
 
 var jsImporter = new JsImporter();
 
-export function compile(srcYaml: string, kslang: string, debug: true | false | 'both'): Promise<any> {
+export function compile(srcYamlFsItem: IFsItem, srcYaml: string, kslang: string, debug: true | false | 'both'): Promise<any> {
     var perfYamlParse = performanceHelper.measureAction("YAML parsing");
+
+    jsImporter.rootFsItem = srcYamlFsItem;
 
     var compilerSchema;
     try {
@@ -178,8 +192,8 @@ function recompile() {
         if (changed && (ksyFsItem.fsType === 'kaitai' || ksyFsItem.fsType === 'static'))
             copyPromise = addKsyFile('localStorage', ksyFsItem.fn.replace('.ksy', '_modified.ksy'), srcYaml).then(fsItem => localforage.setItem(ksyFsItemName, fsItem));
 
-        return copyPromise.then(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
-            return compile(srcYaml, 'javascript', 'both').then(compiled => {
+        return copyPromise.then<any>(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
+            return compile(ksyFsItem, srcYaml, 'javascript', 'both').then(compiled => {
                 if (!compiled) return;
                 var fileNames = Object.keys(compiled.release);
 
@@ -261,7 +275,7 @@ export function loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise
 
             ui.hexViewer.setDataProvider(dataProvider);
             getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
-            return workerCall({ type:'eval', args: ['wi.inputBuffer = args; void(0)', content] }).then(() => refreshGui ? reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
+            return workerCall({ type:'eval', args: ['wi.inputBuffer = args; void(0)', content] }).then<any>(() => refreshGui ? reparse().then(() => ui.hexViewer.resize()) : Promise.resolve());
         }
     });
 }

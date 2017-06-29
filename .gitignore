@@ -251,3 +251,4 @@ out/
 js/
 files/
 .serve_files_secret
+lib/

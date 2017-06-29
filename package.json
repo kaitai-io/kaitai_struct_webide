@@ -5,9 +5,10 @@
     "doc": "docs"
   },
   "dependencies": {
-    "typescript": "^2.2.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "typescript": "2.3.4"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
