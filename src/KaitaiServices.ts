@@ -1,5 +1,6 @@
 ﻿import { fss } from "./app.files";
 import { performanceHelper } from "./utils/PerformanceHelper";
+import KaitaiStructCompiler = require("kaitai-struct-compiler");
 
 class SchemaUtils {
     static ksyNameToJsName(ksyName: string, isProp: boolean) {
@@ -36,7 +37,7 @@ class SchemaUtils {
     }
 }
 
-class JsImporter implements io.kaitai.struct.IYamlImporter {
+class JsImporter implements IYamlImporter {
     importYaml(name: string, mode: string) {
         return new Promise(function (resolve, reject) {
             console.log(`import yaml: ${name}, mode: ${mode}`);
@@ -80,7 +81,7 @@ export class CompilerService {
         else {
             var perfCompile = performanceHelper.measureAction("Compilation");
 
-            var ks = new io.kaitai.struct.MainJs();
+            var ks = new KaitaiStructCompiler();
             var rReleasePromise = (debug === false || debug === "both") ? ks.compile(kslang, compilerSchema, this.jsImporter, false) : Promise.resolve(null);
             var rDebugPromise = (debug === true || debug === "both") ? ks.compile(kslang, compilerSchema, this.jsImporter, true) : Promise.resolve(null);
             //console.log("rReleasePromise", rReleasePromise, "rDebugPromise", rDebugPromise);

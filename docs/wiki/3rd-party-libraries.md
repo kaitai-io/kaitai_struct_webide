@@ -45,12 +45,7 @@ Source: https://github.com/kaitai-io/kaitai_struct_compiler
 
 License: GPL-3.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE)
 
-## Kaitai Struct JS Runtime
-Source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
-
-License: Apache-2.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE)
-
-## Kaitai Struct Javascript Runtime
+## Kaitai Struct JavaScript Runtime
 Source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
 
 License: Apache-2.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE)

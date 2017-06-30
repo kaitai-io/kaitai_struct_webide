@@ -16,6 +16,7 @@ import { exportToJson } from "./ExportToJson";
 import Component from "./ui/Component";
 import { CompilerService, CompilationError } from "./KaitaiServices";
 import { ErrorWindowHandler } from "./app.errors";
+import KaitaiStructCompiler = require("kaitai-struct-compiler");
 $.jstree.defaults.core.force_text = true;
 
 export function ga(category: string, action: string, label?: string, value?: number) {
@@ -228,7 +229,7 @@ interface IInterval {
 
 $(() => {
     $("#webIdeVersion").text(kaitaiIde.version);
-    $("#compilerVersion").text(new io.kaitai.struct.MainJs().version + " (" + new io.kaitai.struct.MainJs().buildDate + ")");
+    $("#compilerVersion").text(new KaitaiStructCompiler().version + " (" + new KaitaiStructCompiler().buildDate + ")");
 
     $("#welcomeDoNotShowAgain").click(() => localStorage.setItem("doNotShowWelcome", "true"));
     if (localStorage.getItem("doNotShowWelcome") !== "true")

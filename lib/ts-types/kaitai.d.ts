@@ -2,16 +2,18 @@ declare class YAML {
     static parse(yaml: string): any;
 }
 
-declare namespace io.kaitai.struct {
-    interface IYamlImporter {
-        importYaml(name: string, mode: string): Promise<string>;
-    }
+interface IYamlImporter {
+    importYaml(name: string, mode: string): Promise<string>;
+}
 
-    class MainJs {
-        version: string;
-        buildDate: string;
-        compile(kslang: string, compilerSchema: any, jsImporter: IYamlImporter, isDebug: boolean): Promise<{ [filename: string]: string }>;
-    }
+declare class KaitaiStructCompiler {
+    version: string;
+    buildDate: string;
+    compile(kslang: string, compilerSchema: any, jsImporter: IYamlImporter, isDebug: boolean): Promise<{ [filename: string]: string }>;
+}
+
+declare module "kaitai-struct-compiler" {
+    export = KaitaiStructCompiler;
 }
 
 declare class KaitaiStream {

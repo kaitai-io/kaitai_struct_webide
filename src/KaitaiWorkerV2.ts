@@ -10,7 +10,7 @@ var window = self;
 
 try {
     importAll('lib/kaitai/kaitai-struct-compiler-fastopt.js', 'lib/kaitai/yaml.js');
-    var compiler = new io.kaitai.struct.MainJs();
+    var compiler = new KaitaiStructCompiler();
     console.log('Kaitai Worker V2!', compiler, methods, YAML);
 
     var ksy: KsySchema.IKsyFile;

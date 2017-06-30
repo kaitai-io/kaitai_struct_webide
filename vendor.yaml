@@ -96,13 +96,6 @@ libs:
     npmDir: jstree
     files: [LICENSE-MIT, dist/*]
 
-  Kaitai Struct Compiler:
-    website: http://kaitai.io/
-    source: https://github.com/kaitai-io/kaitai_struct_compiler
-    licenseName: GPL-3.0
-    licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE
-    distDir: kaitai
-
   localForage:
     source: https://github.com/localForage/localForage
     licenseName: Apache-2.0
@@ -158,6 +151,14 @@ libs:
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/LICENSE
     distDir: ts-types
+
+  Kaitai Struct Compiler:
+    website: http://kaitai.io/
+    source: https://github.com/kaitai-io/kaitai_struct_compiler
+    licenseName: GPL-3.0
+    licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE
+    npmDir: kaitai-struct-compiler
+    files: [LICENSE, kaitai-struct-compiler.js]
 
   Kaitai Struct JavaScript Runtime:
     source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
