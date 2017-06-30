@@ -103,12 +103,6 @@ libs:
     licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE
     distDir: kaitai
 
-  Kaitai Struct JS Runtime:
-    source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
-    licenseName: Apache-2.0
-    licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE
-    distDir: kaitai_js_runtime
-
   localForage:
     source: https://github.com/localForage/localForage
     licenseName: Apache-2.0
@@ -164,3 +158,10 @@ libs:
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/LICENSE
     distDir: ts-types
+
+  Kaitai Struct JavaScript Runtime:
+    source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
+    licenseName: Apache-2.0
+    licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE
+    npmDir: kaitai-struct
+    files: [LICENSE, KaitaiStream.js]

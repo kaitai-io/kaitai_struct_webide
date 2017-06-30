@@ -50,6 +50,11 @@ Source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
 
 License: Apache-2.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE)
 
+## Kaitai Struct Javascript Runtime
+Source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
+
+License: Apache-2.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE)
+
 ## Vue.js
 Source: https://github.com/vuejs/vue
 
