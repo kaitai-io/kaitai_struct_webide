@@ -14,6 +14,7 @@ cat out/js/config.js
 cp -r \
 	index.html \
 	sandbox.html \
+	LICENSE-3RD-PARTY.txt \
 	css \
 	formats \
 	samples \
