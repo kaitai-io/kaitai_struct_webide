@@ -647,6 +647,6 @@ declare namespace bigInt {
 
 declare const bigInt: bigInt.StaticBigInt;
 
-declare module 'bigInt' {
+declare module 'big-integer' {
     export = bigInt;
 }

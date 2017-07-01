@@ -37,7 +37,7 @@
         var paths = {};
         ["bowser", "jstree", "localforage", "goldenlayout", "vue", "kaitai-struct-compiler"].forEach(
             name => paths[name] = `../lib/_npm/${name}/${name}`);
-        paths["bigInt"] = "../lib/_npm/BigInteger/BigInteger";
+        paths["big-integer"] = "../lib/_npm/BigInteger/BigInteger";
 
         requirejs.config({ baseUrl: "js/", paths: paths });
         require(["app.unsupportedBrowser"]);
