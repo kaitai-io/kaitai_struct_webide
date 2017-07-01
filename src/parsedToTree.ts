@@ -261,8 +261,8 @@ export class ParsedTreeHandler {
                 this.fillKsyTypes(exp);
 
                 var intervals: IParsedTreeInterval[] = [];
-                var fillIntervals = (exp: IExportedValue) => {
-                    var objects = collectAllObjects(exp);
+                var fillIntervals = (rootExp: IExportedValue) => {
+                    var objects = collectAllObjects(rootExp);
 
                     var lastEnd = -1;
                     for (let exp of objects) {
