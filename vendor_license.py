@@ -12,9 +12,12 @@ for libName in sorted(libs):
     print "Processing %s" % libName
     lib = libs[libName]
     distDir = ('_npm/' if 'npmDir' in lib else '') + (lib['distDir'] if 'distDir' in lib else lib['npmDir'])
-    licFns = glob.glob('./lib/%s/license*' % distDir)
+    licFns = []
+    for filePattern in ['LICENSE*', 'license*']:
+        licFns = licFns + glob.glob('./lib/%s/%s' % (distDir, filePattern))
+
     if len(licFns) != 1:
-        print "License not found: %s" % distDir
+        print "License not found: %s: %r" % (distDir, licFns)
         continue
 
     licResult += '='*80 + '\n'
