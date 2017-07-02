@@ -53,12 +53,11 @@ class LocalStorageFs implements IFileSystem {
 
     private save() { return localforage.setItem(this.filesKey(), this.root); }
 
-    getRootNode() {
-        if (this.root)
-            return Promise.resolve(this.root);
-        this.rootPromise = localforage.getItem<IFsItem>(this.filesKey())
-            .then(x => x || <IFsItem>{ fsType: "local", type: "folder", children: {} }).then(r => this.root = r);
-        return this.rootPromise;
+    async getRootNode() {
+        if (!this.root)
+            this.root = await localforage.getItem<IFsItem>(this.filesKey()) ||
+                <IFsItem>{ fsType: "local", type: "folder", children: {} };
+        return this.root;
     }
 
     setRootNode(newRoot: IFsItem) {
@@ -92,7 +91,7 @@ class KaitaiFs implements IFileSystem {
 }
 
 class StaticFs implements IFileSystem {
-    public files: { [fn: string]:string };
+    public files: { [fn: string]: string };
     constructor() { this.files = {}; }
     getRootNode() { return Promise.resolve(Object.keys(this.files).map(fn => <IFsItem>{ fsType: "static", type: "file", fn })); }
     get(fn: string) { return Promise.resolve(this.files[fn]); }
@@ -128,22 +127,21 @@ function genChildNodes(obj: IFsItem): any {
     return Object.keys(obj.children || []).map(k => genChildNode(obj.children[k], k));
 }
 
-export function refreshFsNodes() {
+export async function refreshFsNodes() {
     var localStorageNode = app.ui.fileTree.get_node("localStorage");
-    return localFs.getRootNode().then(root => {
-        app.ui.fileTree.delete_node(localStorageNode.children);
-        if (root)
-            genChildNodes(root).forEach((node: any) => app.ui.fileTree.create_node(localStorageNode, node));
-    });
+    var root = await localFs.getRootNode();
+    app.ui.fileTree.delete_node(localStorageNode.children);
+    if (root)
+        genChildNodes(root).forEach((node: any) => app.ui.fileTree.create_node(localStorageNode, node));
 }
 
-export function addKsyFile(parent: string | Element, ksyFn: string, content: string) {
-    var name = ksyFn.split("/").last();
-    return fss.local.put(name, content).then((fsItem: IFsItem) => {
-        app.ui.fileTree.create_node(app.ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: "glyphicon glyphicon-list-alt" },
-            "last", (node: any) => app.ui.fileTree.activate_node(node, null));
-        return app.loadFsItem(fsItem, true);
-    });
+export async function addKsyFile(parent: string | Element, ksyFn: string, content: string) {
+    let name = ksyFn.split("/").last();
+    let fsItem = await fss.local.put(name, content);
+    app.ui.fileTree.create_node(app.ui.fileTree.get_node(parent), { text: name, data: fsItem, icon: "glyphicon glyphicon-list-alt" },
+        "last", (node: any) => app.ui.fileTree.activate_node(node, null));
+    await app.loadFsItem(fsItem, true);
+    return fsItem;
 }
 
 var fileTreeCont: JQuery;
@@ -192,7 +190,8 @@ export function initFileTree() {
             ],
         },
         plugins: ["wholerow", "dnd"]
-    }).bind("loaded.jstree", refreshFsNodes).jstree(true);
+    }).jstree(true);
+    refreshFsNodes();
 
     var uiFiles = {
         fileTreeContextMenu: $("#fileTreeContextMenu"),
@@ -347,7 +346,6 @@ export function initFileTree() {
     ctxAction(uiFiles.cloneKsyFile, e => {
         var fsItem = getSelectedData();
         var newFn = fsItem.fn.replace(".ksy", "_" + new Date().format("Ymd_His") + ".ksy");
-        console.log("newFn", newFn);
 
         fss[fsItem.fsType].get(fsItem.fn).then((content: string) => addKsyFile("localStorage", newFn, content));
     });

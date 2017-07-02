@@ -78,28 +78,26 @@ class AppController {
         });
     }
 
-    recompile() {
-        return localforage.getItem<IFsItem>(this.ksyFsItemName).then(ksyFsItem => {
-            var srcYaml = this.ui.ksyEditor.getValue();
-            var changed = this.lastKsyContent !== srcYaml;
+    async recompile() {
+        let ksyFsItem = await localforage.getItem<IFsItem>(this.ksyFsItemName);
+        var srcYaml = this.ui.ksyEditor.getValue();
+        var changed = this.lastKsyContent !== srcYaml;
 
-            var copyPromise = <Promise<any>>Promise.resolve();
-            if (changed && (ksyFsItem.fsType === "kaitai" || ksyFsItem.fsType === "static"))
-                copyPromise = addKsyFile("localStorage", ksyFsItem.fn.replace(".ksy", "_modified.ksy"), srcYaml)
-                    .then(fsItem => localforage.setItem(this.ksyFsItemName, fsItem));
+        if (changed && (ksyFsItem.fsType === "kaitai" || ksyFsItem.fsType === "static")) {
+            let fsItem = await addKsyFile("localStorage", ksyFsItem.fn.replace(".ksy", "_modified.ksy"), srcYaml);
+            localforage.setItem(this.ksyFsItemName, fsItem);
+        }
 
-            return copyPromise.then<any>(() => changed ? fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml) : Promise.resolve()).then(() => {
-                return this.compile(srcYaml, "javascript", "both").then(compiled => {
-                    if (!compiled) return;
-                    var fileNames = Object.keys(compiled.release);
+        if (changed)
+            await fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml);
 
-                    console.log("ksyFsItem", ksyFsItem);
-                    this.ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(""), -1);
-                    this.ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(""), -1);
-                    return this.reparse();
-                });
-            });
-        });
+        let compiled = await this.compile(srcYaml, "javascript", "both");
+        if (!compiled) return;
+
+        var fileNames = Object.keys(compiled.release);
+        this.ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(""), -1);
+        this.ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(""), -1);
+        await this.reparse();
     }
 
     blockRecursive = false;
@@ -107,79 +105,85 @@ class AppController {
     formatReady: Promise<any> = null;
     inputReady: Promise<any> = null;
 
-    reparse() {
-        return performanceHelper.measureAction("Parse initialization", Promise.all([this.inputReady, this.formatReady]).then(() => {
-            var debugCode = this.ui.genCodeDebugViewer.getValue();
-            var jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
-            return workerMethods.initCode(debugCode, jsClassName, this.compilerService.ksyTypes);
-        })).then(() => {
-            //console.log("recompiled");
-            performanceHelper.measureAction("Parsing", workerMethods.reparse(this.vm.disableLazyParsing).then(exportedRoot => {
-                //console.log("reparse exportedRoot", exportedRoot);
-                kaitaiIde.root = exportedRoot;
+    async reparse() {
+        try {
+            await Promise.all([this.inputReady, this.formatReady]);
 
-                this.ui.parsedDataTreeHandler = new ParsedTreeHandler(this.ui.parsedDataTreeCont.getElement(), exportedRoot, this.compilerService.ksyTypes);
-                performanceHelper.measureAction("Tree / interval handling", this.ui.parsedDataTreeHandler.initNodeReopenHandling())
-                    .then(() => this.ui.hexViewer.onSelectionChanged(), e => this.errors.handle(e));
+            let debugCode = this.ui.genCodeDebugViewer.getValue();
+            let jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
+            await workerMethods.initCode(debugCode, jsClassName, this.compilerService.ksyTypes);
 
-                this.ui.parsedDataTreeHandler.jstree.on("select_node.jstree", (e, selectNodeArgs) => {
-                    var node = <IParsedTreeNode>selectNodeArgs.node;
-                    //console.log("node", node);
-                    var exp = this.ui.parsedDataTreeHandler.getNodeData(node).exported;
+            let exportedRoot = await workerMethods.reparse(this.vm.disableLazyParsing);
+            kaitaiIde.root = exportedRoot;
+            //console.log("reparse exportedRoot", exportedRoot);
 
-                    if (exp && exp.path)
-                        $("#parsedPath").text(exp.path.join("/"));
+            this.ui.parsedDataTreeHandler = new ParsedTreeHandler(this.ui.parsedDataTreeCont.getElement(), exportedRoot, this.compilerService.ksyTypes);
+            await this.ui.parsedDataTreeHandler.initNodeReopenHandling();
+            this.ui.hexViewer.onSelectionChanged();
 
-                    if (!this.blockRecursive && exp && exp.start < exp.end) {
-                        this.selectedInTree = true;
-                        //console.log("setSelection", exp.ioOffset, exp.start);
-                        this.ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
-                        this.selectedInTree = false;
-                    }
-                });
+            this.ui.parsedDataTreeHandler.jstree.on("select_node.jstree", (e, selectNodeArgs) => {
+                var node = <IParsedTreeNode>selectNodeArgs.node;
+                //console.log("node", node);
+                var exp = this.ui.parsedDataTreeHandler.getNodeData(node).exported;
 
-                this.errors.handle(null);
-            }, error => this.errors.handle(error)));
-        });
+                if (exp && exp.path)
+                    $("#parsedPath").text(exp.path.join("/"));
+
+                if (!this.blockRecursive && exp && exp.start < exp.end) {
+                    this.selectedInTree = true;
+                    //console.log("setSelection", exp.ioOffset, exp.start);
+                    this.ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
+                    this.selectedInTree = false;
+                }
+            });
+
+            this.errors.handle(null);
+        } catch(error) {
+            this.errors.handle(error);
+        }
     }
 
     inputContent: ArrayBuffer;
     inputFsItem: IFsItem;
     lastKsyFsItem: IFsItem;
 
-    loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
+    async loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
         if (!fsItem || fsItem.type !== "file")
-            return Promise.resolve();
+            return;
 
-        return fss[fsItem.fsType].get(fsItem.fn).then((content: any) => {
-            if (this.isKsyFile(fsItem.fn)) {
-                localforage.setItem(this.ksyFsItemName, fsItem);
-                this.lastKsyFsItem = fsItem;
-                this.lastKsyContent = content;
-                if (this.ui.ksyEditor.getValue() !== content)
-                    this.ui.ksyEditor.setValue(content, -1);
-                var ksyEditor = this.ui.layout.getLayoutNodeById("ksyEditor");
-                (<any>ksyEditor).container.setTitle(fsItem.fn);
-                return Promise.resolve();
-            } else {
-                this.inputFsItem = fsItem;
-                this.inputContent = content;
+        var contentRaw = await fss[fsItem.fsType].get(fsItem.fn);
+        if (this.isKsyFile(fsItem.fn)) {
+            let content = <string>contentRaw;
+            localforage.setItem(this.ksyFsItemName, fsItem);
+            this.lastKsyFsItem = fsItem;
+            this.lastKsyContent = <string>content;
+            if (this.ui.ksyEditor.getValue() !== content)
+                this.ui.ksyEditor.setValue(content, -1);
+            var ksyEditor = this.ui.layout.getLayoutNodeById("ksyEditor");
+            (<any>ksyEditor).container.setTitle(fsItem.fn);
+        } else {
+            let content = <ArrayBuffer>contentRaw;
+            this.inputFsItem = fsItem;
+            this.inputContent = content;
 
-                localforage.setItem("inputFsItem", fsItem);
+            localforage.setItem("inputFsItem", fsItem);
 
-                this.dataProvider = {
-                    length: content.byteLength,
-                    get(offset, length) {
-                        return new Uint8Array(content, offset, length);
-                    }
-                };
+            this.dataProvider = {
+                length: content.byteLength,
+                get(offset, length) {
+                    return new Uint8Array(content, offset, length);
+                }
+            };
 
-                this.ui.hexViewer.setDataProvider(this.dataProvider);
-                this.ui.layout.getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
-                return workerMethods.setInput(content).then(() => <Promise<void>>(refreshGui ?
-                    this.reparse().then(() => this.ui.hexViewer.resize()) : Promise.resolve()));
+            this.ui.hexViewer.setDataProvider(this.dataProvider);
+            this.ui.layout.getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
+            await workerMethods.setInput(content);
+
+            if (refreshGui) {
+                await this.reparse();
+                this.ui.hexViewer.resize();
             }
-        });
+        }
     }
 
     addNewFiles(files: IFileProcessItem[]) {
@@ -254,9 +258,9 @@ $(() => {
 
     initFileDrop("fileDrop", files => app.addNewFiles(files));
 
-    function loadCachedFsItem(cacheKey: string, defFsType: string, defSample: string) {
-        return localforage.getItem(cacheKey).then((fsItem: IFsItem) =>
-            app.loadFsItem(fsItem || <IFsItem>{ fsType: defFsType, fn: defSample, type: "file" }, false));
+    async function loadCachedFsItem(cacheKey: string, defFsType: string, defSample: string) {
+        let fsItem = <IFsItem> await localforage.getItem(cacheKey);
+        await app.loadFsItem(fsItem || <IFsItem>{ fsType: defFsType, fn: defSample, type: "file" }, false);
     }
 
     app.inputReady = loadCachedFsItem("inputFsItem", "kaitai", "samples/sample1.zip");
