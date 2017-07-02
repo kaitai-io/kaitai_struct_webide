@@ -42,7 +42,7 @@ for libName in sorted(libs):
     wikiResult += 'License: %s (%s)\n\n' % (lib['licenseName'], lib['licenseUrl'])
 
     licResult += '='*80 + '\n'
-    with open(licFns[0],'rt') as f: licResult += f.read().strip() + '\n'
+    with open(licFns[0],'rb') as f: licResult += f.read().strip().replace('\r\n', '\n') + '\n'
     licResult += '='*80 + '\n\n'
 
 open('LICENSE-3RD-PARTY.txt', 'wb').write(licResult.strip())
