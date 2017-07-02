@@ -2,7 +2,7 @@
 
 // app.unsupportedBrowser.ts changed
 
-if (localStorage.getItem("hideUnsupported") === "true" || bowser.check({ chrome: "53", firefox: "49" }, true))
+if (localStorage.getItem("hideUnsupported") === "true" || bowser.check({ chrome: "55", firefox: "52", safari: "10.1" }, true))
     $("#unsupportedBrowser").hide();
 
 $("#unsupportedBrowser .closeBtn").on("click", () => {
