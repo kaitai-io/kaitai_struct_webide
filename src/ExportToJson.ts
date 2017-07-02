@@ -46,4 +46,4 @@ export function exportToJson(useHex: boolean = false) {
         expToNative(exportedRoot);
         return result;
     });
-};
+}

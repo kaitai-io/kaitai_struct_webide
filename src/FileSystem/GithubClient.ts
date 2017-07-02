@@ -65,7 +65,7 @@ export class GithubClient {
         return new Promise((resolve, reject) => $.getJSON(`https://api.github.com${path}?access_token=${this.accessToken}`)
             .then(json => resolve(<T>json), xhr => {
                 var errorMessage = xhr.responseJSON && xhr.responseJSON.message;
-                console.log('github reject', errorMessage, xhr);
+                console.log("github reject", errorMessage, xhr);
                 reject(errorMessage || xhr.statusText);
             }));
     }

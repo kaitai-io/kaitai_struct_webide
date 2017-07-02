@@ -9,7 +9,7 @@ interface IParsedTreeNodeData {
     parent?: IExportedValue;
     arrayStart?: number;
     arrayEnd?: number;
-};
+}
 
 export interface IJSTreeNode<TData> {
     id?: string;
@@ -17,7 +17,7 @@ export interface IJSTreeNode<TData> {
     icon?: string;
     children?: IJSTreeNode<TData>[] | boolean;
     data?: TData;
-};
+}
 
 export interface IParsedTreeNode extends IJSTreeNode<{idx:number}> { }
 
@@ -57,7 +57,7 @@ export class ParsedTreeHandler {
             parsedTreeOpenedNodesStr.split(",").forEach(x => this.parsedTreeOpenedNodes[x] = true);
 
         return new Promise((resolve, reject) => {
-            this.jstree.on("ready.jstree", e => {
+            this.jstree.on("ready.jstree", _ => {
                 this.openNodes(Object.keys(this.parsedTreeOpenedNodes)).then(() => {
                     this.jstree.on("open_node.jstree", (e, te) => {
                         var node = <IParsedTreeNode>te.node;
@@ -70,7 +70,7 @@ export class ParsedTreeHandler {
                     });
 
                     resolve();
-                }, e => reject(e));
+                }, err => reject(err));
             });
         });
     }
@@ -256,9 +256,9 @@ export class ParsedTreeHandler {
 
         var isInstance = !expNode;
         var valuePromise = isInstance ? this.getProp(nodeData.instance.path).then(exp => nodeData.exported = exp) : Promise.resolve(expNode);
-        return valuePromise.then(exp => {
+        return valuePromise.then(valueExp => {
             if (isRoot || isInstance) {
-                this.fillKsyTypes(exp);
+                this.fillKsyTypes(valueExp);
 
                 var intervals: IParsedTreeInterval[] = [];
                 var fillIntervals = (rootExp: IExportedValue) => {
@@ -279,13 +279,13 @@ export class ParsedTreeHandler {
                     if (!isInstance) {
                         var nonParsed: IInterval[] = [];
 
-                        var lastEnd = -1;
-                        intervals.forEach(i => {
+                        lastEnd = -1;
+                        for (var i of intervals){
                             if (i.start !== lastEnd + 1)
                                 nonParsed.push({ start: lastEnd + 1, end: i.start - 1 });
 
                             lastEnd = i.end;
-                        });
+                        }
 
                         app.vm.unparsed = nonParsed;
                         app.vm.byteArrays = objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64).
@@ -298,7 +298,7 @@ export class ParsedTreeHandler {
                         this.intervalHandler.addSorted(intervals);
                 };
 
-                fillIntervals(exp);
+                fillIntervals(valueExp);
 
                 app.ui.hexViewer.setIntervals(this.intervalHandler);
             }
@@ -312,13 +312,13 @@ export class ParsedTreeHandler {
                     value.arrayItems.forEach(item => fillParents(item, parent));
             }
 
-            if (!exp.parent)
-                fillParents(exp, nodeData && nodeData.parent);
+            if (!valueExp.parent)
+                fillParents(valueExp, nodeData && nodeData.parent);
 
-            this.jstree.set_text(node, this.childItemToNode(exp, true).text);
+            this.jstree.set_text(node, this.childItemToNode(valueExp, true).text);
 
-            var nodes = this.exportedToNodes(exp, nodeData, true);
-            nodes.forEach(node => node.id = node.id || this.getNodeId(node));
+            var nodes = this.exportedToNodes(valueExp, nodeData, true);
+            nodes.forEach(x => x.id = x.id || this.getNodeId(x));
             return nodes;
         });
     }
@@ -406,5 +406,5 @@ export class ParsedTreeHandler {
 
             return foundAll;
         });
-    };
+    }
 }

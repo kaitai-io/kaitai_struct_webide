@@ -5,7 +5,7 @@ import KaitaiStructCompiler = require("kaitai-struct-compiler");
 class SchemaUtils {
     static ksyNameToJsName(ksyName: string, isProp: boolean) {
         return ksyName.split("_").map((x, i) => i === 0 && isProp ? x : x.ucFirst()).join("");
-    };
+    }
 
     static collectTypes(types: IKsyTypes, parent: KsySchema.IType) {
         if (parent.types) {
