@@ -1,4 +1,4 @@
-﻿import { fss } from "./app.files";
+﻿import { fss, IFsItem } from "./app.files";
 import { performanceHelper } from "./utils/PerformanceHelper";
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
 
@@ -38,15 +38,28 @@ class SchemaUtils {
 }
 
 class JsImporter implements IYamlImporter {
-    importYaml(name: string, mode: string) {
-        return new Promise(function (resolve, reject) {
-            console.log(`import yaml: ${name}, mode: ${mode}`);
+    rootFsItem: IFsItem;
 
-            return fss.kaitai.get(`formats/${name}.ksy`).then(ksyContent => {
-                var ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
-                return resolve(ksyModel);
-            });
-        });
+    async importYaml(name: string, mode: string) {
+        var loadFn;
+        if (mode === "abs")
+            loadFn = name;
+        else {
+            var fnParts = this.rootFsItem.fn.split('/');
+            fnParts.pop();
+            loadFn = fnParts.join('/') + '/' + name;
+        }
+
+        if (loadFn.startsWith("/"))
+            loadFn = loadFn.substr(1);
+
+        if (this.rootFsItem.fsType === "kaitai" && mode === "abs") 
+            loadFn = "/formats/" + loadFn; 
+
+        console.log(`import yaml: ${name}, mode: ${mode}, loadFn: ${loadFn}, root:`, this.rootFsItem);
+        let ksyContent = await fss[this.rootFsItem.fsType].get(`${loadFn}.ksy`);
+        var ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
+        return ksyModel;
     }
 }
 
@@ -59,8 +72,10 @@ export class CompilerService {
     ksySchema: KsySchema.IKsyFile;
     ksyTypes: IKsyTypes;
 
-    compile(srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
+    compile(srcYamlFsItem: IFsItem, srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
         var perfYamlParse = performanceHelper.measureAction("YAML parsing");
+
+        this.jsImporter.rootFsItem = srcYamlFsItem; 
 
         try {
             this.ksySchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);

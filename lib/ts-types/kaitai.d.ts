@@ -3,7 +3,7 @@ declare class YAML {
 }
 
 interface IYamlImporter {
-    importYaml(name: string, mode: string): Promise<string>;
+    importYaml(name: string, mode: string): Promise<any>;
 }
 
 declare class KaitaiStructCompiler {

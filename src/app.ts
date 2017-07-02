@@ -67,8 +67,8 @@ class AppController {
     lastKsyContent: string = null;
     isKsyFile(fn: string) { return fn.toLowerCase().endsWith(".ksy"); }
 
-    compile(srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
-        return this.compilerService.compile(srcYaml, kslang, debug).then(result => {
+    compile(srcYamlFsItem: IFsItem, srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
+        return this.compilerService.compile(srcYamlFsItem, srcYaml, kslang, debug).then(result => {
             ga("compile", "success");
             return result;
         }, (error: CompilationError) => {
@@ -91,7 +91,7 @@ class AppController {
         if (changed)
             await fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml);
 
-        let compiled = await this.compile(srcYaml, "javascript", "both");
+        let compiled = await this.compile(ksyFsItem, srcYaml, "javascript", "both");
         if (!compiled) return;
 
         var fileNames = Object.keys(compiled.release);
