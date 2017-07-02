@@ -15,6 +15,7 @@ for libName in sorted(libs):
     licFns = []
     for filePattern in ['LICENSE*', 'license*']:
         licFns = licFns + glob.glob('./lib/%s/%s' % (distDir, filePattern))
+    licFns = list(set(licFns))
 
     if len(licFns) != 1:
         print "License not found: %s: %r" % (distDir, licFns)
