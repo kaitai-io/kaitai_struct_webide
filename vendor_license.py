@@ -45,5 +45,5 @@ for libName in sorted(libs):
     with open(licFns[0],'rt') as f: licResult += f.read().strip() + '\n'
     licResult += '='*80 + '\n\n'
 
-open('LICENSE-3RD-PARTY.txt', 'wt').write(licResult.strip())
-open('docs/wiki/3rd-party-libraries.md', 'wt').write(wikiResult.strip())
+open('LICENSE-3RD-PARTY.txt', 'wb').write(licResult.strip())
+open('docs/wiki/3rd-party-libraries.md', 'wb').write(wikiResult.strip())
