@@ -278,7 +278,7 @@ export function initFileTree() {
         //console.log(fsItem, linkData);
 
         fss[fsItem.fsType].get(fsItem.fn).then((content: string) => {
-            return this.compile(content, linkData.kslang, !!linkData.ksdebug).then((compiled: any) => {
+            return app.compilerService.compile(content, linkData.kslang, !!linkData.ksdebug).then((compiled: any) => {
                 Object.keys(compiled).forEach(fileName => {
                     //var title = fsItem.fn.split("/").last() + " [" + $(e.target).text() + "]" + (compiled.length == 1 ? "" : ` ${i + 1}/${compiled.length}`);
                     //addEditorTab(title, compItem, linkData.acelang);
