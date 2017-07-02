@@ -292,7 +292,7 @@ $(() => {
         });
     }
 
-    $(document).on("mouseup", e => {
+    $(document).on("mousedown", e => {
         if ($(e.target).parents(".dropdown-menu").length === 0)
             $(".dropdown").hide();
     });
