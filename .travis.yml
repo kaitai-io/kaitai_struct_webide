@@ -7,9 +7,9 @@ language: javascript
 install:
   - pip install -r requirements.txt
   - npm install
+  - 'if [[ "$TRAVIS_BRANCH" = stable ]]; then npm install kaitai-struct-compiler@latest && npm install kaitai-struct@latest && python vendor_build.py; fi'
 
 script:
-  - '[ "$TRAVIS_BRANCH" = stable ] && npm install kaitai-struct-compiler@latest && npm install kaitai-struct@latest && python vendor_build.py'
   - '[ "$TRAVIS_BRANCH" = stable ] && export GA_ID=UA-76299550-2 || export GA_ID=UA-76299550-3'
   - ./build
 
