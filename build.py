@@ -2,6 +2,7 @@
 import os
 import sys
 import subprocess
+import datetime
 
 GA_TEMPLATE = '''
     <!-- Google Analytics -->
@@ -31,6 +32,12 @@ def appendAfter(str, afterStr, appendStr):
 
 if gaId:
     fileAction(outDir + '/index.html', lambda html: appendAfter(html, '</title>', GA_TEMPLATE.rstrip().replace('#GA_ID#', gaId)))
- 
-commitId = subprocess.check_output(['git rev-parse HEAD'], shell=True).strip()
-fileAction(outDir + '/js/app.js', lambda html: html.replace('kaitaiIde.commitId = "";', 'kaitaiIde.commitId = "%s";' % commitId))
+
+gitInfo = subprocess.check_output(['git log -1 --format=%H,%ct'], shell=True).strip().split(',')
+commitId = gitInfo[0]
+commitTs = int(gitInfo[1])
+commitDate = datetime.datetime.fromtimestamp(commitTs).strftime('%Y-%m-%d %H:%M:%S')
+
+fileAction(outDir + '/js/app.js', lambda html: html
+    .replace('kaitaiIde.commitId = "";', 'kaitaiIde.commitId = "%s";' % (commitId))
+    .replace('kaitaiIde.commitDate = "";', 'kaitaiIde.commitDate = "%s";' % (commitDate)))

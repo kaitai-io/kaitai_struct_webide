@@ -227,6 +227,7 @@ export var app = new AppController();
 var kaitaiIde = window["kaitaiIde"] = <any>{};
 kaitaiIde.version = "0.1";
 kaitaiIde.commitId = "";
+kaitaiIde.commitDate = "";
 //localStorage.setItem("lastVersion", kaitaiIde.version);
 
 interface IInterval {
@@ -236,9 +237,10 @@ interface IInterval {
 
 $(() => {
     $("#webIdeVersion").text(kaitaiIde.version);
-    $("#webideCommit")
+    $("#webideCommitId")
         .attr("href", `https://github.com/kaitai-io/kaitai_struct_webide/commit/${kaitaiIde.commitId}`)
         .text(kaitaiIde.commitId.substr(0,7));
+    $("#webideCommitDate").text(kaitaiIde.commitDate);
     $("#compilerVersion").text(new KaitaiStructCompiler().version + " (" + new KaitaiStructCompiler().buildDate + ")");
 
     $("#welcomeDoNotShowAgain").click(() => localStorage.setItem("doNotShowWelcome", "true"));
