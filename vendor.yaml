@@ -166,3 +166,10 @@ libs:
     licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE
     npmDir: kaitai-struct
     files: [LICENSE, KaitaiStream.js]
+
+  yaml.js:
+    source: https://github.com/jeremyfa/yaml.js
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/jeremyfa/yaml.js/develop/LICENSE
+    npmDir: yamljs
+    files: [LICENSE, dist/yaml.js]

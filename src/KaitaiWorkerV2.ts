@@ -9,7 +9,7 @@ function importAll(...fns: string[]) {
 var window = self;
 
 try {
-    importAll('lib/kaitai/kaitai-struct-compiler-fastopt.js', 'lib/kaitai/yaml.js');
+    importAll('lib/_npm/kaitai-struct-compiler/kaitai-struct-compiler.js', 'lib/_npm/yamljs/yaml.js');
     var compiler = new KaitaiStructCompiler();
     console.log('Kaitai Worker V2!', compiler, methods, YAML);
 

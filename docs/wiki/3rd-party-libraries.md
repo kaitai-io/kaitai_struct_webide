@@ -103,3 +103,8 @@ License: Unlicense (https://raw.githubusercontent.com/inexorabletash/text-encodi
 Source: https://github.com/Teun/thenBy.js
 
 License: Apache-2.0 (https://raw.githubusercontent.com/Teun/thenBy.js/master/LICENSE.TXT)
+
+## yaml.js
+Source: https://github.com/jeremyfa/yaml.js
+
+License: MIT (https://raw.githubusercontent.com/jeremyfa/yaml.js/develop/LICENSE)
