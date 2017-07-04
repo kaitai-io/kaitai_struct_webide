@@ -1,17 +1,14 @@
 #!/usr/bin/env python
 
-import SocketServer
 import SimpleHTTPServer
 import json
 import fnmatch
-import glob
 import os
 import sys
 import threading
 import time
 import subprocess
 import re
-import time
 from SocketServer import ThreadingMixIn
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
@@ -44,18 +41,6 @@ def getLastChange(dirs):
     files = sorted(files, key=lambda x: x['modTime'], reverse=True)
     return files[0] if len(files) > 0 else None
 
-def bumpVersion():
-    configFn = 'src/config.ts'
-    packageJsonFn = 'package.json'
-    with open(configFn, 'rt') as f: configJs = f.read()
-    
-    currVersion = re.search(r'kaitaiIde\.version\s*=\s*[\'"](\d+\.\d+\.\d+.\d+)', configJs).group(1)
-    vp = currVersion.split('.')
-    newVersion = '.'.join(vp[:-1] + [str(int(vp[-1]) + 1)])
-    print "Changed, new version: %r" % (newVersion)
-    configJs = configJs.replace(currVersion, newVersion)
-    with open(configFn, 'wt') as f: f.write(configJs)
-
 class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def resp(self, statusCode, result):
         self.send_response(statusCode)
@@ -72,7 +57,6 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 time.sleep(0.5)
                 currChange = getLastChange(watchDirs)
                 if currChange and lastChange and currChange['modTime'] <> lastChange['modTime'] and not 'config.js' in currChange['fn']:
-                    bumpVersion()
                     self.resp(200, { 'changed': True })
                     break
                 lastChange = currChange

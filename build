@@ -8,8 +8,6 @@ mkdir -p "$OUT_DIR/js"
 ./genKaitaiFsFiles.py "$OUT_DIR"
 
 "$TSC" --outDir $OUT_DIR/js/ --noEmitOnError
-echo '== js/config.js contents:'
-cat out/js/config.js
 
 cp -r \
 	index.html \

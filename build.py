@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 import os
 import sys
+import subprocess
 
 GA_TEMPLATE = '''
     <!-- Google Analytics -->
@@ -30,3 +31,6 @@ def appendAfter(str, afterStr, appendStr):
 
 if gaId:
     fileAction(outDir + '/index.html', lambda html: appendAfter(html, '</title>', GA_TEMPLATE.rstrip().replace('#GA_ID#', gaId)))
+ 
+commitId = subprocess.check_output(['git rev-parse HEAD'], shell=True).strip()
+fileAction(outDir + '/js/app.js', lambda html: html.replace('kaitaiIde.commitId = "";', 'kaitaiIde.commitId = "%s";' % commitId))
