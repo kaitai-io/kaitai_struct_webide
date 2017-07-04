@@ -1,4 +1,6 @@
-﻿class PerformanceHelper {
+﻿import dateFormat = require("dateformat");
+
+class PerformanceHelper {
     public logPerformance: boolean = true;
 
     public measureAction(actionName: string): PerformanceHelper.ActionMeasurement;
@@ -25,7 +27,7 @@
 
     actionDone(action: PerformanceHelper.ActionMeasurement, failed?: boolean) {
         if (!this.logPerformance) return;
-        console.info(`[performance/${(new Date()).format("s.u")}] ${action.name} took `
+        console.info(`[performance/${dateFormat(new Date(), "ss.l")}] ${action.name} took `
             + `${Math.round(performance.now() - action.startTime)} milliseconds${failed ? " before it failed" : ""}.`);
     }
 }

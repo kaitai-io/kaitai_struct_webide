@@ -58,11 +58,12 @@ libs:
     npmDir: bowser
     files: [LICENSE, bowser.js]
 
-  date.format:
-    source: https://github.com/jacwright/date.format
+  dateformat:
+    source: https://github.com/felixge/node-dateformat
     licenseName: MIT
-    licenseUrl: https://raw.githubusercontent.com/jacwright/date.format/master/LICENSE
-    distDir: date.format
+    licenseUrl: https://raw.githubusercontent.com/felixge/node-dateformat/master/LICENSE
+    npmDir: dateformat
+    files: [LICENSE, lib/dateformat.js]
     
   Font Awesome:
     website: http://fontawesome.io/

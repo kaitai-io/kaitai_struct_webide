@@ -10,6 +10,7 @@
     "bootstrap": "^3.3.7",
     "bootswatch": "^3.3.7",
     "bowser": "^1.7.0",
+    "dateformat": "^2.0.0",
     "font-awesome": "^4.7.0",
     "golden-layout": "^1.5.8",
     "jquery": "^3.2.1",

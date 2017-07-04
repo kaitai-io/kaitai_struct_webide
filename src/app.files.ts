@@ -1,8 +1,10 @@
 ﻿import * as localforage from "localforage";
+import dateFormat = require("dateformat");
 
 import { ga, app } from "./app";
 import { IJSTreeNode } from "./parsedToTree";
 import { downloadFile, saveFile, openFilesWithDialog } from "./utils";
+
 declare var kaitaiFsFiles: string[];
 
 interface IFileSystem {
@@ -345,7 +347,7 @@ export function initFileTree() {
 
     ctxAction(uiFiles.cloneKsyFile, e => {
         var fsItem = getSelectedData();
-        var newFn = fsItem.fn.replace(".ksy", "_" + new Date().format("Ymd_His") + ".ksy");
+        var newFn = fsItem.fn.replace(".ksy", "_" + dateFormat(new Date(), "yyyymmdd_HHMMss") + ".ksy");
 
         fss[fsItem.fsType].get(fsItem.fn).then((content: string) => addKsyFile("localStorage", newFn, content));
     });

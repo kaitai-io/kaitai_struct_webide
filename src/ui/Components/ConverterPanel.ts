@@ -2,7 +2,7 @@
 import * as Vue from "vue";
 import * as bigInt from "big-integer";
 import Component from "../Component";
-
+import dateFormat = require("dateformat");
 import { IDataProvider } from "../../HexViewer";
 
 export class Converter {
@@ -73,7 +73,7 @@ export class ConverterPanelModel {
 
         this.float = data.length >= 4 ? "" + new Float32Array(data.buffer.slice(0, 4))[0] : "";
         this.double = data.length >= 8 ? "" + new Float64Array(data.buffer.slice(0, 8))[0] : "";
-        this.unixts = unixtsDate.format("Y-m-d H:i:s");
+        this.unixts = dateFormat(unixtsDate, "yyyy-mm-dd HH:MM:ss");
 
         try {
             this.ascii = Converter.strDecode(data, "ascii");

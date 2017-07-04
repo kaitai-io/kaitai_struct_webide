@@ -17,6 +17,7 @@ import Component from "./ui/Component";
 import { CompilerService, CompilationError } from "./KaitaiServices";
 import { ErrorWindowHandler } from "./app.errors";
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
+
 $.jstree.defaults.core.force_text = true;
 
 export function ga(category: string, action: string, label?: string, value?: number) {

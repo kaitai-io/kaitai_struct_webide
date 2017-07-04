@@ -25,7 +25,6 @@
     <script src="lib/_npm/bootstrap/js/bootstrap.min.js"></script>
     <script src="lib/_npm/yamljs/yaml.js"></script>
     <script src="lib/_npm/ace/ace.js"></script>
-    <script src="lib/date.format/date.format.js"></script>
 
     <script src="js/autorefresh.js"></script>
     <script src="js/extensions.js"></script>
@@ -33,7 +32,7 @@
     <script src="js/kaitaiFsFiles.js"></script>
     <script>
         var paths = {};
-        ["bowser", "jstree", "localforage", "goldenlayout", "vue", "kaitai-struct-compiler"].forEach(
+        ["bowser", "jstree", "localforage", "goldenlayout", "vue", "kaitai-struct-compiler", "dateformat"].forEach(
             name => paths[name] = `../lib/_npm/${name}/${name}`);
         paths["big-integer"] = "../lib/_npm/BigInteger/BigInteger";
 

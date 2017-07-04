@@ -16,6 +16,7 @@ import "../Components/ContextMenu";
 import { InputModal } from "../Components/InputModal";
 import "../Components/InputModal";
 import "../Components/TreeView";
+import dateFormat = require("dateformat");
 
 import { saveFile, Convert } from "../../utils";
 declare var Scrollbar: any;
@@ -171,7 +172,7 @@ export class FileTree extends Vue {
     }
 
     public async cloneFile() {
-        var newUri = this.contextMenuNode.uri.uri.replace(/\.(\w+)$/, `_${new Date().format("Ymd_His")}.$1`);
+        var newUri = this.contextMenuNode.uri.uri.replace(/\.(\w+)$/, `_${new Date().format("yyyymmdd_HHMMss")}.$1`);
         console.log('cloneKsyFile', newUri);
         let content = await this.contextMenuNode.fs.read(this.contextMenuNode.uri.uri);
         await this.contextMenuNode.fs.write(newUri, content);

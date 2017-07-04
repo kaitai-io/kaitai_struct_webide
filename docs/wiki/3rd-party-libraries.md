@@ -60,10 +60,10 @@ Source: https://github.com/ded/bowser
 
 License: MIT (https://raw.githubusercontent.com/ded/bowser/master/LICENSE)
 
-## date.format
-Source: https://github.com/jacwright/date.format
+## dateformat
+Source: https://github.com/felixge/node-dateformat
 
-License: MIT (https://raw.githubusercontent.com/jacwright/date.format/master/LICENSE)
+License: MIT (https://raw.githubusercontent.com/felixge/node-dateformat/master/LICENSE)
 
 ## jQuery
 Website: https://jquery.com/
