@@ -46,7 +46,13 @@ async function openFile(uri: string){
     interface ISandboxMethods {
         eval(code: string): Promise<any>;
         loadScript(src: string): Promise<void>;
-        compile(code: string): Promise<{ releaseCode: { [fileName:string]: string }, debugCode: { [fileName:string]: string } }>;
+        compile(code: string): Promise<{ 
+            releaseCode: { [fileName:string]: string },
+            debugCode: { [fileName:string]: string },
+            debugCodeAll: string 
+        }>;
+        setInput(input: ArrayBuffer): Promise<void>;
+        parse(): Promise<void>;
     }
 
     var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
@@ -54,6 +60,10 @@ async function openFile(uri: string){
     await openFile("https:///formats/archive/zip.ksy");
     var compilationResult = await sandbox.compile(ksyContent);
     console.log('compilationResult', compilationResult);
-    jsCode.setValue(Object.values(compilationResult.releaseCode)[0], -1);
-    jsCodeDebug.setValue(Object.values(compilationResult.debugCode)[0], -1);
+    jsCode.setValue(Object.values(compilationResult.releaseCode).join('\n'), -1);
+    jsCodeDebug.setValue(compilationResult.debugCodeAll, -1);
+
+    let input = await fss.read("https:///samples/sample1.zip");
+    await sandbox.setInput(input);
+    await sandbox.parse();
 })();
