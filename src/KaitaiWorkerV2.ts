@@ -12,7 +12,7 @@ class KaitaiServices {
     compiler: KaitaiStructCompiler;
 
     ksyCode: string;
-    ksy: any;
+    ksy: KsySchema.IKsyFile;
     jsCode: string;
 
     classes: { [name: string]: any };
@@ -69,7 +69,6 @@ try {
     var service = new KaitaiServices();
     console.log('Kaitai Worker V2!', service.compiler, methods, YAML);
 
-    var ksy: KsySchema.IKsyFile;
     methods.compile = (ksyCode: string) => service.compileKsy(ksyCode);
     methods.setInput = (input: ArrayBuffer) => service.setInput(input);
     methods.parse = () => service.parse();
