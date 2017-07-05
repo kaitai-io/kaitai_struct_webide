@@ -1,6 +1,6 @@
 /// <reference path="../src/KsySchema.ts" />
 
-enum ObjectType {
+export enum ObjectType {
     Primitive = "Primitive",
     Array = "Array",
     TypedArray = "TypedArray",
@@ -8,19 +8,19 @@ enum ObjectType {
     Undefined = "Undefined",
 }
 
-interface IInstance {
+export interface IInstance {
     path: string[];
     offset: number;
 }
 
-interface IExportedObject {
+export interface IExportedObject {
     class?: string;
     ksyType?: KsySchema.IType;
     fields?: { [name: string]: IExportedValue; };
     instances?: { [name: string]: IInstance; };
 }
 
-interface IExportedValue {
+export interface IExportedValue {
     type: ObjectType;
     path: string[];
     ioOffset: number;
@@ -39,4 +39,4 @@ interface IExportedValue {
     parent?: IExportedValue;
 }
 
-interface IKsyTypes { [name: string]: KsySchema.IType; };
+export interface IKsyTypes { [name: string]: KsySchema.IType; }

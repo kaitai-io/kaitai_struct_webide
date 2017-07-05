@@ -5,8 +5,6 @@ import KaitaiStream = require("kaitai-struct/KaitaiStream");
 import { YAML } from "yamljs";
 import { ObjectExporter } from "./ObjectExporter";
 
-declare var methods: any;
-
 class KaitaiServices {
     compiler: KaitaiStructCompiler;
 
@@ -19,6 +17,8 @@ class KaitaiServices {
 
     input: ArrayBuffer;
     parsed: any;
+
+    objectExporter: ObjectExporter;
 
     constructor() {
         this.compiler = new KaitaiStructCompiler();
@@ -44,6 +44,8 @@ class KaitaiServices {
         eval(debugCodeAll);
         console.log("compileKsy", this.mainClassName, this.classes);
 
+        this.objectExporter = new ObjectExporter(this.ksy.types, this.classes);
+
         return { releaseCode, debugCode, debugCodeAll };
     }
 
@@ -60,16 +62,21 @@ class KaitaiServices {
 
         console.log("parsed", this.parsed);
     }
+
+    export() {
+        return this.objectExporter.exportValue(this.parsed, null, []);
+    }
 }
 
+declare var methods: any;
 try {
-    var objExp = new ObjectExporter();
     var service = new KaitaiServices();
     console.log("Kaitai Worker V2!", service.compiler, methods, YAML);
 
     methods.compile = (ksyCode: string) => service.compileKsy(ksyCode);
     methods.setInput = (input: ArrayBuffer) => service.setInput(input);
     methods.parse = () => service.parse();
+    methods.export = () => service.export();
 } catch(e) {
     console.log("Worker error", e);
 }

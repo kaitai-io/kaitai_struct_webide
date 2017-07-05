@@ -5,6 +5,7 @@ import { Component } from "./LayoutManagerV2";
 import * as ace from "ace/ace";
 import { SandboxHandler } from "./SandboxHandler";
 import { FsUri } from "./FileSystem/FsUri";
+//import { IKsyTypes, ObjectType, IExportedValue, IInstance } from "../worker/WorkerShared";
 
 window["layout"] = Layout;
 
@@ -53,6 +54,7 @@ async function openFile(uri: string) {
         }>;
         setInput(input: ArrayBuffer): Promise<void>;
         parse(): Promise<void>;
+        export(): Promise<IExportedValue>;
     }
 
     var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
@@ -67,4 +69,6 @@ async function openFile(uri: string) {
     let input = await fss.read("https:///samples/sample1.zip");
     await sandbox.setInput(input);
     await sandbox.parse();
+    let exported = await sandbox.export();
+    console.log("exported", exported);
 })();
