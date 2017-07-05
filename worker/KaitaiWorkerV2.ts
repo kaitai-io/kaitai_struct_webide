@@ -1,12 +1,11 @@
-declare var currentScriptSrc: string;
+/// <reference path="../lib/ts-types/kaitai.d.ts" />
+
+import KaitaiStructCompiler = require("kaitai-struct-compiler");
+import KaitaiStream = require("kaitai-struct/KaitaiStream");
+import { YAML } from "yamljs";
+import { ObjectExporter } from "./ObjectExporter";
+
 declare var methods: any;
-
-let baseDir = new URL('../', currentScriptSrc).href;
-function importAll(...fns: string[]) {
-    importScripts(...fns.map(fn => new URL(fn, baseDir).href));
-}
-
-var window = self;
 
 class KaitaiServices {
     compiler: KaitaiStructCompiler;
@@ -21,29 +20,29 @@ class KaitaiServices {
     input: ArrayBuffer;
     parsed: any;
 
-    constructor(){
+    constructor() {
         this.compiler = new KaitaiStructCompiler();
     }
 
     async compileKsy(ksyCode: string) {
         this.ksyCode = ksyCode;
         this.ksy = YAML.parse(ksyCode);
-        
-        var releaseCode = await this.compiler.compile('javascript', this.ksy, null, false);
-        var debugCode = await this.compiler.compile('javascript', this.ksy, null, true);
-        var debugCodeAll = this.jsCode = Object.values(debugCode).join('\n');
+
+        var releaseCode = await this.compiler.compile("javascript", this.ksy, null, false);
+        var debugCode = await this.compiler.compile("javascript", this.ksy, null, true);
+        var debugCodeAll = this.jsCode = Object.values(debugCode).join("\n");
 
         this.classes = {};
 
         var self = this;
-        function define(name: string, deps: string[], callback: () => any){
+        function define(name: string, deps: string[], callback: () => any) {
             self.classes[name] = callback();
             self.mainClassName = name;
         }
         define["amd"] = true;
-        
+
         eval(debugCodeAll);
-        console.log('compileKsy', this.mainClassName, this.classes);
+        console.log("compileKsy", this.mainClassName, this.classes);
 
         return { releaseCode, debugCode, debugCodeAll };
     }
@@ -51,7 +50,7 @@ class KaitaiServices {
     setInput(input: ArrayBuffer) {
         this.input = input;
 
-        console.log('setInput', this.input);
+        console.log("setInput", this.input);
     }
 
     parse() {
@@ -59,20 +58,18 @@ class KaitaiServices {
         this.parsed = new mainClass(new KaitaiStream(this.input, 0));
         this.parsed._read();
 
-        console.log('parsed', this.parsed);
+        console.log("parsed", this.parsed);
     }
 }
 
 try {
-    importAll('lib/_npm/kaitai-struct-compiler/kaitai-struct-compiler.js', 'lib/_npm/yamljs/yaml.js', 'lib/_npm/kaitai-struct/KaitaiStream.js');
-
+    var objExp = new ObjectExporter();
     var service = new KaitaiServices();
-    console.log('Kaitai Worker V2!', service.compiler, methods, YAML);
+    console.log("Kaitai Worker V2!", service.compiler, methods, YAML);
 
     methods.compile = (ksyCode: string) => service.compileKsy(ksyCode);
     methods.setInput = (input: ArrayBuffer) => service.setInput(input);
     methods.parse = () => service.parse();
-}
-catch(e){
+} catch(e) {
     console.log("Worker error", e);
 }

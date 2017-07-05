@@ -149,7 +149,7 @@ export class FileTree extends Vue {
         var aceLang = typeof aceLangOrDebug === "string" ? aceLangOrDebug : lang;
         var debug = typeof aceLangOrDebug === "boolean" ? aceLangOrDebug : false;
 
-        let data = await fss.read(this.selectedUri)
+        let data = await fss.read(this.selectedUri);
         this.$emit("generate-parser", lang, aceLang, debug, data);
     }
 
@@ -167,13 +167,13 @@ export class FileTree extends Vue {
     public async createKsyFile(name: string) {
         var newUri = this.contextMenuNode.uri.addPath(`${name}.ksy`).uri;
         var content = `meta:\n  id: ${name}\n  file-extension: ${name}\n`;
-        await this.contextMenuNode.fs.write(newUri, Convert.utf8StrToBytes(content).buffer);
+        await this.contextMenuNode.fs.write(newUri, <ArrayBuffer>Convert.utf8StrToBytes(content).buffer);
         await this.contextMenuNode.loadChildren();
     }
 
     public async cloneFile() {
         var newUri = this.contextMenuNode.uri.uri.replace(/\.(\w+)$/, `_${new Date().format("yyyymmdd_HHMMss")}.$1`);
-        console.log('cloneKsyFile', newUri);
+        console.log("cloneKsyFile", newUri);
         let content = await this.contextMenuNode.fs.read(this.contextMenuNode.uri.uri);
         await this.contextMenuNode.fs.write(newUri, content);
         await this.contextMenuNode.parent.loadChildren();
@@ -195,7 +195,7 @@ export class FileTree extends Vue {
         this.fsTreeView.scrollIntoView = (el: Element, alignToTop: boolean) =>
             scrollbar.scrollIntoView(el, { alignToTop: alignToTop, onlyScrollIfNeeded: true });
         document.body.appendChild(this.ctxMenu.$el);
-        console.log('FileTree mounted', this.fsTreeView);
+        console.log("FileTree mounted", this.fsTreeView);
         //this.createFolderModal.show();
     }
 }

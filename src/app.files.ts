@@ -84,7 +84,7 @@ class KaitaiFs implements IFileSystem {
 
     get(fn: string): Promise<string|ArrayBuffer> {
         if (fn.toLowerCase().endsWith(".ksy"))
-            return Promise.resolve<string>($.ajax({ url: fn }));
+            return Promise.resolve<string>(<any>$.ajax({ url: fn }));
         else
             return downloadFile(fn);
     }

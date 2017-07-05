@@ -1,11 +1,30 @@
 {
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
-    "version": "0.1.0",
-    "command": "tsc",
-    "isShellCommand": true,
-    "args": ["-w", "-p", "."],
-    "showOutput": "silent",
-    "isBackground": true,
-    "problemMatcher": "$tsc-watch"
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "taskName": "compile-gui",
+            "command": "node_modules\\.bin\\tsc",
+            "isShellCommand": true,
+            "args": ["-w", "-p", "."],
+            "showOutput": "silent",
+            "isBackground": true,
+            "problemMatcher": "$tsc-watch"
+        },
+        {
+            "taskName": "compile-worker",
+            "command": "node_modules\\.bin\\tsc",
+            "isShellCommand": true,
+            "args": ["-w", "-p", "worker"],
+            "showOutput": "silent",
+            "isBackground": true,
+            "problemMatcher": "$tsc-watch"
+        },
+        {
+            "taskName": "compile",
+            "dependsOn": ["compile-gui", "compile-worker"],
+            "isBuildCommand": true
+        }
+    ]
 }

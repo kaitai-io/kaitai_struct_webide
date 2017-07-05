@@ -52,8 +52,8 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
                 this.setSelected(node.children[0]);
             else {
                 while (node.parent) {
-                    var children = node.parent.children;
-                    var thisIdx = children.indexOf(node);
+                    let children = node.parent.children;
+                    let thisIdx = children.indexOf(node);
 
                     if (thisIdx + 1 < children.length) {
                         this.setSelected(children[thisIdx + 1]);
@@ -64,8 +64,8 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
             }
         } else if (dir === "prev") {
             if (node.parent) {
-                var children = node.parent.children;
-                var thisIdx = children.indexOf(node);
+                let children = node.parent.children;
+                let thisIdx = children.indexOf(node);
 
                 if (thisIdx - 1 >= 0) {
                     var selChildren = children[thisIdx - 1];
@@ -88,7 +88,7 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
         target.scrollIntoView(false);
     }
 
-    getParentBoundingRect(){
+    getParentBoundingRect() {
         return this.$el.getBoundingClientRect();
     }
 
@@ -123,7 +123,7 @@ export class TreeViewItem<T extends IFsTreeNode> extends Vue {
     get icon() {
         return this.model["icon"] ? this.model["icon"] :
             this.model.isFolder ? (this.open ? "glyphicon-folder-open" : "glyphicon-folder-close") : "glyphicon-list-alt";
-    };
+    }
 
     get treeView() { return UIHelper.findParent(this, TreeView); }
 

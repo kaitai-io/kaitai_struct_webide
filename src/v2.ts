@@ -23,9 +23,9 @@ function setupEditor(parent: Component, lang: string) {
     return editor;
 }
 
-var ksyEditor = setupEditor(Layout.ksyEditor, 'yaml');
-var jsCode = setupEditor(Layout.jsCode, 'javascript');
-var jsCodeDebug = setupEditor(Layout.jsCodeDebug, 'javascript');
+var ksyEditor = setupEditor(Layout.ksyEditor, "yaml");
+var jsCode = setupEditor(Layout.jsCode, "javascript");
+var jsCodeDebug = setupEditor(Layout.jsCodeDebug, "javascript");
 
 filetree.$on("open-file", (treeNode: FsTreeNode) => {
     console.log(treeNode);
@@ -34,9 +34,9 @@ filetree.$on("open-file", (treeNode: FsTreeNode) => {
 
 var ksyContent: string;
 
-async function openFile(uri: string){
+async function openFile(uri: string) {
     let content = await fss.read(uri);
-    if(uri.endsWith(".ksy")){
+    if(uri.endsWith(".ksy")) {
         ksyContent = new TextDecoder().decode(new Uint8Array(content));
         ksyEditor.setValue(ksyContent, -1);
     }
@@ -46,21 +46,22 @@ async function openFile(uri: string){
     interface ISandboxMethods {
         eval(code: string): Promise<any>;
         loadScript(src: string): Promise<void>;
-        compile(code: string): Promise<{ 
+        compile(code: string): Promise<{
             releaseCode: { [fileName:string]: string },
             debugCode: { [fileName:string]: string },
-            debugCodeAll: string 
+            debugCodeAll: string,
         }>;
         setInput(input: ArrayBuffer): Promise<void>;
         parse(): Promise<void>;
     }
 
     var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
-    await sandbox.loadScript(new URL('js/KaitaiWorkerV2.js', location.href).href);
+    await sandbox.loadScript(new URL("js/worker/ImportLoader.js", location.href).href);
+    await sandbox.loadScript(new URL("js/worker/KaitaiWorkerV2.js", location.href).href);
     await openFile("https:///formats/archive/zip.ksy");
     var compilationResult = await sandbox.compile(ksyContent);
-    console.log('compilationResult', compilationResult);
-    jsCode.setValue(Object.values(compilationResult.releaseCode).join('\n'), -1);
+    console.log("compilationResult", compilationResult);
+    jsCode.setValue(Object.values(compilationResult.releaseCode).join("\n"), -1);
     jsCodeDebug.setValue(compilationResult.debugCodeAll, -1);
 
     let input = await fss.read("https:///samples/sample1.zip");

@@ -67,7 +67,7 @@ export function arrayBufferToBase64(buffer: ArrayBuffer) {
     return window.btoa(binary);
 }
 
-export function readBlob(blob: Blob, mode: "arrayBuffer" | "text" | "dataUrl", ...args: any[]) {
+export function readBlob(blob: Blob, mode: "arrayBuffer" | "text" | "dataUrl", ...args: any[]): Promise<string|ArrayBuffer> {
     return new Promise(function (resolve, reject) {
         var reader = new FileReader();
         reader.onload = function () { resolve(reader.result); };
@@ -76,15 +76,15 @@ export function readBlob(blob: Blob, mode: "arrayBuffer" | "text" | "dataUrl", .
     });
 }
 
-export function htmlescape(s: string) {
-    return $("<div/>").text(s).html();
+export function htmlescape(str: string) {
+    return $("<div/>").text(str).html();
 }
 
 export interface IFileReader {
     (mode: "arrayBuffer"): Promise<ArrayBuffer>;
     (mode: "text"): Promise<string>;
     (mode: "dataUrl"): Promise<string>;
-};
+}
 
 export interface IFileProcessItem {
     file: File;
@@ -93,13 +93,13 @@ export interface IFileProcessItem {
 
 export interface IFileProcessCallback {
     (files: IFileProcessItem[]): void;
-};
+}
 
 export function processFiles(files: FileList) {
     var resFiles = <IFileProcessItem[]>[];
     for (var i = 0; i < files.length; i++) {
         var file = files[i];
-        resFiles.push({ file: file, read: function (mode: "arrayBuffer" | "text" | "dataUrl") { return readBlob(this.file, mode); } });
+        resFiles.push({ file: file, read: function (mode: "arrayBuffer" | "text" | "dataUrl") { return <Promise<any>>readBlob(this.file, mode); } });
     }
     return resFiles;
 }
