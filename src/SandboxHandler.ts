@@ -24,7 +24,7 @@ export class SandboxHandler {
 
         this.loadedPromise = new Promise<void>((resolve, reject) => {
             this.iframe = document.createElement("iframe");
-            this.iframe.style.display = 'none';
+            this.iframe.style.display = "none";
             this.iframe.onload = () => resolve();
             this.iframe.onerror = () => reject();
             this.iframe.src = iframeSrc;
@@ -51,8 +51,7 @@ export class SandboxHandler {
             this.msgHandlers[request.messageId] = response => {
                 if (response.success)
                     resolve(response.result);
-                else
-                {
+                else {
                     console.log("error", response.error);
                     reject(response.error);
                 }

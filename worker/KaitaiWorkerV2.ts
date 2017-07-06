@@ -1,7 +1,7 @@
 /// <reference path="../lib/ts-types/kaitai.d.ts" />
 
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
-import KaitaiStream = require("kaitai-struct/KaitaiStream");
+import KaitaiStream = require("KaitaiStream");
 import { YAML } from "yamljs";
 import { ObjectExporter } from "./ObjectExporter";
 

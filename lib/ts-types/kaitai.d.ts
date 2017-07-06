@@ -18,7 +18,7 @@ declare module "kaitai-struct-compiler" {
     export = KaitaiStructCompiler;
 }
 
-declare module "kaitai-struct/KaitaiStream" {
+declare module "KaitaiStream" {
     class KaitaiStream {
         constructor(inputBuffer: ArrayBuffer, offset: number);
     }

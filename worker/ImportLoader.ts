@@ -4,7 +4,8 @@ var global = this;
 
 function require(name: string) {
     var paths = {
-        "yamljs": "../../lib/_npm/yamljs/yaml"
+        "yamljs": "../../lib/_npm/yamljs/yaml",
+        "KaitaiStream": "../../lib/_npm/kaitai-struct/KaitaiStream"
     };
 
     var relPath: string;
