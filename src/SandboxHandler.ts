@@ -12,6 +12,25 @@ interface IRpcResponse {
     error?: any;
 }
 
+class ApiProxyPath {
+    static fakeBaseObj = function(){ /* */ };
+
+    constructor(public sandbox: SandboxHandler, public useWorker: boolean, public path: string[]) { }
+
+    createProxy(): ApiProxyPath {
+        return <ApiProxyPath><any>new Proxy(ApiProxyPath.fakeBaseObj, {
+            get: (target, propName: string) => {
+                var path = Array.from(this.path);
+                path.push(propName);
+                return new ApiProxyPath(this.sandbox, this.useWorker, path).createProxy();
+            },
+            apply: (target, _this, args) => {
+                return this.sandbox.workerCall(this.path.join("."), args, this.useWorker);
+            }
+        });
+    }
+}
+
 export class SandboxHandler {
     msgHandlers: { [msgId: string]: (msg: IRpcResponse) => void } = {};
     lastMsgId = 0;
@@ -64,9 +83,7 @@ export class SandboxHandler {
     }
 
     createProxy<T>(useWorker: boolean = true): T {
-        return <T><any>new Proxy(this, {
-            get: (target, methodName: string) => (...args: any[]) => this.workerCall(methodName, args, useWorker)
-        });
+        return <T><any>new ApiProxyPath(this, useWorker, []).createProxy();
     }
 
     static create<T>(src: string, useWorker: boolean = true): T {

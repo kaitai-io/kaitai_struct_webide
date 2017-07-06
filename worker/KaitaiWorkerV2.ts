@@ -24,7 +24,7 @@ class KaitaiServices {
         this.compiler = new KaitaiStructCompiler();
     }
 
-    async compileKsy(ksyCode: string) {
+    public async compile(ksyCode: string) {
         this.ksyCode = ksyCode;
         this.ksy = YAML.parse(ksyCode);
 
@@ -68,15 +68,10 @@ class KaitaiServices {
     }
 }
 
-declare var methods: any;
+declare var api: any;
 try {
-    var service = new KaitaiServices();
-    console.log("Kaitai Worker V2!", service.compiler, methods, YAML);
-
-    methods.compile = (ksyCode: string) => service.compileKsy(ksyCode);
-    methods.setInput = (input: ArrayBuffer) => service.setInput(input);
-    methods.parse = () => service.parse();
-    methods.export = () => service.export();
+    var kaitaiServices = api.kaitaiServices = new KaitaiServices();
+    console.log("Kaitai Worker V2!", api);
 } catch(e) {
     console.log("Worker error", e);
 }

@@ -47,6 +47,10 @@ async function openFile(uri: string) {
     interface ISandboxMethods {
         eval(code: string): Promise<any>;
         loadScript(src: string): Promise<void>;
+        kaitaiServices: IKaitaiServices;
+    }
+
+    interface IKaitaiServices {
         compile(code: string): Promise<{
             releaseCode: { [fileName:string]: string },
             debugCode: { [fileName:string]: string },
@@ -57,18 +61,19 @@ async function openFile(uri: string) {
         export(): Promise<IExportedValue>;
     }
 
-    var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
+    //var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
+    var sandbox = SandboxHandler.create<ISandboxMethods>("http://127.0.0.1:8001/");
     await sandbox.loadScript(new URL("js/worker/ImportLoader.js", location.href).href);
     await sandbox.loadScript(new URL("js/worker/KaitaiWorkerV2.js", location.href).href);
     await openFile("https:///formats/archive/zip.ksy");
-    var compilationResult = await sandbox.compile(ksyContent);
+    var compilationResult = await sandbox.kaitaiServices.compile(ksyContent);
     console.log("compilationResult", compilationResult);
     jsCode.setValue(Object.values(compilationResult.releaseCode).join("\n"), -1);
     jsCodeDebug.setValue(compilationResult.debugCodeAll, -1);
 
     let input = await fss.read("https:///samples/sample1.zip");
-    await sandbox.setInput(input);
-    await sandbox.parse();
-    let exported = await sandbox.export();
+    await sandbox.kaitaiServices.setInput(input);
+    await sandbox.kaitaiServices.parse();
+    let exported = await sandbox.kaitaiServices.export();
     console.log("exported", exported);
 })();

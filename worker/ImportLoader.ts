@@ -22,6 +22,6 @@ function require(name: string) {
     global.window = exports;
     global.module = { exports: exports };
     importScripts(new URL(`${relPath}.js`, currentScriptSrc).href);
-    console.log("require", name, global.module.exports);
+    //console.log("require", name, global.module.exports);
     return global.module.exports;
 }
