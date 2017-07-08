@@ -1,9 +1,9 @@
 ﻿/**warn
-  * Original code:
-  *   vue-class-component v5.0.1
-  *   (c) 2015-2017 Evan You
-  *   @license MIT
-  */
+ * Original code:
+ *   vue-class-component v5.0.1
+ *   (c) 2015-2017 Evan You
+ *   @license MIT
+ */
 import * as Vue from "vue";
 import { ComponentOptions } from "vue";
 import {componentLoader} from "./ComponentLoader";
@@ -27,12 +27,12 @@ declare var requirejs: any;
 export type VueClass = { new (): Vue } & typeof Vue;
 
 export function componentFactory(
-    Component: VueClass,
+    component: VueClass,
     options: ComponentOptions<any> = {}
 ): VueClass {
-    options.name = options.name || (Component as any)._componentTag || (Component as any).name;
+    options.name = options.name || (component as any)._componentTag || (component as any).name;
     // prototype props.
-    const proto = Component.prototype;
+    const proto = component.prototype;
     Object.getOwnPropertyNames(proto).forEach(function(key) {
         if (key === "constructor") {
             return;
@@ -58,7 +58,7 @@ export function componentFactory(
     // add data hook to collect class properties as Vue instance's data
     (options.mixins || (options.mixins = [])).push({
         data() {
-            return collectDataFromConstructor(this, Component);
+            return collectDataFromConstructor(this, component);
         }
     });
 
@@ -72,9 +72,9 @@ export function componentFactory(
         options.template = componentLoader.templates[options.name];
     //else
     //    console.error(`Missing template for component: ${options.name}`);
-    
+
     // find super
-    const superProto = Object.getPrototypeOf(Component.prototype);
+    const superProto = Object.getPrototypeOf(component.prototype);
     const Super = superProto instanceof Vue ? superProto.constructor as VueClass : Vue;
     const result = Super.extend(options);
 
@@ -82,16 +82,16 @@ export function componentFactory(
     return result;
 }
 
-export function collectDataFromConstructor(vm: Vue, Component: VueClass) {
+export function collectDataFromConstructor(vm: Vue, component: VueClass) {
     // override _init to prevent to init as Vue instance
-    Component.prototype._init = function () {
+    component.prototype._init = function () {
         // proxy to actual vm
         const keys = Object.getOwnPropertyNames(vm);
         // 2.2.0 compat (props are no longer exposed as self properties)
         if (vm.$options.props) {
-            for (var key in vm.$options.props) {
-                if (!vm.hasOwnProperty(key)) {
-                    keys.push(key);
+            for (var propKey in vm.$options.props) {
+                if (!vm.hasOwnProperty(propKey)) {
+                    keys.push(propKey);
                 }
             }
         }
@@ -106,7 +106,7 @@ export function collectDataFromConstructor(vm: Vue, Component: VueClass) {
     };
 
     // should be acquired class property values
-    const data = new Component();
+    const data = new component();
 
     // create plain data object
     const plainData: any = {};
@@ -127,8 +127,8 @@ function Component<V extends VueClass, U extends Vue>(
     if (typeof options === "function") {
         return componentFactory(options);
     }
-    return function (Component: V) {
-        return componentFactory(Component, options);
+    return function (component: V) {
+        return componentFactory(component, options);
     };
 }
 

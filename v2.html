@@ -21,9 +21,9 @@
     <script>
         async function init(){
             var paths = {};
-            ["bowser", "jstree", "localforage", "goldenlayout", "vue"].forEach(
+            ["bowser", "jstree", "localforage", "goldenlayout", "vue", "dateformat"].forEach(
                 name => loader.paths[name] = `lib/_npm/${name}/${name}`);
-            loader.paths["bigInt"] = "lib/_npm/BigInteger/BigInteger";
+            loader.paths["big-integer"] = "lib/_npm/BigInteger/BigInteger";
             loader.paths["jquery"] = "lib/_npm/jquery/jquery.min";
             loader.paths["ace"] = "lib/_npm/ace";
 
@@ -32,7 +32,7 @@
             loader.beforeLoadHook = async module => {
                 //console.log('module loading: ', module.url);
                 if(/ui.(Parts|Components)/.exec(module.url)){
-                    //console.log('load template for', module.url);
+                    console.log('load template for', module.url);
                     await componentLoader.loadTemplate(module.url.replace(/\.js$/, ".html").replace(/js\/ui/, "src/ui"));
                     //componentLoader.
                 }

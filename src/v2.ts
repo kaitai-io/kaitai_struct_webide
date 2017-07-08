@@ -5,7 +5,9 @@ import { Component } from "./LayoutManagerV2";
 import * as ace from "ace/ace";
 import { SandboxHandler } from "./SandboxHandler";
 import { FsUri } from "./FileSystem/FsUri";
-import { HexViewer } from "./HexViewer";
+import { HexViewer, IDataProvider } from "./HexViewer";
+import { ConverterPanel, ConverterPanelModel } from "./ui/Components/ConverterPanel";
+import * as Vue from "vue";
 //import { IKsyTypes, ObjectType, IExportedValue, IInstance } from "../worker/WorkerShared";
 
 window["layout"] = Layout;
@@ -73,10 +75,22 @@ async function openFile(uri: string) {
     jsCodeDebug.setValue(compilationResult.debugCodeAll, -1);
 
     let input = await fss.read("https:///samples/sample1.zip");
-    hexViewer.setDataProvider({
+
+    var dataProvider: IDataProvider = {
         length: input.byteLength,
         get(offset, length) { return new Uint8Array(input, offset, length); }
-    });
+    };
+    hexViewer.setDataProvider(dataProvider);
+
+    var converterPanel = new ConverterPanel();
+    converterPanel.$mount(Layout.converterPanel.element);
+    converterPanel.model.update(dataProvider, 0);
+
+    hexViewer.onSelectionChanged = () => {
+        console.log("selectionChanged");
+        converterPanel.model.update(dataProvider, hexViewer.selectionStart);
+    };
+
     await sandbox.kaitaiServices.setInput(input);
     await sandbox.kaitaiServices.parse();
     let exported = await sandbox.kaitaiServices.export();

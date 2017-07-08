@@ -6,7 +6,7 @@ declare function require(deps: string[], callback: (obj: any[]) => void): void;
 class ComponentLoader {
     templates: { [name: string]: string } = {};
     templatePromises: { [name: string]: ((template: string) => void)[] } = {};
-    
+
     load(names: string[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             require(names.map(name => `./${name}`), (...modules: any[]) => {
@@ -36,7 +36,7 @@ class ComponentLoader {
             /\s(\w+)="(\w+)"/g.matches(tagMatch[2]).forEach(attrMatch => attrs[attrMatch[1]] = attrMatch[2]);
 
             if (tag === "template") {
-                var jsClassName = attrs.id || url.split('/').last().replace('.html', '');
+                var jsClassName = attrs.id || url.split("/").last().replace(".html", "");
                 var template = this.templates[jsClassName] = content.replace(/<!--nobr-->\s*/gi, "");
                 if (this.templatePromises[jsClassName]) {
                     for (var resolve of this.templatePromises[jsClassName])
@@ -60,7 +60,7 @@ class ComponentLoader {
             module[componentName].options.template = this.templates[componentName];
         }
     }
-};
+}
 
 window["vue"] = Vue;
 
