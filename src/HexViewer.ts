@@ -1,4 +1,5 @@
-﻿import { IInterval, IIntervalLookup } from "./utils/IntervalHelper";
+﻿import * as $ from "jquery";
+import { IInterval, IIntervalLookup } from "./utils/IntervalHelper";
 
 interface IHexViewerCell extends HTMLSpanElement {
     cell: IHexViewerCell;
@@ -125,7 +126,7 @@ export class HexViewer {
             if (e.type === "mousedown") {
                 this.canDeselect = this.selectionStart === cell.dataOffset && this.selectionEnd === cell.dataOffset;
                 this.mouseDownOffset = cell.dataOffset;
-                this.content.on("mousemove", e => this.cellMouseAction(e));
+                this.content.on("mousemove", evt => this.cellMouseAction(evt));
                 this.setSelection(cell.dataOffset, cell.dataOffset);
             }
             else if (e.type === "mousemove") {
@@ -140,10 +141,10 @@ export class HexViewer {
         }
     }
 
-    constructor(containerId: string, public dataProvider?: IDataProvider) {
+    constructor(container: string|HTMLElement, public dataProvider?: IDataProvider) {
         this.dataProvider = dataProvider;
 
-        this.scrollbox = $(`#${containerId}`).addClass("hexViewer");
+        this.scrollbox = $(container).addClass("hexViewer");
         this.heightbox = $(`<div class="heightbox"></div>`).appendTo(this.scrollbox);
         this.contentOuter = $(`<div class="contentOuter" tabindex="1"></div>`).appendTo(this.scrollbox);
 

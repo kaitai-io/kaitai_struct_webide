@@ -5,6 +5,7 @@ import { Component } from "./LayoutManagerV2";
 import * as ace from "ace/ace";
 import { SandboxHandler } from "./SandboxHandler";
 import { FsUri } from "./FileSystem/FsUri";
+import { HexViewer } from "./HexViewer";
 //import { IKsyTypes, ObjectType, IExportedValue, IInstance } from "../worker/WorkerShared";
 
 window["layout"] = Layout;
@@ -27,6 +28,7 @@ function setupEditor(parent: Component, lang: string) {
 var ksyEditor = setupEditor(Layout.ksyEditor, "yaml");
 var jsCode = setupEditor(Layout.jsCode, "javascript");
 var jsCodeDebug = setupEditor(Layout.jsCodeDebug, "javascript");
+var hexViewer = new HexViewer(Layout.inputBinary.element);
 
 filetree.$on("open-file", (treeNode: FsTreeNode) => {
     console.log(treeNode);
@@ -61,8 +63,7 @@ async function openFile(uri: string) {
         export(): Promise<IExportedValue>;
     }
 
-    //var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
-    var sandbox = SandboxHandler.create<ISandboxMethods>("http://127.0.0.1:8001/");
+    var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
     await sandbox.loadScript(new URL("js/worker/ImportLoader.js", location.href).href);
     await sandbox.loadScript(new URL("js/worker/KaitaiWorkerV2.js", location.href).href);
     await openFile("https:///formats/archive/zip.ksy");
@@ -72,6 +73,10 @@ async function openFile(uri: string) {
     jsCodeDebug.setValue(compilationResult.debugCodeAll, -1);
 
     let input = await fss.read("https:///samples/sample1.zip");
+    hexViewer.setDataProvider({
+        length: input.byteLength,
+        get(offset, length) { return new Uint8Array(input, offset, length); }
+    });
     await sandbox.kaitaiServices.setInput(input);
     await sandbox.kaitaiServices.parse();
     let exported = await sandbox.kaitaiServices.export();

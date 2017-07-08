@@ -55,7 +55,7 @@ export class ClosableComponent {
         for (var event of ["destroy", "close"])
             this.component.container.on(event, () => {
                 this.component = null;
-                console.log('set');
+                console.log("set");
             });
     }
 
@@ -73,7 +73,6 @@ interface IComponentProps {
 }
 
 export class Container extends LayoutItem {
-    
     public children: LayoutItem[] = [];
 
     addChild<T extends LayoutItem>(creator: { new (parent: Container, c: GoldenLayout.ContentItem): T }, props: any, cb?: (c: T) => void) {
@@ -81,7 +80,8 @@ export class Container extends LayoutItem {
         var newItem = new creator(this, this.contentItem.contentItems.last());
         newItem.init();
         this.children.push(newItem);
-        cb && cb(newItem);
+        if (cb)
+            cb(newItem);
         return typeof (cb) === "undefined" ? newItem : this;
     }
 
@@ -125,7 +125,7 @@ export class LayoutManager {
 
     constructor() {
         this.goldenLayout = new GoldenLayout({ settings: { showCloseIcon: false, showPopoutIcon: false }, content: [] });
-        this.goldenLayout.registerComponent(fakeComponentName, function () { });
+        this.goldenLayout.registerComponent(fakeComponentName, function () { /* */ });
         this.goldenLayout.init();
 
         this.root = new Container(null, this.goldenLayout.root);
