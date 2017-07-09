@@ -117,6 +117,11 @@ export class Container extends LayoutItem {
         for (var child of this.children)
             child.init();
     }
+
+    setConfig(config: any) {
+        Object.assign(this.contentItem.config, config);
+        return this;
+    }
 }
 
 export class LayoutManager {

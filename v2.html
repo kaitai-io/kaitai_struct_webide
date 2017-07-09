@@ -32,9 +32,8 @@
             loader.beforeLoadHook = async module => {
                 //console.log('module loading: ', module.url);
                 if(/ui.(Parts|Components)/.exec(module.url)){
-                    console.log('load template for', module.url);
+                    //console.log('load template for', module.url);
                     await componentLoader.loadTemplate(module.url.replace(/\.js$/, ".html").replace(/js\/ui/, "src/ui"));
-                    //componentLoader.
                 }
             };
 

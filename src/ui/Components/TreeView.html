@@ -56,7 +56,6 @@
             <a :class="{bold: model.isFolder}">
                 <i class="glyphicon" :class="[icon]"></i>
                 <span class="nodeText">{{model.text}}</span>
-                <span v-if="model.isFolder">[{{open ? "-" : "+"}}]</span>
             </a>
             <div v-if="childrenLoading" class="loading_icon"></div>
             <i v-show="loadingError" class="loadingFailed fa fa-exclamation-triangle"

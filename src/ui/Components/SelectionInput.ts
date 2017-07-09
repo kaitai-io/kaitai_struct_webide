@@ -1,5 +1,6 @@
 ﻿///<reference path="../../../lib/ts-types/vue.d.ts"/>
 import * as Vue from "vue";
+import * as $ from "jquery";
 import Component from "../Component";
 
 @Component
@@ -12,7 +13,7 @@ export class SelectionInputPart extends Vue {
     get width() { return this.getTextWidth(this.text); }
 
     mounted() {
-        this.inputSizeEl = $("<span>").css({ display: 'none' }).appendTo(this.$parent.$el);
+        this.inputSizeEl = $("<span>").css({ display: "none" }).appendTo(this.$parent.$el);
         this.$watch("text", () => this.parent.inputChanged(this));
     }
 

@@ -158,10 +158,10 @@ class AmdLoader {
 
 let loader = new AmdLoader;
 
-function require() {
-    if(arguments.length === 1 && typeof arguments[0] === "string")
-        return loader.requireLoaded(arguments[0]);
-    return loader.require.apply(loader, loader.parseArgs(arguments, false));
+function require(...args: any[]) {
+    if(args.length === 1 && typeof args[0] === "string")
+        return loader.requireLoaded(args[0]);
+    return loader.require.apply(loader, loader.parseArgs(args, false));
 }
 
 function define() {

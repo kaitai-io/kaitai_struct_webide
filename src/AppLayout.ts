@@ -27,14 +27,14 @@ Layout.manager.root
                     .addComponent(".ksy editor", c => Layout.ksyEditor = c)
                     .addComponent("object tree", c => Layout.objectTree = c)
                 )
-                .addVertical(rightCol => rightCol
+                .addVertical(rightCol => rightCol.setConfig({ width: 38 })
                     .addTabs(files => Layout.files = files
                         .addComponent("JS code", c => Layout.jsCode = c)
                         .addComponent("JS code (debug)", c => Layout.jsCodeDebug = c)
                         .addComponent("input binary", c => Layout.inputBinary = c)
                     )
-                    .addHorizontal(rightPanel => rightPanel
-                        .addComponent("info panel", c => Layout.infoPanel = c)
+                    .addHorizontal(rightPanel => rightPanel.setConfig({ height: 20 })
+                        .addComponent("info panel", { width: 260 }, c => Layout.infoPanel = c)
                         .addComponent("converter", c => Layout.converterPanel = c)
                     )
                 )

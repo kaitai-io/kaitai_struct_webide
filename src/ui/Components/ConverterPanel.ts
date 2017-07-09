@@ -86,5 +86,10 @@ export class ConverterPanelModel {
 
 @Component
 export class ConverterPanel extends Vue {
-    model: ConverterPanelModel = new ConverterPanelModel();
+    model: ConverterPanelModel;
+
+    constructor() {
+        super();
+        this.model = this.model || new ConverterPanelModel();
+    }
 }

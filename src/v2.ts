@@ -1,5 +1,6 @@
 ﻿import { Layout } from "./AppLayout";
 import { FileTree, FsTreeNode, fss } from "./ui/Parts/FileTree";
+import { InfoPanel } from "./ui/Parts/InfoPanel";
 import { componentLoader } from "./ui/ComponentLoader";
 import { Component } from "./LayoutManagerV2";
 import * as ace from "ace/ace";
@@ -31,6 +32,8 @@ var ksyEditor = setupEditor(Layout.ksyEditor, "yaml");
 var jsCode = setupEditor(Layout.jsCode, "javascript");
 var jsCodeDebug = setupEditor(Layout.jsCodeDebug, "javascript");
 var hexViewer = new HexViewer(Layout.inputBinary.element);
+var infoPanel = new InfoPanel();
+infoPanel.$mount(Layout.infoPanel.element);
 
 filetree.$on("open-file", (treeNode: FsTreeNode) => {
     console.log(treeNode);

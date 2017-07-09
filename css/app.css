@@ -34,23 +34,23 @@ body { color:#333 }
 .form-control { padding: 6px 12px; height:34px }
 .modal-footer, .modal-body { padding: 15px }
 .input-group-addon { padding: 8px 8px }
-#infoPanel { background: #222222; }
-#infoPanel { color: #eee; display:none; padding: 10px }
 #noscript, #unsupportedBrowser { background: #ffee00; z-index:999; position:fixed; left:0; right:0; padding:10px; text-align:center }
 #noscript a, #unsupportedBrowser a { color: black; text-decoration: underline }
 #unsupportedBrowser .closeBtn { float:right; margin-top: 1px; cursor: pointer }
-#welcomeModalLabel { text-align:center }
-#aboutWebIde { position:absolute; bottom:10px; right:10px; font-size:12px }
 .marker_solution { background:rgba(255, 80, 80, 0.3); }
 .marker_user { background:rgba(80, 255, 80, 0.30); }
-#welcomeModal .licenses { font-size:12px; margin-bottom:10px }
 #parsedDataTree .intVal, #parsedDataTree .enumDesc { color:#bbb }
 #parsedDataTree .propName { color: blue; }
 #parsedDataTree .className { color: green; }
 #parsedDataTree .primitiveValue { font-weight: bold }
+#infoPanel { background: #222222; }
+#infoPanel { color: #eee; display:none; padding: 10px }
+#aboutWebIde { position:absolute; bottom:10px; right:10px; font-size:12px }
 #disableLazyParsingDiv, #exportToJsonDiv, #unparsedDiv, #bytesDiv, #parsedPathDiv { font-size:13px; margin-top:5px }
 #parsedPath { word-break: break-all; }
 #unparsedDiv { margin-top:0 }
 #disableLazyParsingDiv label { margin-left:2px; font-weight:normal; vertical-align:middle }
+#welcomeModalLabel { text-align:center }
+#welcomeModal .licenses { font-size:12px; margin-bottom:10px }
 #converterPanel { display:none }
 /*.marker_match { background:rgba(80, 255, 80, 0.30); }*/
