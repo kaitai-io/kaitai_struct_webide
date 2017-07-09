@@ -43,7 +43,11 @@
             @keydown.down.prevent="selectNode('next')" @keydown.up.prevent="selectNode('prev')"
             @keydown.pagedown.prevent="selectNode('next', true)" @keydown.pageup.prevent="selectNode('prev', true)">
             <template v-for="child in model.children">
-                <tree-view-item :model="child"></tree-view-item>
+                <tree-view-item :model="child">
+                    <template scope="_">
+                        <slot :vm="_.vm" :model="_.model">{{_.model.text}}</slot>
+                    </template>
+                </tree-view-item>
             </template>
         </ul>
     </div>
@@ -53,16 +57,14 @@
     <li>
         <div class="header" :class="{selected: selected}" @click="click" @dblclick="dblclick" @contextmenu.prevent="contextmenu">
             <div class="wholerow">&nbsp;</div>
-            <a :class="{bold: model.isFolder}">
-                <i class="glyphicon" :class="[icon]"></i>
-                <span class="nodeText">{{model.text}}</span>
-            </a>
-            <div v-if="childrenLoading" class="loading_icon"></div>
-            <i v-show="loadingError" class="loadingFailed fa fa-exclamation-triangle"
-               :title="loadingError" data-toggle="tooltip"></i>
+            <slot :vm="this" :model="model"></slot>
         </div>
-        <ul v-for="model in model.children" v-show="open">
-            <tree-view-item :model="model" treeView="this"></tree-view-item>
+        <ul v-for="child in model.children" v-show="open">
+            <tree-view-item :model="child" treeView="this">
+                <template scope="_">
+                    <slot :vm="_.vm" :model="_.model"></slot>
+                </template>
+            </tree-view-item>
         </ul>
     </li>
 </template>

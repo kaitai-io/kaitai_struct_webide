@@ -3,7 +3,17 @@
 
 <template>
     <div style="height: 100%; background:#333">
-        <tree-view id="fsTree" :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu" style="height: 100%; background: #333"></tree-view>
+        <tree-view id="fsTree" :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu" style="height: 100%; background: #333">
+            <template scope="_">
+                <a :class="{bold: _.model.isFolder}"> 
+                    <i class="glyphicon" :class="[_.vm.icon]"></i> 
+                    <span class="nodeText">{{_.model.text}}</span> 
+                </a> 
+                <div v-if="_.vm.childrenLoading" class="loading_icon"></div> 
+                <i v-show="_.vm.loadingError" class="loadingFailed fa fa-exclamation-triangle" 
+                    :title="_.vm.loadingError" data-toggle="tooltip"></i>                 
+            </template>
+        </tree-view>
         <context-menu ref="ctxMenu">
             <template scope="_">
                 <menu-item icon="glyphicon-pencil" @click="openNode">Open</menu-item>
