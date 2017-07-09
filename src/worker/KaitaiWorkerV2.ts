@@ -1,4 +1,5 @@
-/// <reference path="../lib/ts-types/kaitai.d.ts" />
+/// <reference path="../../lib/ts-types/kaitai.d.ts" />
+/// <reference path="../KsySchema.ts" />
 
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");

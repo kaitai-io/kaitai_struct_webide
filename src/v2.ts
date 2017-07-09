@@ -3,13 +3,12 @@ import { FileTree, FsTreeNode, fss } from "./ui/Parts/FileTree";
 import { InfoPanel } from "./ui/Parts/InfoPanel";
 import { componentLoader } from "./ui/ComponentLoader";
 import { Component } from "./LayoutManagerV2";
-import * as ace from "ace/ace";
 import { SandboxHandler } from "./SandboxHandler";
 import { FsUri } from "./FileSystem/FsUri";
 import { HexViewer, IDataProvider } from "./HexViewer";
 import { ConverterPanel, ConverterPanelModel } from "./ui/Components/ConverterPanel";
 import { AboutModal } from "./ui/Parts/AboutModal";
-import { ISandboxMethods } from "../worker/WorkerShared";
+import { ISandboxMethods } from "worker/WorkerShared";
 import * as Vue from "vue";
 
 window["layout"] = Layout;
@@ -48,8 +47,8 @@ async function openFile(uri: string) {
 
 (async function(){
     var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
-    await sandbox.loadScript(new URL("js/worker/ImportLoader.js", location.href).href);
-    await sandbox.loadScript(new URL("js/worker/KaitaiWorkerV2.js", location.href).href);
+    await sandbox.loadScript(new URL("js/worker/worker/ImportLoader.js", location.href).href);
+    await sandbox.loadScript(new URL("js/worker/worker/KaitaiWorkerV2.js", location.href).href);
     await openFile("https:///formats/archive/zip.ksy");
     var compilationResult = await sandbox.kaitaiServices.compile(ksyContent);
     console.log("compilationResult", compilationResult);

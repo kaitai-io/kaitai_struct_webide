@@ -3,9 +3,10 @@ var exports = {};
 var global = this;
 
 function require(name: string) {
+    var npmDir = "../../../lib/_npm";
     var paths = {
-        "yamljs": "../../lib/_npm/yamljs/yaml",
-        "KaitaiStream": "../../lib/_npm/kaitai-struct/KaitaiStream"
+        "yamljs": `${npmDir}/yamljs/yaml`,
+        "KaitaiStream": `${npmDir}/kaitai-struct/KaitaiStream`
     };
 
     var relPath: string;
@@ -14,9 +15,9 @@ function require(name: string) {
     else if (name.startsWith("./"))
         relPath = name;
     else if (name.indexOf("/") === -1)
-        relPath = `../../lib/_npm/${name}/${name}`;
+        relPath = `${npmDir}/${name}/${name}`;
     else
-        relPath = `../../lib/_npm/${name}`;
+        relPath = `${npmDir}/${name}`;
 
     exports = {};
     global.window = exports;

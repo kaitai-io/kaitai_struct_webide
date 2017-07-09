@@ -12,10 +12,11 @@
     "alwaysStrict": true,
     "sourceMap": true,
     "target": "es2017",
-    "outDir": "../js/",
+    "outDir": "js/worker",
     "lib": ["es2017", "webworker"]
   },
   "include": [
-    "*.ts"
+    "src/worker/*",
+    "lib/ts-types/kaitai.d.ts"
   ]
 } 
