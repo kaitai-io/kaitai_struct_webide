@@ -40,3 +40,21 @@ export interface IExportedValue {
 }
 
 export interface IKsyTypes { [name: string]: KsySchema.IType; }
+
+export interface ISandboxMethods {
+    eval(code: string): Promise<any>;
+    loadScript(src: string): Promise<void>;
+    kaitaiServices: IKaitaiServices;
+}
+
+export interface IKaitaiServices {
+    compile(code: string): Promise<{
+        releaseCode: { [fileName:string]: string },
+        debugCode: { [fileName:string]: string },
+        debugCodeAll: string,
+    }>;
+    setInput(input: ArrayBuffer): Promise<void>;
+    parse(): Promise<void>;
+    export(): Promise<IExportedValue>;
+    getCompilerInfo(): Promise<{ version: string, buildDate: string }>;
+}
