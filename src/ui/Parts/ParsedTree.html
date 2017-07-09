@@ -33,11 +33,11 @@
                             <template v-if="_.model.value.enumStringValue"><!--nobr-->
                                 {{_.model.value.enumStringValue}}
                                 <span class="intVal">
-                                    (0x{{_.model.value.primitiveValue.toString(16)}} = {{_.model.value.primitiveValue}})
+                                    ({{_.model.hexStrValue}} = {{_.model.value.primitiveValue}})
                                 </span><!--nobr-->
                             </template><!--nobr-->
                             <template v-else-if="Number.isInteger(_.model.value.primitiveValue)"><!--nobr-->
-                                0x{{_.model.value.primitiveValue.toString(16)}}<!--nobr-->
+                                {{_.model.hexStrValue}}<!--nobr-->
                                 <span class="intVal"> = {{_.model.value.primitiveValue}}</span><!--nobr-->
                             </template><!--nobr-->
                             <template v-else><!--nobr-->

@@ -5,27 +5,18 @@ import { IKsyTypes, ObjectType, IExportedValue, IInstance } from "../../worker/W
 
 export class ParsedTreeNode implements ITreeNode {
     children: ITreeNode[];
-    get bytesPreview() {
-        if (!(this.value.bytes instanceof Uint8Array)) return "";
-
-        var text = "[";
-        for (var i = 0; i < this.value.bytes.byteLength; i++) {
-            if (i === 8) {
-                text += ", ...";
-                break;
-            }
-            text += (i === 0 ? "" : ", ") + this.value.bytes[i];
-        }
-        text += "]";
-
-        return text;        
-    }
-
-    constructor(public name: string, public value: IExportedValue) {
-
-    }
+    constructor(public name: string, public value: IExportedValue) { }
 
     get hasChildren() { return this.value.type === ObjectType.Object || this.value.type === ObjectType.Array; }
+
+    get bytesPreview() {
+        return `[${this.value.bytes.slice(0,8).join(', ')}${(this.value.bytes.length > 8 ? ", ..." : "")}]`;
+    }
+
+    get hexStrValue() {
+        return (this.value.primitiveValue < 0 ? "-" : "") + "0x" +
+            this.value.primitiveValue.toString(16);
+    }
 
     loadChildren(): Promise<void> {
         if (this.value.type === ObjectType.Object)
