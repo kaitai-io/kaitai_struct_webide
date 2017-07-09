@@ -7,7 +7,7 @@ import { StaticFileSystem } from "./../../FileSystem/StaticFileSystem";
 import { HttpFileSystem } from "../../FileSystem/HttpFileSystem";
 import { FsUri } from "./../../FileSystem/FsUri";
 import { FsSelector } from "./../../FileSystem/FsSelector";
-import { TreeView, IFsTreeNode } from "./../Components/TreeView";
+import { TreeView } from "./../Components/TreeView";
 import * as Vue from "vue";
 import Component from "./../Component";
 
@@ -19,11 +19,21 @@ import "../Components/TreeView";
 import dateFormat = require("dateformat");
 
 import { saveFile, Convert } from "../../utils";
+import { ITreeNode } from "../Components/TreeView";
 declare var Scrollbar: any;
 declare var kaitaiFsFiles: string[];
 
 for (var i = 0; i < 200; i++)
     kaitaiFsFiles.push(`formats/archive/test_${i}.ksy`);
+
+export interface IFsTreeNode extends ITreeNode {
+    text: string;
+    isFolder: boolean;
+    canWrite: boolean;
+    canDelete: boolean;
+    children: IFsTreeNode[];
+    loadChildren(): Promise<void>;
+}
 
 var queryParams: { access_token?: string; secret?: string } = {};
 location.search.substr(1).split("&").map(x => x.split("=")).forEach(x => queryParams[x[0]] = x[1]);
@@ -64,6 +74,7 @@ export class FsTreeNode implements IFsTreeNode {
     get capabilities() { return this.fs.capabilities(this.uri.uri); }
     get canWrite() { return this.capabilities.write; }
     get canDelete() { return this.uri.path !== "/" && this.capabilities.delete; }
+    get hasChildren() { return this.isFolder; }
 
     constructor(public parent: FsTreeNode, public uri: FsUri, public fs: IFileSystem = null) {
         this.fs = this.fs || parent.fs;
@@ -96,6 +107,7 @@ class FsRootNode implements IFsTreeNode {
 
     constructor(public children: IFsTreeNode[] = []) { }
     loadChildren(): Promise<void> { return Promise.resolve(); }
+    get hasChildren() { return true; }
 }
 
 function addRootNode(text: string, icon: string, uri: string) {

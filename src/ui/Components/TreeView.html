@@ -58,6 +58,9 @@
         <div class="header" :class="{selected: selected}" @click="click" @dblclick="dblclick" @contextmenu.prevent="contextmenu">
             <div class="wholerow">&nbsp;</div>
             <slot :vm="this" :model="model"></slot>
+            <div v-if="childrenLoading" class="loading_icon"></div> 
+            <i v-show="loadingError" class="loadingFailed fa fa-exclamation-triangle" 
+                :title="loadingError" data-toggle="tooltip"></i>                 
         </div>
         <ul v-for="child in model.children" v-show="open">
             <tree-view-item :model="child" treeView="this">

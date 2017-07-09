@@ -4,12 +4,9 @@ import Component from "../Component";
 import UIHelper from "../UIHelper";
 declare var Scrollbar: any;
 
-export interface IFsTreeNode {
-    text: string;
-    isFolder: boolean;
-    canWrite: boolean;
-    canDelete: boolean;
-    children: IFsTreeNode[];
+export interface ITreeNode {
+    hasChildren: boolean;
+    children: ITreeNode[];
     loadChildren(): Promise<void>;
 }
 
@@ -17,7 +14,7 @@ Vue.config.keyCodes["pageup"] = 33;
 Vue.config.keyCodes["pagedown"] = 34;
 
 @Component
-export class TreeView<T extends IFsTreeNode> extends Vue {
+export class TreeView<T extends ITreeNode> extends Vue {
     model: T;
     selectedItem: TreeViewItem<T> = null;
 
@@ -113,17 +110,12 @@ export class TreeView<T extends IFsTreeNode> extends Vue {
 }
 
 @Component
-export class TreeViewItem<T extends IFsTreeNode> extends Vue {
+export class TreeViewItem<T extends ITreeNode> extends Vue {
     model: T;
     open = false;
     selected = false;
     childrenLoading = false;
     loadingError: string = null;
-
-    get icon() {
-        return this.model["icon"] ? this.model["icon"] :
-            this.model.isFolder ? (this.open ? "glyphicon-folder-open" : "glyphicon-folder-close") : "glyphicon-list-alt";
-    }
 
     get treeView() { return UIHelper.findParent(this, TreeView); }
 
@@ -131,7 +123,7 @@ export class TreeViewItem<T extends IFsTreeNode> extends Vue {
     get parent() { return <TreeViewItem<T>>this.$parent; }
 
     dblclick() {
-        if (this.model.isFolder) {
+        if (this.model.hasChildren) {
             this.open = !this.open;
             if (this.open && !this.model.children) {
                 this.childrenLoading = true;
