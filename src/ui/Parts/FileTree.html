@@ -3,7 +3,7 @@
 
 <template>
     <div style="height: 100%; background:#333">
-        <tree-view id="fsTree" :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu" style="height: 100%; background: #333">
+        <tree-view id="fsTree" :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu" style="height: 100%; background: #333" :whole-row="true">
             <template scope="_">
                 <a :class="{bold: _.model.isFolder}"> 
                     <i class="glyphicon" :class="[_.model.icon]" v-if="_.model.icon"></i> 

@@ -13,10 +13,11 @@ export interface ITreeNode {
 Vue.config.keyCodes["pageup"] = 33;
 Vue.config.keyCodes["pagedown"] = 34;
 
-@Component
+@Component({ props: { "wholeRow": { default: false } } })
 export class TreeView<T extends ITreeNode> extends Vue {
     model: T;
     selectedItem: TreeViewItem<T> = null;
+    wholeRow: boolean;
 
     get children() { return <TreeViewItem<T>[]>this.$children; }
 

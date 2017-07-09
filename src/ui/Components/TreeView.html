@@ -7,7 +7,7 @@
     .treeView a:hover { text-decoration:none; }
     .treeView .selected>a { color:white; }
     .treeView .header:hover a { color:white; }
-    .treeView .header a i { padding-left: 8px }
+    .treeView .header a { padding-left: 8px }
     .treeView .header:hover .wholerow { background:#666; }
     .treeView .header.selected>.wholerow { background:rgba(95, 162, 219, 1); }
     .treeView .wholerow { position: absolute; left: 0; width:100%; transition: background-color 0.15s, box-shadow 0.15s; }
@@ -45,7 +45,7 @@
             <template v-for="child in model.children">
                 <tree-view-item :model="child">
                     <template scope="_">
-                        <slot :vm="_.vm" :model="_.model">{{_.model.text}}</slot>
+                        <slot :vm="_.vm" :model="_.model"><a>{{_.model.text}}</a></slot>
                     </template>
                 </tree-view-item>
             </template>
@@ -56,7 +56,7 @@
 <template id="TreeViewItem">
     <li>
         <div class="header" :class="{selected: selected}" @click="click" @dblclick="dblclick" @contextmenu.prevent="contextmenu">
-            <div class="wholerow">&nbsp;</div>
+            <div class="wholerow" v-if="treeView.wholeRow">&nbsp;</div>
             <slot :vm="this" :model="model"></slot>
             <div v-if="childrenLoading" class="loading_icon"></div> 
             <i v-show="loadingError" class="loadingFailed fa fa-exclamation-triangle" 
