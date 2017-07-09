@@ -92,6 +92,8 @@ async function openFile(uri: string) {
     hexViewer.onSelectionChanged = () => {
         console.log("selectionChanged");
         converterPanel.model.update(dataProvider, hexViewer.selectionStart);
+        infoPanel.selectionStart = hexViewer.selectionStart;
+        infoPanel.selectionEnd = hexViewer.selectionEnd;
     };
 
     await sandbox.kaitaiServices.setInput(input);
