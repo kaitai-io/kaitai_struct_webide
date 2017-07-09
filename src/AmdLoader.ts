@@ -154,6 +154,8 @@ class AmdLoader {
         else
             promise();
     }
+
+    get notLoaded() { return Object.values(this.modules).filter(x => !x.loaded); }
 }
 
 let loader = new AmdLoader;

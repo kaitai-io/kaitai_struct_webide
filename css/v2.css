@@ -1,3 +1,7 @@
+body { line-height:normal }
+.modal-body { padding:15px }
+.btn { padding: 5px 10px; }
+
 [data-scrollbar] .scrollbar-track-y, [data-scrollbar] .scrollbar-thumb { width:6px }
 .lm_splitter.lm_horizontal .lm_drag_handle { width:9px; left:-2px }
 [data-scrollbar] .scrollbar-track:hover { background: hsla(0, 0%, 25%, 0.75) }

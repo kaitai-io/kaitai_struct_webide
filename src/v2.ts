@@ -8,6 +8,7 @@ import { SandboxHandler } from "./SandboxHandler";
 import { FsUri } from "./FileSystem/FsUri";
 import { HexViewer, IDataProvider } from "./HexViewer";
 import { ConverterPanel, ConverterPanelModel } from "./ui/Components/ConverterPanel";
+import { AboutModal } from "./ui/Parts/AboutModal";
 import * as Vue from "vue";
 //import { IKsyTypes, ObjectType, IExportedValue, IInstance } from "../worker/WorkerShared";
 
@@ -32,8 +33,14 @@ var ksyEditor = setupEditor(Layout.ksyEditor, "yaml");
 var jsCode = setupEditor(Layout.jsCode, "javascript");
 var jsCodeDebug = setupEditor(Layout.jsCodeDebug, "javascript");
 var hexViewer = new HexViewer(Layout.inputBinary.element);
+
+var aboutModal = new AboutModal();
 var infoPanel = new InfoPanel();
+var converterPanel = new ConverterPanel();
+
 infoPanel.$mount(Layout.infoPanel.element);
+converterPanel.$mount(Layout.converterPanel.element);
+infoPanel.aboutModal = aboutModal;
 
 filetree.$on("open-file", (treeNode: FsTreeNode) => {
     console.log(treeNode);
@@ -84,9 +91,6 @@ async function openFile(uri: string) {
         get(offset, length) { return new Uint8Array(input, offset, length); }
     };
     hexViewer.setDataProvider(dataProvider);
-
-    var converterPanel = new ConverterPanel();
-    converterPanel.$mount(Layout.converterPanel.element);
     converterPanel.model.update(dataProvider, 0);
 
     hexViewer.onSelectionChanged = () => {

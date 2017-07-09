@@ -1,6 +1,7 @@
 import * as Vue from "vue";
 import Component from "../Component";
 import { IInterval } from "../../utils/IntervalHelper";
+import { AboutModal } from "./AboutModal";
 import "../Components/Stepper";
 import "../Components/SelectionInput";
 
@@ -13,9 +14,10 @@ export class InfoPanel extends Vue {
     byteArrays: IInterval[] = [];
 
     disableLazyParsing: boolean = false;
+    aboutModal: AboutModal;
 
     public selectInterval(interval: IInterval) { this.selectionChanged(interval.start, interval.end); }
     public selectionChanged(start: number, end: number) { /* TODO */ }
     public exportToJson(hex: boolean) { /* TODO */ }
-    public about() { (<any>$("#welcomeModal")).modal(); }
+    public about() { this.aboutModal.show(); }
 }
