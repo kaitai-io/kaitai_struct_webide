@@ -8,6 +8,9 @@ mkdir -p "$OUT_DIR/js"
 ./genKaitaiFsFiles.py "$OUT_DIR"
 
 "$TSC" --outDir $OUT_DIR/js/ --noEmitOnError
+if [ -f "tsconfig.worker.json" ]; then
+    "$TSC" --outDir $OUT_DIR/js/worker/ --noEmitOnError
+fi
 
 cp -r \
 	index.html \
