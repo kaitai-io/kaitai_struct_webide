@@ -6,11 +6,12 @@
     .parsedTree .propName { color: #9090ff; }
     .parsedTree .className { color: #7fff7f; }
     .parsedTree .primitiveValue { font-weight: bold }
+    .parsedTree .treeView .header.selected>.wholerow { background:rgb(86, 86, 86); }
 </style>
 
 <template>
     <div class="parsedTree" style="height: 100%; background:#333">
-        <tree-view :model="rootNode" style="height: 100%">
+        <tree-view :model="rootNode" style="height: 100%" :whole-row="true">
             <template scope="_">
                 <a>
                     {{ _.model.hasChildren ? (_.vm.open ? "V" : ">") : "" }}
