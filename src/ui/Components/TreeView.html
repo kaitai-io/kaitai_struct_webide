@@ -62,7 +62,7 @@
             <i v-show="loadingError" class="loadingFailed fa fa-exclamation-triangle" 
                 :title="loadingError" data-toggle="tooltip"></i>                 
         </div>
-        <ul v-for="child in model.children" v-show="open">
+        <ul v-for="child in model.children" v-if="open">
             <tree-view-item :model="child" treeView="this">
                 <template scope="_">
                     <slot :vm="_.vm" :model="_.model"></slot>
