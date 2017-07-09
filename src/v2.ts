@@ -73,6 +73,7 @@ async function openFile(uri: string) {
         setInput(input: ArrayBuffer): Promise<void>;
         parse(): Promise<void>;
         export(): Promise<IExportedValue>;
+        getCompilerInfo(): Promise<{ version: string, buildDate: string }>;
     }
 
     var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
@@ -104,4 +105,8 @@ async function openFile(uri: string) {
     await sandbox.kaitaiServices.parse();
     let exported = await sandbox.kaitaiServices.export();
     console.log("exported", exported);
+
+    var compilerInfo = await sandbox.kaitaiServices.getCompilerInfo();
+    aboutModal.compilerVersion = compilerInfo.version;
+    aboutModal.compilerBuildDate = compilerInfo.buildDate;
 })();

@@ -66,6 +66,10 @@ class KaitaiServices {
     export() {
         return this.objectExporter.exportValue(this.parsed, null, []);
     }
+
+    getCompilerInfo() {
+        return { version: this.compiler.version, buildDate: this.compiler.buildDate };
+    }
 }
 
 declare var api: any;

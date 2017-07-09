@@ -11,6 +11,7 @@ export class AboutModal extends Vue {
     webideCommitId = "?";
     webideCommitDate = "?";
     compilerVersion = "?";
+    compilerBuildDate = "?";
 
     created() {
         this.$mount(document.createElement("div"));
