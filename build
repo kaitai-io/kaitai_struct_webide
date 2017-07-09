@@ -9,7 +9,7 @@ mkdir -p "$OUT_DIR/js"
 
 "$TSC" --outDir $OUT_DIR/js/ --noEmitOnError
 if [ -f "tsconfig.worker.json" ]; then
-    "$TSC" --outDir $OUT_DIR/js/worker/ --noEmitOnError
+    "$TSC" -p tsconfig.worker.json --outDir $OUT_DIR/js/worker/ --noEmitOnError
 fi
 
 cp -r \
