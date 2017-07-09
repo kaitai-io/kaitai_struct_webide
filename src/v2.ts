@@ -8,6 +8,7 @@ import { FsUri } from "./FileSystem/FsUri";
 import { HexViewer, IDataProvider } from "./HexViewer";
 import { ConverterPanel, ConverterPanelModel } from "./ui/Components/ConverterPanel";
 import { AboutModal } from "./ui/Parts/AboutModal";
+import { ParsedTree, ParsedTreeNode } from "./ui/Parts/ParsedTree";
 import { ISandboxMethods } from "worker/WorkerShared";
 import * as Vue from "vue";
 
@@ -44,6 +45,15 @@ async function openFile(uri: string) {
         ksyEditor.setValue(ksyContent, -1);
     }
 }
+
+var parsedTree = new ParsedTree();
+parsedTree.rootNode = new ParsedTreeNode(null, [
+    new ParsedTreeNode("hello", [
+        new ParsedTreeNode("bello1", []),
+        new ParsedTreeNode("bello2", []),
+    ]),
+]);
+parsedTree.$mount(Layout.objectTree.element);
 
 (async function(){
     var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
