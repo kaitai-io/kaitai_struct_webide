@@ -13,5 +13,7 @@ function CreateScopedLocalStorage<T>(prefix: string, defaults: T): T {
 }
 
 export var localSettings = CreateScopedLocalStorage("settings", {
-    showAboutOnStart: true
+    showAboutOnStart: true,
+    latestKsyUri: "https:///formats/archive/zip.ksy",
+    latestInputUri: "https:///samples/sample1.zip"
 });

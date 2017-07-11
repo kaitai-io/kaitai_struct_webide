@@ -1,89 +1,98 @@
-﻿import { Layout, LayoutHelper } from "./AppLayout";
-import { FileTree, FsTreeNode, fss } from "./ui/Parts/FileTree";
-import { InfoPanel } from "./ui/Parts/InfoPanel";
-import { componentLoader } from "./ui/ComponentLoader";
-import { Component } from "./LayoutManagerV2";
+﻿
+import { AppView } from "./AppView";
+import { ISandboxMethods } from "./worker/WorkerShared";
+import { IDataProvider } from "./HexViewer";
+import { localSettings } from "./LocalSettings";
+import { FsTreeNode, fss } from "./ui/Parts/FileTree";
+import { Delayed } from "./utils";
 import { SandboxHandler } from "./SandboxHandler";
-import { FsUri } from "./FileSystem/FsUri";
-import { HexViewer, IDataProvider } from "./HexViewer";
-import { ConverterPanel, ConverterPanelModel } from "./ui/Components/ConverterPanel";
-import { AboutModal } from "./ui/Parts/AboutModal";
-import { ParsedTree, ParsedTreeNode, ParsedTreeRootNode } from "./ui/Parts/ParsedTree";
-import { ISandboxMethods } from "worker/WorkerShared";
-import * as Vue from "vue";
+import { ParsedTreeNode, ParsedTreeRootNode } from "./ui/Parts/ParsedTree";
 
-window["layout"] = Layout;
+class AppController {
+    view: AppView;
+    sandbox: ISandboxMethods;
+    dataProvider: IDataProvider;
 
-var filetree = new FileTree();
-filetree.init();
-filetree.$mount(Layout.fileTree.element);
+    async start() {
+        this.initView();
+        await this.initWorker();
+        await this.openFile(localSettings.latestKsyUri);
+        await this.openFile(localSettings.latestInputUri);
+    }
 
-var ksyEditor = LayoutHelper.setupEditor(Layout.ksyEditor, "yaml");
-var jsCode = LayoutHelper.setupEditor(Layout.jsCode, "javascript");
-var jsCodeDebug = LayoutHelper.setupEditor(Layout.jsCodeDebug, "javascript");
-var hexViewer = new HexViewer(Layout.inputBinary.element);
+    protected initView() {
+        this.view = new AppView();
+        
+        this.view.fileTree.$on("open-file", (treeNode: FsTreeNode) => {
+            console.log('treeView openFile', treeNode);
+            this.openFile(treeNode.uri.uri);
+        });
 
-var aboutModal = new AboutModal();
-var infoPanel = new InfoPanel();
-var converterPanel = new ConverterPanel();
+        var editDelay = new Delayed(500);
+        this.view.ksyEditor.on("change", () => editDelay.do(() => 
+            this.setKsyContent(this.view.ksyEditor.getValue())));
 
-infoPanel.$mount(Layout.infoPanel.element);
-converterPanel.$mount(Layout.converterPanel.element);
-infoPanel.aboutModal = aboutModal;
+        this.view.hexViewer.onSelectionChanged = () => {
+            console.log("selectionChanged");
+            this.view.converterPanel.model.update(this.dataProvider, this.view.hexViewer.selectionStart);
+            this.view.infoPanel.selectionStart = this.view.hexViewer.selectionStart;
+            this.view.infoPanel.selectionEnd = this.view.hexViewer.selectionEnd;
+        };
+    }
 
-filetree.$on("open-file", (treeNode: FsTreeNode) => {
-    console.log(treeNode);
-    openFile(treeNode.uri.uri);
-});
+    protected async initWorker() {
+        this.sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
+        await this.sandbox.loadScript(new URL("js/worker/worker/ImportLoader.js", location.href).href);
+        await this.sandbox.loadScript(new URL("js/worker/worker/KaitaiWorkerV2.js", location.href).href);
 
-var ksyContent: string;
+        var compilerInfo = await this.sandbox.kaitaiServices.getCompilerInfo();
+        this.view.aboutModal.compilerVersion = compilerInfo.version;
+        this.view.aboutModal.compilerBuildDate = compilerInfo.buildDate;
+    }
 
-async function openFile(uri: string) {
-    let content = await fss.read(uri);
-    if(uri.endsWith(".ksy")) {
-        ksyContent = new TextDecoder().decode(new Uint8Array(content));
-        ksyEditor.setValue(ksyContent, -1);
+    async openFile(uri: string) {
+        let content = await fss.read(uri);
+        if (uri.endsWith(".ksy")) {
+            localSettings.latestKsyUri = uri;
+            let ksyContent = new TextDecoder().decode(new Uint8Array(content));
+            this.setKsyContent(ksyContent);
+        } else {
+            localSettings.latestInputUri = uri;
+            this.setInput(content);
+        }
+    }
+
+    protected async setKsyContent(ksyContent: string) {
+        if (this.view.ksyEditor.getValue() !== ksyContent)
+            this.view.ksyEditor.setValue(ksyContent, -1);
+
+        var compilationResult = await this.sandbox.kaitaiServices.compile(ksyContent);
+        console.log("compilationResult", compilationResult);
+        this.view.jsCode.setValue(Object.values(compilationResult.releaseCode).join("\n"), -1);
+        this.view.jsCodeDebug.setValue(compilationResult.debugCodeAll, -1);
+        await this.reparse();
+    }
+
+    protected async setInput(input: ArrayBuffer) {
+        this.dataProvider = {
+            length: input.byteLength,
+            get(offset, length) { return new Uint8Array(input, offset, length); }
+        };
+
+        this.view.hexViewer.setDataProvider(this.dataProvider);
+        this.view.converterPanel.model.update(this.dataProvider, 0);
+        await this.sandbox.kaitaiServices.setInput(input);
+        await this.reparse();
+    }
+
+    protected async reparse() {
+        await this.sandbox.kaitaiServices.parse();
+        let exported = await this.sandbox.kaitaiServices.export();
+        console.log("exported", exported);
+
+        this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", exported));
     }
 }
 
-var parsedTree = new ParsedTree();
-parsedTree.$mount(Layout.objectTree.element);
-
-(async function(){
-    var sandbox = SandboxHandler.create<ISandboxMethods>("https://webide-usercontent.kaitai.io");
-    await sandbox.loadScript(new URL("js/worker/worker/ImportLoader.js", location.href).href);
-    await sandbox.loadScript(new URL("js/worker/worker/KaitaiWorkerV2.js", location.href).href);
-
-    var compilerInfo = await sandbox.kaitaiServices.getCompilerInfo();
-    aboutModal.compilerVersion = compilerInfo.version;
-    aboutModal.compilerBuildDate = compilerInfo.buildDate;
-
-    await openFile("https:///formats/archive/zip.ksy");
-    var compilationResult = await sandbox.kaitaiServices.compile(ksyContent);
-    console.log("compilationResult", compilationResult);
-    jsCode.setValue(Object.values(compilationResult.releaseCode).join("\n"), -1);
-    jsCodeDebug.setValue(compilationResult.debugCodeAll, -1);
-
-    let input = await fss.read("https:///samples/sample1.zip");
-
-    var dataProvider: IDataProvider = {
-        length: input.byteLength,
-        get(offset, length) { return new Uint8Array(input, offset, length); }
-    };
-    hexViewer.setDataProvider(dataProvider);
-    converterPanel.model.update(dataProvider, 0);
-
-    hexViewer.onSelectionChanged = () => {
-        console.log("selectionChanged");
-        converterPanel.model.update(dataProvider, hexViewer.selectionStart);
-        infoPanel.selectionStart = hexViewer.selectionStart;
-        infoPanel.selectionEnd = hexViewer.selectionEnd;
-    };
-
-    await sandbox.kaitaiServices.setInput(input);
-    await sandbox.kaitaiServices.parse();
-    let exported = await sandbox.kaitaiServices.export();
-    console.log("exported", exported);
-
-    parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", exported));
-})();
+var app = window["ide"] = new AppController();
+app.start();
