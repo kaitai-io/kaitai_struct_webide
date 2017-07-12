@@ -1,6 +1,6 @@
 import * as Vue from "vue";
 import Component from "./../Component";
-import { ITreeNode } from "../Components/TreeView";
+import { TreeView, ITreeNode } from "../Components/TreeView";
 import { IKsyTypes, ObjectType, IExportedValue, IInstance } from "../../worker/WorkerShared";
 
 export class ParsedTreeNode implements ITreeNode {
@@ -43,4 +43,6 @@ export class ParsedTreeRootNode implements ITreeNode {
 @Component
 export class ParsedTree extends Vue {
     rootNode: ParsedTreeRootNode = null;
+
+    get treeView() { return <TreeView>this.$refs["treeView"]; }
 }

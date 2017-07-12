@@ -24,7 +24,7 @@
             Byte arrays:
             <stepper :items="byteArrays" @changed="selectInterval"></stepper>
         </div>
-        <div id="parsedPathDiv">Selected: <span id="parsedPath"></span></div>
+        <div id="parsedPathDiv">Selected: <span>{{parsedPath}}</span></div>
         <div id="exportToJsonDiv">
             <a @click="exportToJson(false)" href="#">export to JSON</a> (<a @click="exportToJson(true)" href="#">hex</a>)
         </div>

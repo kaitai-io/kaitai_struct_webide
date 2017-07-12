@@ -15,6 +15,7 @@ export class InfoPanel extends Vue {
 
     disableLazyParsing: boolean = false;
     aboutModal: AboutModal;
+    parsedPath = "";
 
     public selectInterval(interval: IInterval) { this.selectionChanged(interval.start, interval.end); }
     public selectionChanged(start: number, end: number) { /* TODO */ }

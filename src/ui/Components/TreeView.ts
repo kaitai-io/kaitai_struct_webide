@@ -107,6 +107,7 @@ export class TreeView<T extends ITreeNode> extends Vue {
         this.selectedItem = newSelected;
         this.selectedItem.selected = true;
         this.scrollSelectedIntoView();
+        this.$emit("selected", this.selectedItem.model);
     }
 }
 

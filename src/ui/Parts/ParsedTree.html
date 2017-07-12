@@ -11,7 +11,7 @@
 
 <template>
     <div class="parsedTree" style="height: 100%; background:#333">
-        <tree-view :model="rootNode" style="height: 100%" :whole-row="true">
+        <tree-view :model="rootNode" style="height: 100%" :whole-row="true" ref="treeView">
             <template scope="_">
                 <a>
                     {{ _.model.hasChildren ? (_.vm.open ? "V" : ">") : "" }}

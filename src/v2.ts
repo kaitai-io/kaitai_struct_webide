@@ -7,11 +7,15 @@ import { FsTreeNode, fss } from "./ui/Parts/FileTree";
 import { Delayed } from "./utils";
 import { SandboxHandler } from "./SandboxHandler";
 import { ParsedTreeNode, ParsedTreeRootNode } from "./ui/Parts/ParsedTree";
+import { IExportedValue } from "worker/WorkerShared";
+import { ParsedMap } from "./ParsedMap";
 
 class AppController {
     view: AppView;
     sandbox: ISandboxMethods;
     dataProvider: IDataProvider;
+    exported: IExportedValue;
+    parsedMap: ParsedMap;
 
     async start() {
         this.initView();
@@ -34,10 +38,27 @@ class AppController {
 
         this.view.hexViewer.onSelectionChanged = () => {
             console.log("selectionChanged");
-            this.view.converterPanel.model.update(this.dataProvider, this.view.hexViewer.selectionStart);
-            this.view.infoPanel.selectionStart = this.view.hexViewer.selectionStart;
-            this.view.infoPanel.selectionEnd = this.view.hexViewer.selectionEnd;
+            this.setSelection(this.view.hexViewer.selectionStart, this.view.hexViewer.selectionEnd);
         };
+
+        this.view.parsedTree.treeView.$on("selected", (node: ParsedTreeNode) => {
+            console.log("selectedItem", node);
+            this.setSelection(node.value.start, node.value.end - 1);
+            this.view.infoPanel.parsedPath = node.value.path.join("/");
+        });
+    }
+
+    protected setSelection(start: number, end: number) {
+        this.view.hexViewer.setSelection(start, end);
+        this.view.converterPanel.model.update(this.dataProvider, start);
+        this.view.infoPanel.selectionStart = start;
+        this.view.infoPanel.selectionEnd = end;
+
+        let itemMatches = this.parsedMap.intervalHandler.searchRange(start, end);
+        let itemToSelect = itemMatches.items[0].exp;
+        let itemPathToSelect = itemToSelect.path.join('/');
+        this.view.infoPanel.parsedPath = itemPathToSelect;
+        console.log("itemPathToSelect", itemPathToSelect);
     }
 
     protected async initWorker() {
@@ -87,10 +108,13 @@ class AppController {
 
     protected async reparse() {
         await this.sandbox.kaitaiServices.parse();
-        let exported = await this.sandbox.kaitaiServices.export();
-        console.log("exported", exported);
+        this.exported = await this.sandbox.kaitaiServices.export();
+        console.log("exported", this.exported);
 
-        this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", exported));
+        this.parsedMap = new ParsedMap(this.exported);
+        this.view.infoPanel.unparsed = this.parsedMap.unparsed;
+        this.view.infoPanel.byteArrays = this.parsedMap.byteArrays;
+        this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", this.exported));
     }
 }
 
