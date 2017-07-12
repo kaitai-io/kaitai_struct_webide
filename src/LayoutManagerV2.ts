@@ -60,7 +60,8 @@ export class ClosableComponent {
     }
 
     hide() {
-        this.component.component.remove();
+        if (this.component)
+            this.component.component.remove();
     }
 }
 

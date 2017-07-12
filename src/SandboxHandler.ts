@@ -9,7 +9,13 @@ interface IRpcResponse {
     messageId: string;
     success: boolean;
     result?: any;
-    error?: any;
+    error?: { asText: string, class: string, asJson: string };
+}
+
+class GenericSandboxError extends Error {
+    constructor(public text: string, public errorClass: string, public value: any) {
+        super(`${errorClass}: ${text}`);
+    }
 }
 
 class ApiProxyPath {
@@ -20,6 +26,8 @@ class ApiProxyPath {
     createProxy(): ApiProxyPath {
         return <ApiProxyPath><any>new Proxy(ApiProxyPath.fakeBaseObj, {
             get: (target, propName: string) => {
+                if (propName === "then") return null;
+                
                 var path = Array.from(this.path);
                 path.push(propName);
                 return new ApiProxyPath(this.sandbox, this.useWorker, path).createProxy();
@@ -37,6 +45,7 @@ export class SandboxHandler {
     iframe: HTMLIFrameElement;
     loadedPromise: Promise<void>;
     iframeOrigin: string;
+    errorHandlers: { [errorClass: string]: new (text: string, value: any) => Error };
 
     constructor(public iframeSrc: string) {
         this.iframeOrigin = new URL(iframeSrc).origin;
@@ -71,8 +80,13 @@ export class SandboxHandler {
                 if (response.success)
                     resolve(response.result);
                 else {
-                    console.log("error", response.error);
-                    reject(response.error);
+                    let error = response.error;
+                    console.log("error", error);
+                    let errorObj = JSON.parse(error.asJson);
+                    if (error.class in this.errorHandlers)
+                        reject(new this.errorHandlers[error.class](error.asText, errorObj));
+                    else
+                        reject(new GenericSandboxError(error.asText, error.class, errorObj));
                 }
 
                 //console.info(`[performance] [${(new Date()).format("H:i:s.u")}] Got worker response: ${Date.now()}.`);

@@ -1,4 +1,5 @@
 import * as Vue from "vue";
+import * as $ from "jquery";
 import { Layout, LayoutHelper } from "./AppLayout";
 import { ParsedTree } from "./ui/Parts/ParsedTree";
 import { ConverterPanel } from "./ui/Components/ConverterPanel";
@@ -6,6 +7,7 @@ import { InfoPanel } from "./ui/Parts/InfoPanel";
 import { AboutModal } from "./ui/Parts/AboutModal";
 import { HexViewer } from "./HexViewer";
 import { FileTree } from "./ui/Parts/FileTree";
+import { ErrorWindow } from "./ui/Parts/ErrorWindow";
 
 export class AppView {
     layout: Layout;
@@ -57,5 +59,17 @@ export class AppView {
                 }
             });
         });
+    }
+
+    showError(errorMsg: string) {
+        this.layout.errors.show();
+
+        var errorWnd = new ErrorWindow();
+        errorWnd.errorMsg = errorMsg;
+        errorWnd.$mount($("<div>").appendTo(this.layout.errors.component.element).get(0));
+    }
+
+    hideErrors() {
+        this.layout.errors.hide();
     }
 }
