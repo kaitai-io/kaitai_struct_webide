@@ -67,6 +67,8 @@ class AppController {
                     this.view.parsedTree.treeView.setSelected(node);
                 }
             }
+
+            localSettings.latestSelection = { start, end };
         } finally {
             this.blockSelection = false;
         }
@@ -129,6 +131,7 @@ class AppController {
         this.view.parsedTree.rootNode = null;
         await this.view.nextTick(() =>
             this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", this.exported)));
+        this.setSelection(localSettings.latestSelection.start, localSettings.latestSelection.end);
     }
 
     async openNode(path: string) {
