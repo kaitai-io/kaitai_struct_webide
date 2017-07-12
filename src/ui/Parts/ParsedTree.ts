@@ -44,5 +44,5 @@ export class ParsedTreeRootNode implements ITreeNode {
 export class ParsedTree extends Vue {
     rootNode: ParsedTreeRootNode = null;
 
-    get treeView() { return <TreeView>this.$refs["treeView"]; }
+    get treeView() { return <TreeView<ITreeNode>>this.$refs["treeView"]; }
 }
