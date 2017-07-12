@@ -58,13 +58,14 @@ class AppController {
             this.view.infoPanel.selectionStart = start;
             this.view.infoPanel.selectionEnd = end;
 
-            let itemMatches = this.parsedMap.intervalHandler.searchRange(start, end);
-            let itemToSelect = itemMatches.items[0].exp;
-            let itemPathToSelect = itemToSelect.path.join('/');
-            this.view.infoPanel.parsedPath = itemPathToSelect;
-            if (origin !== "ParsedTree") {
-                let node = await this.openNode(itemPathToSelect);
-                this.view.parsedTree.treeView.setSelected(node);
+            let itemMatches = this.parsedMap.intervalHandler.searchRange(start, end).items;
+            if (itemMatches.length > 0) {
+                let itemPathToSelect = itemMatches[0].exp.path.join('/');
+                this.view.infoPanel.parsedPath = itemPathToSelect;
+                if (origin !== "ParsedTree") {
+                    let node = await this.openNode(itemPathToSelect);
+                    this.view.parsedTree.treeView.setSelected(node);
+                }
             }
         } finally {
             this.blockSelection = false;
@@ -124,8 +125,10 @@ class AppController {
         this.parsedMap = new ParsedMap(this.exported);
         this.view.infoPanel.unparsed = this.parsedMap.unparsed;
         this.view.infoPanel.byteArrays = this.parsedMap.byteArrays;
-        this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", this.exported));
         this.view.hexViewer.setIntervals(this.parsedMap.intervalHandler);
+        this.view.parsedTree.rootNode = null;
+        await this.view.nextTick(() =>
+            this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", this.exported)));
     }
 
     async openNode(path: string) {

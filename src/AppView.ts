@@ -1,3 +1,4 @@
+import * as Vue from "vue";
 import { Layout, LayoutHelper } from "./AppLayout";
 import { ParsedTree } from "./ui/Parts/ParsedTree";
 import { ConverterPanel } from "./ui/Components/ConverterPanel";
@@ -43,5 +44,18 @@ export class AppView {
 
         this.parsedTree = new ParsedTree();
         this.parsedTree.$mount(this.layout.objectTree.element);
+    }
+
+    nextTick(action: () => void) {
+        return new Promise<void>((resolve, reject) => {
+            Vue.nextTick(() => {
+                try {
+                    action();
+                    resolve();
+                } catch(e) {
+                    reject(e);
+                }
+            });
+        });
     }
 }
