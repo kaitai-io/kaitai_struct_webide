@@ -48,17 +48,28 @@ class AppController {
         });
     }
 
-    protected setSelection(start: number, end: number) {
-        this.view.hexViewer.setSelection(start, end);
-        this.view.converterPanel.model.update(this.dataProvider, start);
-        this.view.infoPanel.selectionStart = start;
-        this.view.infoPanel.selectionEnd = end;
+    blockSelection = false;
 
-        let itemMatches = this.parsedMap.intervalHandler.searchRange(start, end);
-        let itemToSelect = itemMatches.items[0].exp;
-        let itemPathToSelect = itemToSelect.path.join('/');
-        this.view.infoPanel.parsedPath = itemPathToSelect;
-        console.log("itemPathToSelect", itemPathToSelect);
+    protected async setSelection(start: number, end: number) {
+        if (this.blockSelection) return;
+        this.blockSelection = true;
+
+        try {
+            this.view.hexViewer.setSelection(start, end);
+            this.view.converterPanel.model.update(this.dataProvider, start);
+            this.view.infoPanel.selectionStart = start;
+            this.view.infoPanel.selectionEnd = end;
+
+            let itemMatches = this.parsedMap.intervalHandler.searchRange(start, end);
+            let itemToSelect = itemMatches.items[0].exp;
+            let itemPathToSelect = itemToSelect.path.join('/');
+            this.view.infoPanel.parsedPath = itemPathToSelect;
+            console.log("itemPathToSelect", itemPathToSelect);
+            let node = await this.openNode(itemPathToSelect);
+            this.view.parsedTree.treeView.setSelected(node);
+        } finally {
+            this.blockSelection = false;
+        }
     }
 
     protected async initWorker() {
@@ -116,6 +127,23 @@ class AppController {
         this.view.infoPanel.byteArrays = this.parsedMap.byteArrays;
         this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", this.exported));
         this.view.hexViewer.setIntervals(this.parsedMap.intervalHandler);
+    }
+
+    async openNode(path: string) {
+        let pathParts = path.split("/");
+        var currNode = this.view.parsedTree.treeView.children[0];
+
+        for (let pathPart of pathParts) {
+            await currNode.openNode();
+            currNode = currNode.children.find(x => (<ParsedTreeNode>x.model).value.path.last() === pathPart);
+            if (!currNode) {
+                console.error(`openNode: next node not found: ${pathPart} (${path})`);
+                return;
+            }
+        }
+
+        await currNode.openNode();
+        return currNode;
     }
 }
 
