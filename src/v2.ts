@@ -37,20 +37,18 @@ class AppController {
             this.setKsyContent(this.view.ksyEditor.getValue())));
 
         this.view.hexViewer.onSelectionChanged = () => {
-            console.log("selectionChanged");
             this.setSelection(this.view.hexViewer.selectionStart, this.view.hexViewer.selectionEnd);
         };
 
         this.view.parsedTree.treeView.$on("selected", (node: ParsedTreeNode) => {
-            console.log("selectedItem", node);
-            this.setSelection(node.value.start, node.value.end - 1);
+            this.setSelection(node.value.start, node.value.end - 1, "ParsedTree");
             this.view.infoPanel.parsedPath = node.value.path.join("/");
         });
     }
 
     blockSelection = false;
 
-    protected async setSelection(start: number, end: number) {
+    protected async setSelection(start: number, end: number, origin?: "ParsedTree") {
         if (this.blockSelection) return;
         this.blockSelection = true;
 
@@ -64,9 +62,10 @@ class AppController {
             let itemToSelect = itemMatches.items[0].exp;
             let itemPathToSelect = itemToSelect.path.join('/');
             this.view.infoPanel.parsedPath = itemPathToSelect;
-            console.log("itemPathToSelect", itemPathToSelect);
-            let node = await this.openNode(itemPathToSelect);
-            this.view.parsedTree.treeView.setSelected(node);
+            if (origin !== "ParsedTree") {
+                let node = await this.openNode(itemPathToSelect);
+                this.view.parsedTree.treeView.setSelected(node);
+            }
         } finally {
             this.blockSelection = false;
         }
