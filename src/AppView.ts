@@ -29,8 +29,10 @@ export class AppView {
         this.ksyEditor = LayoutHelper.setupEditor(this.layout.ksyEditor, "yaml");
         this.jsCode = LayoutHelper.setupEditor(this.layout.jsCode, "javascript");
         this.jsCodeDebug = LayoutHelper.setupEditor(this.layout.jsCodeDebug, "javascript");
-        this.hexViewer = new HexViewer(this.layout.inputBinary.element);
         this.aboutModal = new AboutModal();
+
+        this.hexViewer = new HexViewer(this.layout.inputBinary.element);
+        this.layout.inputBinary.container.on("resize", () => this.hexViewer.resize());
 
         this.infoPanel = new InfoPanel();
         this.infoPanel.$mount(this.layout.infoPanel.element);

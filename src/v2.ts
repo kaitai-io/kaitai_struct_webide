@@ -115,6 +115,7 @@ class AppController {
         this.view.infoPanel.unparsed = this.parsedMap.unparsed;
         this.view.infoPanel.byteArrays = this.parsedMap.byteArrays;
         this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", this.exported));
+        this.view.hexViewer.setIntervals(this.parsedMap.intervalHandler);
     }
 }
 
