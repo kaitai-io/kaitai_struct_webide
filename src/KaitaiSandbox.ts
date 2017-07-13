@@ -8,7 +8,7 @@ export class ParseError extends Error {
 }
 
 export async function InitKaitaiSandbox() {
-    var handler = new SandboxHandler("http://webide-usercontent.kaitai.io");
+    var handler = new SandboxHandler("https://webide-usercontent.kaitai.io");
     handler.errorHandlers = { "ParseException": ParseError };
 
     var sandbox = handler.createProxy<ISandboxMethods>();
