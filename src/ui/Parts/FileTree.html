@@ -5,7 +5,7 @@
     <div style="height: 100%; background:#333">
         <tree-view id="fsTree" :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu" style="height: 100%; background: #333" :whole-row="true">
             <template scope="_">
-                <a :class="{bold: _.model.isFolder}"> 
+                <a :class="{bold: _.vm.open}"> 
                     <i class="glyphicon" :class="[_.model.icon]" v-if="_.model.icon"></i> 
                     <i class="glyphicon glyphicon-list-alt" v-else-if="!_.model.isFolder"></i> 
                     <i class="glyphicon glyphicon-folder-open" v-else-if="_.vm.open"></i> 
