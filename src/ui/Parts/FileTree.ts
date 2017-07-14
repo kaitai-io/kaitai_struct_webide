@@ -20,6 +20,7 @@ import dateFormat = require("dateformat");
 
 import { saveFile, Convert } from "../../utils";
 import { ITreeNode } from "../Components/TreeView";
+import { FileUtils } from "../../utils/FileUtils";
 declare var Scrollbar: any;
 declare var kaitaiFsFiles: string[];
 
@@ -181,11 +182,18 @@ export class FileTree extends Vue {
         await this.selectedFsItem.loadChildren();
     }
 
-    public async createKsyFile(name: string) {
-        var newUri = this.selectedFsItem.uri.addPath(`${name}.ksy`).uri;
-        var content = `meta:\n  id: ${name}\n  file-extension: ${name}\n`;
-        await this.selectedFsItem.fs.write(newUri, <ArrayBuffer>Convert.utf8StrToBytes(content).buffer);
+    public async uploadFiles(files: { [fileName: string]: ArrayBufferLike }) {
+        for(let fileName in files) {
+            var newUri = this.selectedFsItem.uri.addPath(fileName).uri;
+            await this.selectedFsItem.fs.write(newUri, files[fileName]);
+        }
+        
         await this.selectedFsItem.loadChildren();
+    }
+
+    public async createKsyFile(name: string) {
+        var content = `meta:\n  id: ${name}\n  file-extension: ${name}\n`;
+        await this.uploadFiles({ [`${name}.ksy`]: Convert.utf8StrToBytes(content).buffer });
     }
 
     public async cloneFile() {
@@ -198,11 +206,12 @@ export class FileTree extends Vue {
 
     public async downloadFile() {
         let data = await this.selectedFsItem.fs.read(this.selectedFsItem.uri.uri);
-        await saveFile(data, this.selectedFsItem.uri.name);
+        await FileUtils.saveFile(this.selectedFsItem.uri.name, data);
     }
 
     public async uploadFile() {
-        console.log("upload file!");
+        const files = await FileUtils.openFilesWithDialog();
+        this.uploadFiles(files);
     }
 
     public async deleteFile() {

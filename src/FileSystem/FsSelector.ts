@@ -26,11 +26,11 @@ export class FsSelector implements IFileSystem {
         return this.getFs(uri).createFolder(uri);
     }
 
-    read(uri: string): Promise<ArrayBuffer> {
+    read(uri: string): Promise<ArrayBufferLike> {
         return this.getFs(uri).read(uri);
     }
 
-    write(uri: string, data: ArrayBuffer): Promise<void> {
+    write(uri: string, data: ArrayBufferLike): Promise<void> {
         return this.getFs(uri).write(uri, data);
     }
 

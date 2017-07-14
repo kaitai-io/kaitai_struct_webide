@@ -118,7 +118,7 @@ class AppController {
         }
     }
 
-    protected async setInput(input: ArrayBuffer) {
+    protected async setInput(input: ArrayBufferLike) {
         this.dataProvider = {
             length: input.byteLength,
             get(offset, length) { return new Uint8Array(input, offset, length); }

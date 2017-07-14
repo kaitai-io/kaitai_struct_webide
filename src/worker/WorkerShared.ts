@@ -53,7 +53,7 @@ export interface IKaitaiServices {
         debugCode: { [fileName:string]: string },
         debugCodeAll: string,
     }>;
-    setInput(input: ArrayBuffer): Promise<void>;
+    setInput(input: ArrayBufferLike): Promise<void>;
     parse(): Promise<void>;
     export(): Promise<IExportedValue>;
     getCompilerInfo(): Promise<{ version: string, buildDate: string }>;
