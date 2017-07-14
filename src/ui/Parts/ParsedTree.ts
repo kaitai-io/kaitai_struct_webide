@@ -19,6 +19,8 @@ export class ParsedTreeNode implements ITreeNode {
     }
 
     loadChildren(): Promise<void> {
+        if (this.children) return;
+        
         if (this.value.type === ObjectType.Object)
             this.children = Object.keys(this.value.object.fields).map(x => new ParsedTreeNode(x, this.value.object.fields[x]));
         else if (this.value.type === ObjectType.Array)

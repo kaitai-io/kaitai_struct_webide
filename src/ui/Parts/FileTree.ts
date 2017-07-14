@@ -202,7 +202,7 @@ export class FileTree extends Vue {
     }
 
     mounted() {
-        var scrollbar = Scrollbar.init(this.$el);
+        var scrollbar = Scrollbar.init(this.fsTreeView.$el);
         this.fsTreeView.getParentBoundingRect = () => scrollbar.bounding;
         this.fsTreeView.scrollIntoView = (el: Element, alignToTop: boolean) =>
             scrollbar.scrollIntoView(el, { alignToTop: alignToTop, onlyScrollIfNeeded: true });

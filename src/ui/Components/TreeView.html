@@ -1,6 +1,8 @@
 ﻿<style>
-    .treeView { font-family: Arial; font-size: 12px; background: #333; color: #999; text-shadow: 1px 1px 0 rgba(0,0,0,.5);
-        user-select:none; -moz-user-select:none; position:relative; overflow-y:auto; overflow-x:hidden; height:100%; width:100%; outline:0; }
+    .treeViewRoot { background: #333; color: #999; 
+        text-shadow: 1px 1px 0 rgba(0,0,0,.5); margin-bottom:0;
+        user-select:none; -moz-user-select:none; 
+        position:relative; overflow-y:auto; overflow-x:hidden; height:100%; width:100%; outline:0; }
     .treeView li { cursor: pointer; }
     .treeView li a { display:inline-block; position:relative; }
     .treeView a { white-space:nowrap; color: #d8d8d8; }
@@ -12,8 +14,8 @@
     .treeView .header.selected>.wholerow { background:rgba(95, 162, 219, 1); }
     .treeView .wholerow { position: absolute; left: 0; width:100%; transition: background-color 0.15s, box-shadow 0.15s; }
     .treeView .bold { font-weight: bold; }
-    .treeView, .treeView ul { padding-left:0; line-height: 1.5em; list-style-type: none; }
-    .treeView ul { padding-left: 10px }
+    .treeView ul { padding-left:0; line-height: 1.5em; list-style-type: none; }
+    .treeViewRoot ul { padding-left: 10px }
     @keyframes loading-indicator-spin {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
@@ -35,12 +37,12 @@
 
     .treeView .tooltip.top .tooltip-arrow { border-top-color: #eee }
     .treeView .tooltip-inner { background-color:#eee; color:black; box-shadow:0 0 3px 1px rgba(0, 0, 0, 0.5) }
-    .treeView .noitems { text-align:center; font-style:italic; }
+    .treeView .noitems { margin-left: 12px; font-style: italic; }
 </style>
 
 <template id="TreeView">
-    <div>
-        <ul class="treeView" tabindex="0" v-if="model" @keydown.right.prevent="openSelected" @keydown.left.prevent="closeSelected" 
+    <div class="treeView">
+        <ul class="treeViewRoot" tabindex="0" v-if="model" @keydown.right.prevent="openSelected" @keydown.left.prevent="closeSelected" 
             @keydown.down.prevent="selectNode('next')" @keydown.up.prevent="selectNode('prev')"
             @keydown.pagedown.prevent="selectNode('next', true)" @keydown.pageup.prevent="selectNode('prev', true)">
             <template v-for="child in model.children">
@@ -63,16 +65,14 @@
             <i v-show="loadingError" class="loadingFailed fa fa-exclamation-triangle" 
                 :title="loadingError" data-toggle="tooltip"></i>                 
         </div>
-        <template v-if="model.children && model.children.length > 0">
-            <ul v-for="child in model.children" v-show="open">
-                <tree-view-item :model="child" treeView="this">
-                    <template scope="_">
-                        <slot :vm="_.vm" :model="_.model"></slot>
-                    </template>
-                </tree-view-item>
-            </ul>
-        </template>
-        <div class="noitems" v-else-if="open">
+        <ul v-for="child in model.children" v-show="open">
+            <tree-view-item :model="child" treeView="this">
+                <template scope="_">
+                    <slot :vm="_.vm" :model="_.model"></slot>
+                </template>
+            </tree-view-item>
+        </ul>
+        <div class="noitems" v-if="model.children && model.children.length === 0 && open">
             empty
         </div>
     </li>

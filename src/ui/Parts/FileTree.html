@@ -1,9 +1,13 @@
 ﻿<style>
+    .fileTree { display: flex; flex-flow: column; height: 100%; background: #333 }
+    .fileTree .treeView { font-family: Arial; font-size: 12px; height: 100%; background: #333 }
+    .fileTree .footer { width:100%; padding-left:2px }
+    .fileTree .footer .btn { width:33.3%; border-radius:0; font-size:13px; padding:3px 10px }
 </style>
 
 <template>
-    <div style="height: 100%; background:#333">
-        <tree-view id="fsTree" :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu" style="height: 100%; background: #333" :whole-row="true">
+    <div class="fileTree">
+        <tree-view :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu" :whole-row="true">
             <template scope="_">
                 <a :class="{bold: _.vm.open}"> 
                     <i class="glyphicon" :class="[_.model.icon]" v-if="_.model.icon"></i> 
@@ -14,6 +18,11 @@
                 </a> 
             </template>
         </tree-view>
+        <div class="footer btn-group" role="group">
+            <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-file"></i></button>
+            <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-cloud-upload"></i></button>
+            <button type="button" class="btn btn-default disabled"><i class="glyphicon glyphicon-cloud-download"></i></button>
+        </div>        
         <context-menu ref="ctxMenu">
             <template scope="_">
                 <menu-item icon="glyphicon-pencil" @click="openNode">Open</menu-item>
