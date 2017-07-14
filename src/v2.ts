@@ -10,6 +10,7 @@ import { ParsedTreeNode, ParsedTreeRootNode } from "./ui/Parts/ParsedTree";
 import { IExportedValue } from "worker/WorkerShared";
 import { ParsedMap } from "./ParsedMap";
 import { InitKaitaiSandbox, ParseError } from "./KaitaiSandbox";
+import { Conversion } from "./utils/Conversion";
 
 class AppController {
     view: AppView;
@@ -44,6 +45,12 @@ class AppController {
         this.view.parsedTree.treeView.$on("selected", (node: ParsedTreeNode) => {
             this.setSelection(node.value.start, node.value.end - 1, "ParsedTree");
             this.view.infoPanel.parsedPath = node.value.path.join("/");
+        });
+
+        this.view.fileTree.$on("generate-parser", async (lang: string, aceLang: string, debug: boolean, ksyContent: string) => {
+            const generatedFiles = await this.sandbox.kaitaiServices.generateParser(ksyContent, lang, debug);
+            for (let fileName in generatedFiles)
+                this.view.addFileView(fileName, generatedFiles[fileName], aceLang);
         });
     }
 
@@ -87,7 +94,7 @@ class AppController {
         let content = await fss.read(uri);
         if (uri.endsWith(".ksy")) {
             localSettings.latestKsyUri = uri;
-            let ksyContent = new TextDecoder().decode(new Uint8Array(content));
+            const ksyContent = Conversion.utf8BytesToStr(content);
             this.compile(ksyContent);
         } else {
             localSettings.latestInputUri = uri;

@@ -5,8 +5,9 @@ import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");
 import { YAML } from "yamljs";
 import { ObjectExporter } from "./ObjectExporter";
+import { IKaitaiServices } from "./WorkerShared";
 
-class KaitaiServices {
+class KaitaiServices implements IKaitaiServices {
     compiler: KaitaiStructCompiler;
 
     ksyCode: string;
@@ -31,7 +32,7 @@ class KaitaiServices {
 
         var releaseCode = await this.compiler.compile("javascript", this.ksy, null, false);
         var debugCode = await this.compiler.compile("javascript", this.ksy, null, true);
-        var debugCodeAll = this.jsCode = Object.values(debugCode).join("\n");
+        var debugCodeAll = this.jsCode = (<any>Object).values(debugCode).join("\n");
 
         this.classes = {};
 
@@ -50,13 +51,13 @@ class KaitaiServices {
         return { releaseCode, debugCode, debugCodeAll };
     }
 
-    setInput(input: ArrayBuffer) {
+    async setInput(input: ArrayBufferLike) {
         this.input = input;
 
         console.log("setInput", this.input);
     }
 
-    parse() {
+    async parse() {
         var mainClass = this.classes[this.mainClassName];
         this.parsed = new mainClass(new KaitaiStream(this.input, 0));
         this.parsed._read();
@@ -64,12 +65,18 @@ class KaitaiServices {
         console.log("parsed", this.parsed);
     }
 
-    export() {
+    async export() {
         return this.objectExporter.exportValue(this.parsed, null, []);
     }
 
-    getCompilerInfo() {
+    async getCompilerInfo() {
         return { version: this.compiler.version, buildDate: this.compiler.buildDate };
+    }
+
+    async generateParser(ksyContent: string, lang: string, debug: boolean): Promise<{ [fileName: string]: string; }> {
+        const ksy = YAML.parse(ksyContent);
+        const compiledCode = await this.compiler.compile(lang, ksy, null, debug);
+        return compiledCode;
     }
 }
 

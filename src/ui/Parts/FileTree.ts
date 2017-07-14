@@ -21,6 +21,7 @@ import dateFormat = require("dateformat");
 import { saveFile, Convert } from "../../utils";
 import { ITreeNode } from "../Components/TreeView";
 import { FileUtils } from "../../utils/FileUtils";
+import { Conversion } from "../../utils/Conversion";
 declare var Scrollbar: any;
 declare var kaitaiFsFiles: string[];
 
@@ -168,8 +169,8 @@ export class FileTree extends Vue {
         var aceLang = typeof aceLangOrDebug === "string" ? aceLangOrDebug : lang;
         var debug = typeof aceLangOrDebug === "boolean" ? aceLangOrDebug : false;
 
-        let data = await fss.read(this.selectedUri);
-        this.$emit("generate-parser", lang, aceLang, debug, data);
+        let ksyContent = Conversion.utf8BytesToStr(await fss.read(this.selectedUri));
+        this.$emit("generate-parser", lang, aceLang, debug, ksyContent);
     }
 
     public showContextMenu(event: MouseEvent) {
@@ -193,7 +194,7 @@ export class FileTree extends Vue {
 
     public async createKsyFile(name: string) {
         var content = `meta:\n  id: ${name}\n  file-extension: ${name}\n`;
-        await this.uploadFiles({ [`${name}.ksy`]: Convert.utf8StrToBytes(content).buffer });
+        await this.uploadFiles({ [`${name}.ksy`]: Conversion.strToUtf8Bytes(content) });
     }
 
     public async cloneFile() {

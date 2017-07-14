@@ -47,12 +47,15 @@ export interface ISandboxMethods {
     kaitaiServices: IKaitaiServices;
 }
 
+type ITextFiles = { [fileName:string]: string };
+
 export interface IKaitaiServices {
     compile(code: string): Promise<{
-        releaseCode: { [fileName:string]: string },
-        debugCode: { [fileName:string]: string },
+        releaseCode: ITextFiles,
+        debugCode: ITextFiles,
         debugCodeAll: string,
     }>;
+    generateParser(ksy: string, lang: string, debug: boolean): Promise<ITextFiles>;
     setInput(input: ArrayBufferLike): Promise<void>;
     parse(): Promise<void>;
     export(): Promise<IExportedValue>;
