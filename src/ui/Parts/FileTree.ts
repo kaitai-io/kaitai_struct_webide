@@ -129,15 +129,16 @@ var fsData = new FsRootNode([
 @Component
 export class FileTree extends Vue {
     fsTree: IFsTreeNode = null;
-    contextMenuNode: FsTreeNode; // selectedFsItem can be something else (eg. by pressing down)
+    selectedFsItem: FsTreeNode = null;
 
     get ctxMenu() { return <ContextMenu>this.$refs["ctxMenu"]; }
     get fsTreeView() { return <TreeView<FsTreeNode>>this.$refs["fsTree"]; }
     get createKsyModal() { return <InputModal>this.$refs["createKsyModal"]; }
     get createFolderModal() { return <InputModal>this.$refs["createFolderModal"]; }
 
-    get selectedFsItem() { return this.fsTreeView.selectedItem.model; }
     get selectedUri() { return this.selectedFsItem.uri.uri; }
+    get canCreateFile() { return this.selectedFsItem && this.selectedFsItem.canWrite && this.selectedFsItem.isFolder; }
+    get canDownloadFile() { return this.selectedFsItem && !this.selectedFsItem.isFolder; }
 
     public init() {
         this.fsTree = fsData;
@@ -157,6 +158,11 @@ export class FileTree extends Vue {
         this.$emit("open-file", this.selectedFsItem);
     }
 
+    public fsItemSelected(item: FsTreeNode) {
+        this.selectedFsItem = item;
+        console.log("fsItemSelected", arguments);
+    }
+
     public async generateParser(lang: string, aceLangOrDebug?: any) {
         var aceLang = typeof aceLangOrDebug === "string" ? aceLangOrDebug : lang;
         var debug = typeof aceLangOrDebug === "boolean" ? aceLangOrDebug : false;
@@ -166,39 +172,42 @@ export class FileTree extends Vue {
     }
 
     public showContextMenu(event: MouseEvent) {
-        this.contextMenuNode = this.selectedFsItem;
-        this.ctxMenu.open(event, this.contextMenuNode);
+        this.ctxMenu.open(event, this.selectedFsItem);
     }
 
     public async createFolder(name: string) {
-        var newUri = this.contextMenuNode.uri.addPath(`${name}/`).uri;
-        await this.contextMenuNode.fs.createFolder(newUri);
-        await this.contextMenuNode.loadChildren();
+        var newUri = this.selectedFsItem.uri.addPath(`${name}/`).uri;
+        await this.selectedFsItem.fs.createFolder(newUri);
+        await this.selectedFsItem.loadChildren();
     }
 
     public async createKsyFile(name: string) {
-        var newUri = this.contextMenuNode.uri.addPath(`${name}.ksy`).uri;
+        var newUri = this.selectedFsItem.uri.addPath(`${name}.ksy`).uri;
         var content = `meta:\n  id: ${name}\n  file-extension: ${name}\n`;
-        await this.contextMenuNode.fs.write(newUri, <ArrayBuffer>Convert.utf8StrToBytes(content).buffer);
-        await this.contextMenuNode.loadChildren();
+        await this.selectedFsItem.fs.write(newUri, <ArrayBuffer>Convert.utf8StrToBytes(content).buffer);
+        await this.selectedFsItem.loadChildren();
     }
 
     public async cloneFile() {
-        var newUri = this.contextMenuNode.uri.uri.replace(/\.(\w+)$/, `_${new Date().format("yyyymmdd_HHMMss")}.$1`);
+        var newUri = this.selectedFsItem.uri.uri.replace(/\.(\w+)$/, `_${new Date().format("yyyymmdd_HHMMss")}.$1`);
         console.log("cloneKsyFile", newUri);
-        let content = await this.contextMenuNode.fs.read(this.contextMenuNode.uri.uri);
-        await this.contextMenuNode.fs.write(newUri, content);
-        await this.contextMenuNode.parent.loadChildren();
+        let content = await this.selectedFsItem.fs.read(this.selectedFsItem.uri.uri);
+        await this.selectedFsItem.fs.write(newUri, content);
+        await this.selectedFsItem.parent.loadChildren();
     }
 
     public async downloadFile() {
-        let data = await this.contextMenuNode.fs.read(this.contextMenuNode.uri.uri);
-        await saveFile(data, this.contextMenuNode.uri.name);
+        let data = await this.selectedFsItem.fs.read(this.selectedFsItem.uri.uri);
+        await saveFile(data, this.selectedFsItem.uri.name);
+    }
+
+    public async uploadFile() {
+        console.log("upload file!");
     }
 
     public async deleteFile() {
-        await this.contextMenuNode.fs.delete(this.contextMenuNode.uri.uri);
-        await this.contextMenuNode.parent.loadChildren();
+        await this.selectedFsItem.fs.delete(this.selectedFsItem.uri.uri);
+        await this.selectedFsItem.parent.loadChildren();
     }
 
     mounted() {
