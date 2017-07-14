@@ -17,7 +17,7 @@ class KaitaiServices implements IKaitaiServices {
     classes: { [name: string]: any };
     mainClassName: string;
 
-    input: ArrayBuffer;
+    input: ArrayBufferLike;
     parsed: any;
 
     objectExporter: ObjectExporter;
