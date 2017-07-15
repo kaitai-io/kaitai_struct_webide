@@ -1,7 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "amd",
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "noEmitOnError": false,

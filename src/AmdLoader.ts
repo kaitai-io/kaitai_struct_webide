@@ -10,21 +10,45 @@ class AmdModule {
      }
 }
 
-window["module"] = { exports: null };
+const isWorker = typeof window === "undefined";
+
+this["module"] = { exports: null };
+if (isWorker)
+    this["window"] = { exports: null };
 
 class AmdLoader {
     modules: { [url: string]: AmdModule } = {};
     paths: { [name: string]: string } = {};
+    projectBase = "";
     moduleLoadedHook: (module: AmdModule) => Promise<void> = null;
     beforeLoadHook: (module: AmdModule) => Promise<void> = null;
 
-    loadWithScriptTag(src: string): Promise<HTMLScriptElement> {
+    constructor() {
+        this.projectBase = isWorker ? "" : window.location.href;
+    }
+
+    get currentScriptSrc(){ return typeof document !== "undefined" ? document.currentScript["src"] : self["currentScriptSrc"]; }
+
+    loadScript(src: string): Promise<void> {
         return new Promise((resolve, reject) => {
-            let scriptEl = document.createElement("script");
-            scriptEl.onload = e => resolve(scriptEl);
-            scriptEl.onerror = e => reject(e);
-            scriptEl.src = src;
-            document.head.appendChild(scriptEl);
+            if (typeof document === "undefined") {
+                try {
+                    const oldScriptSrc = self["currentScriptSrc"];
+                    self["currentScriptSrc"] = src;
+                    //console.log(`importScripts("${src}")`);
+                    importScripts(src);
+                    self["currentScriptSrc"] = oldScriptSrc;
+                    resolve();
+                } catch(e) {
+                    reject(e);
+                }
+            } else {
+                let scriptEl = document.createElement("script");
+                scriptEl.onload = e => resolve();
+                scriptEl.onerror = e => reject(e);
+                scriptEl.src = src;
+                document.head.appendChild(scriptEl);
+            }
         });
     }
 
@@ -37,9 +61,9 @@ class AmdLoader {
             throw Error(`Module "${name}" can be loaded from multiple paths: ${pathMatches.join(", ")}`);
 
         let url =
-            isRelative ? new URL(`${name}.js`, baseUrl || document.currentScript["src"] || window.location).href :
-            pathMatches.length > 0 ? new URL(`${this.paths[pathMatches[0]]}${name.substr(pathMatches[0].length)}.js`, window.location.href).href :
-            new URL(`js/${name}.js`, window.location.href).href;
+            isRelative ? new URL(`${name}.js`, baseUrl || this.currentScriptSrc || this.projectBase).href :
+            pathMatches.length > 0 ? new URL(`${this.paths[pathMatches[0]]}${name.substr(pathMatches[0].length)}.js`, this.projectBase).href :
+            new URL(`js/${name}.js`, this.projectBase).href;
 
         return url;
     }
@@ -68,13 +92,19 @@ class AmdLoader {
                 await this.beforeLoadHook(module);
 
             //console.log("will load ", module.url, "exports", module.exports, "module", module);
-            this.loadWithScriptTag(module.url).then(x => this.onScriptLoaded(module), x => loadPromiseReject(module.url));
+            this.loadScript(module.url).then(() => this.onScriptLoaded(module), x => loadPromiseReject(module.url));
         }
         return module.loadPromise;
     }
 
     async onModuleLoaded(moduleDesc: AmdModule, value: any) {
-        //console.log("onModuleLoaded", moduleDesc.url);
+        console.log("onModuleLoaded", moduleDesc.url, value);
+
+        if (!value) {
+            debugger;
+            throw new Error(`Module result is null! ${moduleDesc.url}`);
+        }
+
         moduleDesc.exports = value;
         if (this.moduleLoadedHook)
             await this.moduleLoadedHook(moduleDesc);
@@ -86,7 +116,7 @@ class AmdLoader {
     async onScriptLoaded(module: AmdModule) {
         //console.log("script loaded", module.url);
         if (!module.loaded && !module.amdLoading)
-            this.onModuleLoaded(module, window["module"].exports);
+            this.onModuleLoaded(module, self["module"].exports || self["window"]);
     }
 
     parseArgs(argumentsObj: IArguments|any[], isDefine: boolean) {
@@ -130,10 +160,9 @@ class AmdLoader {
     }
 
     async define(name: string, deps: string[], callback: any) {
-        let currScript = document.currentScript;
-        //console.log("define", currScript, name, deps, callback);
+        //console.log("define", this.currentScriptSrc, name, deps, callback);
 
-        let moduleDesc = name ? this.getModule(name) : currScript && currScript["src"] && this.modules[currScript["src"]];
+        let moduleDesc = name ? this.getModule(name) : this.currentScriptSrc && this.modules[this.currentScriptSrc];
         if (moduleDesc)
             moduleDesc.amdLoading = true;
 
@@ -149,7 +178,7 @@ class AmdLoader {
             return moduleDesc;
         };
 
-        if (!moduleDesc.loadPromise)
+        if (moduleDesc && !moduleDesc.loadPromise)
             moduleDesc.loadPromise = promise();
         else
             promise();
@@ -171,4 +200,4 @@ function define() {
 }
 
 define["amd"] = true;
-window["requirejs"] = require; // hack to bypass requirejs detections
+this["requirejs"] = require; // hack to bypass requirejs detections
