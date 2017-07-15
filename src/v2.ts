@@ -28,14 +28,14 @@ class AppController {
 
     protected initView() {
         this.view = new AppView();
-        
+
         this.view.fileTree.$on("open-file", (treeNode: FsTreeNode) => {
-            console.log('treeView openFile', treeNode);
+            console.log("treeView openFile", treeNode);
             this.openFile(treeNode.uri.uri);
         });
 
         var editDelay = new Delayed(500);
-        this.view.ksyEditor.on("change", () => editDelay.do(() => 
+        this.view.ksyEditor.on("change", () => editDelay.do(() =>
             this.compile(this.view.ksyEditor.getValue())));
 
         this.view.hexViewer.onSelectionChanged = () => {
@@ -68,7 +68,7 @@ class AppController {
 
             let itemMatches = this.parsedMap.intervalHandler.searchRange(start, end).items;
             if (itemMatches.length > 0) {
-                let itemPathToSelect = itemMatches[0].exp.path.join('/');
+                let itemPathToSelect = itemMatches[0].exp.path.join("/");
                 this.view.infoPanel.parsedPath = itemPathToSelect;
                 if (origin !== "ParsedTree") {
                     let node = await this.openNode(itemPathToSelect);
@@ -117,10 +117,10 @@ class AppController {
             if (e instanceof ParseError) {
                 //e.value.parsedLine
             }
-            
+
             if (e instanceof Error)
                 this.view.showError(e.message);
-                
+
             console.log("compile error", typeof e, e);
         }
     }
