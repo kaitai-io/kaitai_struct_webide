@@ -41,11 +41,20 @@
             };
 
             require(["autorefresh2"]);
+            require(["app.unsupportedBrowser"]);
             require(["v2"]);
         };
         init();
     </script>
 </head>
 <body>
+    <div id="unsupportedBrowser">
+        Your browser is not supported. Features may be or may not be working. <a href="http://outdatedbrowser.com/" target="_blank">Please use the latest Chrome or Firefox.</a>
+        <i class="closeBtn glyphicon glyphicon-remove" style="cursor: pointer"></i>
+    </div>
+
+    <noscript>
+        <div id="noscript">This app requires Javascript to work. <a href="http://enable-javascript.com/" target="_blank">Learn how to enable Javascript.</a></div>
+    </noscript>
 </body>
 </html>

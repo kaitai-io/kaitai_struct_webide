@@ -1,11 +1,9 @@
 ﻿import * as bowser from "bowser";
 
-// app.unsupportedBrowser.ts changed
-
 if (localStorage.getItem("hideUnsupported") === "true" || bowser.check({ chrome: "55", firefox: "52", safari: "10.1" }, true))
-    $("#unsupportedBrowser").hide();
+    document.getElementById("unsupportedBrowser").style.display = "none";
 
-$("#unsupportedBrowser .closeBtn").on("click", () => {
+document.querySelector("#unsupportedBrowser .closeBtn").addEventListener("click", () => {
     localStorage.setItem("hideUnsupported", "true");
-    $("#unsupportedBrowser").hide();
+    document.getElementById("unsupportedBrowser").style.display = "none";
 });
