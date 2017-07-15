@@ -27,7 +27,7 @@ class ApiProxyPath {
         return <ApiProxyPath><any>new Proxy(ApiProxyPath.fakeBaseObj, {
             get: (target, propName: string) => {
                 if (propName === "then") return null;
-                
+
                 var path = Array.from(this.path);
                 path.push(propName);
                 return new ApiProxyPath(this.sandbox, this.useWorker, path).createProxy();

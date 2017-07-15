@@ -47,4 +47,4 @@ interface IExportedValue {
     parent?: IExportedValue;
 }
 
-interface IKsyTypes { [name: string]: KsySchema.IType; };
+interface IKsyTypes { [name: string]: KsySchema.IType; }
