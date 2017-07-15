@@ -8,6 +8,7 @@ import { AboutModal } from "./ui/Parts/AboutModal";
 import { HexViewer } from "./HexViewer";
 import { FileTree } from "./ui/Parts/FileTree";
 import { ErrorWindow } from "./ui/Parts/ErrorWindow";
+import { DragAndDrop } from "./ui/Components/DragAndDrop";
 
 export class AppView {
     layout: Layout;
@@ -21,6 +22,7 @@ export class AppView {
     infoPanel: InfoPanel;
     converterPanel: ConverterPanel;
     parsedTree: ParsedTree;
+    dragAndDrop: DragAndDrop;
 
     constructor() {
         this.layout = new Layout();
@@ -40,12 +42,15 @@ export class AppView {
         this.infoPanel = new InfoPanel();
         this.infoPanel.$mount(this.layout.infoPanel.element);
         this.infoPanel.aboutModal = this.aboutModal;
-        
+
         this.converterPanel = new ConverterPanel();
         this.converterPanel.$mount(this.layout.converterPanel.element);
 
         this.parsedTree = new ParsedTree();
         this.parsedTree.$mount(this.layout.objectTree.element);
+
+        this.dragAndDrop = new DragAndDrop();
+        this.dragAndDrop.$mount($("<div>").appendTo(document.body).get(0));
     }
 
     nextTick(action: () => void) {

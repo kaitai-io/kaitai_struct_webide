@@ -1,0 +1,13 @@
+<style>
+    .fileDrop { font-family: Arial; position: fixed; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0,0,0,0.8); z-index: 9999 }
+    .fileDrop>div { border:2px dashed white; border-radius:25px; width:500px; margin-left:-250px; height:180px; margin-top:-100px; 
+        position:fixed; top:50%; left:50%; color:white; text-align:center; font-size:22px; padding-top:65px }    
+</style>
+
+<template>
+    <div class="fileDrop" v-show="visible">
+        <div>
+            Drag &amp; drop a file here<br />to upload
+        </div>
+    </div>
+</template>

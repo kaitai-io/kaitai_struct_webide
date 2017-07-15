@@ -119,10 +119,11 @@ function addRootNode(text: string, icon: string, uri: string) {
     return node;
 }
 
+var browserStorage = addRootNode("browser", "glyphicon-cloud", "browser:///");
 var fsData = new FsRootNode([
     addRootNode("kaitai.io", "glyphicon-cloud", "https:///formats/"),
     addRootNode("kaitai-io/formats", "fa fa-github", "github://kaitai-io/kaitai_struct_formats/"),
-    addRootNode("browser", "glyphicon-cloud", "browser:///"),
+    browserStorage,
     addRootNode("browser (legacy)", "glyphicon-cloud", "browser_legacy:///"),
 ]);
 
@@ -132,6 +133,7 @@ var fsData = new FsRootNode([
 export class FileTree extends Vue {
     fsTree: IFsTreeNode = null;
     selectedFsItem: FsTreeNode = null;
+    defaultStorage: FsTreeNode = null;
 
     get ctxMenu() { return <ContextMenu>this.$refs["ctxMenu"]; }
     get fsTreeView() { return <TreeView<FsTreeNode>>this.$refs["fsTree"]; }
@@ -144,6 +146,7 @@ export class FileTree extends Vue {
 
     public init() {
         this.fsTree = fsData;
+        this.defaultStorage = browserStorage;
         console.log(fsData.children);
 
         setTimeout(() => {
@@ -184,12 +187,14 @@ export class FileTree extends Vue {
     }
 
     public async uploadFiles(files: { [fileName: string]: ArrayBufferLike }) {
+        const dest = this.selectedFsItem || this.defaultStorage;
+
         for(const fileName of Object.keys(files)) {
-            var newUri = this.selectedFsItem.uri.addPath(fileName).uri;
-            await this.selectedFsItem.fs.write(newUri, files[fileName]);
+            var newUri = dest.uri.addPath(fileName).uri;
+            await dest.fs.write(newUri, files[fileName]);
         }
 
-        await this.selectedFsItem.loadChildren();
+        await dest.loadChildren();
     }
 
     public async createKsyFile(name: string) {

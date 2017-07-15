@@ -11,6 +11,7 @@ import { IExportedValue } from "worker/WorkerShared";
 import { ParsedMap } from "./ParsedMap";
 import { InitKaitaiSandbox, ParseError } from "./KaitaiSandbox";
 import { Conversion } from "./utils/Conversion";
+import { IDataFiles } from "./utils/FileUtils";
 
 class AppController {
     view: AppView;
@@ -51,6 +52,11 @@ class AppController {
             const generatedFiles = await this.sandbox.kaitaiServices.generateParser(ksyContent, lang, debug);
             for (let fileName in generatedFiles)
                 this.view.addFileView(fileName, generatedFiles[fileName], aceLang);
+        });
+
+        this.view.dragAndDrop.$on("files-uploaded", async (files: IDataFiles) => {
+            console.log("files-uploaded", files);
+            this.view.fileTree.uploadFiles(files);
         });
     }
 

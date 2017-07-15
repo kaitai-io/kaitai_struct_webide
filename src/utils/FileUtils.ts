@@ -1,6 +1,8 @@
 import * as $ from "jquery";
 
-export class FileUtils { 
+export type IDataFiles = { [fileName: string]: ArrayBuffer };
+
+export class FileUtils {
     static readBlob(blob: Blob) {
         return new Promise<ArrayBuffer>(function (resolve, reject) {
             const reader = new FileReader();
@@ -10,16 +12,18 @@ export class FileUtils {
         });
     }
 
-    static openFilesWithDialog(): Promise<{ [fileName: string]: ArrayBuffer }> {
+    static async processFileList(fileList: FileList) {
+        const result: IDataFiles = { };
+        for(let file of Array.from(fileList))
+            result[file.name] = await FileUtils.readBlob(file);
+        return result;
+    }
+
+    static openFilesWithDialog(): Promise<IDataFiles> {
         return new Promise((resolve, reject) => {
             const input = $(`<input type="file" multiple />`);
             input.on("change", async e => {
-                const fileList: FileList = (<any>e.target).files;
-
-                const result = { };
-                for(let file of Array.from(fileList))
-                    result[file.name] = await FileUtils.readBlob(file);
-
+                const result = FileUtils.processFileList((<any>e.target).files);
                 input.remove();
                 resolve(result);
             }).click();
