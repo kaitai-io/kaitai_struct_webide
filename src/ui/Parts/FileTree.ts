@@ -189,12 +189,15 @@ export class FileTree extends Vue {
     public async uploadFiles(files: { [fileName: string]: ArrayBufferLike }) {
         const dest = this.selectedFsItem || this.defaultStorage;
 
+        const resultUris = [];
         for(const fileName of Object.keys(files)) {
             var newUri = dest.uri.addPath(fileName).uri;
             await dest.fs.write(newUri, files[fileName]);
+            resultUris.push(newUri);
         }
 
         await dest.loadChildren();
+        return resultUris;
     }
 
     public async createKsyFile(name: string) {

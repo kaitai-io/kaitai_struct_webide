@@ -55,8 +55,9 @@ class AppController {
         });
 
         this.view.dragAndDrop.$on("files-uploaded", async (files: IDataFiles) => {
-            console.log("files-uploaded", files);
-            this.view.fileTree.uploadFiles(files);
+            const newFileUris = await this.view.fileTree.uploadFiles(files);
+            if (newFileUris.length === 1)
+                this.openFile(newFileUris[0]);
         });
     }
 
