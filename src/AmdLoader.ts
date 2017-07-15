@@ -98,7 +98,7 @@ class AmdLoader {
     }
 
     async onModuleLoaded(moduleDesc: AmdModule, value: any) {
-        console.log("onModuleLoaded", moduleDesc.url, value);
+        //console.log("onModuleLoaded", moduleDesc.url, value);
 
         if (!value) {
             debugger;

@@ -284,6 +284,7 @@ export class HexViewer {
 
     public setDataProvider(dataProvider: IDataProvider) {
         this.dataProvider = dataProvider;
+        this.intervals = null;
         this.topRow = 0;
         this.deselect();
         this.resize();
