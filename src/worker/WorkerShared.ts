@@ -59,5 +59,6 @@ export interface IKaitaiServices {
     setInput(input: ArrayBufferLike): Promise<void>;
     parse(): Promise<void>;
     export(): Promise<IExportedValue>;
+    exportToJson(useHex: boolean): Promise<string>;
     getCompilerInfo(): Promise<{ version: string, buildDate: string }>;
 }

@@ -59,6 +59,11 @@ class AppController {
             if (newFileUris.length === 1)
                 this.openFile(newFileUris[0]);
         });
+
+        this.view.infoPanel.exportToJson = async hex => {
+            const json = await this.sandbox.kaitaiServices.exportToJson(hex);
+            this.view.addFileView("json export", json, "json");
+        };
     }
 
     blockSelection = false;

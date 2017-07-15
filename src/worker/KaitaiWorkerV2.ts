@@ -6,6 +6,7 @@ import KaitaiStream = require("KaitaiStream");
 import { YAML } from "yamljs";
 import { ObjectExporter } from "./ObjectExporter";
 import { IKaitaiServices } from "./WorkerShared";
+import { JsonExporter } from "./JsonExporter";
 
 class KaitaiServices implements IKaitaiServices {
     compiler: KaitaiStructCompiler;
@@ -77,6 +78,12 @@ class KaitaiServices implements IKaitaiServices {
         const ksy = YAML.parse(ksyContent);
         const compiledCode = await this.compiler.compile(lang, ksy, null, debug);
         return compiledCode;
+    }
+
+    async exportToJson(useHex: boolean) {
+        const exported = await this.objectExporter.exportValue(this.parsed, null, [], true);
+        const json = new JsonExporter(useHex).export(exported);
+        return json;
     }
 }
 
