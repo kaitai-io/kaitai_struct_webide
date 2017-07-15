@@ -12,7 +12,7 @@
             <template scope="_">
                 <a :class="{bold: _.vm.open}"> 
                     <i class="glyphicon" :class="[_.model.icon]" v-if="_.model.icon"></i> 
-                    <i class="glyphicon glyphicon-list-alt" v-else-if="!_.model.isFolder"></i> 
+                    <i class="glyphicon glyphicon-file" v-else-if="!_.model.isFolder"></i> 
                     <i class="glyphicon glyphicon-folder-open" v-else-if="_.vm.open"></i> 
                     <i class="glyphicon glyphicon-folder-close" v-else></i> 
                     <span class="nodeText">{{_.model.text}}</span> 

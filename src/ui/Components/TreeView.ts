@@ -136,7 +136,8 @@ export class TreeViewItem<T extends ITreeNode> extends Vue {
         this.loadingError = null;
 
         try {
-            await this.model.loadChildren();    
+            if (!this.model.children)
+                await this.model.loadChildren();
             this.open = true;
         } catch(e) {
             console.error(e);

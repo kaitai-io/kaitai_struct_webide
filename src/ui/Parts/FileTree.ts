@@ -82,6 +82,8 @@ export class FsTreeNode implements IFsTreeNode {
         this.fs = this.fs || parent.fs;
         this.text = uri.name;
         this.isFolder = uri.type === "directory";
+        if (this.isKsy)
+            this.icon = "glyphicon-list-alt";
     }
 
     async loadChildren(): Promise<void> {
@@ -120,12 +122,19 @@ function addRootNode(text: string, icon: string, uri: string) {
 }
 
 var browserStorage = addRootNode("browser", "glyphicon-cloud", "browser:///");
+var nodeKaitaiIo = addRootNode("kaitai.io", "glyphicon-cloud", "https:///");
 var fsData = new FsRootNode([
-    addRootNode("kaitai.io", "glyphicon-cloud", "https:///formats/"),
+    nodeKaitaiIo,
     addRootNode("kaitai-io/formats", "fa fa-github", "github://kaitai-io/kaitai_struct_formats/"),
     browserStorage,
     addRootNode("browser (legacy)", "glyphicon-cloud", "browser_legacy:///"),
 ]);
+
+nodeKaitaiIo.loadChildren().then(() => {
+    nodeKaitaiIo.children[0].icon = "glyphicon-book";
+    nodeKaitaiIo.children[1].icon = "glyphicon-cd";
+    console.log('set icons!', nodeKaitaiIo, nodeKaitaiIo.children[0].icon);
+});
 
 //setTimeout(() => fsData.children.push(addRootNode("browser", "glyphicon-cloud", "browser:///")), 5000);
 
