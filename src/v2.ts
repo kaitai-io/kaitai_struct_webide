@@ -159,18 +159,21 @@ class AppController {
     }
 
     protected async reparse() {
-        await this.sandbox.kaitaiServices.parse();
-        this.exported = await this.sandbox.kaitaiServices.export();
-        console.log("exported", this.exported);
+        try {
+            await this.sandbox.kaitaiServices.parse();
+        } finally {
+            this.exported = await this.sandbox.kaitaiServices.export();
+            console.log("exported", this.exported);
 
-        this.parsedMap = new ParsedMap(this.exported);
-        this.view.infoPanel.unparsed = this.parsedMap.unparsed;
-        this.view.infoPanel.byteArrays = this.parsedMap.byteArrays;
-        this.view.hexViewer.setIntervals(this.parsedMap.intervalHandler);
-        this.view.parsedTree.rootNode = null;
-        await this.view.nextTick(() =>
-            this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", this.exported)));
-        this.setSelection(localSettings.latestSelection.start, localSettings.latestSelection.end);
+            this.parsedMap = new ParsedMap(this.exported);
+            this.view.infoPanel.unparsed = this.parsedMap.unparsed;
+            this.view.infoPanel.byteArrays = this.parsedMap.byteArrays;
+            this.view.hexViewer.setIntervals(this.parsedMap.intervalHandler);
+            this.view.parsedTree.rootNode = null;
+            await this.view.nextTick(() =>
+                this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", this.exported)));
+            this.setSelection(localSettings.latestSelection.start, localSettings.latestSelection.end);
+        }
     }
 }
 
