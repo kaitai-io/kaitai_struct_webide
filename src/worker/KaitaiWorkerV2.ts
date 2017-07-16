@@ -5,8 +5,9 @@ import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");
 import { YAML } from "yamljs";
 import { ObjectExporter } from "./ObjectExporter";
-import { IKaitaiServices } from "./WorkerShared";
+import { IKaitaiServices, IKsyTypes } from "./WorkerShared";
 import { JsonExporter } from "./JsonExporter";
+import { SchemaUtils } from "./SchemaUtils";
 
 class KaitaiServices implements IKaitaiServices {
     compiler: KaitaiStructCompiler;
@@ -47,7 +48,9 @@ class KaitaiServices implements IKaitaiServices {
         eval(debugCodeAll);
         console.log("compileKsy", this.mainClassName, this.classes);
 
-        this.objectExporter = new ObjectExporter(this.ksy.types, this.classes);
+        const ksyTypes = SchemaUtils.collectKsyTypes(this.ksy);
+
+        this.objectExporter = new ObjectExporter(ksyTypes, this.classes);
 
         return { releaseCode, debugCode, debugCodeAll };
     }
