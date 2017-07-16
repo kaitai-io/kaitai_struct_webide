@@ -51,7 +51,7 @@ export class ParsedTree extends Vue {
     async open(path: string) {
         return this.treeView.searchNode((item: ParsedTreeNode) => {
             const itemPath = item.value.path.join("/");
-            return itemPath === path ? "match" : path.startsWith(itemPath) ? "children" : "nomatch";
+            return itemPath === path ? "match" : itemPath === "" || path.startsWith(itemPath + "/") ? "children" : "nomatch";
         });
     }
 }

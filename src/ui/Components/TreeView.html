@@ -72,7 +72,7 @@
                 </template>
             </tree-view-item>
         </ul>
-        <div class="noitems" v-if="model.children && model.children.length === 0 && open">
+        <div class="noitems" v-if="model.hasChildren && model.children && model.children.length === 0 && open">
             empty
         </div>
     </li>
