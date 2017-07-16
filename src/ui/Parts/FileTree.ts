@@ -133,7 +133,7 @@ var fsData = new FsRootNode([
 nodeKaitaiIo.loadChildren().then(() => {
     nodeKaitaiIo.children[0].icon = "glyphicon-book";
     nodeKaitaiIo.children[1].icon = "glyphicon-cd";
-    console.log('set icons!', nodeKaitaiIo, nodeKaitaiIo.children[0].icon);
+    //console.log('set icons!', nodeKaitaiIo, nodeKaitaiIo.children[0].icon);
 });
 
 //setTimeout(() => fsData.children.push(addRootNode("browser", "glyphicon-cloud", "browser:///")), 5000);
@@ -174,7 +174,7 @@ export class FileTree extends Vue {
 
     public fsItemSelected(item: FsTreeNode) {
         this.selectedFsItem = item;
-        console.log("fsItemSelected", arguments);
+        //console.log("fsItemSelected", arguments);
     }
 
     public async generateParser(lang: string, aceLangOrDebug?: any) {
@@ -196,17 +196,56 @@ export class FileTree extends Vue {
     }
 
     public async uploadFiles(files: { [fileName: string]: ArrayBufferLike }) {
-        const dest = this.selectedFsItem || this.defaultStorage;
+        let dest = this.selectedFsItem || this.defaultStorage;
+        if (!dest.isFolder)
+            dest = dest.parent;
 
         const resultUris = [];
         for(const fileName of Object.keys(files)) {
-            var newUri = dest.uri.addPath(fileName).uri;
-            await dest.fs.write(newUri, files[fileName]);
-            resultUris.push(newUri);
+            const newProposedUri = dest.uri.addPath(fileName).uri;
+            const newFinalUri = await this.writeFile(newProposedUri, files[fileName]);
+            resultUris.push(newFinalUri);
         }
 
         await dest.loadChildren();
         return resultUris;
+    }
+
+    public async findNextAvailableName(uri: string) {
+        const uriObj = new FsUri(uri);
+        const parentNames = (await fss.list(uriObj.parentUri.uri)).map(x => x.uri.name);
+        for (var iTry = 1; iTry < 50; iTry++) {
+            const newName = iTry === 1 ? uriObj.name : `${uriObj.nameWoExtension} (${iTry}).${uriObj.extension}`;
+            if (!parentNames.some(x => x === newName))
+                return uriObj.parentUri.addPath(newName).uri;
+        }
+
+        throw new Error(`Something went wrong. Could not find any available filename for uri "${uri}"!`);
+    }
+
+    public async writeFile(uri: string, content: ArrayBufferLike, renameOnConflict = true): Promise<string> {
+        const isReadOnly = !fss.capabilities(uri).write;
+        if (isReadOnly)
+            uri = this.defaultStorage.uri.changePath(new FsUri(uri).path).uri;
+
+        if (renameOnConflict)
+            uri = await this.findNextAvailableName(uri);
+
+        await fss.write(uri, content);
+        await this.selectItem(uri);
+        return uri;
+    }
+
+    public async getNodeForUri(uri: string, loadChildrenIfNeeded = true) {
+        return await this.fsTreeView.searchNode(item => {
+            return uri === item.uri.uri ? "match" :
+                uri.startsWith(item.uri.uri) ? "children" : "nomatch";
+        });
+    }
+
+    public async selectItem(uri: string) {
+        const itemNode = await this.getNodeForUri(uri);
+        this.fsTreeView.setSelected(itemNode);
     }
 
     public async createKsyFile(name: string) {
@@ -229,7 +268,7 @@ export class FileTree extends Vue {
 
     public async uploadFile() {
         const files = await FileUtils.openFilesWithDialog();
-        this.uploadFiles(files);
+        await this.uploadFiles(files);
     }
 
     public async deleteFile() {
@@ -240,8 +279,10 @@ export class FileTree extends Vue {
     mounted() {
         var scrollbar = Scrollbar.init(this.fsTreeView.$el);
         this.fsTreeView.getParentBoundingRect = () => scrollbar.bounding;
-        this.fsTreeView.scrollIntoView = (el: Element, alignToTop: boolean) =>
+        this.fsTreeView.scrollIntoView = (el: Element, alignToTop: boolean) => {
+            scrollbar.update();
             scrollbar.scrollIntoView(el, { alignToTop: alignToTop, onlyScrollIfNeeded: true });
+        };
         document.body.appendChild(this.ctxMenu.$el);
         console.log("FileTree mounted", this.fsTreeView);
         //this.createFolderModal.show();

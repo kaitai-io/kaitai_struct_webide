@@ -20,25 +20,25 @@ export class FsSelector implements IFileSystem {
 
     capabilities(uri: string) {
         return this.getFs(uri).capabilities(uri);
-    };
-
-    createFolder(uri: string): Promise<void> {
-        return this.getFs(uri).createFolder(uri);
     }
 
-    read(uri: string): Promise<ArrayBufferLike> {
-        return this.getFs(uri).read(uri);
+    async createFolder(uri: string): Promise<void> {
+        await this.getFs(uri).createFolder(uri);
     }
 
-    write(uri: string, data: ArrayBufferLike): Promise<void> {
-        return this.getFs(uri).write(uri, data);
+    async read(uri: string): Promise<ArrayBufferLike> {
+        return await this.getFs(uri).read(uri);
     }
 
-    delete(uri: string): Promise<void> {
-        return this.getFs(uri).delete(uri);
+    async write(uri: string, data: ArrayBufferLike): Promise<void> {
+        await this.getFs(uri).write(uri, data);
     }
 
-    list(uri: string): Promise<IFsItem[]> {
-        return this.getFs(uri).list(uri);
+    async delete(uri: string): Promise<void> {
+        await this.getFs(uri).delete(uri);
+    }
+
+    async list(uri: string): Promise<IFsItem[]> {
+        return await this.getFs(uri).list(uri);
     }
 }

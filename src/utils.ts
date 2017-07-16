@@ -39,6 +39,21 @@ export class Delayed {
     }
 }
 
+export class EventSilencer {
+    silence = false;
+
+    silenceThis(callback: () => void) {
+        this.silence = true;
+        callback();
+        this.silence = false;
+    }
+
+    do(callback: () => void) {
+        if (!this.silence)
+            callback();
+    }
+}
+
 export class Convert {
     static utf8StrToBytes(str: string): Uint8Array {
         return new TextEncoder("utf-8").encode(str);

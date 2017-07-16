@@ -4,7 +4,7 @@ import { ISandboxMethods } from "./worker/WorkerShared";
 import { IDataProvider } from "./HexViewer";
 import { localSettings } from "./LocalSettings";
 import { FsTreeNode, fss } from "./ui/Parts/FileTree";
-import { Delayed } from "./utils";
+import { Delayed, EventSilencer } from "./utils";
 import { SandboxHandler } from "./SandboxHandler";
 import { ParsedTreeNode, ParsedTreeRootNode } from "./ui/Parts/ParsedTree";
 import { IExportedValue } from "worker/WorkerShared";
@@ -12,6 +12,7 @@ import { ParsedMap } from "./ParsedMap";
 import { InitKaitaiSandbox, ParseError } from "./KaitaiSandbox";
 import { Conversion } from "./utils/Conversion";
 import { IDataFiles } from "./utils/FileUtils";
+import { FsUri } from "./FileSystem/FsUri";
 
 class AppController {
     view: AppView;
@@ -19,6 +20,7 @@ class AppController {
     dataProvider: IDataProvider;
     exported: IExportedValue;
     parsedMap: ParsedMap;
+    ksyEditorSilentChange = new EventSilencer();
 
     async start() {
         this.initView();
@@ -36,8 +38,8 @@ class AppController {
         });
 
         var editDelay = new Delayed(500);
-        this.view.ksyEditor.on("change", () => editDelay.do(() =>
-            this.compile(this.view.ksyEditor.getValue())));
+        this.view.ksyEditor.on("change", () => this.ksyEditorSilentChange.do(() =>
+            editDelay.do(() => this.onKsyChanged(this.view.ksyEditor.getValue()))));
 
         this.view.hexViewer.onSelectionChanged = () => {
             this.setSelection(this.view.hexViewer.selectionStart, this.view.hexViewer.selectionEnd);
@@ -83,7 +85,7 @@ class AppController {
                 let itemPathToSelect = itemMatches[0].exp.path.join("/");
                 this.view.infoPanel.parsedPath = itemPathToSelect;
                 if (origin !== "ParsedTree") {
-                    let node = await this.openNode(itemPathToSelect);
+                    let node = await this.view.parsedTree.open(itemPathToSelect);
                     this.view.parsedTree.treeView.setSelected(node);
                 }
             }
@@ -114,9 +116,16 @@ class AppController {
         }
     }
 
+    protected async onKsyChanged(ksyContent: string) {
+        localSettings.latestKsyUri = await this.view.fileTree.writeFile(
+            localSettings.latestKsyUri, Conversion.strToUtf8Bytes(ksyContent), false);
+
+        return await this.compile(ksyContent);
+    }
+
     protected async compile(ksyContent: string) {
         if (this.view.ksyEditor.getValue() !== ksyContent)
-            this.view.ksyEditor.setValue(ksyContent, -1);
+            this.ksyEditorSilentChange.silenceThis(() => this.view.ksyEditor.setValue(ksyContent, -1));
 
         try {
             this.view.hideErrors();
@@ -162,23 +171,6 @@ class AppController {
         await this.view.nextTick(() =>
             this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", this.exported)));
         this.setSelection(localSettings.latestSelection.start, localSettings.latestSelection.end);
-    }
-
-    async openNode(path: string) {
-        let pathParts = path.split("/");
-        var currNode = this.view.parsedTree.treeView.children[0];
-
-        for (let pathPart of pathParts) {
-            await currNode.openNode();
-            currNode = currNode.children.find(x => (<ParsedTreeNode>x.model).value.path.last() === pathPart);
-            if (!currNode) {
-                console.error(`openNode: next node not found: ${pathPart} (${path})`);
-                return;
-            }
-        }
-
-        await currNode.openNode();
-        return currNode;
     }
 }
 

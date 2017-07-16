@@ -34,7 +34,6 @@ export class TreeView<T extends ITreeNode> extends Vue {
             this.selectedItem.dblclick();
         else
             this.selectNode("next");
-        this.scrollSelectedIntoView();
     }
 
     closeSelected() {
@@ -42,7 +41,6 @@ export class TreeView<T extends ITreeNode> extends Vue {
             this.selectedItem.dblclick();
         else if (this.selectedItem.parent.parent)
             this.setSelected(this.selectedItem.parent);
-        this.scrollSelectedIntoView();
     }
 
     selectRelativeNode(node: TreeViewItem<T>, dir: "prev" | "next") {
@@ -109,6 +107,37 @@ export class TreeView<T extends ITreeNode> extends Vue {
         this.selectedItem.selected = true;
         this.scrollSelectedIntoView();
         this.$emit("selected", this.selectedItem.model);
+    }
+
+    async searchNode(searchCallback: (item: T) => "match" | "children" | "nomatch", loadChildrenIfNeeded = true) {
+        type NodeLike = { children: TreeViewItem<T>[], model?: ITreeNode, open?: boolean };
+        let currNode: NodeLike = this;
+        let canForceLoadChildren = false;
+        while (true) {
+            if (loadChildrenIfNeeded && (!currNode.children || currNode.children.length === 0 || canForceLoadChildren)) {
+                await currNode.model.loadChildren();
+                currNode.open = true;
+            }
+
+            let nextNode: NodeLike = null;
+            for (const child of currNode.children) {
+                const matchResult = searchCallback(child.model);
+                if(matchResult === "match")
+                    return child;
+                else if (matchResult === "children") {
+                    nextNode = child;
+                    canForceLoadChildren = false;
+                    break;
+                }
+            }
+
+            if (nextNode !== null)
+                currNode = nextNode;
+            else if (!canForceLoadChildren)
+                canForceLoadChildren = true;
+            else
+                return null;
+        }
     }
 }
 

@@ -4,45 +4,54 @@ import * as localforage from "localforage";
 
 export class BrowserFileSystem implements IFileSystem {
     scheme = ["browser"];
-    capabilities() { return { write: true, delete: true }; };
+    capabilities() { return { write: true, delete: true }; }
 
     private lfCache: { [name: string]: LocalForage } = {};
 
-    execute<T>(uri: string, action: (localforage: LocalForage, fsUri: FsUri) => Promise<T>) {
+    prepare(uri: string) {
         var fsUri = new FsUri(uri, 1);
         var name = "kaitai_files" + (fsUri.fsData[0] ? "_" + fsUri.fsData[0] : "");
         if (!this.lfCache[name])
             this.lfCache[name] = localforage.createInstance({ name: name });
-        return action(this.lfCache[name], fsUri);
+        return { lf: this.lfCache[name], fsUri };
     }
 
     async createFolder(uri: string): Promise<void> {
-        await this.execute(uri, (lf, fsUri) => lf.setItem(fsUri.path, null));
+        var { lf, fsUri } = this.prepare(uri);
+        await lf.setItem(fsUri.path, null);
     }
 
-    read(uri: string): Promise<ArrayBuffer> {
-        return this.execute(uri, (lf, fsUri) => lf.getItem(fsUri.path));
+    async read(uri: string): Promise<ArrayBuffer> {
+        var { lf, fsUri } = this.prepare(uri);
+        return await lf.getItem<ArrayBuffer>(fsUri.path);
     }
 
     async write(uri: string, data: ArrayBuffer): Promise<void> {
-        await this.execute(uri, (lf, fsUri) => lf.setItem(fsUri.path, data));
+        var { lf, fsUri } = this.prepare(uri);
+        await lf.setItem(fsUri.path, data);
     }
 
     async delete(uri: string): Promise<void> {
-        await this.execute(uri, (lf, fsUri) => lf.removeItem(fsUri.path));
+        var { lf, fsUri } = this.prepare(uri);
+        if (fsUri.type === "directory") {
+            const keys = await lf.keys();
+            const itemsToDelete = keys.filter(key => key.startsWith(fsUri.path));
+            for (const itemToDelete of itemsToDelete)
+                await lf.removeItem(itemToDelete);
+        } else
+            await lf.removeItem(fsUri.path);
     }
 
-    list(uri: string): Promise<FsItem[]> {
-        return this.execute(uri, async (lf, fsUri) => {
-            let keys = await lf.keys();
-            return FsUri.getChildUris(keys, fsUri).map(uri => new FsItem(uri));
-        });
+    async list(uri: string): Promise<FsItem[]> {
+        var { lf, fsUri } = this.prepare(uri);
+        let keys = await lf.keys();
+        return FsUri.getChildUris(keys, fsUri).map(childUri => new FsItem(childUri));
     }
 }
 
 export class BrowserLegacyFileSystem implements IFileSystem {
     scheme = ["browser_legacy"];
-    capabilities() { return { write: false, delete: true }; };
+    capabilities() { return { write: false, delete: true }; }
 
     createFolder(uri: string): Promise<void> { throw new Error("Not implemented!");  }
     write(uri: string, data: ArrayBuffer): Promise<void> { throw new Error("Not implemented!"); }
@@ -60,6 +69,6 @@ export class BrowserLegacyFileSystem implements IFileSystem {
     async list(uri: string): Promise<FsItem[]> {
         let keys = await localforage.keys();
         var fsKeys = keys.filter(x => x.startsWith("fs_file[")).map(x => "/" + x.substr(8, x.length - 9));
-        return FsUri.getChildUris(fsKeys, new FsUri(uri)).map(uri => new FsItem(uri));
+        return FsUri.getChildUris(fsKeys, new FsUri(uri)).map(childUri => new FsItem(childUri));
     }
 }

@@ -2,7 +2,8 @@
 
 /**
  * Rules:
- *  - path format example: <fsScheme>://<fsData>/<folder>/<subfolder>/<file>
+ *  - uri format example: <fsScheme>://<fsData>/<folder>/<subfolder>/<file>
+ *  - path = /<folder>/<subfolder>/<file>
  *  - if type == "directory" then path.endswith($`/{name}/`) === true
  *     - except for root where path === "/"
  *  - if type == "file" then path.endswith($`/{name}`) === true
@@ -13,7 +14,11 @@ export class FsUri {
     path: string;
     parentPath: string;
     name: string;
+    nameWoExtension: string;
+    extension: string;
     type: "file" | "directory";
+
+    get parentUri() { return this.changePath(this.parentPath); }
 
     constructor(public uri: string, fsDataLen: number = 0, scheme: string = null) {
         var uriParts = uri.split("://", 2);
@@ -37,6 +42,15 @@ export class FsUri {
         var split = this.path.lastIndexOf("/", usableLen);
         this.name = this.path.substring(split + 1, usableLen + 1);
         this.parentPath = this.path.substr(0, split + 1);
+
+        var extIdx = this.name.lastIndexOf(".");
+        if (extIdx === -1) {
+            this.nameWoExtension = this.name;
+            this.extension = null;
+        } else {
+            this.nameWoExtension = this.name.substring(0, extIdx);
+            this.extension = this.name.substring(extIdx + 1);
+        }
     }
 
     addPath(childPath: string) {
