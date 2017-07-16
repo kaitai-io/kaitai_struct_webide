@@ -67,6 +67,6 @@ export class SelectionInput extends Vue {
 
         var start = this.startPart.value;
         var end = this.endPart.value;
-        this.$emit("selectionchanged", start !== null ? start : -1, end === null || end < start ? start : end);
+        this.$emit("selection-changed", start !== null ? start : -1, end === null || end < start ? start : end);
     }
 }
