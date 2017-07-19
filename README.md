@@ -1,5 +1,9 @@
 # Kaitai Struct WebIDE
+
 Online editor / visualizer for Kaitai Struct .ksy files
+
+[![Build Status](https://travis-ci.org/kaitai-io/kaitai_struct_webide.svg?branch=master)](https://travis-ci.org/kaitai-io/kaitai_struct_webide)
+[![Known Vulnerabilities](https://snyk.io/test/github/kaitai-io/kaitai_struct_webide/badge.svg)](https://snyk.io/test/github/kaitai-io/kaitai_struct_webide)
 
 ## features
 
