@@ -114,7 +114,7 @@ class AppController {
             this.compile(ksyContent);
         } else {
             localSettings.latestInputUri = uri;
-            this.setInput(content);
+            this.setInput(content, uri);
         }
     }
 
@@ -148,13 +148,13 @@ class AppController {
         }
     }
 
-    protected async setInput(input: ArrayBufferLike) {
+    protected async setInput(input: ArrayBufferLike, uri: string = null) {
         this.dataProvider = {
             length: input.byteLength,
             get(offset, length) { return new Uint8Array(input, offset, length); }
         };
 
-        this.view.hexViewer.setDataProvider(this.dataProvider);
+        this.view.binaryPanel.setInput(this.dataProvider, uri);
         this.view.converterPanel.model.update(this.dataProvider, 0);
         await this.sandbox.kaitaiServices.setInput(input);
         await this.reparse();

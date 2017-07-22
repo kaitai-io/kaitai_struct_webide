@@ -30,7 +30,7 @@ export class FileUtils {
         });
     }
 
-    static saveFile(filename: string, data: ArrayBufferLike) {
+    static saveFile(filename: string, data: ArrayBufferLike|Uint8Array) {
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style.display = "none";

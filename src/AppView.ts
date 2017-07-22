@@ -9,6 +9,7 @@ import { HexViewer } from "./HexViewer";
 import { FileTree } from "./ui/Parts/FileTree";
 import { ErrorWindow } from "./ui/Parts/ErrorWindow";
 import { DragAndDrop } from "./ui/Components/DragAndDrop";
+import { BinaryPanel } from "./ui/Parts/BinaryPanel";
 
 export class AppView {
     layout: Layout;
@@ -17,6 +18,7 @@ export class AppView {
     ksyEditor: AceAjax.Editor;
     jsCode: AceAjax.Editor;
     jsCodeDebug: AceAjax.Editor;
+    binaryPanel: BinaryPanel;
     hexViewer: HexViewer;
     aboutModal: AboutModal;
     infoPanel: InfoPanel;
@@ -36,7 +38,9 @@ export class AppView {
         this.jsCodeDebug = LayoutHelper.setupEditor(this.layout.jsCodeDebug, "javascript");
         this.aboutModal = new AboutModal();
 
-        this.hexViewer = new HexViewer(this.layout.inputBinary.element);
+        this.binaryPanel = new BinaryPanel();
+        this.binaryPanel.$mount(this.layout.inputBinary.element);
+        this.hexViewer = this.binaryPanel.hexViewer;
         this.layout.inputBinary.container.on("resize", () => this.hexViewer.resize());
 
         this.infoPanel = new InfoPanel();
