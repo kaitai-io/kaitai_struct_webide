@@ -14,6 +14,7 @@
     <link rel="stylesheet" type="text/css" href="css/v2.css" />
     
     <script src="lib/_npm/smooth-scrollbar/smooth-scrollbar.js"></script>
+    <script src="lib/_npm/yamljs/yaml.js"></script>
     <script src="js/extensions.js"></script>
     <script src="js/kaitaiFsFiles.js"></script>
     <script src="js/AmdLoader.js"></script>
@@ -25,6 +26,9 @@
                 jquery: "lib/_npm/jquery/jquery.min",
                 ace: "lib/_npm/ace",
                 bootstrap: "lib/_npm/bootstrap/js/bootstrap.min",
+                "yamljs": "lib/_npm/yamljs/yaml",
+                "KaitaiStream": "lib/_npm/kaitai-struct/KaitaiStream",
+                "kaitai-struct-compiler": "lib/_npm/kaitai-struct-compiler/kaitai-struct-compiler"
             };
             ["bowser", "jstree", "localforage", "goldenlayout", "vue", "dateformat"].forEach(
                 name => loader.paths[name] = `lib/_npm/${name}/${name}`);

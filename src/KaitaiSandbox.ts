@@ -24,3 +24,9 @@ export async function InitKaitaiSandbox() {
     await sandbox.loadScript(new URL("js/worker/worker/KaitaiWorkerV2.js", location.href).href);
     return sandbox;
 }
+
+export async function InitKaitaiWithoutSandbox() {
+    window["api"] = {};
+    await loader.require(["/worker/KaitaiWorkerV2"]);
+    return window["api"];
+}
