@@ -33,6 +33,15 @@
         id: string;
     }
 
+    interface IYamlFieldMeta {
+        lineIdx: number;
+    }
+
+    interface IYamlMeta {
+        lineIdx: number;
+        fields: { [name: string]: IYamlFieldMeta };
+    }
+
     export interface IInstance extends IAttributeLike {
         io?: string;
         pos?: string | number;
@@ -49,6 +58,7 @@
 
         typesByJsName: { [name: string]: IType };
         instancesByJsName: { [name: string]: IInstance };
+        $meta: IYamlMeta;
     }
 
     export interface IKsyFile extends IType {
