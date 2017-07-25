@@ -25,9 +25,6 @@ import { Conversion } from "../../utils/Conversion";
 declare var Scrollbar: any;
 declare var kaitaiFsFiles: string[];
 
-for (var i = 0; i < 200; i++)
-    kaitaiFsFiles.push(`formats/archive/test_${i}.ksy`);
-
 export interface IFsTreeNode extends ITreeNode {
     text: string;
     isFolder: boolean;
