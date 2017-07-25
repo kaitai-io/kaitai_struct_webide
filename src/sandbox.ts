@@ -1,27 +1,33 @@
-import * as Vue from "vue";
-import { componentLoader } from "./ui/ComponentLoader";
-import Component from "./ui/Component";
-import { FileTree, FsTreeNode } from "./ui/Parts/FileTree";
-import * as $ from "jquery";
+import KaitaiStructCompiler = require("kaitai-struct-compiler");
+import KaitaiStream = require("KaitaiStream");
+import { YAML } from "yamljs";
 
-@Component
-class App extends Vue {
-    selectedUri: string = null;
-    get fileTree() { return <FileTree>this.$refs["fileTree"]; }
+declare var kaitaiFsFiles: string[];
 
-    public openFile(fsItem: FsTreeNode, data: ArrayBuffer) {
-        console.log("openFile", fsItem, data);
-        this.selectedUri = fsItem.uri.uri;
+function cloneWithFilter(obj: any, filterFunc: (prop: string) => boolean): any {
+    if (Array.isArray(obj))
+        return obj.map(x => cloneWithFilter(x, filterFunc));
+    else if (typeof obj === "object") {
+        const result = {};
+        for (const key of Object.keys(obj))
+            if(filterFunc(key))
+                result[key] = cloneWithFilter(obj[key], filterFunc);
+        return result;
     }
-
-    public generateParser() {
-        console.log("generateParser", arguments);
-    }
+    else
+        return obj;
 }
 
-componentLoader.load(["Components/TreeView", "Components/ContextMenu", "Components/InputModal", "Parts/FileTree", "Components/DummyComponent"]).then(() => {
-    var app = new App({ el: "#app" });
-    app.fileTree.init();
-    window["app"] = app;
-    //$('body').tooltip({ selector: '[data-toggle="tooltip"]', container: 'body', trigger: "click hover" });
-});
+async function run(){
+    const ksyContent = await (await fetch("template_compiler/test.ksy")).text();
+    const ksy = <KsySchema.IKsyFile>YAML.parse(ksyContent, null, null, true);
+    //const compilerKsy = cloneWithFilter(ksy, prop => !prop.startsWith("$"));
+    //const compiler = new KaitaiStructCompiler();
+    console.log(ksy);
+    //console.log(compilerKsy);
+    //const compiled = await compiler.compile("javascript", compilerKsy, null, false);
+    //ksy.instancesByJsName
+    //console.log(compiled);
+}
+
+run();

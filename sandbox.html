@@ -1,56 +1,20 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Github test</title>
+    <title>Kaitai playground</title>
 	<meta charset="utf-8" />
-    
-    <link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="lib/bootstrap/contextmenu.css" />
-    <link rel="stylesheet" type="text/css" href="lib/font-awesome/font-awesome.min.css" />
-    <link rel="stylesheet" type="text/css" href="lib/smooth-scrollbar/smooth-scrollbar.css">
-    <script src="lib/smooth-scrollbar/smooth-scrollbar.js"></script>
-    
-    <script src="lib/jquery/jquery-3.1.1.min.js"></script>
-    <script src="lib/bootstrap/bootstrap.min.js"></script>
-    <script src="lib/requirejs/require.js"></script>
-    <script src="lib/thenBy/thenBy.js"></script>
-    <script src="js/extensions.js"></script>
     <script src="js/kaitaiFsFiles.js"></script>
-    <script src="lib/date.format/date.format.js"></script>
-    <style>
-        a { color:#d8d8d8 }
-        a:hover { text-decoration:none; }
-        #app { height:500px; }
-        #fileTree { width:200px; display:inline-block; margin:0; margin-left:10px }
-        #info { display:inline-block; vertical-align:top; margin-left:5px }
-    </style>
+    <script src="js/AmdLoader.js"></script>
 </head>
 <body>
-hello66
-
-<div id="app">
-    <file-tree id="fileTree" ref="fileTree" @open-file="openFile" @generate-parser="generateParser"></file-tree>
-    <!--<div style="width: 200px; height: 200px; background: red; overflow: hidden">
-        <dummy-component></dummy-component>
-    </div>-->
-
-    <div id="info">
-        {{selectedUri}}
-    </div>
-    <!--<iframe src="github_oauth.html" style="background:white; position:absolute; top:10px"></iframe>-->
-    <!--<iframe src="https://github.com/login/oauth/authorize?scope=user:email,public_repo&client_id=90e011feac3dced5d059"></iframe>-->
-</div>
-
 <script>
-    var paths = {};
-    ["bowser", "jstree", "localforage", "goldenlayout", "vue", "smooth-scrollbar"].forEach(
-        name => paths[name] = `../lib/${name}/${name}`);
-    paths["jquery"] = "../lib/jquery/jquery-3.1.1.min";
-
-    requirejs.config({ baseUrl: "js/", paths: paths, shim : {
-        //'autorefresh': { deps: ['jquery'] }
-	} });
-    require([/*"autorefresh",*/ "sandbox"]);
+    loader.paths = {
+        "yamljs": "lib/_npm/yamljs/yaml",
+        "KaitaiStream": "lib/_npm/kaitai-struct/KaitaiStream",
+        "kaitai-struct-compiler": "lib/_npm/kaitai-struct-compiler/kaitai-struct-compiler"
+    };
+ 
+    require(["sandbox"]);
 </script>
 </body>
 </html>
