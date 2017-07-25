@@ -13,6 +13,7 @@ import { InitKaitaiSandbox, ParseError } from "./KaitaiSandbox";
 import { Conversion } from "./utils/Conversion";
 import { IDataFiles } from "./utils/FileUtils";
 import { FsUri } from "./FileSystem/FsUri";
+import { EditorChangeHandler } from "./ui/UIHelper";
 
 class AppController {
     view: AppView;
@@ -20,12 +21,14 @@ class AppController {
     dataProvider: IDataProvider;
     exported: IExportedValue;
     parsedMap: ParsedMap;
-    ksyEditorSilentChange = new EventSilencer();
+    ksyChangeHandler: EditorChangeHandler;
+    templateChangeHandler: EditorChangeHandler;
 
     async start() {
         this.initView();
         await this.initWorker();
         await this.openFile(localSettings.latestKsyUri);
+        await this.openFile(localSettings.latestKcyUri);
         await this.openFile(localSettings.latestInputUri);
     }
 
@@ -37,9 +40,10 @@ class AppController {
             this.openFile(treeNode.uri.uri);
         });
 
-        var editDelay = new Delayed(500);
-        this.view.ksyEditor.on("change", () => this.ksyEditorSilentChange.do(() =>
-            editDelay.do(() => this.onKsyChanged(this.view.ksyEditor.getValue()))));
+        this.ksyChangeHandler = new EditorChangeHandler(this.view.ksyEditor, 500, 
+            (newContent, userChange) => this.inputFileChanged("Ksy", newContent, userChange));
+        this.templateChangeHandler = new EditorChangeHandler(this.view.templateEditor, 500, 
+            (newContent, userChange) => this.inputFileChanged("Kcy", newContent, userChange));
 
         this.view.hexViewer.onSelectionChanged = () => {
             this.setSelection(this.view.hexViewer.selectionStart, this.view.hexViewer.selectionEnd);
@@ -99,7 +103,7 @@ class AppController {
     }
 
     protected async initWorker() {
-        this.sandbox = await InitKaitaiSandbox();
+        this.sandbox = await InitKaitaiWithoutSandbox();
 
         var compilerInfo = await this.sandbox.kaitaiServices.getCompilerInfo();
         this.view.aboutModal.compilerVersion = compilerInfo.version;
@@ -107,31 +111,38 @@ class AppController {
     }
 
     async openFile(uri: string) {
+        if (uri === null) return;
+
         let content = await fss.read(uri);
         if (uri.endsWith(".ksy")) {
             localSettings.latestKsyUri = uri;
             const ksyContent = Conversion.utf8BytesToStr(content);
-            this.compile(ksyContent);
+            this.ksyChangeHandler.setContent(ksyContent);
+        } else if (uri.endsWith(".kcy")) {
+            localSettings.latestKcyUri = uri;
+            const tplContent = Conversion.utf8BytesToStr(content);
+            this.templateChangeHandler.setContent(tplContent);
         } else {
             localSettings.latestInputUri = uri;
             this.setInput(content, uri);
         }
     }
 
-    protected async onKsyChanged(ksyContent: string) {
-        localSettings.latestKsyUri = await this.view.fileTree.writeFile(
-            localSettings.latestKsyUri, Conversion.strToUtf8Bytes(ksyContent), false);
+    async inputFileChanged(type: "Ksy" | "Kcy", newContent: string, userChange: boolean) {
+        const settingKey = `latest${type}Uri`;
+        if (userChange)
+            localSettings[settingKey] = await this.view.fileTree.writeFile(
+                localSettings[settingKey], Conversion.strToUtf8Bytes(newContent), false);
 
-        return await this.compile(ksyContent);
+        await this.recompile();
     }
 
-    protected async compile(ksyContent: string) {
-        if (this.view.ksyEditor.getValue() !== ksyContent)
-            this.ksyEditorSilentChange.silenceThis(() => this.view.ksyEditor.setValue(ksyContent, -1));
-
+    protected async recompile() {
         try {
             this.view.hideErrors();
-            var compilationResult = await this.sandbox.kaitaiServices.compile(ksyContent);
+            const ksyContent = this.ksyChangeHandler.getContent();
+            const template = this.templateChangeHandler.getContent();
+            var compilationResult = await this.sandbox.kaitaiServices.compile(ksyContent, template);
             console.log("compilationResult", compilationResult);
             this.view.jsCode.setValue(Object.values(compilationResult.releaseCode).join("\n"), -1);
             this.view.jsCodeDebug.setValue(compilationResult.debugCodeAll, -1);

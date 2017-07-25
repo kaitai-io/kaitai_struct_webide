@@ -7,6 +7,7 @@ export class Layout {
     files: Container;
     fileTree: Component;
     ksyEditor: Component;
+    templateEditor: Component;
     objectTree: Component;
     infoPanel: Component;
     converterPanel: Component;
@@ -24,7 +25,10 @@ export class Layout {
                 .addVertical(errorArea => errorArea
                     .addHorizontal(middleArea => middleArea
                         .addVertical(middleCol => middleCol
-                            .addComponent(".ksy editor", c => this.ksyEditor = c)
+                            .addTabs(ksyTab => ksyTab
+                                .addComponent(".ksy editor", c => this.ksyEditor = c)
+                                .addComponent("template editor", c => this.templateEditor = c)
+                            )
                             .addComponent("object tree", c => this.objectTree = c)
                         )
                         .addVertical(rightCol => rightCol.setConfig({ width: 48 })

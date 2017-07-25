@@ -50,7 +50,7 @@ export interface ISandboxMethods {
 type ITextFiles = { [fileName:string]: string };
 
 export interface IKaitaiServices {
-    compile(code: string): Promise<{
+    compile(code: string, template?: string): Promise<{
         releaseCode: ITextFiles,
         debugCode: ITextFiles,
         debugCodeAll: string,

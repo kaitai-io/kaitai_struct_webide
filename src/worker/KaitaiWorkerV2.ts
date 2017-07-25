@@ -10,8 +10,6 @@ import { JsonExporter } from "./JsonExporter";
 import { SchemaUtils } from "./SchemaUtils";
 
 class KaitaiServices implements IKaitaiServices {
-    compiler: KaitaiStructCompiler;
-
     ksyCode: string;
     ksy: KsySchema.IKsyFile;
     jsCode: string;
@@ -24,8 +22,7 @@ class KaitaiServices implements IKaitaiServices {
 
     objectExporter: ObjectExporter;
 
-    constructor() {
-        this.compiler = new KaitaiStructCompiler();
+    constructor(public compiler: ICompiler) {
     }
 
     public async compile(ksyCode: string) {
@@ -92,7 +89,7 @@ class KaitaiServices implements IKaitaiServices {
 
 declare var api: any;
 try {
-    var kaitaiServices = api.kaitaiServices = new KaitaiServices();
+    var kaitaiServices = api.kaitaiServices = new KaitaiServices(new KaitaiStructCompiler());
     console.log("Kaitai Worker V2!", api);
 } catch(e) {
     console.log("Worker error", e);

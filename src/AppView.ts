@@ -16,6 +16,7 @@ export class AppView {
 
     fileTree: FileTree;
     ksyEditor: AceAjax.Editor;
+    templateEditor: AceAjax.Editor;
     jsCode: AceAjax.Editor;
     jsCodeDebug: AceAjax.Editor;
     binaryPanel: BinaryPanel;
@@ -34,6 +35,7 @@ export class AppView {
         this.fileTree.$mount(this.layout.fileTree.element);
 
         this.ksyEditor = LayoutHelper.setupEditor(this.layout.ksyEditor, "yaml");
+        this.templateEditor = LayoutHelper.setupEditor(this.layout.templateEditor, "yaml");
         this.jsCode = LayoutHelper.setupEditor(this.layout.jsCode, "javascript");
         this.jsCodeDebug = LayoutHelper.setupEditor(this.layout.jsCodeDebug, "javascript");
         this.aboutModal = new AboutModal();

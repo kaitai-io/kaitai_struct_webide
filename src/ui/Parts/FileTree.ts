@@ -249,8 +249,12 @@ export class FileTree extends Vue {
     }
 
     public async createKsyFile(name: string) {
-        var content = `meta:\n  id: ${name}\n  file-extension: ${name}\n`;
-        await this.uploadFiles({ [`${name}.ksy`]: Conversion.strToUtf8Bytes(content) });
+        if (name.endsWith(".kcy")) {
+            await this.uploadFiles({ [name]: Conversion.strToUtf8Bytes("") });
+        } else {
+            var content = `meta:\n  id: ${name}\n  file-extension: ${name}\n`;
+            await this.uploadFiles({ [`${name}.ksy`]: Conversion.strToUtf8Bytes(content) });
+        }
     }
 
     public async cloneFile() {
