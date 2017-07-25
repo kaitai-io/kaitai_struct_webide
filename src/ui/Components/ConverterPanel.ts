@@ -9,7 +9,7 @@ export class Converter {
     static numConv(data: Uint8Array, len: number, signed: boolean, bigEndian: boolean): string {
         if (len > data.length) return "";
 
-        var arr = data.subarray(0, len);
+        var arr = data.slice(0, len);
 
         if (!bigEndian)
             arr = arr.reverse();
@@ -61,11 +61,13 @@ export class ConverterPanelModel {
 
         var data = dataProvider.get(offset, Math.min(dataProvider.length - offset, 64)).slice(0);
 
-        [1, 2, 4, 8].forEach(len => [false, true].forEach(signed => [false, true].forEach(bigEndian => {
-            var convRes = Converter.numConv(data, len, signed, bigEndian);
-            var propName = `${signed ? "s" : "u"}${len * 8}${len === 1 ? "" : bigEndian ? "be" : "le"}`;
-            this[propName] = convRes;
-        })));
+        for (const len of [1, 2, 4, 8])
+            for (const signed of [false, true])
+                for (const bigEndian of [false, true]) {
+                    var convRes = Converter.numConv(data, len, signed, bigEndian);
+                    var propName = `${signed ? "s" : "u"}${len * 8}${len === 1 ? "" : bigEndian ? "be" : "le"}`;
+                    this[propName] = convRes;
+                }
 
         this.float = data.length >= 4 ? "" + new Float32Array(data.buffer.slice(0, 4))[0] : "";
         this.double = data.length >= 8 ? "" + new Float64Array(data.buffer.slice(0, 8))[0] : "";
