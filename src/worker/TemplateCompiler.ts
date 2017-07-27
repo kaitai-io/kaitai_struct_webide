@@ -1,3 +1,6 @@
+import { AstNode, AstNodeType } from "./ExpressionLanguage/Parser";
+import { ExpressionParser } from "./ExpressionLanguage/ExpressionParser";
+
 export interface ITemplateSchema {
     templates: { [name: string]: string };
 }
@@ -20,10 +23,10 @@ class TemplatePart {
     type: "text"|"template"|"for"|"if"|"closeNode";
 
     textValue: string;
-    for: { item: string, expr: string };
-    if: { expr: string };
-    closeNode: { tag: string };
-    template: { expr: string, formatter: string };
+    for: { itemName: string, array: AstNode };
+    if: { condition: AstNode };
+    closeNode: { tag: "for"|"if" };
+    template: { expr: AstNode };
 
     constructor(public value: string, isText: boolean) {
         let match;
@@ -33,16 +36,16 @@ class TemplatePart {
         }
         else if (match = /for ([a-zA-Z]+) in (.*)/.exec(value)) {
             this.type = "for";
-            this.for = { item: match[1], expr: match[2] };
+            this.for = { itemName: match[1], array: ExpressionParser.parse(match[2]) };
         } else if (match = /if (.*)/.exec(value)) {
             this.type = "if";
-            this.if = { expr: match[1] };
+            this.if = { condition: ExpressionParser.parse(match[1]) };
         } else if (match = /\/(for|if)/.exec(value)) {
             this.type = "closeNode";
-            this.closeNode = { tag: match[1] };
-        } else if (match = /(.*)(?:\|(.*))?$/.exec(value)) {
+            this.closeNode = { tag: <"for"|"if">match[1] };
+        } else {
             this.type = "template";
-            this.template = { expr: match[1], formatter: match[2] };
+            this.template = { expr: ExpressionParser.parse(value) };
         }
     }
 
@@ -77,21 +80,87 @@ export class TemplateCompiler {
 
     static compileTemplate(template: string) {
         const parts = template.split(/\{\{(.*?)\}\}/).map((x,i) => new TemplatePart(x, i % 2 == 0));
-        const exprs = parts.map(x => x.for && x.for.expr || x.if && x.if.expr || x.template && x.template.expr).filter(x => x);
-        console.log("exprs", exprs);
+        const exprs = parts.map(x => x.for && x.for.array || x.if && x.if.condition || x.template && x.template.expr).filter(x => x);
+        //console.log("exprs", exprs);
         //for (let part of parts)
         //    console.log(part.type, part.for || part.if || part.template || part.closeNode);
         
         const rootNode = this.templateListToTree(parts);
-        console.log(rootNode.repr());
+        //console.log(rootNode.repr());
         return rootNode;
+    }
+
+    static astToJs(ast: AstNode): string {
+        if (ast.type === AstNodeType.Identifier)
+            return ast.identifier;
+        else if (ast.type === AstNodeType.OperatorList)
+            return ast.operands.reduce((prev, curr) => 
+                `${prev}${curr.operator ? curr.operator.text : ""}${this.astToJs(curr.operand)}` , "");
+        else if (ast.type === AstNodeType.Function)
+            return `${this.astToJs(ast.function)}(${ast.arguments.map(arg => this.astToJs(arg)).join(', ')})`;
+        else
+            throw new Error(`Unhandled AST type: ${ast.type}!`);
+    }
+
+    static escapeJsString(str: string) {
+         // TODO replace others
+        const charsToQuote = ["'", "\"", "\\n", "\\r", "\\t", "\\v"];
+        return charsToQuote.reduce((prev, char) => prev.replace(new RegExp(char, "g"), "\\" + char), str);
+    }
+
+    static templateNodeToJs(node: TemplateNode, padding = "") {
+        let result = padding;
+
+        if (node.value) {
+            if (node.value.type === "text")
+                result += `print('${this.escapeJsString(node.value.textValue)}');`;
+            else if (node.value.type === "for")
+                result += `for (let ${node.value.for.itemName} of ${this.astToJs(node.value.for.array)})`;
+            else if (node.value.type === "if")
+                result += `if (${this.astToJs(node.value.if.condition)})`;
+            else if (node.value.type === "template")
+                result += `print(${this.astToJs(node.value.template.expr)});`;
+            else
+                throw new Error(`Unhandled template node type: ${node.value.type}!`);
+        }
+
+        if (node.children && node.children.length > 0)
+            result += ` {\n${node.children.map(x => padding + this.templateNodeToJs(x, padding + "  ")).join('')}${padding}}\n`;
+        else
+            result += "\n";
+
+        return result;
+    }
+
+    static templateNodeToJs2(node: TemplateNode, padding = "") {
+        let result = padding;
+
+        const children = node.children && node.children.length > 0 ? 
+            node.children.map(x => this.templateNodeToJs2(x)).join("") : "";
+
+        if (node.value) {
+            if (node.value.type === "text")
+                result += node.value.textValue;
+            else if (node.value.type === "for")
+                result += `\${${this.astToJs(node.value.for.array)}.map(${node.value.for.itemName} => \`${children}\`).join("")}`;
+            else if (node.value.type === "if")
+                result += `\${${this.astToJs(node.value.if.condition)} ? \`${children}\` : ""}`;
+            else if (node.value.type === "template")
+                result += `\${${this.astToJs(node.value.template.expr)}}`;
+            else
+                throw new Error(`Unhandled template node type: ${node.value.type}!`);
+        }
+        else
+            result = children;
+
+        return result;
     }
 
     async compile(templateSchema: ITemplateSchema, compilerSchema: KsySchema.IKsyFile, jsImporter: IYamlImporter, isDebug: boolean): Promise<{ [filename: string]: string; }> {
         console.log("TemplateCompiler", templateSchema, compilerSchema);
         for (let tpl of Object.values(templateSchema.templates)) {
             const rootNode = TemplateCompiler.compileTemplate(tpl);
-            console.log(rootNode);
+            //console.log(rootNode);
         }
         return { };
     }
