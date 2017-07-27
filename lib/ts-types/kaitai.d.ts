@@ -8,14 +8,8 @@ interface IYamlImporter {
     importYaml(name: string, mode: string): Promise<any>;
 }
 
-interface ICompiler {
-    version: string;
-    buildDate: string;
-    compile(kslang: string, compilerSchema: any, jsImporter: IYamlImporter, isDebug: boolean): Promise<{ [filename: string]: string }>;
-}
-
 declare module "kaitai-struct-compiler" {
-    class KaitaiStructCompiler implements ICompiler {
+    class KaitaiStructCompiler {
         version: string;
         buildDate: string;
         compile(kslang: string, compilerSchema: any, jsImporter: IYamlImporter, isDebug: boolean): Promise<{ [filename: string]: string }>;

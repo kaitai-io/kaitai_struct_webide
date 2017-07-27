@@ -8,8 +8,12 @@ import { ObjectExporter } from "./ObjectExporter";
 import { IKaitaiServices, IKsyTypes } from "./WorkerShared";
 import { JsonExporter } from "./JsonExporter";
 import { SchemaUtils } from "./SchemaUtils";
+import { TemplateCompiler } from "./TemplateCompiler";
 
 class KaitaiServices implements IKaitaiServices {
+    kaitaiCompiler: KaitaiStructCompiler;
+    templateCompiler: TemplateCompiler;
+
     ksyCode: string;
     ksy: KsySchema.IKsyFile;
     jsCode: string;
@@ -22,15 +26,25 @@ class KaitaiServices implements IKaitaiServices {
 
     objectExporter: ObjectExporter;
 
-    constructor(public compiler: ICompiler) {
+    constructor() {
+        this.kaitaiCompiler = new KaitaiStructCompiler();
+        this.templateCompiler = new TemplateCompiler();
     }
 
-    public async compile(ksyCode: string) {
+    public async compile(ksyCode: string, template: string) {
         this.ksyCode = ksyCode;
         this.ksy = YAML.parse(ksyCode);
 
-        var releaseCode = await this.compiler.compile("javascript", this.ksy, null, false);
-        var debugCode = await this.compiler.compile("javascript", this.ksy, null, true);
+        if (template) {
+            const templateSchema = YAML.parse(template);
+            var releaseCode = await this.templateCompiler.compile(templateSchema, this.ksy, null, false);
+            var debugCode = await this.templateCompiler.compile(templateSchema, this.ksy, null, true);
+        }
+        else {
+            var releaseCode = await this.kaitaiCompiler.compile("javascript", this.ksy, null, false);
+            var debugCode = await this.kaitaiCompiler.compile("javascript", this.ksy, null, true);
+        }
+
         var debugCodeAll = this.jsCode = (<any>Object).values(debugCode).join("\n");
 
         this.classes = {};
@@ -71,12 +85,12 @@ class KaitaiServices implements IKaitaiServices {
     }
 
     async getCompilerInfo() {
-        return { version: this.compiler.version, buildDate: this.compiler.buildDate };
+        return { version: this.kaitaiCompiler.version, buildDate: this.kaitaiCompiler.buildDate };
     }
 
     async generateParser(ksyContent: string, lang: string, debug: boolean): Promise<{ [fileName: string]: string; }> {
         const ksy = YAML.parse(ksyContent);
-        const compiledCode = await this.compiler.compile(lang, ksy, null, debug);
+        const compiledCode = await this.kaitaiCompiler.compile(lang, ksy, null, debug);
         return compiledCode;
     }
 
@@ -89,7 +103,7 @@ class KaitaiServices implements IKaitaiServices {
 
 declare var api: any;
 try {
-    var kaitaiServices = api.kaitaiServices = new KaitaiServices(new KaitaiStructCompiler());
+    var kaitaiServices = api.kaitaiServices = new KaitaiServices();
     console.log("Kaitai Worker V2!", api);
 } catch(e) {
     console.log("Worker error", e);
