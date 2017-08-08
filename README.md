@@ -15,7 +15,7 @@ Online editor / visualizer for Kaitai Struct .ksy files
 
 ## demo
 
-[https://kt.pe/kaitai_struct_webide/](https://kt.pe/kaitai_struct_webide/)
+[ide.kaitai.io](https://ide.kaitai.io/)
 
 ## run locally (without compiling / modifying the source code)
 
