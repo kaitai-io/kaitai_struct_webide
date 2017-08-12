@@ -19,11 +19,14 @@ export class EditorChangeHandler {
     constructor(public editor: AceAjax.Editor, delay: number, public changeCallback: (newContent: string, userChange: boolean) => void) {
         this.editDelay = new Delayed(delay);
 
-        this.editor.on("change", () => this.editDelay.do(() =>
-            this.changeCallback(this.editor.getValue(), !this.internalChange)));
+        if (this.editor)
+            this.editor.on("change", () => this.editDelay.do(() =>
+                this.changeCallback(this.editor.getValue(), !this.internalChange)));
     }
 
     setContent(newContent: string) {
+        if (!this.editor) return;
+
         if (this.editor.getValue() !== newContent) {
             this.internalChange = true;
             this.editor.setValue(newContent, -1);
@@ -32,6 +35,6 @@ export class EditorChangeHandler {
     }
 
     getContent() {
-        return this.editor.getValue();
+        return this.editor ? this.editor.getValue() : "";
     }
 }

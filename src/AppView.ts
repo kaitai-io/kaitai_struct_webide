@@ -35,7 +35,8 @@ export class AppView {
         this.fileTree.$mount(this.layout.fileTree.element);
 
         this.ksyEditor = LayoutHelper.setupEditor(this.layout.ksyEditor, "yaml");
-        this.templateEditor = LayoutHelper.setupEditor(this.layout.templateEditor, "yaml");
+        if (this.layout.templateEditor)
+            this.templateEditor = LayoutHelper.setupEditor(this.layout.templateEditor, "yaml");
         this.jsCode = LayoutHelper.setupEditor(this.layout.jsCode, "javascript");
         this.jsCodeDebug = LayoutHelper.setupEditor(this.layout.jsCodeDebug, "javascript");
         this.aboutModal = new AboutModal();

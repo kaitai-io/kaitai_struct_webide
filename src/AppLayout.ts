@@ -16,7 +16,7 @@ export class Layout {
     inputBinary: Component;
     errors: ClosableComponent;
 
-    constructor() {
+    constructor(enableTemplateEditor = false) {
         this.manager = new LayoutManager();
 
         this.manager.root
@@ -25,10 +25,11 @@ export class Layout {
                 .addVertical(errorArea => errorArea
                     .addHorizontal(middleArea => middleArea
                         .addVertical(middleCol => middleCol
-                            .addTabs(ksyTab => ksyTab
-                                .addComponent(".ksy editor", c => this.ksyEditor = c)
-                                .addComponent("template editor", c => this.templateEditor = c)
-                            )
+                            .addTabs(ksyTab => {
+                                if (enableTemplateEditor)
+                                    ksyTab = ksyTab.addComponent("template editor", c => this.templateEditor = c);
+                                return ksyTab.addComponent(".ksy editor", c => this.ksyEditor = c);
+                            })
                             .addComponent("object tree", c => this.objectTree = c)
                         )
                         .addVertical(rightCol => rightCol.setConfig({ width: 48 })
