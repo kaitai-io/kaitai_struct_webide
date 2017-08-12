@@ -53,7 +53,7 @@ export class SelectionInput extends Vue {
     }
 
     setAddrInput(ctrl: SelectionInputPart, value: number) {
-        var newValue = value < 0 ? 0 : value >= this.maxLength ? this.maxLength - 1 : value;
+        const newValue = value < 0 ? 0 : value >= this.maxLength ? this.maxLength - 1 : value;
         ctrl.text = newValue === null ? "" : this.useHexAddr ? `0x${newValue.toString(16)}` : `${newValue}`;
     }
 
@@ -67,6 +67,7 @@ export class SelectionInput extends Vue {
 
         var start = this.startPart.value;
         var end = this.endPart.value;
-        this.$emit("selection-changed", start !== null ? start : -1, end === null || end < start ? start : end);
+        if (ctrl.focused)
+            this.$emit("selection-changed", start !== null ? start : -1, end === null || end < start ? start : end);
     }
 }

@@ -79,7 +79,6 @@ class AppController {
 
     protected async setSelection(start: number, end: number, origin?: "ParsedTree"|"HexViewer"|"InfoPanel"|"Reparse") {
         if (this.blockSelection || end < start) return;
-        if (localSettings.latestSelection.start === start && localSettings.latestSelection.end === end && origin !== "Reparse") return;
         this.blockSelection = true;
 
         try {
