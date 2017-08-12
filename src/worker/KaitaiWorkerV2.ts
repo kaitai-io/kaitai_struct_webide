@@ -103,7 +103,7 @@ class KaitaiServices implements IKaitaiServices {
             curr = curr[item];
         }
 
-        return this.objectExporter.exportValue(curr, parent._debug[path.last()], path);
+        return this.objectExporter.exportValue(curr, parent._debug["_m_" + path.last()], path);
     }
 
     async getCompilerInfo() {

@@ -7,13 +7,8 @@ interface IParsedTreeInterval extends IInterval {
 
 export class ParsedMap {
     intervalHandler = new IntervalHandler<IParsedTreeInterval>();
-    intervals: IParsedTreeInterval[] = [];
-    unparsed: IInterval[];
-    byteArrays: IInterval[];
-
-    constructor(public root: IExportedValue) {
-        this.fillIntervals(root);
-    }
+    unparsed: IInterval[] = [];
+    byteArrays: IInterval[] = [];
 
     private static collectAllObjects(root: IExportedValue): IExportedValue[] {
         var objects: IExportedValue[] = [];
@@ -30,10 +25,23 @@ export class ParsedMap {
         return objects;
     }
 
-    fillIntervals(value: IExportedValue) {
-        var isInstance = false; // TODO
+    protected recalculateUnusedParts() {
+        // TODO: optimize this, not to recalculate all the parts
+        let lastEnd = -1;
+        const unparsed: IInterval[] = [];
+        for (var i of this.intervalHandler.sortedItems){
+            if (i.start !== lastEnd + 1)
+                unparsed.push({ start: lastEnd + 1, end: i.start - 1 });
+
+            lastEnd = i.end;
+        }
+        this.unparsed = unparsed;
+    }
+
+    public addObject(value: IExportedValue) {
         var objects = ParsedMap.collectAllObjects(value);
 
+        const newIntervals = [];
         var lastEnd = -1;
         for (let exp of objects) {
             if (!(exp.type === ObjectType.Primitive || exp.type === ObjectType.TypedArray)) continue;
@@ -43,28 +51,19 @@ export class ParsedMap {
             if (start <= lastEnd || start > end) continue;
             lastEnd = end;
 
-            this.intervals.push(<IParsedTreeInterval>{ start: start, end: end, exp: exp });
+            newIntervals.push(<IParsedTreeInterval>{ start: start, end: end, exp: exp });
         }
 
-        if (!isInstance) {
-            var unparsed: IInterval[] = [];
-
-            lastEnd = -1;
-            for (var i of this.intervals){
-                if (i.start !== lastEnd + 1)
-                    unparsed.push({ start: lastEnd + 1, end: i.start - 1 });
-
-                lastEnd = i.end;
-            }
-
-            this.unparsed = unparsed;
-            this.byteArrays = objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64).
-                map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1 }));
+        if (this.intervalHandler.sortedItems.length + newIntervals.length > 400000) {
+            console.warn("Too many items for interval tree: " + this.intervalHandler.sortedItems.length);
+            return;
         }
-
-        if (this.intervals.length > 400000)
-            console.warn("Too many items for interval tree: " + this.intervals.length);
         else
-            this.intervalHandler.addSorted(this.intervals);
+            this.intervalHandler.addSorted(newIntervals);
+
+        this.byteArrays.push(...objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64).
+            map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1 })));
+
+        this.recalculateUnusedParts();
     }
 }

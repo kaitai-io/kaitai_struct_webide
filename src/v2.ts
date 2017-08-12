@@ -174,23 +174,36 @@ class AppController {
         await this.reparse();
     }
 
+    protected onNewObjectExported(obj: IExportedValue) {
+        this.parsedMap.addObject(obj);
+        this.view.infoPanel.unparsed = this.parsedMap.unparsed;
+        this.view.infoPanel.byteArrays = this.parsedMap.byteArrays;
+        this.view.hexViewer.setIntervals(this.parsedMap.intervalHandler);
+    }
+
     protected async reparse() {
         try {
             await this.sandbox.kaitaiServices.parse();
         } finally {
+            const exportStartTime = performance.now();
             this.exported = await this.sandbox.kaitaiServices.export(this.view.infoPanel.disableLazyParsing);
-            console.log("exported", this.exported);
+            console.log("exported", this.exported, `${performance.now() - exportStartTime}ms`);
             if (!this.exported) return;
             Object.freeze(this.exported); // prevent Vue from converting this object to an observable one
 
-            this.parsedMap = new ParsedMap(this.exported);
-            this.view.infoPanel.unparsed = this.parsedMap.unparsed;
-            this.view.infoPanel.byteArrays = this.parsedMap.byteArrays;
-            this.view.hexViewer.setIntervals(this.parsedMap.intervalHandler);
+            const parseMapStartTime = performance.now();
+            this.parsedMap = new ParsedMap();
+            this.onNewObjectExported(this.exported);
+            console.log("parsed", `${performance.now() - parseMapStartTime}ms`);
+
             this.view.parsedTree.rootNode = null;
             await this.view.nextTick(() => {
                 var rootNode = this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode(null, "", this.exported));
-                rootNode.loadInstance = async (path) => this.sandbox.kaitaiServices.exportInstance(path);
+                rootNode.loadInstance = async (path) => {
+                    const instanceExport = await this.sandbox.kaitaiServices.exportInstance(path);
+                    this.onNewObjectExported(instanceExport);
+                    return instanceExport;
+                };
             });
             this.setSelection(localSettings.latestSelection.start, localSettings.latestSelection.end, "Reparse");
         }
