@@ -24,6 +24,23 @@ export class ObjectExporter {
             return ObjectType.Object;
     }
 
+    exportProperty(obj: any, propName: string, objPath: string[], noLazy: boolean) {
+        let propertyValue = undefined;
+        let propertyException = null;
+        try {
+            propertyValue = obj[propName];
+        } catch(e) {
+            propertyException = e;
+            try {
+                propertyValue = obj[propName];
+            } catch (e2) { /* same as previous or does not happen */ }
+        }
+
+        const exportedProperty = this.exportValue(propertyValue, obj._debug["_m_" + propName], objPath.concat(propName), noLazy);
+        exportedProperty.exception = propertyException;
+        return exportedProperty;
+    }
+
     exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boolean): IExportedValue {
         var result = <IExportedValue>{
             start: debug && debug.start,
@@ -79,8 +96,10 @@ export class ObjectExporter {
                 var ksyInstanceData = ksyType && ksyType.instancesByJsName[propName];
                 var eagerLoad = ksyInstanceData && ksyInstanceData["-webide-parse-mode"] === "eager";
 
-                if (eagerLoad || noLazy)
-                    result.object.fields[propName] = this.exportValue(obj[propName], obj._debug["_m_" + propName], path.concat(propName), noLazy);
+                if (eagerLoad || noLazy) {
+                    const exportedProperty = this.exportProperty(obj, propName, path, noLazy);
+                    result.object.fields[propName] = exportedProperty;
+                }
                 else
                     result.object.instances[propName] = <IInstance>{ path: path.concat(propName), offset: 0 };
             });

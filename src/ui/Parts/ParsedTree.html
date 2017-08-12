@@ -18,36 +18,40 @@
                     <template v-if="_.model.isUnloadedInstance">
                         {{_.model.name}}
                     </template>
-                    <template v-else-if="_.model.value.type === 'Object'">
-                        {{_.model.name}}
-                        [<span class="className">{{_.model.value.object.class}}</span>]
-                    </template>
-                    <template v-else-if="_.model.value.type === 'Array'">
-                        {{_.model.name}}
-                        ({{_.model.value.arrayItems.length}})
-                    </template>
-                    <template v-else-if="_.model.value.type === 'TypedArray'">
-                        <span class="propName">{{_.model.name}}</span>
-                        = {{_.model.bytesPreview}}
-                    </template>
                     <template v-else>
-                        <span class="propName">{{_.model.name}}</span>
-                        =
-                        <template if="_.model.value.type === 'Primitive'">
-                            <template v-if="_.model.value.enumStringValue"><!--nobr-->
-                                {{_.model.value.enumStringValue}}
-                                <span class="intVal">
-                                    ({{_.model.hexStrValue}} = {{_.model.value.primitiveValue}})
-                                </span><!--nobr-->
-                            </template><!--nobr-->
-                            <template v-else-if="Number.isInteger(_.model.value.primitiveValue)"><!--nobr-->
-                                {{_.model.hexStrValue}}<!--nobr-->
-                                <span class="intVal"> = {{_.model.value.primitiveValue}}</span><!--nobr-->
-                            </template><!--nobr-->
-                            <template v-else><!--nobr-->
-                                {{_.model.value.primitiveValue}}<!--nobr-->
-                            </template><!--nobr-->
+                        <template v-if="_.model.value.type === 'Object'">
+                            {{_.model.name}}
+                            [<span class="className">{{_.model.value.object.class}}</span>]
                         </template>
+                        <template v-else-if="_.model.value.type === 'Array'">
+                            {{_.model.name}}
+                            ({{_.model.value.arrayItems.length}})
+                        </template>
+                        <template v-else-if="_.model.value.type === 'TypedArray'">
+                            <span class="propName">{{_.model.name}}</span>
+                            = {{_.model.bytesPreview}}
+                        </template>
+                        <template v-else>
+                            <span class="propName">{{_.model.name}}</span>
+                            =
+                            <template if="_.model.value.type === 'Primitive'">
+                                <template v-if="_.model.value.enumStringValue"><!--nobr-->
+                                    {{_.model.value.enumStringValue}}
+                                    <span class="intVal">
+                                        ({{_.model.hexStrValue}} = {{_.model.value.primitiveValue}})
+                                    </span><!--nobr-->
+                                </template><!--nobr-->
+                                <template v-else-if="Number.isInteger(_.model.value.primitiveValue)"><!--nobr-->
+                                    {{_.model.hexStrValue}}<!--nobr-->
+                                    <span class="intVal"> = {{_.model.value.primitiveValue}}</span><!--nobr-->
+                                </template><!--nobr-->
+                                <template v-else><!--nobr-->
+                                    {{_.model.value.primitiveValue}}<!--nobr-->
+                                </template><!--nobr-->
+                            </template>
+                        </template>
+                        <i v-if="_.model.value.exception" class="loadingFailed fa fa-exclamation-triangle" 
+                            :title="_.model.exceptionText" data-toggle="tooltip"></i>                 
                     </template>
                 </a>
             </template>

@@ -186,7 +186,7 @@ class AppController {
             await this.sandbox.kaitaiServices.parse();
         } finally {
             const exportStartTime = performance.now();
-            this.exported = await this.sandbox.kaitaiServices.export(this.view.infoPanel.disableLazyParsing);
+            this.exported = await this.sandbox.kaitaiServices.export({ noLazy: this.view.infoPanel.disableLazyParsing });
             console.log("exported", this.exported, `${performance.now() - exportStartTime}ms`);
             if (!this.exported) return;
             Object.freeze(this.exported); // prevent Vue from converting this object to an observable one
@@ -200,7 +200,7 @@ class AppController {
             await this.view.nextTick(() => {
                 var rootNode = this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode(null, "", this.exported));
                 rootNode.loadInstance = async (path) => {
-                    const instanceExport = await this.sandbox.kaitaiServices.exportInstance(path);
+                    const instanceExport = await this.sandbox.kaitaiServices.export({ path });
                     this.onNewObjectExported(instanceExport);
                     return instanceExport;
                 };

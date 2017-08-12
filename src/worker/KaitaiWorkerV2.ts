@@ -5,7 +5,7 @@ import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");
 import { YAML } from "yamljs";
 import { ObjectExporter } from "./ObjectExporter";
-import { IKaitaiServices, IKsyTypes } from "./WorkerShared";
+import { IKaitaiServices, IKsyTypes, IExportOptions } from "./WorkerShared";
 import { JsonExporter } from "./JsonExporter";
 import { SchemaUtils } from "./SchemaUtils";
 import { TemplateCompiler } from "./TemplateCompiler";
@@ -88,22 +88,20 @@ class KaitaiServices implements IKaitaiServices {
         console.log("parsed", this.parsed);
     }
 
-    async export(noLazy: boolean) {
+    async export(options?: IExportOptions) {
         if (!this.initCode()) return null;
 
-        return this.objectExporter.exportValue(this.parsed, null, [], noLazy);
-    }
+        options = options || {};
+        if (options.path) {
+            let propName = options.path.pop();
 
-    async exportInstance(path: string[]) {
-        let curr = this.parsed;
-        let parent = null;
+            let parent = this.parsed;
+            for (const item of options.path)
+                parent = parent[item];
 
-        for (const item of path) {
-            parent = curr;
-            curr = curr[item];
-        }
-
-        return this.objectExporter.exportValue(curr, parent._debug["_m_" + path.last()], path);
+            return this.objectExporter.exportProperty(parent, propName, options.path, options.noLazy);
+        } else
+            return this.objectExporter.exportValue(this.parsed, null, [], options.noLazy);
     }
 
     async getCompilerInfo() {
