@@ -30,17 +30,19 @@ async function run() {
     }
     
     const ksyContent = await (await fetch("template_compiler/test.ksy")).text();
-    const templateContent = await (await fetch("template_compiler/test.kcy")).text();
+    const templateContent = await (await fetch("template_compiler/test.kcy.yaml")).text();
     const ksy = <KsySchema.IKsyFile>YAML.parse(ksyContent, null, null, true);
     const kcy = <ITemplateSchema>YAML.parse(templateContent);
 
-    let templates = {};
-    for (let name of Object.keys(kcy.templates)){ 
-        const template = templates[name] = TemplateCompiler.compileTemplate(kcy.templates[name]);
-        const jsCode = TemplateCompiler.templateNodeToJs2(template);
-        console.log(`templates[${name}]\n${jsCode}`);
-    }
-    //console.log("templates", templates);
+    const compiledTemplate = TemplateCompiler.compileTemplateSchema(kcy);
+    console.log("compiledTemplate", compiledTemplate);
+
+    const ksyAny = <any>ksy;
+    ksyAny.name = ksy.meta.id.ucFirst();
+    const compiledCode = compiledTemplate.main(ksyAny);
+    console.log("compiledCode", compiledCode);
+
+    console.log("ksy", ksy);
 
     //const compilerKsy = cloneWithFilter(ksy, prop => !prop.startsWith("$"));
     //const compiler = new KaitaiStructCompiler();

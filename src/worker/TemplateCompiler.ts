@@ -1,8 +1,13 @@
 import { AstNode, AstNodeType } from "./ExpressionLanguage/Parser";
 import { ExpressionParser } from "./ExpressionLanguage/ExpressionParser";
 
+export interface ITemplate {
+    arguments: string[];
+    template: string;
+}
+
 export interface ITemplateSchema {
-    templates: { [name: string]: string };
+    templates: { [name: string]: ITemplate };
 }
 
 class TemplateNode {
@@ -90,6 +95,27 @@ export class TemplateCompiler {
         return rootNode;
     }
 
+    static compileTemplateToJsFunction(template: ITemplate) {
+        const templateNode = this.compileTemplate(template.template);
+        const funcCode = `(function(){ return \`${this.templateNodeToJs2(templateNode)}\`; })`;
+        return eval(funcCode);
+    }
+
+    static compileTemplateSchema(schema: ITemplateSchema) {
+        return eval(`class CompiledTemplate {
+            ${Object.keys(schema.templates).map(tplName => {
+                const tpl = schema.templates[tplName];
+                const tplAst = this.compileTemplate(tpl.template);
+                const tplJsCode = this.templateNodeToJs2(tplAst);
+                return `
+                    ${tplName}(${tpl.arguments.join(", ")}) {
+                        return \`${tplJsCode}\`;
+                    }
+                `; }).join("\n")}
+            }
+            new CompiledTemplate();`);
+    }
+
     static astToJs(ast: AstNode): string {
         if (ast.type === AstNodeType.Identifier)
             return ast.identifier;
@@ -142,7 +168,7 @@ export class TemplateCompiler {
             if (node.value.type === "text")
                 result += node.value.textValue;
             else if (node.value.type === "for")
-                result += `\${${this.astToJs(node.value.for.array)}.map(${node.value.for.itemName} => \`${children}\`).join("")}`;
+                result += `\${(${this.astToJs(node.value.for.array)}||[]).map(${node.value.for.itemName} => \`${children}\`).join("")}`;
             else if (node.value.type === "if")
                 result += `\${${this.astToJs(node.value.if.condition)} ? \`${children}\` : ""}`;
             else if (node.value.type === "template")
@@ -159,7 +185,7 @@ export class TemplateCompiler {
     async compile(templateSchema: ITemplateSchema, compilerSchema: KsySchema.IKsyFile, jsImporter: IYamlImporter, isDebug: boolean): Promise<{ [filename: string]: string; }> {
         console.log("TemplateCompiler", templateSchema, compilerSchema);
         for (let tpl of Object.values(templateSchema.templates)) {
-            const rootNode = TemplateCompiler.compileTemplate(tpl);
+            const rootNode = TemplateCompiler.compileTemplate(tpl.template);
             //console.log(rootNode);
         }
         return { };

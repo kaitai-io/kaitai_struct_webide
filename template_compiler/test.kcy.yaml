@@ -1,0 +1,68 @@
+templates: 
+  main:
+    arguments:
+      - root
+    template: |
+      // This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
+      
+      var {{root.name}} = {{this.generateType(root)}}
+      
+      // Export for amd environments
+      if (typeof define === 'function' && define.amd) {
+        define('{{root.name}}', [], function() {
+          return {{root.name}};
+        });
+      }
+      
+      // Export for CommonJS
+      if (typeof module === 'object' && module && module.exports) {
+        module.exports = {{root.name}};
+      }
+
+  generateType:
+    arguments:
+      - type
+    template: |
+      (function() {
+        {{for enumx in type.enums}}
+          {{type.name}}.{{enumx.name}} = Object.freeze({
+            {{for enumItem in items}}
+              {{enumItem.name}}: {{enumItem.value}},
+            {{/for}}
+            
+            {{for enumItem in items}}
+              {{enumItem.value}}: {{enumItem.name}}
+            {{/for}}
+          });
+        {{/for}}
+
+        function {{type.name}}(_io, _parent, _root) {
+          this._io = _io;
+          this._parent = _parent;
+          this._root = _root || this;
+      
+          this._read();
+        }
+        
+        {{type.name}}.prototype._read = function() {
+          {{for item in type.seq}}
+          {{/for}}
+        }
+      
+        {{for instance in type.instances}}
+            Object.defineProperty({{type.name}}.prototype, '{{instance.name}}', {
+              get: function() {
+                if (this.{{instance.backingField}} !== undefined)
+                  return this.{{instance.backingField}};
+                this._m_prop1 = {{instance.value}};
+                return this._m_prop1;
+              }
+            });
+        {{/for}}
+
+        {{for subType in type.types}}
+          var {{subType.name}} = {{type.name}}.{{subType.name}} = {{this.generateType(subType)}}
+        {{/for}}
+        
+        return {{type.name}};
+      })();
