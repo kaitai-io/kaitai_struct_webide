@@ -106,6 +106,9 @@ if '--compile' in sys.argv:
     t.start()
     print "auto compile started"
 
+sys.dont_write_bytecode = True
+import genKaitaiFsFiles
+    
 print "please use 127.0.0.1:%d on Windows (using localhost makes 1sec delay)" % PORT
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
