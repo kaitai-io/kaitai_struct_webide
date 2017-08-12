@@ -15,7 +15,7 @@ fi
 cp -r \
 	index.html \
 	v2.html \
-	sandbox.html \
+	Playground.html \
 	LICENSE-3RD-PARTY.txt \
 	css \
 	formats \

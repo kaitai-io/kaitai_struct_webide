@@ -11,6 +11,8 @@ install:
 
 script:
   - '[ "$TRAVIS_BRANCH" = stable ] && export GA_ID=UA-76299550-2 || export GA_ID=UA-76299550-3'
+  - '[ "$TRAVIS_BRANCH" = stable ] && export SENTRY_ENV=stable || export SENTRY_ENV=devel'
+  - 'export SENTRY_DSN=https://a01cdb58ab3e43dd9ce695dd20a19d00@sentry.io/202888'
   - ./build
 
 after_success:
