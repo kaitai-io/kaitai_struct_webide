@@ -51,6 +51,7 @@ class AppController {
         };
 
         this.view.parsedTree.treeView.$on("selected", (node: ParsedTreeNode) => {
+            if (!node.value) return; // instance-only
             this.setSelection(node.value.start, node.value.end - 1, "ParsedTree");
             this.view.infoPanel.parsedPath = node.value.path.join("/");
         });
@@ -73,6 +74,7 @@ class AppController {
         };
 
         this.view.infoPanel.selectionChanged = (start, end) => this.setSelection(start, end, "InfoPanel");
+        this.view.infoPanel.$watch("disableLazyParsing", () => this.reparse());
     }
 
     blockSelection = false;
@@ -176,16 +178,20 @@ class AppController {
         try {
             await this.sandbox.kaitaiServices.parse();
         } finally {
-            this.exported = await this.sandbox.kaitaiServices.export();
+            this.exported = await this.sandbox.kaitaiServices.export(this.view.infoPanel.disableLazyParsing);
             console.log("exported", this.exported);
+            if (!this.exported) return;
+            Object.freeze(this.exported); // prevent Vue from converting this object to an observable one
 
             this.parsedMap = new ParsedMap(this.exported);
             this.view.infoPanel.unparsed = this.parsedMap.unparsed;
             this.view.infoPanel.byteArrays = this.parsedMap.byteArrays;
             this.view.hexViewer.setIntervals(this.parsedMap.intervalHandler);
             this.view.parsedTree.rootNode = null;
-            await this.view.nextTick(() =>
-                this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", this.exported)));
+            await this.view.nextTick(() => {
+                var rootNode = this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode(null, "", this.exported));
+                rootNode.loadInstance = async (path) => this.sandbox.kaitaiServices.exportInstance(path);
+            });
             this.setSelection(localSettings.latestSelection.start, localSettings.latestSelection.end, "Reparse");
         }
     }

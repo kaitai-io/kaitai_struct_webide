@@ -58,7 +58,8 @@ export interface IKaitaiServices {
     generateParser(ksy: string, lang: string, debug: boolean): Promise<ITextFiles>;
     setInput(input: ArrayBufferLike): Promise<void>;
     parse(): Promise<void>;
-    export(): Promise<IExportedValue>;
+    export(noLazy: boolean): Promise<IExportedValue>;
+    exportInstance(path: string[]): Promise<IExportedValue>;
     exportToJson(useHex: boolean): Promise<string>;
     getCompilerInfo(): Promise<{ version: string, buildDate: string }>;
 }

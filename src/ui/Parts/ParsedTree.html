@@ -15,7 +15,10 @@
             <template scope="_">
                 <a>
                     {{ _.model.hasChildren ? (_.vm.open ? "V" : ">") : "" }}
-                    <template v-if="_.model.value.type === 'Object'">
+                    <template v-if="_.model.isUnloadedInstance">
+                        {{_.model.name}}
+                    </template>
+                    <template v-else-if="_.model.value.type === 'Object'">
                         {{_.model.name}}
                         [<span class="className">{{_.model.value.object.class}}</span>]
                     </template>

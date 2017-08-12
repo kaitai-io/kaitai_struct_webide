@@ -31,7 +31,29 @@ class KaitaiServices implements IKaitaiServices {
         this.templateCompiler = new TemplateCompiler();
     }
 
+    public initCode() {
+        if (!this.jsCode) return false;
+        if (this.classes) return true;
+
+        this.classes = {};
+
+        var self = this;
+        function define(name: string, deps: string[], callback: () => any) {
+            self.classes[name] = callback();
+            self.mainClassName = name;
+        }
+        define["amd"] = true;
+
+        eval(this.jsCode);
+        console.log("compileKsy", this.mainClassName, this.classes);
+
+        const ksyTypes = SchemaUtils.collectKsyTypes(this.ksy);
+        this.objectExporter = new ObjectExporter(ksyTypes, this.classes);
+        return true;
+    }
+
     public async compile(ksyCode: string, template: string) {
+        this.jsCode = this.classes = this.objectExporter = null;
         this.ksyCode = ksyCode;
         this.ksy = YAML.parse(ksyCode);
 
@@ -46,25 +68,8 @@ class KaitaiServices implements IKaitaiServices {
             debugCode = await this.kaitaiCompiler.compile("javascript", this.ksy, null, true);
         }
 
-        var debugCodeAll = this.jsCode = (<any>Object).values(debugCode).join("\n");
-
-        this.classes = {};
-
-        var self = this;
-        function define(name: string, deps: string[], callback: () => any) {
-            self.classes[name] = callback();
-            self.mainClassName = name;
-        }
-        define["amd"] = true;
-
-        eval(debugCodeAll);
-        console.log("compileKsy", this.mainClassName, this.classes);
-
-        const ksyTypes = SchemaUtils.collectKsyTypes(this.ksy);
-
-        this.objectExporter = new ObjectExporter(ksyTypes, this.classes);
-
-        return { releaseCode, debugCode, debugCodeAll };
+        this.jsCode = (<any>Object).values(debugCode).join("\n");
+        return { releaseCode, debugCode, debugCodeAll: this.jsCode };
     }
 
     async setInput(input: ArrayBufferLike) {
@@ -74,7 +79,7 @@ class KaitaiServices implements IKaitaiServices {
     }
 
     async parse() {
-        if (!this.mainClassName) return;
+        if (!this.initCode()) return;
 
         var mainClass = this.classes[this.mainClassName];
         this.parsed = new mainClass(new KaitaiStream(this.input, 0));
@@ -83,10 +88,22 @@ class KaitaiServices implements IKaitaiServices {
         console.log("parsed", this.parsed);
     }
 
-    async export() {
-        if (!this.objectExporter) return null;
+    async export(noLazy: boolean) {
+        if (!this.initCode()) return null;
 
-        return this.objectExporter.exportValue(this.parsed, null, []);
+        return this.objectExporter.exportValue(this.parsed, null, [], noLazy);
+    }
+
+    async exportInstance(path: string[]) {
+        let curr = this.parsed;
+        let parent = null;
+
+        for (const item of path) {
+            parent = curr;
+            curr = curr[item];
+        }
+
+        return this.objectExporter.exportValue(curr, parent._debug[path.last()], path);
     }
 
     async getCompilerInfo() {
@@ -100,7 +117,7 @@ class KaitaiServices implements IKaitaiServices {
     }
 
     async exportToJson(useHex: boolean) {
-        if (!this.objectExporter) return null;
+        if (!this.initCode()) return null;
 
         const exported = await this.objectExporter.exportValue(this.parsed, null, [], true);
         const json = new JsonExporter(useHex).export(exported);
