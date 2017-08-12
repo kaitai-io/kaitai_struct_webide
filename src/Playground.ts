@@ -28,7 +28,7 @@ async function run() {
         const js = TemplateCompiler.astToJs(expr);
         console.log(`"${exprStr}" -> ${expr.repr()}`, expr);
     }
-    
+
     const ksyContent = await (await fetch("template_compiler/test.ksy")).text();
     const templateContent = await (await fetch("template_compiler/test.kcy.yaml")).text();
     const ksy = <KsySchema.IKsyFile>YAML.parse(ksyContent, null, null, true);
