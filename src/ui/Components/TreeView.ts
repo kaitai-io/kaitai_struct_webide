@@ -111,10 +111,13 @@ export class TreeView<T extends ITreeNode> extends Vue {
 
     async searchNode(searchCallback: (item: T) => "match" | "children" | "nomatch", loadChildrenIfNeeded = true) {
         let currNode = <TreeViewItem<T>>null;
-        let canForceLoadChildren = false;
+        let forceLoadChildren = false;
         while (true) {
-            if (loadChildrenIfNeeded && currNode && (!currNode.children || currNode.children.length === 0 || canForceLoadChildren || !currNode.open))
+            if (currNode && !currNode.open)
                 await currNode.openNode();
+
+            if (loadChildrenIfNeeded && currNode && (!currNode.children || currNode.children.length === 0 || forceLoadChildren))
+                await currNode.model.loadChildren();
 
             let nextNode = null;
             for (const child of (currNode||this).children) {
@@ -123,15 +126,15 @@ export class TreeView<T extends ITreeNode> extends Vue {
                     return child;
                 else if (matchResult === "children") {
                     nextNode = child;
-                    canForceLoadChildren = false;
+                    forceLoadChildren = false;
                     break;
                 }
             }
 
             if (nextNode !== null)
                 currNode = nextNode;
-            else if (!canForceLoadChildren)
-                canForceLoadChildren = true;
+            else if (!forceLoadChildren)
+                forceLoadChildren = true;
             else
                 return null;
         }
