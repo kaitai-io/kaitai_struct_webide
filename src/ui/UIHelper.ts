@@ -8,7 +8,7 @@ export default class UIHelper {
                 return <T>res;
             res = res.$parent;
         }
-        return null;        
+        return null;
     }
 }
 
@@ -19,7 +19,7 @@ export class EditorChangeHandler {
     constructor(public editor: AceAjax.Editor, delay: number, public changeCallback: (newContent: string, userChange: boolean) => void) {
         this.editDelay = new Delayed(delay);
 
-        this.editor.on("change", () => this.editDelay.do(() => 
+        this.editor.on("change", () => this.editDelay.do(() =>
             this.changeCallback(this.editor.getValue(), !this.internalChange)));
     }
 

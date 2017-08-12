@@ -11,7 +11,7 @@ export class ParsedMap {
     unparsed: IInterval[];
     byteArrays: IInterval[];
 
-    constructor(public root: IExportedValue) { 
+    constructor(public root: IExportedValue) {
         this.fillIntervals(root);
     }
 
@@ -28,7 +28,7 @@ export class ParsedMap {
 
         process(root);
         return objects;
-    }    
+    }
 
     fillIntervals(value: IExportedValue) {
         var isInstance = false; // TODO

@@ -35,14 +35,15 @@ class KaitaiServices implements IKaitaiServices {
         this.ksyCode = ksyCode;
         this.ksy = YAML.parse(ksyCode);
 
+        var releaseCode, debugCode;
         if (template) {
             const templateSchema = YAML.parse(template);
-            var releaseCode = await this.templateCompiler.compile(templateSchema, this.ksy, null, false);
-            var debugCode = await this.templateCompiler.compile(templateSchema, this.ksy, null, true);
+            releaseCode = await this.templateCompiler.compile(templateSchema, this.ksy, null, false);
+            debugCode = await this.templateCompiler.compile(templateSchema, this.ksy, null, true);
         }
         else {
-            var releaseCode = await this.kaitaiCompiler.compile("javascript", this.ksy, null, false);
-            var debugCode = await this.kaitaiCompiler.compile("javascript", this.ksy, null, true);
+            releaseCode = await this.kaitaiCompiler.compile("javascript", this.ksy, null, false);
+            debugCode = await this.kaitaiCompiler.compile("javascript", this.ksy, null, true);
         }
 
         var debugCodeAll = this.jsCode = (<any>Object).values(debugCode).join("\n");

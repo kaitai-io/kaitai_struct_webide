@@ -40,9 +40,9 @@ class AppController {
             this.openFile(treeNode.uri.uri);
         });
 
-        this.ksyChangeHandler = new EditorChangeHandler(this.view.ksyEditor, 500, 
+        this.ksyChangeHandler = new EditorChangeHandler(this.view.ksyEditor, 500,
             (newContent, userChange) => this.inputFileChanged("Ksy", newContent, userChange));
-        this.templateChangeHandler = new EditorChangeHandler(this.view.templateEditor, 500, 
+        this.templateChangeHandler = new EditorChangeHandler(this.view.templateEditor, 500,
             (newContent, userChange) => this.inputFileChanged("Kcy", newContent, userChange));
 
         this.view.hexViewer.onSelectionChanged = () => {
