@@ -253,3 +253,4 @@ files/
 lib/_npm/
 *.pyc
 .serve_files_secret
+\.DS_Store
