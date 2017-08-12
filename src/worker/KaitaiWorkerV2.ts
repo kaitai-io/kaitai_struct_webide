@@ -74,6 +74,8 @@ class KaitaiServices implements IKaitaiServices {
     }
 
     async parse() {
+        if (!this.mainClassName) return;
+
         var mainClass = this.classes[this.mainClassName];
         this.parsed = new mainClass(new KaitaiStream(this.input, 0));
         this.parsed._read();
@@ -82,6 +84,8 @@ class KaitaiServices implements IKaitaiServices {
     }
 
     async export() {
+        if (!this.objectExporter) return null;
+
         return this.objectExporter.exportValue(this.parsed, null, []);
     }
 
@@ -96,6 +100,8 @@ class KaitaiServices implements IKaitaiServices {
     }
 
     async exportToJson(useHex: boolean) {
+        if (!this.objectExporter) return null;
+
         const exported = await this.objectExporter.exportValue(this.parsed, null, [], true);
         const json = new JsonExporter(useHex).export(exported);
         return json;

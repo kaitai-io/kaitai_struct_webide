@@ -42,11 +42,12 @@ class AppController {
 
         this.ksyChangeHandler = new EditorChangeHandler(this.view.ksyEditor, 500,
             (newContent, userChange) => this.inputFileChanged("Ksy", newContent, userChange));
+
         this.templateChangeHandler = new EditorChangeHandler(this.view.templateEditor, 500,
             (newContent, userChange) => this.inputFileChanged("Kcy", newContent, userChange));
 
         this.view.hexViewer.onSelectionChanged = () => {
-            this.setSelection(this.view.hexViewer.selectionStart, this.view.hexViewer.selectionEnd);
+            this.setSelection(this.view.hexViewer.selectionStart, this.view.hexViewer.selectionEnd, "HexViewer");
         };
 
         this.view.parsedTree.treeView.$on("selected", (node: ParsedTreeNode) => {
@@ -71,13 +72,13 @@ class AppController {
             this.view.addFileView("json export", json, "json");
         };
 
-        this.view.infoPanel.selectionChanged = (start, end) => this.setSelection(start, end);
+        this.view.infoPanel.selectionChanged = (start, end) => this.setSelection(start, end, "InfoPanel");
     }
 
     blockSelection = false;
 
-    protected async setSelection(start: number, end: number, origin?: "ParsedTree") {
-        if (this.blockSelection) return;
+    protected async setSelection(start: number, end: number, origin?: "ParsedTree"|"HexViewer"|"InfoPanel"|"Reparse") {
+        if (this.blockSelection || (localSettings.latestSelection.start === start && localSettings.latestSelection.end === end) || end < start) return;
         this.blockSelection = true;
 
         try {
@@ -103,7 +104,7 @@ class AppController {
     }
 
     protected async initWorker() {
-        this.sandbox = await InitKaitaiWithoutSandbox();
+        this.sandbox = await InitKaitaiSandbox();
 
         var compilerInfo = await this.sandbox.kaitaiServices.getCompilerInfo();
         this.view.aboutModal.compilerVersion = compilerInfo.version;
@@ -185,7 +186,7 @@ class AppController {
             this.view.parsedTree.rootNode = null;
             await this.view.nextTick(() =>
                 this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode("", this.exported)));
-            this.setSelection(localSettings.latestSelection.start, localSettings.latestSelection.end);
+            this.setSelection(localSettings.latestSelection.start, localSettings.latestSelection.end, "Reparse");
         }
     }
 }

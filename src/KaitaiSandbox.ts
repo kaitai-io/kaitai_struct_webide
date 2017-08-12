@@ -21,6 +21,7 @@ export async function InitKaitaiSandbox() {
             "KaitaiStream": "${npmDir}/kaitai-struct/KaitaiStream",
             "kaitai-struct-compiler": "${npmDir}/kaitai-struct-compiler/kaitai-struct-compiler"
         }`);
+    await sandbox.loadScript(new URL("js/extensions.js", location.href).href);
     await sandbox.loadScript(new URL("js/worker/worker/KaitaiWorkerV2.js", location.href).href);
     return sandbox;
 }

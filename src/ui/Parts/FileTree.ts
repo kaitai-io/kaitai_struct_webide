@@ -60,7 +60,7 @@ function getRelativeUrl(url: string) {
 }
 
 var httpFs = new HttpFileSystem(kaitaiFsFiles.reduce((obj, fn) => { obj[`/${fn}`] = getRelativeUrl(fn); return obj; }, {}));
-console.log(httpFs.fileUrls);
+//console.log(httpFs.fileUrls);
 fss.addFs(httpFs);
 
 export class FsTreeNode implements IFsTreeNode {
