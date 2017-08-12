@@ -21,7 +21,10 @@ GA_TEMPLATE = '''
 SENTRY_TEMPLATE = '''
     <script src="https://cdn.ravenjs.com/3.17.0/raven.min.js" crossorigin="anonymous"></script>
     <script>
-        Raven.config('{{SENTRY_DSN}}', { environment: "{{SENTRY_ENV}}" }).install();
+        Raven.config('{{SENTRY_DSN}}', {
+            environment: "{{SENTRY_ENV}}",
+            release: "{{SENTRY_RELEASE}}",
+        }).install();
     </script>
 '''
 
@@ -47,14 +50,14 @@ def appendAfter(str, afterStr, appendStr):
     i = str.index(afterStr) + len(afterStr)
     return str[0:i] + appendStr + str[i:]
     
-scriptAppend = envVarFill(SENTRY_TEMPLATE, ['SENTRY_DSN', 'SENTRY_ENV']) + envVarFill(GA_TEMPLATE, ['GA_ID'])
-if scriptAppend:
-    fileAction(outDir + '/index.html', lambda html: appendAfter(html, '<!-- SCRIPT_INJECTION_POINT -->', scriptAppend))
-
 gitInfo = subprocess.check_output(['git log -1 --format=%H,%ct'], shell=True).strip().split(',')
 commitId = gitInfo[0]
 commitTs = int(gitInfo[1])
 commitDate = datetime.datetime.fromtimestamp(commitTs).strftime('%Y-%m-%d %H:%M:%S')
+
+scriptAppend = envVarFill(SENTRY_TEMPLATE, ['SENTRY_DSN', 'SENTRY_ENV']).replace("{{SENTRY_RELEASE}}", commitId) + envVarFill(GA_TEMPLATE, ['GA_ID'])
+if scriptAppend:
+    fileAction(outDir + '/index.html', lambda html: appendAfter(html, '<!-- SCRIPT_INJECTION_POINT -->', scriptAppend))
 
 fileAction(outDir + '/js/v1/app.js', lambda html: html
     .replace('kaitaiIde.commitId = "";', 'kaitaiIde.commitId = "%s";' % (commitId))
