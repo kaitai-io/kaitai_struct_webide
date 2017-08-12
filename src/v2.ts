@@ -92,13 +92,13 @@ class AppController {
             const itemMatches = this.parsedMap.intervalHandler.searchRange(start, end).items;
             const itemPathToSelect = itemMatches.length > 0 ? itemMatches[0].exp.path.join("/") : localSettings.latestPath;
             this.view.infoPanel.parsedPath = itemPathToSelect;
-            localSettings.latestPath = itemPathToSelect;
             if (origin !== "ParsedTree") {
                 const node = await this.view.parsedTree.open(itemPathToSelect);
                 this.view.parsedTree.treeView.setSelected(node);
             }
 
             localSettings.latestSelection = { start, end };
+            localSettings.latestPath = itemPathToSelect;
         } finally {
             this.blockSelection = false;
         }
@@ -119,6 +119,7 @@ class AppController {
         if (uri.endsWith(".ksy")) {
             localSettings.latestKsyUri = uri;
             const ksyContent = Conversion.utf8BytesToStr(content);
+            this.view.layout.ksyEditor.title = new FsUri(uri).name;
             this.ksyChangeHandler.setContent(ksyContent);
         } else if (uri.endsWith(".kcy")) {
             localSettings.latestKcyUri = uri;
@@ -126,6 +127,7 @@ class AppController {
             this.templateChangeHandler.setContent(tplContent);
         } else {
             localSettings.latestInputUri = uri;
+            this.view.layout.inputBinary.title = new FsUri(uri).name;
             this.setInput(content, uri);
         }
     }
