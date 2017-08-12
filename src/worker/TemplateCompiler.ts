@@ -13,12 +13,12 @@ export interface ITemplateSchema {
 class TemplateNode {
     children: TemplateNode[] = [];
 
-    constructor(public value: TemplatePart, public parent: TemplateNode){ }
+    constructor(public value: TemplatePart, public parent: TemplateNode) { }
 
     repr(): string {
         let result = this.value ? this.value.repr() + "\n" : "";
         for (const item of this.children)
-            result += item.repr().split("\n").map((x,i) => (i == 0 ? '- ': '  ') + x).join("\n") + "\n";
+            result += item.repr().split("\n").map((x,i) => (i === 0 ? "- ": "  ") + x).join("\n") + "\n";
         result = result.substring(0, result.length - 1);
         return result;
     }
@@ -84,12 +84,12 @@ export class TemplateCompiler {
     }
 
     static compileTemplate(template: string) {
-        const parts = template.split(/\{\{(.*?)\}\}/).map((x,i) => new TemplatePart(x, i % 2 == 0));
+        const parts = template.split(/\{\{(.*?)\}\}/).map((x,i) => new TemplatePart(x, i % 2 === 0));
         const exprs = parts.map(x => x.for && x.for.array || x.if && x.if.condition || x.template && x.template.expr).filter(x => x);
         //console.log("exprs", exprs);
         //for (let part of parts)
         //    console.log(part.type, part.for || part.if || part.template || part.closeNode);
-        
+
         const rootNode = this.templateListToTree(parts);
         //console.log(rootNode.repr());
         return rootNode;
@@ -120,10 +120,10 @@ export class TemplateCompiler {
         if (ast.type === AstNodeType.Identifier)
             return ast.identifier;
         else if (ast.type === AstNodeType.OperatorList)
-            return ast.operands.reduce((prev, curr) => 
+            return ast.operands.reduce((prev, curr) =>
                 `${prev}${curr.operator ? curr.operator.text : ""}${this.astToJs(curr.operand)}` , "");
         else if (ast.type === AstNodeType.Function)
-            return `${this.astToJs(ast.function)}(${ast.arguments.map(arg => this.astToJs(arg)).join(', ')})`;
+            return `${this.astToJs(ast.function)}(${ast.arguments.map(arg => this.astToJs(arg)).join(", ")})`;
         else
             throw new Error(`Unhandled AST type: ${ast.type}!`);
     }
@@ -151,7 +151,7 @@ export class TemplateCompiler {
         }
 
         if (node.children && node.children.length > 0)
-            result += ` {\n${node.children.map(x => padding + this.templateNodeToJs(x, padding + "  ")).join('')}${padding}}\n`;
+            result += ` {\n${node.children.map(x => padding + this.templateNodeToJs(x, padding + "  ")).join("")}${padding}}\n`;
         else
             result += "\n";
 
@@ -161,7 +161,7 @@ export class TemplateCompiler {
     static templateNodeToJs2(node: TemplateNode, padding = "") {
         let result = padding;
 
-        const children = node.children && node.children.length > 0 ? 
+        const children = node.children && node.children.length > 0 ?
             node.children.map(x => this.templateNodeToJs2(x)).join("") : "";
 
         if (node.value) {
@@ -182,7 +182,8 @@ export class TemplateCompiler {
         return result;
     }
 
-    async compile(templateSchema: ITemplateSchema, compilerSchema: KsySchema.IKsyFile, jsImporter: IYamlImporter, isDebug: boolean): Promise<{ [filename: string]: string; }> {
+    async compile(templateSchema: ITemplateSchema, compilerSchema: KsySchema.IKsyFile,
+            jsImporter: IYamlImporter, isDebug: boolean): Promise<{ [filename: string]: string; }> {
         console.log("TemplateCompiler", templateSchema, compilerSchema);
         for (let tpl of Object.values(templateSchema.templates)) {
             const rootNode = TemplateCompiler.compileTemplate(tpl.template);
