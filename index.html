@@ -33,10 +33,10 @@
     <script>
         var paths = {};
         ["bowser", "jstree", "localforage", "goldenlayout", "vue", "kaitai-struct-compiler", "dateformat"].forEach(
-            name => paths[name] = `../lib/_npm/${name}/${name}`);
-        paths["big-integer"] = "../lib/_npm/BigInteger/BigInteger";
+            name => paths[name] = `../../lib/_npm/${name}/${name}`);
+        paths["big-integer"] = "../../lib/_npm/BigInteger/BigInteger";
 
-        requirejs.config({ baseUrl: "js/", paths: paths });
+        requirejs.config({ baseUrl: "js/v1/", paths: paths });
         require(["app.unsupportedBrowser"]);
         require(["jstree", "app"]);
     </script>

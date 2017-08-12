@@ -1,4 +1,4 @@
-﻿var worker = new Worker("js/kaitaiWorker.js");
+﻿var worker = new Worker("js/v1/kaitaiWorker.js");
 
 var msgHandlers: { [msgId: number]: (msg: IWorkerMessage) => void } = {};
 

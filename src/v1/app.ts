@@ -5,15 +5,14 @@ import { UI } from "./app.layout";
 import { IFsItem, fss, addKsyFile, refreshFsNodes, initFileTree } from "./app.files";
 import { ParsedTreeHandler, IParsedTreeNode } from "./parsedToTree";
 import { workerMethods } from "./app.worker";
-import { IDataProvider } from "./HexViewer";
+import { IDataProvider } from "../HexViewer";
 import { initFileDrop } from "./FileDrop";
 import { performanceHelper } from "./utils/PerformanceHelper";
-import { IFileProcessItem, saveFile, precallHook } from "./utils";
-import { Delayed } from "./utils";
-import { componentLoader } from "./ui/ComponentLoader";
-import { ConverterPanelModel } from "./ui/Components/ConverterPanel";
+import { IFileProcessItem, saveFile, precallHook, Delayed } from "../utils";
+import { componentLoader } from "../ui/ComponentLoader";
+import { ConverterPanelModel } from "../ui/Components/ConverterPanel";
 import { exportToJson } from "./ExportToJson";
-import Component from "./ui/Component";
+import Component from "../ui/Component";
 import { CompilerService, CompilationError } from "./KaitaiServices";
 import { ErrorWindowHandler } from "./app.errors";
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
@@ -265,7 +264,7 @@ $(() => {
         exec: function (editor: any) { app.reparse(); }
     });
 
-    initFileDrop("fileDrop", files => app.addNewFiles(files));
+    initFileDrop("fileDrop", (files: any) => app.addNewFiles(files));
 
     async function loadCachedFsItem(cacheKey: string, defFsType: string, defSample: string) {
         let fsItem = <IFsItem> await localforage.getItem(cacheKey);

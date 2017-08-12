@@ -3,7 +3,7 @@ import dateFormat = require("dateformat");
 
 import { ga, app } from "./app";
 import { IJSTreeNode } from "./parsedToTree";
-import { downloadFile, saveFile, openFilesWithDialog } from "./utils";
+import { downloadFile, saveFile, openFilesWithDialog } from "../utils";
 
 declare var kaitaiFsFiles: string[];
 

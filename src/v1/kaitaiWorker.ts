@@ -99,8 +99,8 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
     return result;
 }
 
-importScripts("entities.js");
-importScripts("../lib/_npm/kaitai-struct/KaitaiStream.js");
+importScripts("../entities.js");
+importScripts("../../lib/_npm/kaitai-struct/KaitaiStream.js");
 
 this["define"] = function(name: string, deps: any, getter: any) { myself[name] = getter(); };
 (<any>define).amd = true;

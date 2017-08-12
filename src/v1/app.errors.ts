@@ -1,4 +1,4 @@
-﻿import { htmlescape } from "./utils";
+﻿import { htmlescape } from "../utils";
 import { app, ga } from "./app";
 
 export class ErrorWindowHandler {
@@ -15,7 +15,7 @@ export class ErrorWindowHandler {
             this.parentContainer.addChild({ type: "component", componentName: newPanel.componentName, title: "Errors" });
             this.errorWnd = await newPanel.donePromise;
             this.errorWnd.setSize(0, this.lastErrWndSize);
-            this.errorWnd.getElement().addClass('errorWindow');
+            this.errorWnd.getElement().addClass("errorWindow");
         }
         this.errorWnd.on("resize", () => this.lastErrWndSize = this.errorWnd.getElement().outerHeight());
         this.errorWnd.on("destroy", () => { ga("errorwnd", "destroy"); this.errorWnd = null; });

@@ -1,5 +1,4 @@
-﻿import { processFiles } from "./utils";
-import { IFileProcessCallback } from "./utils";
+﻿import { processFiles, IFileProcessCallback } from "../utils";
 
 export function initFileDrop(containerId: string, callback: IFileProcessCallback) {
     var dragLeaveClear: number;

@@ -1,5 +1,5 @@
-﻿import { IInterval, IntervalHandler } from "./utils/IntervalHelper";
-import { s, htmlescape, asciiEncode, hexEncode, collectAllObjects } from "./utils";
+﻿import { IInterval, IntervalHandler } from "../utils/IntervalHelper";
+import { s, htmlescape, asciiEncode, hexEncode, collectAllObjects } from "../utils";
 import { workerMethods } from "./app.worker";
 import { app } from "./app";
 
@@ -221,7 +221,7 @@ export class ParsedTreeHandler {
                 return result;
             }
 
-            return items.map((item, i) => this.childItemToNode(item, true));
+            return items.map(item => this.childItemToNode(item, true));
         } else if (exported.type === ObjectType.Object) {
             var obj = exported.object;
             return Object.keys(obj.fields).map(fieldName => this.childItemToNode(obj.fields[fieldName], true)).concat(

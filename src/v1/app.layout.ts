@@ -1,6 +1,6 @@
 ﻿import * as GoldenLayout from "goldenlayout";
 
-import { HexViewer } from "./HexViewer";
+import { HexViewer } from "../HexViewer";
 import { ParsedTreeHandler } from "./parsedToTree";
 
 export class LayoutManager<T> {
