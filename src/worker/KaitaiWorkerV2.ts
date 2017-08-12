@@ -3,7 +3,7 @@
 
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");
-//import { YAML } from "yamljs";
+import { YAML } from "yamljs";
 import { ObjectExporter } from "./ObjectExporter";
 import { IKaitaiServices, IKsyTypes } from "./WorkerShared";
 import { JsonExporter } from "./JsonExporter";
