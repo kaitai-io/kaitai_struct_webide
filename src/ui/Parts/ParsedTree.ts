@@ -42,7 +42,10 @@ export class ParsedTreeNode implements ITreeNode {
 
     get isUnloadedInstance() { return this.instance && !this.value; }
 
-    get exceptionText() { return typeof this.value.exception === "string" ? this.value.exception : JSON.stringify(this.value.exception); }
+    get exceptionText() {
+        return typeof this.value.exception === "string" ? this.value.exception :
+            this.value.exception.message ? this.value.exception.message : JSON.stringify(this.value.exception);
+    }
 
     get hasChildren() { return this.isUnloadedInstance || this.value.type === ObjectType.Object || this.value.type === ObjectType.Array; }
 
