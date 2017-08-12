@@ -63,9 +63,7 @@ class AppController {
         });
 
         this.view.dragAndDrop.$on("files-uploaded", async (files: IDataFiles) => {
-            const newFileUris = await this.view.fileTree.uploadFiles(files);
-            if (newFileUris.length === 1)
-                this.openFile(newFileUris[0]);
+            await this.view.fileTree.uploadFiles(files);
         });
 
         this.view.infoPanel.exportToJson = async hex => {
