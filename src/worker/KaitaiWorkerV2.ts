@@ -5,10 +5,11 @@ import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");
 import { YAML } from "yamljs";
 import { ObjectExporter } from "./ObjectExporter";
-import { IKaitaiServices, IKsyTypes, IExportOptions } from "./WorkerShared";
+import { IKaitaiServices, IKsyTypes, IExportOptions, ILazyArrayExportOptions } from "./WorkerShared";
 import { JsonExporter } from "./JsonExporter";
 import { SchemaUtils } from "./SchemaUtils";
 import { TemplateCompiler } from "./TemplateCompiler";
+import { IExportedValue } from "./WorkerShared";
 
 class KaitaiServices implements IKaitaiServices {
     kaitaiCompiler: KaitaiStructCompiler;
@@ -88,20 +89,31 @@ class KaitaiServices implements IKaitaiServices {
         console.log("parsed", this.parsed);
     }
 
-    async export(options?: IExportOptions) {
+    async export(options?: IExportOptions): Promise<IExportedValue>;
+    async export(options: ILazyArrayExportOptions): Promise<IExportedValue[]>;
+
+    async export(options: IExportOptions|ILazyArrayExportOptions): Promise<IExportedValue|IExportedValue[]> {
         if (!this.initCode()) return null;
+
+        this.objectExporter.noLazy = options.noLazy;
+        this.objectExporter.arrayLenLimit = options.arrayLenLimit;
 
         options = options || {};
         if (options.path) {
-            let propName = options.path.pop();
+            let path = Array.from(options.path);
+            let propName = path.pop();
 
             let parent = this.parsed;
-            for (const item of options.path)
+            for (const item of path)
                 parent = parent[item];
 
-            return this.objectExporter.exportProperty(parent, propName, options.path, options.noLazy);
+            const arrayRange = (<ILazyArrayExportOptions>options).arrayRange;
+            if (arrayRange)
+                return this.objectExporter.exportArray(parent, propName, options.path, arrayRange.from, arrayRange.to);
+            else
+                return this.objectExporter.exportProperty(parent, propName, options.path);
         } else
-            return this.objectExporter.exportValue(this.parsed, null, [], options.noLazy);
+            return this.objectExporter.exportValue(this.parsed, null, []);
     }
 
     async getCompilerInfo() {
@@ -117,7 +129,10 @@ class KaitaiServices implements IKaitaiServices {
     async exportToJson(useHex: boolean) {
         if (!this.initCode()) return null;
 
-        const exported = await this.objectExporter.exportValue(this.parsed, null, [], true);
+        this.objectExporter.noLazy = true;
+        this.objectExporter.arrayLenLimit = null;
+
+        const exported = await this.objectExporter.exportValue(this.parsed, null, []);
         const json = new JsonExporter(useHex).export(exported);
         return json;
     }

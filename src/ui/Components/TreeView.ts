@@ -110,17 +110,14 @@ export class TreeView<T extends ITreeNode> extends Vue {
     }
 
     async searchNode(searchCallback: (item: T) => "match" | "children" | "nomatch", loadChildrenIfNeeded = true) {
-        type NodeLike = { children: TreeViewItem<T>[], model?: ITreeNode, open?: boolean };
-        let currNode: NodeLike = this;
+        let currNode = <TreeViewItem<T>>null;
         let canForceLoadChildren = false;
         while (true) {
-            if (loadChildrenIfNeeded && (!currNode.children || currNode.children.length === 0 || canForceLoadChildren)) {
-                await currNode.model.loadChildren();
-                currNode.open = true;
-            }
+            if (loadChildrenIfNeeded && currNode && (!currNode.children || currNode.children.length === 0 || canForceLoadChildren || !currNode.open))
+                await currNode.openNode();
 
-            let nextNode: NodeLike = null;
-            for (const child of currNode.children) {
+            let nextNode = null;
+            for (const child of (currNode||this).children) {
                 const matchResult = searchCallback(child.model);
                 if(matchResult === "match")
                     return child;

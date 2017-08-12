@@ -17,7 +17,7 @@ export class ParsedMap {
             objects.push(value);
             if (value.type === ObjectType.Object)
                 Object.keys(value.object.fields).forEach(fieldName => process(value.object.fields[fieldName]));
-            else if (value.type === ObjectType.Array)
+            else if (value.type === ObjectType.Array && !value.isLazyArray)
                 value.arrayItems.forEach(arrItem => process(arrItem));
         }
 
@@ -38,12 +38,12 @@ export class ParsedMap {
         this.unparsed = unparsed;
     }
 
-    public addObject(value: IExportedValue) {
-        var objects = ParsedMap.collectAllObjects(value);
+    public addObjects(objects: IExportedValue[]) {
+        var allObjects = <IExportedValue[]>[].concat.apply([], objects.map(x => ParsedMap.collectAllObjects(x)));
 
         const newIntervals = [];
         var lastEnd = -1;
-        for (let exp of objects) {
+        for (let exp of allObjects) {
             if (!(exp.type === ObjectType.Primitive || exp.type === ObjectType.TypedArray)) continue;
 
             var start = exp.ioOffset + exp.start;
@@ -61,7 +61,7 @@ export class ParsedMap {
         else
             this.intervalHandler.addSorted(newIntervals);
 
-        this.byteArrays.push(...objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64).
+        this.byteArrays.push(...allObjects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64).
             map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1 })));
 
         this.recalculateUnusedParts();

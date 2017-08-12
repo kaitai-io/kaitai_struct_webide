@@ -17,5 +17,6 @@ export var localSettings = CreateScopedLocalStorage("settings", {
     latestKsyUri: "https:///formats/archive/zip.ksy",
     latestKcyUri: <string>null,
     latestInputUri: "https:///samples/sample1.zip",
-    latestSelection: { start: -1, end: -1 }
+    latestSelection: { start: -1, end: -1 },
+    latestPath: ""
 });

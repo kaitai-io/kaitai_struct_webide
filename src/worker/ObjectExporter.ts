@@ -9,6 +9,9 @@ interface IDebugInfo {
 }
 
 export class ObjectExporter {
+    noLazy = false;
+    arrayLenLimit = 100;
+
     constructor(public ksyTypes: IKsyTypes, public classes: { [name: string]: any }) { }
 
     static isUndef(obj: any) { return typeof obj === "undefined"; }
@@ -24,7 +27,17 @@ export class ObjectExporter {
             return ObjectType.Object;
     }
 
-    exportProperty(obj: any, propName: string, objPath: string[], noLazy: boolean) {
+    exportArray(parent: any, arrayPropName: string, arrayPath: string[], from: number, to: number) {
+        const array = <any[]> parent[arrayPropName];
+        const debug = parent._debug[arrayPropName];
+
+        let result = [];
+        for (let i = from; i <= to; i++)
+            result[i - from] = this.exportValue(array[i], debug && debug.arr[i], arrayPath.concat(i.toString()));
+        return result;
+    }
+
+    exportProperty(obj: any, propName: string, objPath: string[]) {
         let propertyValue = undefined;
         let propertyException = null;
         try {
@@ -36,12 +49,12 @@ export class ObjectExporter {
             } catch (e2) { /* same as previous or does not happen */ }
         }
 
-        const exportedProperty = this.exportValue(propertyValue, obj._debug["_m_" + propName], objPath.concat(propName), noLazy);
+        const exportedProperty = this.exportValue(propertyValue, obj._debug["_m_" + propName], objPath.concat(propName));
         exportedProperty.exception = propertyException;
         return exportedProperty;
     }
 
-    exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boolean): IExportedValue {
+    exportValue(obj: any, debug: IDebugInfo, path: string[]): IExportedValue {
         var result = <IExportedValue>{
             start: debug && debug.start,
             end: debug && debug.end,
@@ -75,7 +88,11 @@ export class ObjectExporter {
             }
         }
         else if (result.type === ObjectType.Array) {
-            result.arrayItems = (<any[]>obj).map((item, i) => this.exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy));
+            const array = <any[]>obj;
+            result.arrayLength = array.length;
+            result.isLazyArray = this.arrayLenLimit && array.length > this.arrayLenLimit;
+            if (!result.isLazyArray)
+                result.arrayItems = array.map((item, i) => this.exportValue(item, debug && debug.arr[i], path.concat(i.toString())));
         }
         else if (result.type === ObjectType.Object) {
             var childIoOffset = obj._io._byteOffset;
@@ -90,14 +107,14 @@ export class ObjectExporter {
             var ksyType = this.ksyTypes[result.object.class];
 
             for(var key of Object.keys(obj).filter(x => x[0] !== "_"))
-                result.object.fields[key] = this.exportValue(obj[key], obj._debug[key], path.concat(key), noLazy);
+                result.object.fields[key] = this.exportValue(obj[key], obj._debug[key], path.concat(key));
 
             Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor").forEach(propName => {
                 var ksyInstanceData = ksyType && ksyType.instancesByJsName[propName];
                 var eagerLoad = ksyInstanceData && ksyInstanceData["-webide-parse-mode"] === "eager";
 
-                if (eagerLoad || noLazy) {
-                    const exportedProperty = this.exportProperty(obj, propName, path, noLazy);
+                if (eagerLoad || this.noLazy) {
+                    const exportedProperty = this.exportProperty(obj, propName, path);
                     result.object.fields[propName] = exportedProperty;
                 }
                 else

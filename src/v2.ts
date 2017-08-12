@@ -89,14 +89,13 @@ class AppController {
             this.view.infoPanel.selectionStart = start;
             this.view.infoPanel.selectionEnd = end;
 
-            let itemMatches = this.parsedMap.intervalHandler.searchRange(start, end).items;
-            if (itemMatches.length > 0) {
-                let itemPathToSelect = itemMatches[0].exp.path.join("/");
-                this.view.infoPanel.parsedPath = itemPathToSelect;
-                if (origin !== "ParsedTree") {
-                    let node = await this.view.parsedTree.open(itemPathToSelect);
-                    this.view.parsedTree.treeView.setSelected(node);
-                }
+            const itemMatches = this.parsedMap.intervalHandler.searchRange(start, end).items;
+            const itemPathToSelect = itemMatches.length > 0 ? itemMatches[0].exp.path.join("/") : localSettings.latestPath;
+            this.view.infoPanel.parsedPath = itemPathToSelect;
+            localSettings.latestPath = itemPathToSelect;
+            if (origin !== "ParsedTree") {
+                const node = await this.view.parsedTree.open(itemPathToSelect);
+                this.view.parsedTree.treeView.setSelected(node);
             }
 
             localSettings.latestSelection = { start, end };
@@ -174,35 +173,43 @@ class AppController {
         await this.reparse();
     }
 
-    protected onNewObjectExported(obj: IExportedValue) {
-        this.parsedMap.addObject(obj);
+    protected onNewObjectsExported(objs: IExportedValue[]) {
+        this.parsedMap.addObjects(objs);
         this.view.infoPanel.unparsed = this.parsedMap.unparsed;
         this.view.infoPanel.byteArrays = this.parsedMap.byteArrays;
         this.view.hexViewer.setIntervals(this.parsedMap.intervalHandler);
     }
 
     protected async reparse() {
+        const arrayLenLimit = 100;
         try {
             await this.sandbox.kaitaiServices.parse();
         } finally {
             const exportStartTime = performance.now();
-            this.exported = await this.sandbox.kaitaiServices.export({ noLazy: this.view.infoPanel.disableLazyParsing });
+            this.exported = await this.sandbox.kaitaiServices.export({ noLazy: this.view.infoPanel.disableLazyParsing, arrayLenLimit });
             console.log("exported", this.exported, `${performance.now() - exportStartTime}ms`);
             if (!this.exported) return;
             Object.freeze(this.exported); // prevent Vue from converting this object to an observable one
 
             const parseMapStartTime = performance.now();
             this.parsedMap = new ParsedMap();
-            this.onNewObjectExported(this.exported);
+            this.onNewObjectsExported([this.exported]);
             console.log("parsed", `${performance.now() - parseMapStartTime}ms`);
 
             this.view.parsedTree.rootNode = null;
             await this.view.nextTick(() => {
                 var rootNode = this.view.parsedTree.rootNode = new ParsedTreeRootNode(new ParsedTreeNode(null, "", this.exported));
+
                 rootNode.loadInstance = async (path) => {
-                    const instanceExport = await this.sandbox.kaitaiServices.export({ path });
-                    this.onNewObjectExported(instanceExport);
+                    const instanceExport = await this.sandbox.kaitaiServices.export({ path, arrayLenLimit });
+                    this.onNewObjectsExported([instanceExport]);
                     return instanceExport;
+                };
+
+                rootNode.loadLazyArray = async (arrayPath, from, to) => {
+                    const array = await this.sandbox.kaitaiServices.export({ path: arrayPath, arrayRange: { from, to } });
+                    this.onNewObjectsExported(array);
+                    return array;
                 };
             });
             this.setSelection(localSettings.latestSelection.start, localSettings.latestSelection.end, "Reparse");

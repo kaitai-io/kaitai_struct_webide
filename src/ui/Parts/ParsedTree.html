@@ -15,7 +15,10 @@
             <template scope="_">
                 <a>
                     {{ _.model.hasChildren ? (_.vm.open ? "V" : ">") : "" }}
-                    <template v-if="_.model.isUnloadedInstance">
+                    <template v-if="_.model.nodeType === 'LazyArray'">
+                        [{{_.model.from}} … {{_.model.to}}]
+                    </template>
+                    <template v-else-if="_.model.isUnloadedInstance">
                         {{_.model.name}}
                     </template>
                     <template v-else>
@@ -25,7 +28,7 @@
                         </template>
                         <template v-else-if="_.model.value.type === 'Array'">
                             {{_.model.name}}
-                            ({{_.model.value.arrayItems.length}})
+                            ({{_.model.value.arrayLength}})
                         </template>
                         <template v-else-if="_.model.value.type === 'TypedArray'">
                             <span class="propName">{{_.model.name}}</span>

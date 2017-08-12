@@ -36,6 +36,9 @@ export interface IExportedValue {
     enumStringValue?: string;
     //isInstance?: boolean;
 
+    isLazyArray?: boolean;
+    arrayLength?: number;
+
     exception: any;
 
     parent?: IExportedValue;
@@ -54,8 +57,12 @@ type ITextFiles = { [fileName:string]: string };
 export interface IExportOptions {
     noLazy?: boolean;
     path?: string[];
-    arrayMaxExportCount?: number;
-    arrayRange?: { start: number, end: number };
+    arrayLenLimit?: number;
+}
+
+export interface ILazyArrayExportOptions extends IExportOptions {
+    path: string[];
+    arrayRange: { from: number, to: number };
 }
 
 export interface IKaitaiServices {
@@ -67,7 +74,8 @@ export interface IKaitaiServices {
     generateParser(ksy: string, lang: string, debug: boolean): Promise<ITextFiles>;
     setInput(input: ArrayBufferLike): Promise<void>;
     parse(): Promise<void>;
-    export(options?: IExportOptions): Promise<IExportedValue>;
+    export(options: IExportOptions): Promise<IExportedValue>;
+    export(options: ILazyArrayExportOptions): Promise<IExportedValue[]>;
     exportToJson(useHex: boolean): Promise<string>;
     getCompilerInfo(): Promise<{ version: string, buildDate: string }>;
 }
