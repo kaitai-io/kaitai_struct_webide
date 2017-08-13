@@ -27,7 +27,7 @@
                         <template v-if="_.model.value.type === 'Object'">
                             {{_.model.name}}
                             [<span class="className">{{_.model.value.object.class}}</span>]<!--nobr-->
-                            <template v-if="_.model.value.representation"><!--nobr-->
+                            <template v-if="_.model.value.representation.length > 0"><!--nobr-->
                                 :
                                 <template v-for="item in _.model.value.representation"><!--nobr-->
                                     <span class="repr-text" v-if="item.type === 'text'">{{item.value}}</span><!--nobr-->
