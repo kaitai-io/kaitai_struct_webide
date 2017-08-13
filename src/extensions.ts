@@ -4,12 +4,17 @@ interface IThenBy<T> {
     sort(): T[];
 }
 
+// tslint:disable-next-line
 interface Array<T> {
     last(): T;
     remove(item: T): void;
     sortBy(selector: ((item: T) => any)): IThenBy<T>;
     toDict(keySelector: ((item: T) => string)): { [key: string]: T; };
     toDict<T2>(keySelector: ((item: T) => string), valueSelector: ((item: T) => T2)): { [key: string]: T2; };
+}
+
+class ArrayHelper {
+    static flatten<TItem>(arr: TItem[][]): TItem[] { return <TItem[]> [].concat.apply([], arr); }
 }
 
 if (!Array.prototype.last) {
@@ -29,10 +34,11 @@ Array.prototype.remove = function<T>(item: T) {
             this.splice(i, 1);
         }
     }
-}
+};
 // #endregion
 
 // #region String
+// tslint:disable-next-line
 interface String {
     ucFirst(): string;
     repeat(count: number): string;
@@ -101,6 +107,7 @@ if (!String.prototype.repeat) {
 // #endregion
 
 // #region Promise
+// tslint:disable-next-line
 interface PromiseConstructor {
     delay(timeoutMs: number): Promise<void>;
 }
@@ -111,6 +118,7 @@ Promise.delay = function(timeoutMs: number) {
 // #endregion
 
 // #region RegExp
+// tslint:disable-next-line
 interface RegExp {
     matches(value: string): RegExpExecArray[];
 }
@@ -125,6 +133,7 @@ RegExp.prototype.matches = function (value: string) {
 
 // #endregion
 
+// tslint:disable-next-line
 interface Date {
     format(format: string): string;
 }

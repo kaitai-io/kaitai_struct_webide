@@ -7,6 +7,8 @@
     .parsedTree .className { color: #7fff7f; }
     .parsedTree .primitiveValue { font-weight: bold }
     .parsedTree .treeView .header.selected>.wholerow { background:rgb(86, 86, 86); }
+    .parsedTree .repr-value { color: white; }
+    .parsedTree .repr-text { color: #aaa; }
 </style>
 
 <template>
@@ -24,7 +26,14 @@
                     <template v-else>
                         <template v-if="_.model.value.type === 'Object'">
                             {{_.model.name}}
-                            [<span class="className">{{_.model.value.object.class}}</span>]
+                            [<span class="className">{{_.model.value.object.class}}</span>]<!--nobr-->
+                            <template v-if="_.model.value.representation"><!--nobr-->
+                                :
+                                <template v-for="item in _.model.value.representation"><!--nobr-->
+                                    <span class="repr-text" v-if="item.type === 'text'">{{item.value}}</span><!--nobr-->
+                                    <span class="repr-value" v-if="item.type === 'value'">{{item.value}}</span><!--nobr-->
+                                </template>
+                            </template>
                         </template>
                         <template v-else-if="_.model.value.type === 'Array'">
                             {{_.model.name}}

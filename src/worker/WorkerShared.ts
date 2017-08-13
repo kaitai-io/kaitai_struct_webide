@@ -20,6 +20,11 @@ export interface IExportedObject {
     instances?: { [name: string]: IInstance; };
 }
 
+export interface IReprPart {
+    type: "text"|"value";
+    value: string;
+}
+
 export interface IExportedValue {
     type: ObjectType;
     path: string[];
@@ -42,6 +47,7 @@ export interface IExportedValue {
     exception: any;
 
     parent?: IExportedValue;
+    representation?: IReprPart[];
 }
 
 export interface IKsyTypes { [name: string]: KsySchema.IType; }

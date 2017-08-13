@@ -1,4 +1,4 @@
-import { IKsyTypes, ObjectType, IExportedValue, IInstance } from "./WorkerShared";
+import { IKsyTypes, ObjectType, IExportedValue, IInstance, IReprPart } from "./WorkerShared";
 
 interface IDebugInfo {
     start: number;
@@ -58,6 +58,79 @@ export class ObjectExporter {
         const exportedProperty = this.exportValue(propertyValue, obj._debug["_m_" + propName], objPath.concat(propName));
         exportedProperty.exception = propertyException;
         return exportedProperty;
+    }
+
+    asciiEncode(bytes: Uint8Array) {
+        var len = bytes.byteLength;
+        var binary = "";
+        for (var i = 0; i < len; i++)
+            binary += String.fromCharCode(bytes[i]);
+        return binary;
+    }
+
+    hexEncode(bytes: Uint8Array) {
+        var len = bytes.byteLength;
+        var binary = "0x";
+        for (var i = 0; i < len; i++)
+            binary += bytes[i].toString(16);
+        return binary;
+    }
+
+    getWebIdeRepr(exp: IExportedValue): IReprPart[] {
+        if (exp.type !== ObjectType.Object) return [];
+
+        var ksyType = this.ksyTypes[exp.object.class];
+        var repr = ksyType && ksyType["-webide-representation"];
+        if (!repr) return [];
+
+        function ksyNameToJsName(ksyName: string) { return ksyName.split("_").map((x, i) => (i === 0 ? x : x.ucFirst())).join(""); }
+
+        return ArrayHelper.flatten(repr.split(/\{(.*?)\}/).map((value, idx) => {
+            if (idx % 2 === 0) {
+                return [<IReprPart> { type: "text", value }];
+            } else {
+                var currItem = exp;
+                var parts = value.split(":");
+
+                var format: { sep:string, str?:string, hex?:string, dec?:string } = { sep: ", " };
+                if (parts.length > 1)
+                    parts[1].split(",").map(x => x.split("=")).forEach(kv => format[kv[0]] = kv.length > 1 ? kv[1] : true);
+                parts[0].split(".").forEach(k => {
+                    if (!currItem || !currItem.object)
+                        currItem = null;
+                    else {
+                        var child = k === "_parent" ? currItem.parent : currItem.object.fields[ksyNameToJsName(k)];
+                        // TODO: add warning
+                        //if (!child)
+                        //    console.log("[webrepr] child not found in object", currItem, k);
+                        currItem = child;
+                    }
+                });
+
+                const result = <IReprPart> { type: "value" };
+                let resArr = [result];
+                if (!currItem)
+                    result.value = "";
+                else if (currItem.type === ObjectType.Object)
+                    resArr = this.getWebIdeRepr(currItem);
+                else if (format.str && currItem.type === ObjectType.TypedArray)
+                    result.value = this.asciiEncode(currItem.bytes);
+                else if (format.hex && currItem.type === ObjectType.TypedArray)
+                    result.value = this.hexEncode(currItem.bytes);
+                else if (currItem.type === ObjectType.Primitive && Number.isInteger(currItem.primitiveValue))
+                    result.value = format.dec ? `${currItem.primitiveValue}` : currItem.enumStringValue || `0x${currItem.primitiveValue.toString(16)}`;
+                else if (currItem.type === ObjectType.Array) {
+                    const sepObj = <IReprPart> { type: "text", value: format.sep };
+                    resArr = [sepObj];
+                    for (const item of currItem.arrayItems)
+                        resArr.push(...this.getWebIdeRepr(item), sepObj);
+                }
+                else
+                    result.value = (currItem.primitiveValue || "").toString();
+
+                return resArr;
+            }
+        }));
     }
 
     exportValue(obj: any, debug: IDebugInfo, path: string[]): IExportedValue {
@@ -129,6 +202,12 @@ export class ObjectExporter {
         }
         else
             console.log(`Unknown object type: ${result.type}`);
+
+        try {
+            result.representation = this.getWebIdeRepr(result);
+        } catch(e) {
+            result.exception = result.exception || e.toString();
+        }
 
         return result;
     }
