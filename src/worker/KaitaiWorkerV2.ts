@@ -5,7 +5,7 @@ import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");
 import { YAML } from "yamljs";
 import { ObjectExporter } from "./ObjectExporter";
-import { IKaitaiServices, IKsyTypes, IExportOptions, ILazyArrayExportOptions } from "./WorkerShared";
+import { IKaitaiServices, IExportOptions, ILazyArrayExportOptions } from "./WorkerShared";
 import { JsonExporter } from "./JsonExporter";
 import { SchemaUtils } from "./SchemaUtils";
 import { TemplateCompiler } from "./TemplateCompiler";
@@ -15,8 +15,7 @@ class KaitaiServices implements IKaitaiServices {
     kaitaiCompiler: KaitaiStructCompiler;
     templateCompiler: TemplateCompiler;
 
-    ksyCode: string;
-    ksy: KsySchema.IKsyFile;
+    ksys: { [fn: string]: KsySchema.IKsyFile } = {};
     jsCode: string;
 
     classes: { [name: string]: any };
@@ -34,7 +33,7 @@ class KaitaiServices implements IKaitaiServices {
 
     public initCode() {
         if (!this.jsCode) return false;
-        if (this.classes) return true;
+        if (this.classes && this.objectExporter) return true;
 
         this.classes = {};
 
@@ -45,28 +44,51 @@ class KaitaiServices implements IKaitaiServices {
         }
         define["amd"] = true;
 
-        eval(this.jsCode);
+        eval(this.jsCode.replace(/if \(typeof require(.|\n)*?require\([^;]*;/g, ""));
         console.log("compileKsy", this.mainClassName, this.classes);
 
-        const ksyTypes = SchemaUtils.collectKsyTypes(this.ksy);
-        this.objectExporter = new ObjectExporter(ksyTypes, this.classes);
+        this.objectExporter = new ObjectExporter(this.classes);
+        for (const ksy of Object.values(this.ksys))
+            this.objectExporter.addKsyTypes(SchemaUtils.collectKsyTypes(ksy));
         return true;
     }
 
-    public async compile(ksyCode: string, template: string) {
+    protected async getMissingImports() {
+        const missingImports = new Set<string>();
+        for (const ksyUri of Object.keys(this.ksys)) {
+            const ksyUriParts = ksyUri.split("/");
+            const parentUri = ksyUriParts.slice(0, ksyUriParts.length - 1).join("/");
+            const ksy = this.ksys[ksyUri];
+            if (!ksy.meta || !ksy.meta.imports) continue;
+
+            for (const importFn of ksy.meta.imports) {
+                const importUri = `${parentUri}/${importFn}.ksy`;
+                if(!(importUri in this.ksys))
+                    missingImports.add(importUri);
+            }
+        }
+        return Array.from(missingImports);
+    }
+
+    public async setKsys(ksyCodes: { [fn: string]: string }) {
+        for (const importFn of Object.keys(ksyCodes))
+            this.ksys[importFn] = YAML.parse(ksyCodes[importFn]);
+        return await this.getMissingImports();
+    }
+
+    public async compile(ksyUri: string, template: string) {
         this.jsCode = this.classes = this.objectExporter = null;
-        this.ksyCode = ksyCode;
-        this.ksy = YAML.parse(ksyCode);
+        const ksy = this.ksys[ksyUri];
 
         var releaseCode, debugCode;
         if (template) {
             const templateSchema = YAML.parse(template);
-            releaseCode = await this.templateCompiler.compile(templateSchema, this.ksy, null, false);
-            debugCode = await this.templateCompiler.compile(templateSchema, this.ksy, null, true);
+            releaseCode = await this.templateCompiler.compile(templateSchema, ksy, this, false);
+            debugCode = await this.templateCompiler.compile(templateSchema, ksy, this, true);
         }
         else {
-            releaseCode = await this.kaitaiCompiler.compile("javascript", this.ksy, null, false);
-            debugCode = await this.kaitaiCompiler.compile("javascript", this.ksy, null, true);
+            releaseCode = await this.kaitaiCompiler.compile("javascript", ksy, this, false);
+            debugCode = await this.kaitaiCompiler.compile("javascript", ksy, this, true);
         }
 
         this.jsCode = (<any>Object).values(debugCode).join("\n");
@@ -122,8 +144,15 @@ class KaitaiServices implements IKaitaiServices {
 
     async generateParser(ksyContent: string, lang: string, debug: boolean): Promise<{ [fileName: string]: string; }> {
         const ksy = YAML.parse(ksyContent);
-        const compiledCode = await this.kaitaiCompiler.compile(lang, ksy, null, debug);
+        const compiledCode = await this.kaitaiCompiler.compile(lang, ksy, this, debug);
         return compiledCode;
+    }
+
+    async importYaml(name: string, mode: "abs"|"rel") {
+        for (const ksyUri of Object.keys(this.ksys))
+            if (ksyUri.endsWith(`/${name}.ksy`))
+                return this.ksys[ksyUri];
+        throw new Error(`importYaml failed: ${name}. Available ksys: ${Object.keys(this.ksys).join(", ")}`);
     }
 
     async exportToJson(useHex: boolean) {

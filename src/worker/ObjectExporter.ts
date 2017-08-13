@@ -1,4 +1,4 @@
-import { IKsyTypes, ObjectType, IExportedValue, IInstance } from "./WorkerShared";
+import { ObjectType, IExportedValue, IInstance } from "./WorkerShared";
 
 interface IDebugInfo {
     start: number;
@@ -11,8 +11,14 @@ interface IDebugInfo {
 export class ObjectExporter {
     noLazy = false;
     arrayLenLimit = 100;
+    ksyTypes: IKsyTypes = {};
 
-    constructor(public ksyTypes: IKsyTypes, public classes: { [name: string]: any }) { }
+    constructor(public classes: { [name: string]: any }) { }
+
+    addKsyTypes(ksyTypes: IKsyTypes) {
+        for (const typeName of Object.keys(ksyTypes))
+            this.ksyTypes[typeName] = ksyTypes[typeName];
+    }
 
     static isUndef(obj: any) { return typeof obj === "undefined"; }
 

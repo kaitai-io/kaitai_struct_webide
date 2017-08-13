@@ -139,12 +139,34 @@ class AppController {
         await this.recompile();
     }
 
+    protected async setupImports(mainKsyUri: string, ksyContent: string) {
+        let currImports = { [mainKsyUri]: ksyContent };
+
+        while (true) {
+            const newImports = await this.sandbox.kaitaiServices.setKsys(currImports);
+            console.log("newImports", newImports);
+            if(newImports.length === 0) break;
+
+            currImports = {};
+            for (const importUri of newImports) {
+                const importStr = Conversion.utf8BytesToStr(await fss.read(importUri));
+                if (!importStr)
+                    throw new Error(`File not found: ${importUri}`);
+                currImports[importUri] = importStr;
+            }
+        }
+    }
+
     protected async recompile() {
         try {
             this.view.hideErrors();
             const ksyContent = this.ksyChangeHandler.getContent();
             const template = this.templateChangeHandler.getContent();
-            var compilationResult = await this.sandbox.kaitaiServices.compile(ksyContent, template);
+
+            const mainKsyUri = localSettings.latestKsyUri;
+            await this.setupImports(mainKsyUri, ksyContent);
+
+            const compilationResult = await this.sandbox.kaitaiServices.compile(mainKsyUri, template);
             console.log("compilationResult", compilationResult);
             this.view.jsCode.setValue(Object.values(compilationResult.releaseCode).join("\n"), -1);
             this.view.jsCodeDebug.setValue(compilationResult.debugCodeAll, -1);

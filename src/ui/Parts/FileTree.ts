@@ -165,9 +165,7 @@ export class FileTree extends Vue {
         this.fsTreeView.selectedItem.dblclick();
     }
 
-    public async openFile(uri?: string) {
-        if (uri)
-            await this.selectItem(uri);
+    public async openFile() {
         this.$emit("open-file", this.selectedFsItem);
     }
 
@@ -208,8 +206,10 @@ export class FileTree extends Vue {
 
         await dest.loadChildren();
 
-        if (resultUris.length === 1)
-            await this.openFile(resultUris[0]);
+        if (resultUris.length === 1) {
+            await this.selectItem(resultUris[0]);
+            await this.openFile();
+        }
 
         return resultUris;
     }

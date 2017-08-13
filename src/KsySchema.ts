@@ -4,6 +4,7 @@
         endian?: "le" | "be";
         application?: string;
         "file-extension"?: string;
+        imports?: string[];
     }
 
     interface ITypeSwitch {

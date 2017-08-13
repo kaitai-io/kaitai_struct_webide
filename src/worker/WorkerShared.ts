@@ -66,7 +66,8 @@ export interface ILazyArrayExportOptions extends IExportOptions {
 }
 
 export interface IKaitaiServices {
-    compile(code: string, template?: string): Promise<{
+    setKsys(ksyCodes: { [uri: string]: string }): Promise<string[]>;
+    compile(ksyUri: string, template?: string): Promise<{
         releaseCode: ITextFiles,
         debugCode: ITextFiles,
         debugCodeAll: string,
