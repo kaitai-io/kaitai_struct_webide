@@ -1,4 +1,4 @@
-import "ace/ext-language_tools";
+import * as ace from "ace/ace";
 
 interface ISuggestionData {
     regex: RegExp;
@@ -54,19 +54,19 @@ export class KsyAutoCompleter {
             "meta/endian": ["le", "be"],
             "meta/ks-version": ["0.8", "0.7"],
             "meta/license": ["CC0-1.0", "MIT", "Unlicense"],
-            "seq/\\d+/type": [() => this.getRelativeSuggestions("types"), "u8", "u4", "u2", "u1", "s8", "s4", "s2", "s1", "f8", "f4",
+            "(seq|instances)/[^/]+/type": [() => this.getRelativeSuggestions("types"), "u8", "u4", "u2", "u1", "s8", "s4", "s2", "s1", "f8", "f4",
                 "str", "strz", "u8le", "u4le", "u2le", "s8le", "s4le", "s2le", "u8be", "u4be", "u2be", "s8be", "s4be", "s2be", "f8le", "f4le", "f8be", "f4be"],
             "seq(/\\d+)?": ["id", "-orig-id", ...attributeSpec],
-            "seq/\\d+/encoding": ["UTF-8", "ASCII", "UTF-16LE", "UTF-16BE"],
-            "seq/\\d+/enum": [() => this.getRelativeSuggestions("enums")],
-            "seq/\\d+/repeat": ["expr", "until", "eos"],
-            "seq/\\d+/repeat-eos": ["true"],
-            "seq/\\d+/consume": ["false", "true"],
-            "seq/\\d+/include": ["true", "false"],
-            "seq/\\d+/eos-error": ["false", "true"],
-            "seq/\\d+/size-eos": ["true", "false"],
-            "seq/\\d+/terminator": ["0"],
-            "seq/\\d+/process": ["zlib", "xor(key)", "rol(4)", "ror(4)"],
+            "(seq|instances)/[^/]+/encoding": ["UTF-8", "ASCII", "UTF-16LE", "UTF-16BE"],
+            "(seq|instances)/[^/]+/enum": [() => this.getRelativeSuggestions("enums")],
+            "(seq|instances)/[^/]+/repeat": ["expr", "until", "eos"],
+            "(seq|instances)/[^/]+/repeat-eos": ["true"],
+            "(seq|instances)/[^/]+/consume": ["false", "true"],
+            "(seq|instances)/[^/]+/include": ["true", "false"],
+            "(seq|instances)/[^/]+/eos-error": ["false", "true"],
+            "(seq|instances)/[^/]+/size-eos": ["true", "false"],
+            "(seq|instances)/[^/]+/terminator": ["0"],
+            "(seq|instances)/[^/]+/process": ["zlib", "xor(key)", "rol(4)", "ror(4)"],
             "instances/[^/]+": ["value", "pos", "io", ...attributeSpec],
             "instances/[^/]+/io": ["_parent.io", "_root.io"],
             "(types/[^/]+|/)": ["seq", "instances", "enums", "types", "meta", "doc"],
@@ -75,11 +75,12 @@ export class KsyAutoCompleter {
         this.initWithSuggestionList(suggestionList);
     }
 
-    static setup(editor: AceAjax.Editor) {
+    static async setup(editor: AceAjax.Editor) {
         const completer = new KsyAutoCompleter();
         editor["completers"] = [completer];
+        await loader.getLoadedModule("ace/ext-language_tools");
         editor.setOptions({ enableBasicAutocompletion: true, enableLiveAutocompletion: true });
-        console.log("auto completer", editor);
+        //console.log("auto completer", editor);
         return completer;
     }
 
@@ -97,7 +98,7 @@ export class KsyAutoCompleter {
             this.suggestionData.push(result);
         }
 
-        console.log("suggestionData", this.suggestionData);
+        //console.log("suggestionData", this.suggestionData);
     }
 
     getCompletions(editor: AceAjax.Editor, session: any, pos: { start: number, end: number }, prefix: string, callback: any) {
@@ -107,7 +108,7 @@ export class KsyAutoCompleter {
             this.editor = editor;
             this.ksy = YAML.parse(editor.getValue(), false, null, true);
             this.context = this.getContext(editor.getSelectionRange().start.row + 1);
-            console.log("context", this.context);
+            //console.log("context", this.context);
 
             if (this.context.current) {
                 suggestions = this.generateSuggestions(this.context.current).map(x => ({ value: x }));
@@ -121,7 +122,7 @@ export class KsyAutoCompleter {
             for (var i = 0; i < suggestions.length; i++)
                 if(!suggestions[i].score) suggestions[i].score = 1000 - i;
 
-            console.log("suggestions", suggestions);
+            //console.log("suggestions", suggestions);
         } catch(e) {
             console.error("KsyAutoCompleter exception", e);
         }
