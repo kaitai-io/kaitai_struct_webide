@@ -1,5 +1,5 @@
 declare class YAML {
-    static parse(yaml: string): any;
+    static parse(yaml: string, exceptionOnInvalidType?: boolean, objectDecoder?: any, saveMeta?: boolean): any;
 }
 
 interface IYamlImporter {

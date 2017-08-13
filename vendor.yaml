@@ -25,6 +25,7 @@ libs:
         - src/theme-textmate.js
         - src/worker-javascript.js
         - src/worker-json.js
+        - src/ext-language_tools.js
 
   BigInteger.js:
     source: https://github.com/peterolson/BigInteger.js
