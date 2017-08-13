@@ -12,7 +12,7 @@ export async function InitKaitaiSandbox() {
     handler.errorHandlers = { "ParseException": ParseError };
 
     const sandbox = handler.createProxy<ISandboxMethods>();
-    const npmDir = "../../../lib/_npm";
+    const npmDir = "lib/_npm";
     await sandbox.loadScript(new URL("js/AmdLoader.js", location.href).href);
     await sandbox.eval(`
         loader.projectBase = "${window.location.href}";
