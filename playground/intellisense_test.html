@@ -17,7 +17,7 @@
     var editor = ace.edit("editor");
     editor.getSession().setMode("ace/mode/yaml");
     editor.setTheme("ace/theme/monokai");
-    editor.setOptions({ enableBasicAutocompletion: true, tabSize: 2 });
+    editor.setOptions({ enableBasicAutocompletion: true, enableLiveAutocompletion: true, tabSize: 2 });
     editor.setValue(localStorage.ksyContent || `meta:
   id: intellisense_test
   file-extension: intellisense_test`, 1);
@@ -110,15 +110,30 @@
             const context = getSelectedFieldName();
             console.log("context", context);
 
+            function flattenArray(arr) { return [].concat.apply([], arr); }
+
+            function getRelativeSuggestions(type) {
+                const enumRoots = [""];
+                const path = context.current.split("/");
+                for (var i = 0; i < path.length; i++)
+                    if (path[i] === "types")
+                        enumRoots.push(path.slice(0, i + 2).join("/"));
+                return flattenArray(enumRoots.map(enumRoot => Object.keys(selectObject(context.data, `${enumRoot}/${type}`) || {}))).filter(x => x !== "$meta");
+            }
+            
+            function getEnumSuggestions() { return getRelativeSuggestions("enums"); }
+            function getTypeSuggestions() { return getRelativeSuggestions("types"); }
+
             var attributeSpec = ["size", "type", "enum", "contents", "terminator", "include", "consume", "eos-error", "encoding", "process", "repeat", "repeat-eos", "repeat-expr", "repeat-until", "if", "doc", "doc-ref", "size-eos"];
-            var fieldSuggestions = {
+            var fieldSuggestionList = {
                 "meta": ["id", "title", "application", "file-extension", "xref", "license", "ks-version", "imports", "encoding", "endian"],
                 "meta/endian": ["le", "be"],
                 "meta/ks-version": ["0.8", "0.7"],
                 "meta/license": ["CC0-1.0", "MIT", "Unlicense"],
-                "seq/\\d+/type": ["u8", "u4", "u2", "u1", "s8", "s4", "s2", "s1", "f8", "f4", "str", "strz", "u8le", "u4le", "u2le", "s8le", "s4le", "s2le", "u8be", "u4be", "u2be", "s8be", "s4be", "s2be", "f8le", "f4le", "f8be", "f4be"],
+                "seq/\\d+/type": [getTypeSuggestions, "u8", "u4", "u2", "u1", "s8", "s4", "s2", "s1", "f8", "f4", "str", "strz", "u8le", "u4le", "u2le", "s8le", "s4le", "s2le", "u8be", "u4be", "u2be", "s8be", "s4be", "s2be", "f8le", "f4le", "f8be", "f4be"],
                 "seq(/\\d+)?": ["id", "-orig-id", ...attributeSpec],
                 "seq/\\d+/encoding": ["UTF-8", "ASCII", "UTF-16LE", "UTF-16BE"],
+                "seq/\\d+/enum": [getEnumSuggestions],
                 "seq/\\d+/repeat": ["expr", "until", "eos"],
                 "seq/\\d+/repeat-eos": ["true"],
                 "seq/\\d+/consume": ["false", "true"],
@@ -132,28 +147,47 @@
                 "(types/[^/]+|/)": ["seq", "instances", "enums", "types", "meta", "doc"],
             };
 
+            var fieldSuggestions = [];
+            for (const regexPattern of Object.keys(fieldSuggestionList)) {
+                const result = { regex: new RegExp(regexPattern + "$"), suggestions: [], generator: null };
+                for (const sugg of fieldSuggestionList[regexPattern])
+                    if (typeof sugg === "string")
+                        result.suggestions.push(sugg);
+                    else if (typeof sugg === "function")
+                        result.generator = sugg;
+                fieldSuggestions.push(result);
+            }
+                
+
+            console.log('fieldSuggestions', fieldSuggestions);
+
             function selectObject(root, path) {
                 return path === "/" ? root : path.substr(1).split("/").reduce((curr, name) => curr[name], root);
             }
 
-            function matchField(name) {
-                for (const regexPattern of Object.keys(fieldSuggestions))
-                    if (new RegExp(regexPattern + "$").exec(name))
-                        return fieldSuggestions[regexPattern];
+            function getSuggestions(path) {
+                for (const sugg of fieldSuggestions)
+                    if (sugg.regex.exec(path)) {
+                        const suggestions = sugg.generator ? sugg.generator() : [];
+                        return suggestions.concat(sugg.suggestions);
+                    }
                 return [];
             }
 
             var suggestions = [];
             if (context.current) {
-                var fieldValues = matchField(context.current);
-                suggestions = fieldValues.map(x => ({ value: x }));
+                suggestions = getSuggestions(context.current).map(x => ({ value: x }));
             }
             else {
                 var parentObj = selectObject(context.data, context.parent);
                 var parentKeys = parentObj ? Object.keys(parentObj) : [];
-                suggestions = matchField(context.parent).filter(x => parentKeys.indexOf(x) === -1).map(x => ({ caption: x, value: `${x}: ` }));
+                suggestions = getSuggestions(context.parent).filter(x => parentKeys.indexOf(x) === -1).map(x => ({ caption: x, value: `${x}: ` }));
             }
 
+            for (var i = 0; i < suggestions.length; i++)
+                if(!suggestions[i].score) suggestions[i].score = 1000 - i;
+
+            console.log("suggestions", suggestions);
             callback(null, suggestions);
         }
     }]);
