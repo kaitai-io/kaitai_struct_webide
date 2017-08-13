@@ -1,4 +1,4 @@
-import { ObjectType, IExportedValue, IInstance } from "./WorkerShared";
+import { IKsyTypes, ObjectType, IExportedValue, IInstance } from "./WorkerShared";
 
 interface IDebugInfo {
     start: number;
