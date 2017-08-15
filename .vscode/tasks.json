@@ -6,25 +6,52 @@
         {
             "taskName": "compile-gui",
             "command": "node_modules/.bin/tsc",
-            "isShellCommand": true,
             "args": ["-w", "-p", "."],
-            "showOutput": "silent",
+            "type": "shell",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            },
             "isBackground": true,
             "problemMatcher": "$tsc-watch"
         },
         {
             "taskName": "compile-worker",
             "command": "node_modules/.bin/tsc",
-            "isShellCommand": true,
             "args": ["-w", "-p", "tsconfig.worker.json"],
-            "showOutput": "silent",
+            "type": "shell",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            },
+            "isBackground": true,
+            "problemMatcher": "$tsc-watch"
+        },
+        {
+            "taskName": "compile-playground",
+            "command": "node_modules/.bin/tsc",
+            "args": ["-w", "-p", "tsconfig.playground.json"],
+            "type": "shell",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            },
             "isBackground": true,
             "problemMatcher": "$tsc-watch"
         },
         {
             "taskName": "compile",
             "dependsOn": ["compile-gui", "compile-worker"],
-            "isBuildCommand": true
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

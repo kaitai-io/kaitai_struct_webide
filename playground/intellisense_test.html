@@ -12,6 +12,9 @@
   <script src="https://rawgithub.com/ajaxorg/ace-builds/master/src/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
   <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
   <script src="../lib/yaml.js"></script>
+  <script>exports = {}</script>
+  <!-- <script src="KsyAutoCompleter.js"></script> -->
+  <script src="KsyAst.js"></script>
 <script>
     function startup() {
         var editor = ace.edit("editor");
@@ -23,7 +26,14 @@
     file-extension: intellisense_test`, 1);
         editor.focus();
 
-        var completer = new KsyAutoCompleter();
+        const completer = {
+            getCompletions(editor, session, pos, prefix, callback) {
+                const ksy = new KsyAst.Parser(editor.getValue()).parse();
+                console.log(ksy);
+            }
+        };
+
+        //var completer = new KsyAutoCompleter();
         editor.completers = [completer];
         editor.on("change", () => {
             try {
@@ -32,152 +42,8 @@
                 console.log("error", e);
             }
         });
-    }
 
-    class KsyAutoCompleter {
-        constructor() {
-            var attributeSpec = ["size", "type", "enum", "contents", "terminator", "include", "consume", "eos-error", "encoding", "process", "repeat", "repeat-eos", "repeat-expr", "repeat-until", "if", "doc", "doc-ref", "size-eos"];
-            var suggestionList = {
-                "meta": ["id", "title", "application", "file-extension", "xref", "license", "ks-version", "imports", "encoding", "endian"],
-                "meta/endian": ["le", "be"],
-                "meta/ks-version": ["0.8", "0.7"],
-                "meta/license": ["CC0-1.0", "MIT", "Unlicense"],
-                "seq/\\d+/type": [() => this.getRelativeSuggestions("types"), "u8", "u4", "u2", "u1", "s8", "s4", "s2", "s1", "f8", "f4", "str", "strz", "u8le", "u4le", "u2le", "s8le", "s4le", "s2le", "u8be", "u4be", "u2be", "s8be", "s4be", "s2be", "f8le", "f4le", "f8be", "f4be"],
-                "seq(/\\d+)?": ["id", "-orig-id", ...attributeSpec],
-                "seq/\\d+/encoding": ["UTF-8", "ASCII", "UTF-16LE", "UTF-16BE"],
-                "seq/\\d+/enum": [() => this.getRelativeSuggestions("enums")],
-                "seq/\\d+/repeat": ["expr", "until", "eos"],
-                "seq/\\d+/repeat-eos": ["true"],
-                "seq/\\d+/consume": ["false", "true"],
-                "seq/\\d+/include": ["true", "false"],
-                "seq/\\d+/eos-error": ["false", "true"],
-                "seq/\\d+/size-eos": ["true", "false"],
-                "seq/\\d+/terminator": ["0"],
-                "seq/\\d+/process": ["zlib", "xor(key)", "rol(4)", "ror(4)"],
-                "instances/[^/]+": ["value", "pos", "io", ...attributeSpec],
-                "instances/[^/]+/io": ["_parent.io", "_root.io"],
-                "(types/[^/]+|/)": ["seq", "instances", "enums", "types", "meta", "doc"],
-            };
-
-            this.initWithSuggestionList(suggestionList);
-        }
-
-        initWithSuggestionList(suggestionList) {
-            this.suggestionData = [];
-            for (const regexPattern of Object.keys(suggestionList)) {
-                const result = { regex: new RegExp(regexPattern + "$"), suggestions: [], generator: null };
-                for (const sugg of suggestionList[regexPattern])
-                    if (typeof sugg === "string")
-                        result.suggestions.push(sugg);
-                    else if (typeof sugg === "function")
-                        result.generator = sugg;
-                this.suggestionData.push(result);
-            }
-                
-            console.log('suggestionData', this.suggestionData);
-        }
-
-        getCompletions(editor, session, pos, prefix, callback) {
-            this.editor = editor;
-            this.ksy = YAML.parse(editor.getValue(), false, null, true);
-            this.context = this.getContext(editor.getSelectionRange().start.row + 1);
-            console.log("context", this.context);
-
-            var suggestions = [];
-            if (this.context.current) {
-                suggestions = this.generateSuggestions(this.context.current).map(x => ({ value: x }));
-            } else {
-                var parentObj = this.selectObject(this.context.parent);
-                var parentKeys = parentObj ? Object.keys(parentObj) : [];
-                suggestions = this.generateSuggestions(this.context.parent).filter(x => parentKeys.indexOf(x) === -1).map(x => ({ caption: x, value: `${x}: ` }));
-            }
-
-            for (var i = 0; i < suggestions.length; i++)
-                if(!suggestions[i].score) suggestions[i].score = 1000 - i;
-
-            console.log("suggestions", suggestions);
-            callback(null, suggestions);
-        }
-
-        getContext(row) {
-            const lineDict = this.getLineInfoFromYaml(this.ksy);
-            var linePadding = KsyAutoCompleter.getPaddingLen(this.editor.session.getLine(row - 1));
-
-            var result = {};
-            if (lineDict[row]) 
-                result.current = lineDict[row--];
-
-            while(true && row >= 0) {
-                var line = this.editor.session.getLine(row - 1);
-                if (KsyAutoCompleter.getPaddingLen(line) < linePadding && lineDict[row]) {
-                    // "seq/0/id" and "seq/0" are on the same line, but we want to get "seq/0", not "seq/0/id"
-                    result.parent = line.trim().startsWith("- ") ? KsyAutoCompleter.getParentPath(lineDict[row]) : lineDict[row];
-                    break;
-                }
-                row--;
-            }
-
-            if (linePadding === 0)
-                result.parent = result.parent || "/";
-
-            return result;
-        }
-
-        getLineInfoFromYaml(yaml) {
-            const lineDict = {};
-            function parseObject(path, ksy) {
-                if (ksy.$meta)
-                    for (const fieldName of Object.keys(ksy.$meta))
-                        lineDict[ksy.$meta[fieldName]] = `${path}/${fieldName}`;
-
-                for (const fieldName of Object.keys(ksy).filter(x => x !== "$meta")) {
-                    const value = ksy[fieldName];
-                    if (value && typeof value === "object")
-                        parseObject(`${path}/${fieldName}`, ksy[fieldName]);
-                }
-            }
-
-            console.log('yaml', yaml, 'lineDict', lineDict);
-            parseObject("", yaml);
-            return lineDict;
-        }        
-
-        generateSuggestions(path) {
-            for (const sugg of this.suggestionData)
-                if (sugg.regex.exec(path)) {
-                    const suggestions = sugg.generator ? sugg.generator() : [];
-                    return suggestions.concat(sugg.suggestions);
-                }
-            return [];
-        }
-
-        getRelativeSuggestions(type) {
-            const enumRoots = [""];
-            const path = this.context.current.split("/");
-            for (var i = 0; i < path.length; i++)
-                if (path[i] === "types")
-                    enumRoots.push(path.slice(0, i + 2).join("/"));
-            return flattenArray(enumRoots.map(enumRoot => Object.keys(this.selectObject(`${enumRoot}/${type}`) || {}))).filter(x => x !== "$meta");
-        }
-
-        selectObject(path) {
-            return path === "/" ? this.ksy : path.substr(1).split("/").reduce((curr, name) => curr[name], this.ksy);
-        }
-
-        static flattenArray(arr) { return [].concat.apply([], arr); }
-
-        static getPaddingLen(line) {
-            for(let i = 0; i < line.length; i++)
-                if(line[i] !== ' ')
-                    return i;
-            return line.length;
-        }
-
-        static getParentPath(path) {
-            var parts = path.split("/");
-            parts.pop();
-            return parts.join("/");
-        }
+        //KsyAutoCompleter.setup(editor);
     }
 
     startup();
