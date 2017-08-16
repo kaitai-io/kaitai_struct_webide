@@ -1,70 +1,54 @@
 import { KsyAst } from "./KsyAst";
-const ast = new KsyAst.Parser(
-`meta:
-#
-#
-#
-  a:
-  id: intellisense_test
-  file-extension: intellisense_test
-  endian: le
-  title: ""
-  application: ""
-  ks-version: 0.
-  license: CC0-1.0
-doc:
-  5
-seq:
-  - id: test
-    type: str
-    enum: enum1
-    encoding: ASCII
-    repeat: expr
-    repeat-eos: true
-    doc: 
-      - x: a
-    eos-error: false
-    terminator: 0
-    process: xor(key)
-    
-    consume: false
-  - 
-    eos-error: false
-    encoding: UTF-8
-    include: true
-  - a: b
-    c: dd
-    
-enums:
-  enum1:
-    1: a
-  enum2:
-    2: b
-types:
-  test_type:
-    seq:
-      - id: f1
-        encoding: UTF-8
-        process: zlib
-        size-eos: true
-        enum: enum3
-        type: s8
-    instances:
-      test_instance:
-        io: _parent.io
-    enums: 
-      enum3:
-        a: 1
-    types: 
-      new_type:
-        seq: 
-          - id: test
-    meta: 
-    doc: 
-instances: 
-asdasd:
-`).parse();
-const astJson = JSON.stringify(ast, (k,v) => k === "parent" || k === "range" ? undefined : v, 4);
-const ksy = KsyAst.Converter.astToRaw(ast);
-console.log(ksy);
-console.log(ast);
+const fs = require("fs");
+const yaml = require("yaml-js");
+const glob = require("glob");
+var mkdirp = require("mkdirp");
+const path = require("path");
+
+const outDir = "playground/compare_results";
+
+function testAllKsys() {
+  const ksyFns = glob.sync("formats/**/*.ksy");
+  //.filter(x => x.includes("dex.ksy"));
+  console.log(ksyFns);
+
+  for (const ksyFn of ksyFns) {
+    console.log(`processing "${ksyFn}"...`);
+    const ksyContent = fs.readFileSync(ksyFn, "utf8");
+
+    try {
+      const ast = new KsyAst.Parser(ksyContent).parse();
+      const ksyAstRaw = KsyAst.Converter.astToRaw(ast);
+      const ksyAstJsonFn = `${outDir}/ksyAst/${ksyFn}`.replace(".ksy", ".json");
+      mkdirp.sync(path.dirname(ksyAstJsonFn));
+      fs.writeFileSync(ksyAstJsonFn, JSON.stringify(ksyAstRaw, null, 4));
+    } catch(e) {
+      console.error(ksyFn, e);
+    }
+
+    try {
+      const yamlJsRaw = yaml.load(ksyContent);
+      const yamlJsJsonFn = `${outDir}/yamlJs/${ksyFn}`.replace(".ksy", ".json");
+      mkdirp.sync(path.dirname(yamlJsJsonFn));
+      fs.writeFileSync(yamlJsJsonFn.replace(".ksy", ".json"), JSON.stringify(yamlJsRaw, null, 4));
+    } catch(e) {
+      console.error(ksyFn, e);
+    }
+
+    const ksyOutFn = `${outDir}/ksy/${ksyFn}`;
+    mkdirp.sync(path.dirname(ksyOutFn));
+    fs.writeFileSync(ksyOutFn, ksyContent);
+  }
+}
+
+testAllKsys();
+console.log("DONE");
+
+//const ksyContent = fs.readFileSync("playground/test.ksy");
+//const yamlRes = yaml.load(ksyContent);
+//console.log(yamlRes);
+//const ast = new KsyAst.Parser(ksyContent).parse();
+//const astJson = JSON.stringify(ast, (k,v) => k === "parent" || k === "range" ? undefined : v, 4);
+//const ksy = KsyAst.Converter.astToRaw(ast);
+//console.log(ksy);
+//console.log(ast);

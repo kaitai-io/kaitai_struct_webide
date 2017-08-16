@@ -67,7 +67,7 @@ export namespace KsyAst {
             this.nextLine();
         }
 
-        getPosition(column = 0) { return new Position(this.rowStartOffset + column, this.row, column); }
+        getPosition() { return new Position(this.rowStartOffset + this.linePos, this.row, this.linePos); }
 
         nextLine() {
             if (this.row === this.lines.length - 1)
@@ -106,25 +106,48 @@ export namespace KsyAst {
             const key = new Key();
             key.range.start = this.getPosition();
 
-            const line = this.line;
-            for (let i = this.linePos; i < line.length; i++) {
-                if (this.line[i] === ":") {
-                    const isLastChar = i === line.length -1;
-                    if (isLastChar || line[i + 1] === " ") {
-                        key.text = line.substring(this.linePos, i).trim();
-                        key.range.end = this.getPosition();
-                        if (movePos)
-                            this.linePos = i + (isLastChar ? 1 : 2);
-                        return key;
+            const tryToFinishKey = () => {
+                if (this.line[this.linePos] !== ":")
+                    return false;
+
+                const isLastChar = this.linePos === this.line.length -1;
+                if (isLastChar || this.line[this.linePos + 1] === " ") {
+                    key.range.end = this.getPosition();
+                    this.linePos += isLastChar ? 1 : 2;
+                    return true;
+                }
+
+                return false;
+            };
+
+            key.text = this.readQuotedString();
+
+            if (key.text) {
+                this.skipWhitespaceInLine();
+                if (!tryToFinishKey())
+                    this.error("Invalid character after quoted key!");
+            } else {
+                for (; this.linePos < this.line.length; this.linePos++) {
+                    if (tryToFinishKey()) {
+                        key.text = this.line.substring(key.range.start.column, key.range.end.column).trim();
+
+                        const keyAsInt = parseInt(key.text); // convert hex key to dec key
+                        if (!Number.isNaN(keyAsInt))
+                            key.text = keyAsInt.toString();
+
+                        break;
                     }
                 }
             }
 
-            return null;
+            if (key.text === null || !movePos)
+                this.linePos = key.range.start.column;
+
+            return key.text === null ? null : key;
         }
 
         error(text: string, range?: TextRange) {
-            if (this.errorCount++ > 10)
+            if (this.errorCount++ > 100)
                 throw new Error("Fail safe!");
 
             const row = range ? range.start.row : this.row;
@@ -168,10 +191,144 @@ export namespace KsyAst {
 
         get remainingLine() { return this.line.substr(this.linePos); }
 
-        readLiteral(parent: Node): LiteralNode {
-            const remainingLine = this.remainingLine;
+        readQuotedString() {
+            const strStartTag = this.line[this.linePos];
+            if (!(strStartTag === "'" || strStartTag === "\""))
+                return null;
+
+            this.linePos++;
+
+            let prevC = null, str = "";
+            for (; this.linePos < this.line.length; this.linePos++) {
+                const c = this.line[this.linePos];
+                if (c === strStartTag) {
+                    this.linePos++;
+                    break;
+                } else if (c === "\\") {
+                    if (this.linePos === this.line.length - 1) {
+                        this.error(`Non-closed quoted string: "${str}".`);
+                        break;
+                    }
+
+                    this.linePos++;
+                    str += this.line[this.linePos];
+                }
+                else
+                    str += c;
+            }
+
+            return str;
+        }
+
+        strToLiteral(str: string) {
+            let value: any = str;
+
+            if (str === "true") value = true;
+            else if (str === "false") value = false;
+            else if (/^[-+]?0[xX][0-9a-fA-F]+\s*$/.exec(str)) value = parseInt(str, 16);
+            else if (/^[-+]?(\d+\.)?\d+(e\d+)?\s*$/.exec(str)) value = parseFloat(str);
+
+            return value;
+        }
+
+        readArray() {
+            if (this.line[this.linePos] !== "[") return null;
+            this.linePos++;
+
+            const result = [];
+            while (true) {
+                this.skipWhitespaceInLine();
+                const c2 = this.line[this.linePos];
+                const isEnd = c2 === "]";
+
+                if (isEnd || c2 === ",") {
+                    this.linePos++;
+                    if (isEnd)
+                        break;
+                }
+                this.skipWhitespaceInLine();
+
+                const quotedStr = this.readQuotedString();
+                if (quotedStr)
+                    result.push(quotedStr);
+                else {
+                    const origLinePos = this.linePos;
+                    let endPos = this.line.length;
+
+                    for (; this.linePos < this.line.length; this.linePos++) {
+                        const c = this.line[this.linePos];
+                        const isSeparator = c === ",";
+                        if (isSeparator || c === "]") {
+                            endPos = this.linePos;
+                            break;
+                        }
+                    }
+
+                    if (this.isEof)
+                        this.error("Could not find array end!");
+
+                    const str = this.line.substring(origLinePos, endPos);
+                    const value = this.strToLiteral(str);
+                    result.push(value);
+                }
+            }
+
+            return result;
+        }
+
+        readLineWithoutComment() {
+            const commentStart = this.line.indexOf("#", this.linePos);
+            const str = commentStart === -1 ? this.line.substr(this.linePos) :
+                this.line.substring(this.linePos, commentStart).trim();
             this.nextLine();
-            const literal = new LiteralNode(parent, remainingLine);
+            return str;
+        }
+
+        readBlockString() {
+            const startChar = this.line[this.linePos];
+            const foldedStyle = startChar === ">";
+            if (!(startChar === "|" || foldedStyle)) return null;
+            this.linePos++;
+
+            const modChar = this.line[this.linePos];
+            if (modChar === "-" || modChar === "+")
+                this.linePos++;
+            this.nextLine();
+
+            const basePadding = this.linePadding;
+
+            let result = "";
+            while (true) {
+                const pad = this.linePadding - basePadding;
+                if (pad > 0)
+                    result += " ".repeat(pad);
+
+                const line = this.remainingLine;
+                result += line;
+
+                this.nextLine();
+                const currPad = this.linePadding - basePadding;
+                if (!this.isEof && this.linePadding < basePadding)
+                    break;
+                result += foldedStyle && !this.isEof && currPad === 0 ? (line.length === 0 ? "" : " ") : "\n";
+            }
+
+            if (modChar !== "-")
+                result += "\n";
+
+            return result;
+        }
+
+        readLiteral(parent: Node): LiteralNode {
+            this.skipWhitespaceInLine();
+
+            let value: any = this.readQuotedString() || this.readArray();
+            if (value)
+                this.nextLine();
+            else
+                value = this.readBlockString() || this.strToLiteral(this.readLineWithoutComment().trim());
+
+            const literal = new LiteralNode(parent, value);
             return literal;
         }
 
@@ -221,6 +378,7 @@ export namespace KsyAst {
         }
 
         parse(): Map {
+            this.skipWhitespace();
             return this.readMap(null);
         }
     }
