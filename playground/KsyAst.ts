@@ -28,6 +28,7 @@ export namespace KsyAst {
     class Map extends Node {
         range: TextRange = new TextRange();
         items: KeyValuePair[] = [];
+        invalidKeys: string[] = [];
     }
 
     class Sequence extends Node {
@@ -41,6 +42,9 @@ export namespace KsyAst {
     export class Converter {
         static astToRaw(ast: Node): any {
             if (ast instanceof Map) {
+                if (ast.items.length === 0 && ast.invalidKeys.length !== 0)
+                    return ast.invalidKeys.join(" ");
+
                 const result = {};
                 for (const item of ast.items)
                     result[item.key.text] = this.astToRaw(item.value);
@@ -71,8 +75,10 @@ export namespace KsyAst {
         getPosition() { return new Position(this.rowStartOffset + this.linePos, this.row, this.linePos); }
 
         nextLine() {
-            if (this.row === this.lines.length - 1)
+            if (this.row === this.lines.length - 1) {
+                this.linePos = this.lineLen - 1;
                 return false;
+            }
 
             this.row++;
             this.rowStartOffset += this.line.length + 1;
@@ -129,8 +135,10 @@ export namespace KsyAst {
 
             if (key.text) {
                 this.skipWhitespaceInLine();
-                if (!tryToFinishKey())
+                if (!tryToFinishKey()) {
                     this.error("Invalid character after quoted key!");
+                    key.text = null;
+                }
             } else {
                 for (; this.linePos < this.lineLen; this.linePos++) {
                     if (tryToFinishKey()) {
@@ -366,7 +374,9 @@ export namespace KsyAst {
                 const kvp = new KeyValuePair(this.readKey());
                 if (kvp.key === null) {
                     this.error(`Mapping key not found!`);
-                    this.nextLine(); // probably invalid line?
+                    map.invalidKeys.push(this.remainingLine);
+                    if (!this.nextLine()) // probably invalid line?
+                        break;
                 }
                 else {
                     map.items.push(kvp);
