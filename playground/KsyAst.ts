@@ -58,6 +58,7 @@ export namespace KsyAst {
         line: string = "";
         linePadding: number;
         linePos: number;
+        lineLen: number;
         row = -1;
         rowStartOffset = 0;
         errorCount = 0;
@@ -76,6 +77,10 @@ export namespace KsyAst {
             this.row++;
             this.rowStartOffset += this.line.length + 1;
             this.line = this.lines[this.row];
+            this.lineLen = this.line.length;
+            if (this.line[this.lineLen - 1] === "\r")
+                this.lineLen--;
+
             this.linePos = 0;
 
             this.skipWhitespaceInLine();
@@ -85,7 +90,7 @@ export namespace KsyAst {
         }
 
         skipWhitespaceInLine() {
-            for (; this.linePos < this.line.length; this.linePos++)
+            for (; this.linePos < this.lineLen; this.linePos++)
                 if (this.line[this.linePos] !== " ")
                     break;
         }
@@ -98,7 +103,7 @@ export namespace KsyAst {
             return true;
         }
 
-        get isEof() { return this.linePos >= this.line.length; }
+        get isEof() { return this.linePos >= this.lineLen; }
         get isEofOrOnlyComment() { return this.isEof || this.line[this.linePos] === "#"; }
         get isInputEof() { return this.rowStartOffset + this.linePos >= this.input.length; }
 
@@ -110,7 +115,7 @@ export namespace KsyAst {
                 if (this.line[this.linePos] !== ":")
                     return false;
 
-                const isLastChar = this.linePos === this.line.length -1;
+                const isLastChar = this.linePos === this.lineLen -1;
                 if (isLastChar || this.line[this.linePos + 1] === " ") {
                     key.range.end = this.getPosition();
                     this.linePos += isLastChar ? 1 : 2;
@@ -127,7 +132,7 @@ export namespace KsyAst {
                 if (!tryToFinishKey())
                     this.error("Invalid character after quoted key!");
             } else {
-                for (; this.linePos < this.line.length; this.linePos++) {
+                for (; this.linePos < this.lineLen; this.linePos++) {
                     if (tryToFinishKey()) {
                         key.text = this.line.substring(key.range.start.column, key.range.end.column).trim();
 
@@ -155,8 +160,12 @@ export namespace KsyAst {
             console.log(`${text}. Affected line: '${this.lines[row]}' (row: ${row}, linePos: ${column}).`);
         }
 
+        isSequenceStart() {
+            return this.line.startsWith("- ", this.linePos);
+        }
+
         skipSequenceStart() {
-            if (!this.line.startsWith("- ", this.linePos))
+            if (!this.isSequenceStart())
                 return false;
 
             this.linePos += 2;
@@ -199,19 +208,31 @@ export namespace KsyAst {
             this.linePos++;
 
             let prevC = null, str = "";
-            for (; this.linePos < this.line.length; this.linePos++) {
+            for (; this.linePos < this.lineLen; this.linePos++) {
                 const c = this.line[this.linePos];
                 if (c === strStartTag) {
                     this.linePos++;
                     break;
                 } else if (c === "\\") {
-                    if (this.linePos === this.line.length - 1) {
+                    if (this.linePos === this.lineLen - 1) {
                         this.error(`Non-closed quoted string: "${str}".`);
                         break;
                     }
 
                     this.linePos++;
-                    str += this.line[this.linePos];
+                    const quotedChar = this.line[this.linePos];
+                    if (quotedChar === "0") {
+                        str += "\0";
+                    } else if (quotedChar === "n") {
+                        str += "\n";
+                    } else if (quotedChar === "u") {
+                        str += String.fromCharCode(parseInt(this.line.substr(this.linePos + 1, 4), 16));
+                        this.linePos += 4;
+                    } else if (quotedChar === "x") {
+                        str += String.fromCharCode(parseInt(this.line.substr(this.linePos + 1, 2), 16));
+                        this.linePos += 2;
+                    } else
+                        str += quotedChar;
                 }
                 else
                     str += c;
@@ -253,9 +274,9 @@ export namespace KsyAst {
                     result.push(quotedStr);
                 else {
                     const origLinePos = this.linePos;
-                    let endPos = this.line.length;
+                    let endPos = this.lineLen;
 
-                    for (; this.linePos < this.line.length; this.linePos++) {
+                    for (; this.linePos < this.lineLen; this.linePos++) {
                         const c = this.line[this.linePos];
                         const isSeparator = c === ",";
                         if (isSeparator || c === "]") {
@@ -356,8 +377,11 @@ export namespace KsyAst {
                         kvp.value = this.readLiteral(map);
 
                     const isEnd = !this.skipWhitespace();
+                    const invalidSeqIndent = this.linePos === map.padding && this.isSequenceStart();
+                    if (invalidSeqIndent)
+                        this.error("Sequence is not indented properly!");
 
-                    if (!isEnd && this.linePos > map.padding) { // child level
+                    if (!isEnd && this.linePos > map.padding || invalidSeqIndent) { // child level
                         if (inlineValue)
                             this.error("Found inline value and intended value too!");
                         kvp.value = this.tryToReadSequence(map) || this.readMap(map);
