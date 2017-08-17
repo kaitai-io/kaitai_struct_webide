@@ -8,8 +8,8 @@ const path = require("path");
 const outDir = "playground/compare_results";
 
 function testAllKsys() {
-  const ksyFns = glob.sync("formats/**/*.ksy");
-  //.filter(x => x.includes("dex.ksy"));
+  let ksyFns = glob.sync("formats/**/*.ksy");
+  //ksyFns = ksyFns.filter(x => x.includes("ttf.ksy"));
   console.log(ksyFns);
 
   for (const ksyFn of ksyFns) {
