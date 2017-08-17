@@ -80,7 +80,7 @@ export namespace KsyAst {
             }
 
             this.row++;
-            this.rowStartOffset += this.line.length + 1;
+            this.rowStartOffset += this.row === 0 ? 0 : this.line.length + 1;
             this.line = this.lines[this.row];
             this.lineLen = this.line.length;
             if (this.line[this.lineLen - 1] === "\r")
@@ -278,14 +278,6 @@ export namespace KsyAst {
             return result;
         }
 
-        readLineWithoutComment() {
-            const commentStart = this.line.indexOf("#", this.linePos);
-            const str = commentStart === -1 ? this.line.substr(this.linePos) :
-                this.line.substring(this.linePos, commentStart).trim();
-            this.nextLine();
-            return str;
-        }
-
         readBlockString() {
             const startChar = this.tryReadToken(">") || this.tryReadToken("|");
             if (!startChar) return null;
@@ -334,11 +326,15 @@ export namespace KsyAst {
                     break; // TODO
                 } else {
                     map.items.push(kvp);
-                    let value: any = this.readQuotedString() || this.readArray() || this.readInlineMap(parent);
+
+                    const value = kvp.value = this.start(new LiteralNode(map));
+                    value.value = this.readQuotedString() || this.readArray() || this.readInlineMap(parent);
                     if (!value) {
                         const str = this.readUntilSeparator(",", "}");
-                        kvp.value = new LiteralNode(map, this.strToLiteral(str));
+                        value.value = this.strToLiteral(str);
                     }
+
+                    this.end(value);
                 }
             }
 
@@ -351,12 +347,24 @@ export namespace KsyAst {
             const result = this.start(new LiteralNode(parent));
 
             result.value = this.readQuotedString() || this.readArray();
-            if (result.value)
+            if (result.value) {
+                result.range.end = this.getPosition();
                 this.nextLine();
-            else
-                result.value = this.readBlockString() || this.strToLiteral(this.readLineWithoutComment().trim());
+            } else {
+                result.value = this.readBlockString();
+                if (!result.value) {
+                    const commentStart = this.line.indexOf("#", this.linePos);
+                    const str = commentStart === -1 ? this.line.substr(this.linePos) :
+                        this.line.substring(this.linePos, commentStart).trim();
+                    this.linePos = this.lineLen;
+                    result.range.end = this.getPosition();
+                    this.nextLine();
+                    result.value = this.strToLiteral(str.trim());
+                } else
+                    result.range.end = this.getPosition();
+            }
 
-            return this.end(result);
+            return result;
         }
 
         start<T extends Node>(node: T): T {

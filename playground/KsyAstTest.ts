@@ -9,6 +9,7 @@ const outDir = "playground/compare_results";
 
 function testAllKsys() {
   let ksyFns = glob.sync("formats/**/*.ksy");
+  //ksyFns = ["playground/test.ksy"];
   //ksyFns = ksyFns.filter(x => x.includes("ttf.ksy"));
   console.log(ksyFns);
 
