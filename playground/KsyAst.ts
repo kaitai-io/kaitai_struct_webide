@@ -72,7 +72,7 @@ export namespace KsyAst {
             this.nextLine();
         }
 
-        getPosition() { return new Position(this.rowStartOffset + this.linePos, this.row, this.linePos); }
+        getPosition(diff = 0) { return new Position(this.rowStartOffset + this.linePos + diff, this.row, this.linePos + diff); }
 
         nextLine() {
             if (this.row === this.lines.length - 1) {
@@ -118,17 +118,9 @@ export namespace KsyAst {
             key.range.start = this.getPosition();
 
             const tryToFinishKey = () => {
-                if (this.line[this.linePos] !== ":")
-                    return false;
-
-                const isLastChar = this.linePos === this.lineLen -1;
-                if (isLastChar || this.line[this.linePos + 1] === " ") {
-                    key.range.end = this.getPosition();
-                    this.linePos += isLastChar ? 1 : 2;
-                    return true;
-                }
-
-                return false;
+                if (!this.tryReadToken(":")) return false;
+                key.range.end = this.getPosition(-1);
+                return this.isEof || this.tryReadToken(" ");
             };
 
             key.text = this.readQuotedString();
@@ -153,7 +145,7 @@ export namespace KsyAst {
                 }
             }
 
-            if (key.text === null || !movePos)
+            if (key.text === null || !movePos) // operation failed, restore state
                 this.linePos = key.range.start.column;
 
             return key.text === null ? null : key;
@@ -173,8 +165,7 @@ export namespace KsyAst {
         }
 
         tryToReadSequence(parent: Node): Sequence {
-            if (!this.isSequenceStart())
-                return null;
+            if (!this.isSequenceStart()) return null;
 
             const seq = new Sequence(parent);
             seq.padding = this.linePadding;
@@ -196,46 +187,37 @@ export namespace KsyAst {
             return seq;
         }
 
+        readN(len: number) {
+            const result = this.line.substr(this.linePos, len);
+            this.linePos += len;
+            return result;
+        }
+
         get remainingLine() { return this.line.substr(this.linePos); }
 
         readQuotedString() {
-            const strStartTag = this.line[this.linePos];
-            if (!(strStartTag === "'" || strStartTag === "\""))
-                return null;
+            const strStartTag = this.tryReadToken("'") || this.tryReadToken("\"");
+            if (!strStartTag) return null;
 
-            this.linePos++;
-
-            let prevC = null, str = "";
-            for (; this.linePos < this.lineLen; this.linePos++) {
-                const c = this.line[this.linePos];
-                if (c === strStartTag) {
-                    this.linePos++;
-                    break;
-                } else if (c === "\\") {
-                    if (this.linePos === this.lineLen - 1) {
-                        this.error(`Non-closed quoted string: "${str}".`);
-                        break;
-                    }
-
-                    this.linePos++;
-                    const quotedChar = this.line[this.linePos];
-                    if (quotedChar === "0") {
-                        str += "\0";
-                    } else if (quotedChar === "n") {
-                        str += "\n";
-                    } else if (quotedChar === "u") {
-                        str += String.fromCharCode(parseInt(this.line.substr(this.linePos + 1, 4), 16));
-                        this.linePos += 4;
-                    } else if (quotedChar === "x") {
-                        str += String.fromCharCode(parseInt(this.line.substr(this.linePos + 1, 2), 16));
-                        this.linePos += 2;
-                    } else
-                        str += quotedChar;
-                }
+            let str = "";
+            while (this.linePos < this.lineLen && !this.tryReadToken(strStartTag)) {
+                if (this.tryReadToken("\\0"))
+                    str += "\0";
+                else if (this.tryReadToken("\\n"))
+                    str += "\n";
+                else if (this.tryReadToken("\\\""))
+                    str += "\"";
+                else if (this.tryReadToken("\\'"))
+                    str += "'";
+                else if (this.tryReadToken("\\\\"))
+                    str += "\\";
+                else if (this.tryReadToken("\\u"))
+                    str += String.fromCharCode(parseInt(this.readN(4), 16));
+                else if (this.tryReadToken("\\x"))
+                    str += String.fromCharCode(parseInt(this.readN(2), 16));
                 else
-                    str += c;
+                    str += this.readN(1);
             }
-
             return str;
         }
 
@@ -270,10 +252,10 @@ export namespace KsyAst {
         tryReadToken(token: string) {
             if (this.line.startsWith(token, this.linePos)) {
                 this.linePos += token.length;
-                return true;
+                return token;
             }
 
-            return false;
+            return null;
         }
 
         readArray() {
@@ -310,16 +292,13 @@ export namespace KsyAst {
         }
 
         readBlockString() {
-            const startChar = this.line[this.linePos];
-            const foldedStyle = startChar === ">";
-            if (!(startChar === "|" || foldedStyle)) return null;
-            this.linePos++;
+            const startChar = this.tryReadToken(">") || this.tryReadToken("|");
+            if (!startChar) return null;
 
-            const modChar = this.line[this.linePos];
-            if (modChar === "-" || modChar === "+")
-                this.linePos++;
+            const modChar = this.tryReadToken("+") || this.tryReadToken("-");
             this.nextLine();
 
+            const foldedStyle = startChar === ">";
             const basePadding = this.linePadding;
 
             let result = "";
