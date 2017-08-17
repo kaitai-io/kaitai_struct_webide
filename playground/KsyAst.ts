@@ -10,8 +10,8 @@ export namespace KsyAst {
     enum NodeKind { Map, Sequence, Key }
 
     class Node {
-        // kind: NodeKind;
         padding: number;
+        range: TextRange = new TextRange();
 
         constructor(public parent: Node) { }
     }
@@ -26,7 +26,6 @@ export namespace KsyAst {
     }
 
     class Map extends Node {
-        range: TextRange = new TextRange();
         items: KeyValuePair[] = [];
         invalidKeys: string[] = [];
     }
@@ -36,7 +35,7 @@ export namespace KsyAst {
     }
 
     class LiteralNode extends Node {
-        constructor(parent: Node, public value: any) { super(parent); }
+        constructor(parent: Node, public value: any = null) { super(parent); }
     }
 
     export class Converter {
@@ -57,7 +56,7 @@ export namespace KsyAst {
         }
     }
 
-    export class Parser {
+    export class Reader {
         lines: string[];
         line: string = "";
         linePadding: number;
@@ -113,6 +112,50 @@ export namespace KsyAst {
         get isEofOrOnlyComment() { return this.isEof || this.line[this.linePos] === "#"; }
         get isInputEof() { return this.rowStartOffset + this.linePos >= this.input.length; }
 
+        error(text: string, range?: TextRange) {
+            if (this.errorCount++ > 100)
+                throw new Error("Fail safe!");
+
+            const row = range ? range.start.row : this.row;
+            const column = range ? range.start.column : this.linePos;
+            console.log(`${text}. Affected line: '${this.lines[row]}' (row: ${row}, linePos: ${column}).`);
+        }
+
+        readN(len: number) {
+            const result = this.line.substr(this.linePos, len);
+            this.linePos += len;
+            return result;
+        }
+
+        get remainingLine() { return this.line.substr(this.linePos); }
+
+        readUntilSeparator(itemSep, endSep) {
+            const origLinePos = this.linePos;
+            for (; this.linePos < this.lineLen; this.linePos++) {
+                const c = this.line[this.linePos];
+                if (c === itemSep || c === endSep) {
+                    const value = this.line.substring(origLinePos, this.linePos);
+                    if (c === itemSep)
+                        this.linePos++;
+                    return value;
+                }
+            }
+
+            this.error(`Could not find end separator (${endSep})!`);
+            return null;
+        }
+
+        tryReadToken(token: string) {
+            if (this.line.startsWith(token, this.linePos)) {
+                this.linePos += token.length;
+                return token;
+            }
+
+            return null;
+        }
+    }
+
+    export class Parser extends Reader {
         readKey(movePos = true) {
             const key = new Key();
             key.range.start = this.getPosition();
@@ -151,15 +194,6 @@ export namespace KsyAst {
             return key.text === null ? null : key;
         }
 
-        error(text: string, range?: TextRange) {
-            if (this.errorCount++ > 100)
-                throw new Error("Fail safe!");
-
-            const row = range ? range.start.row : this.row;
-            const column = range ? range.start.column : this.linePos;
-            console.log(`${text}. Affected line: '${this.lines[row]}' (row: ${row}, linePos: ${column}).`);
-        }
-
         isSequenceStart() {
             return this.line.startsWith("- ", this.linePos);
         }
@@ -167,8 +201,7 @@ export namespace KsyAst {
         tryToReadSequence(parent: Node): Sequence {
             if (!this.isSequenceStart()) return null;
 
-            const seq = new Sequence(parent);
-            seq.padding = this.linePadding;
+            const seq = this.start(new Sequence(parent));
 
             while (true) {
                 this.linePos += 2;
@@ -184,16 +217,8 @@ export namespace KsyAst {
                     !this.isSequenceStart()) break;
             }
 
-            return seq;
+            return this.end(seq);
         }
-
-        readN(len: number) {
-            const result = this.line.substr(this.linePos, len);
-            this.linePos += len;
-            return result;
-        }
-
-        get remainingLine() { return this.line.substr(this.linePos); }
 
         readQuotedString() {
             const strStartTag = this.tryReadToken("'") || this.tryReadToken("\"");
@@ -201,16 +226,11 @@ export namespace KsyAst {
 
             let str = "";
             while (this.linePos < this.lineLen && !this.tryReadToken(strStartTag)) {
-                if (this.tryReadToken("\\0"))
-                    str += "\0";
-                else if (this.tryReadToken("\\n"))
-                    str += "\n";
-                else if (this.tryReadToken("\\\""))
-                    str += "\"";
-                else if (this.tryReadToken("\\'"))
-                    str += "'";
-                else if (this.tryReadToken("\\\\"))
-                    str += "\\";
+                if      (this.tryReadToken("\\0"))  str += "\0";
+                else if (this.tryReadToken("\\n"))  str += "\n";
+                else if (this.tryReadToken("\\\"")) str += "\"";
+                else if (this.tryReadToken("\\'"))  str += "'";
+                else if (this.tryReadToken("\\\\")) str += "\\";
                 else if (this.tryReadToken("\\u"))
                     str += String.fromCharCode(parseInt(this.readN(4), 16));
                 else if (this.tryReadToken("\\x"))
@@ -231,31 +251,6 @@ export namespace KsyAst {
             else value = value.trim();
 
             return value;
-        }
-
-        readUntilSeparator(itemSep, endSep) {
-            const origLinePos = this.linePos;
-            for (; this.linePos < this.lineLen; this.linePos++) {
-                const c = this.line[this.linePos];
-                if (c === itemSep || c === endSep) {
-                    const value = this.line.substring(origLinePos, this.linePos);
-                    if (c === itemSep)
-                        this.linePos++;
-                    return value;
-                }
-            }
-
-            this.error(`Could not find end separator (${endSep})!`);
-            return null;
-        }
-
-        tryReadToken(token: string) {
-            if (this.line.startsWith(token, this.linePos)) {
-                this.linePos += token.length;
-                return token;
-            }
-
-            return null;
         }
 
         readArray() {
@@ -326,7 +321,7 @@ export namespace KsyAst {
         readInlineMap(parent: Node): Map {
             if (!this.tryReadToken("{")) return null;
 
-            const map = new Map(parent);
+            const map = this.start(new Map(parent));
 
             while (true) {
                 this.skipWhitespaceInLine();
@@ -347,25 +342,37 @@ export namespace KsyAst {
                 }
             }
 
-            return map;
+            return this.end(map);
         }
 
         readLiteral(parent: Node): LiteralNode {
             this.skipWhitespaceInLine();
 
-            let value: any = this.readQuotedString() || this.readArray();
-            if (value)
+            const result = this.start(new LiteralNode(parent));
+
+            result.value = this.readQuotedString() || this.readArray();
+            if (result.value)
                 this.nextLine();
             else
-                value = this.readBlockString() || this.strToLiteral(this.readLineWithoutComment().trim());
+                result.value = this.readBlockString() || this.strToLiteral(this.readLineWithoutComment().trim());
 
-            return new LiteralNode(parent, value);
+            return this.end(result);
+        }
+
+        start<T extends Node>(node: T): T {
+            node.padding = this.linePadding;
+            node.range.start = this.getPosition();
+            return node;
+        }
+
+        end<T extends Node>(node: T): T {
+            node.range.end = this.getPosition();
+            return node;
         }
 
         readMap(parent: Node): Map {
-            const map = new Map(parent);
+            const map = this.start(new Map(parent));
             map.padding = this.linePos;
-            map.range.start = this.getPosition();
 
             const expectedPadding = !parent ? 0 : parent.padding + 2;
             if (map.padding !== expectedPadding)
@@ -385,7 +392,7 @@ export namespace KsyAst {
                     this.skipWhitespaceInLine();
                     const inlineValue = !this.isEofOrOnlyComment;
                     if (inlineValue)
-                        kvp.value = this.readInlineMap(parent) || this.readLiteral(map);
+                        kvp.value = this.readInlineMap(map) || this.readLiteral(map);
 
                     const isEnd = !this.skipWhitespace();
                     const invalidSeqIndent = this.linePos === map.padding && this.isSequenceStart();
@@ -408,8 +415,7 @@ export namespace KsyAst {
                 if (this.isInputEof) break;
             }
 
-            map.range.end = this.getPosition();
-            return map;
+            return this.end(map);
         }
 
         parse(): Map {
