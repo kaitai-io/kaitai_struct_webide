@@ -102,9 +102,6 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
 importScripts("../entities.js");
 importScripts("../../lib/_npm/kaitai-struct/KaitaiStream.js");
 
-this["define"] = function(name: string, deps: any, getter: any) { myself[name] = getter(); };
-(<any>define).amd = true;
-
 var apiMethods = {
     initCode: (sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes) => {
         wi.ksyTypes = ksyTypes;
