@@ -5,30 +5,30 @@
     "doc": "docs"
   },
   "dependencies": {
-    "ace-builds": "^1.2.6",
-    "big-integer": "^1.6.23",
+    "ace-builds": "^1.2.8",
+    "big-integer": "^1.6.25",
     "bootstrap": "^3.3.7",
     "bootswatch": "^3.3.7",
-    "bowser": "^1.7.0",
+    "bowser": "^1.7.3",
     "dateformat": "^2.0.0",
     "font-awesome": "^4.7.0",
-    "golden-layout": "^1.5.8",
+    "golden-layout": "^1.5.9",
     "jquery": "^3.2.1",
     "jstree": "^3.3.4",
-    "kaitai-struct": "^0.8.0-SNAPSHOT.8",
-    "kaitai-struct-compiler": "^0.8.0-SNAPSHOT.20170905.171851",
+    "kaitai-struct": "next",
+    "kaitai-struct-compiler": "^0.8.0-SNAPSHOT.20170906.215006",
     "localforage": "^1.5.0",
     "require-from-string": "^1.2.1",
-    "requirejs": "^2.3.3",
-    "smooth-scrollbar": "^7.3.1",
+    "requirejs": "^2.3.5",
+    "smooth-scrollbar": "^7.4.1",
     "text-encoding": "^0.6.4",
     "thenby": "^1.2.3",
-    "vue": "^2.3.4",
+    "vue": "^2.4.4",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "tslint": "^5.5.0",
-    "typescript": "^2.4.1"
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
