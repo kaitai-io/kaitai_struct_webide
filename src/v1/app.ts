@@ -95,8 +95,10 @@ class AppController {
         if (!compiled) return;
 
         var fileNames = Object.keys(compiled.release);
-        this.ui.genCodeViewer.setValue(fileNames.map(x => compiled.release[x]).join(""), -1);
-        this.ui.genCodeDebugViewer.setValue(fileNames.map(x => compiled.debug[x]).join(""), -1);
+        let debugUserTypes = localStorage.getItem("userTypes") || "";
+        if (debugUserTypes) debugUserTypes += "\n\n";
+        this.ui.genCodeViewer.setValue(debugUserTypes + fileNames.map(x => compiled.release[x]).join(""), -1);
+        this.ui.genCodeDebugViewer.setValue(debugUserTypes + fileNames.map(x => compiled.debug[x]).join(""), -1);
         await this.reparse();
     }
 
