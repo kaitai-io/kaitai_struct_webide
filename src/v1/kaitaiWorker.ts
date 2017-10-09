@@ -102,6 +102,9 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
 importScripts("../entities.js");
 importScripts("../../lib/_npm/kaitai-struct/KaitaiStream.js");
 
+(KaitaiStream as any).depUrls = (KaitaiStream as any).depUrls  || {};
+(KaitaiStream as any).depUrls.zlib = "../../lib/_npm/pako/pako_inflate.min.js";
+
 var apiMethods = {
     initCode: (sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes) => {
         wi.ksyTypes = ksyTypes;
