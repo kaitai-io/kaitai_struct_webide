@@ -84,6 +84,11 @@ Source: https://github.com/localForage/localForage
 
 License: Apache-2.0 (https://raw.githubusercontent.com/localForage/localForage/master/LICENSE)
 
+## pako
+Source: https://github.com/nodeca/pako
+
+License: MIT (https://raw.githubusercontent.com/nodeca/pako/master/LICENSE)
+
 ## require-from-string
 Source: https://github.com/floatdrop/require-from-string
 

@@ -18,6 +18,7 @@
     "kaitai-struct": "next",
     "kaitai-struct-compiler": "^0.8.0-SNAPSHOT.20170906.215006",
     "localforage": "^1.5.0",
+    "pako": "^1.0.4",
     "require-from-string": "^1.2.1",
     "requirejs": "^2.3.5",
     "smooth-scrollbar": "^7.4.1",

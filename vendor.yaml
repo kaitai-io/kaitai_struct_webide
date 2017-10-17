@@ -104,7 +104,14 @@ libs:
     licenseUrl: https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
     npmDir: localforage
     files: [LICENSE, dist/localforage.js]
-    
+
+  pako:
+    source: https://github.com/nodeca/pako
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/nodeca/pako/master/LICENSE
+    npmDir: pako
+    files: [LICENSE, dist/pako_inflate.min.js]
+
   require.js:
     source: https://github.com/requirejs/requirejs
     licenseName: jQuery license
