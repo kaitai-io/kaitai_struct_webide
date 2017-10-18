@@ -30,7 +30,8 @@ def recursive_overwrite(src, dest):
 
 with open('vendor.yaml','rt') as f: vendor = yaml.safe_load(f.read())
 
-for (libName, lib) in vendor['libs'].items():
+sortedLibs = sorted(vendor['libs'].iteritems(), key=lambda (k,v): v.get('priority'))
+for (libName, lib) in sortedLibs:
     if 'npmDir' in lib and 'files' in lib:
         print 'Processing: %s' % libName
         distDir = './lib/_npm/%s/' % (lib['distDir'] if 'distDir' in lib else lib['npmDir'])

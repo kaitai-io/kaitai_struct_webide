@@ -51,6 +51,7 @@ libs:
     npmDir: bootswatch
     distDir: bootstrap/css/
     files: [LICENSE, darkly/bootstrap.min.css]
+    priority: 10
 
   bowser:
     source: https://github.com/ded/bowser
