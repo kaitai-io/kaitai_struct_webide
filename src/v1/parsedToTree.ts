@@ -103,7 +103,7 @@ export class ParsedTreeHandler {
 
             return s`${text}`;
         } else if (exported.type === ObjectType.Undefined) {
-            return s`<missing>`;
+            return htmlescape("<missing>");
         } else
             throw new Error(`primitiveToText: object is not primitive: ${exported.type}!`);
     }
