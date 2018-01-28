@@ -16,7 +16,7 @@
     "jquery": "^3.2.1",
     "jstree": "^3.3.4",
     "kaitai-struct": "next",
-    "kaitai-struct-compiler": "^0.8.0-SNAPSHOT.20170906.215006",
+    "kaitai-struct-compiler": "^0.8.0-SNAPSHOT.20180126.2450",
     "localforage": "^1.5.0",
     "pako": "^1.0.6",
     "require-from-string": "^1.2.1",
