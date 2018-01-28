@@ -102,8 +102,10 @@ export class ParsedTreeHandler {
             text += "]";
 
             return s`${text}`;
+        } else if (exported.type === ObjectType.Undefined) {
+            return s`<missing>`;
         } else
-            throw new Error("primitiveToText: object is not primitive!");
+            throw new Error(`primitiveToText: object is not primitive: ${exported.type}!`);
     }
 
     reprObject(obj: IExportedValue): string {
