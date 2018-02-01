@@ -25,6 +25,9 @@ export function ga(category: string, action: string, label?: string, value?: num
         window["_ga"]("send", "event", category, action, label, value);
 }
 
+const qs = {};
+location.search.substr(1).split("&").map(x => x.split("=")).forEach(x => qs[x[0]] = x[1]);
+
 interface IInterval {
     start: number;
     end: number;
@@ -260,11 +263,10 @@ $(() => {
 
     app.refreshSelectionInput();
 
-    app.ui.genCodeDebugViewer.commands.addCommand({
-        name: "compile",
-        bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
-        exec: function (editor: any) { app.reparse(); }
-    });
+    app.ui.genCodeDebugViewer.commands.addCommand({ name: "compile", bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
+        exec: function (editor: any) { app.reparse(); } });
+    app.ui.ksyEditor.commands.addCommand({ name: "compile", bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
+        exec: function (editor: any) { app.recompile(); } });
 
     initFileDrop("fileDrop", (files: any) => app.addNewFiles(files));
 
@@ -283,7 +285,8 @@ $(() => {
     });
 
     var editDelay = new Delayed(500);
-    app.ui.ksyEditor.on("change", () => editDelay.do(() => app.recompile()));
+    if (!("noAutoCompile" in qs))
+        app.ui.ksyEditor.on("change", () => editDelay.do(() => app.recompile()));
 
     var inputContextMenu = $("#inputContextMenu");
     var downloadInput = $("#inputContextMenu .downloadItem");
