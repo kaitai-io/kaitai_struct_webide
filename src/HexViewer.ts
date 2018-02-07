@@ -85,7 +85,7 @@ export interface IDataProvider {
 
 export class HexViewer {
     private rowHeight = 21;
-    private bytesPerLine = 16;
+    public bytesPerLine = 16;
 
     private intervals: IIntervalLookup<IInterval>;
     private rows: IHexViewerRow[] = [];
