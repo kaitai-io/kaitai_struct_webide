@@ -10,6 +10,8 @@ var wi = {
     exported: <IExportedValue>null,
 };
 
+var hooks = { nodeFilter: <(obj: any) => any> null };
+
 declare function importScripts(...urls: string[]): void;
 
 interface IDebugInfo {
@@ -67,10 +69,10 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         }
     }
     else if (result.type === ObjectType.Array) {
-        result.arrayItems = (<any[]>obj).map((item, i) => exportValue(item, debug && debug.arr[i], path.concat(i.toString()), noLazy));
+        result.arrayItems = (<any[]>obj).map((item, i) => exportValue(item, debug && debug.arr && debug.arr[i], path.concat(i.toString()), noLazy));
     }
     else if (result.type === ObjectType.Object) {
-        var childIoOffset = obj._io._byteOffset;
+        var childIoOffset = obj._io ? obj._io._byteOffset : 0;
 
         if (result.start === childIoOffset) { // new KaitaiStream was used, fix start position
             result.ioOffset = childIoOffset;
@@ -81,7 +83,7 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
         var ksyType = wi.ksyTypes[result.object.class];
 
-        Object.keys(obj).filter(x => x[0] !== "_").forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug[key], path.concat(key), noLazy));
+        Object.keys(obj).filter(x => x[0] !== "_").forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], path.concat(key), noLazy));
 
         Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor").forEach(propName => {
             var ksyInstanceData = ksyType && ksyType.instancesByJsName[propName];
@@ -116,6 +118,8 @@ var apiMethods = {
         wi.ioInput = new KaitaiStream(wi.inputBuffer, 0);
         wi.root = new wi.MainClass(wi.ioInput);
         wi.root._read();
+        if (hooks.nodeFilter)
+            wi.root = hooks.nodeFilter(wi.root);
         wi.exported = exportValue(wi.root, <IDebugInfo>{ start: 0, end: wi.inputBuffer.byteLength }, [], eagerMode);
         //console.log("parse before return", performance.now() - start, "date", Date.now());
         return wi.exported;
