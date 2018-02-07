@@ -1,5 +1,5 @@
 ﻿import { IInterval, IntervalHandler } from "../utils/IntervalHelper";
-import { s, htmlescape, asciiEncode, hexEncode, collectAllObjects } from "../utils";
+import { s, htmlescape, asciiEncode, hexEncode, uuidEncode, collectAllObjects } from "../utils";
 import { workerMethods } from "./app.worker";
 import { app } from "./app";
 
@@ -118,7 +118,7 @@ export class ParsedTreeHandler {
             var currItem = obj;
             var parts = g1.split(":");
 
-            var format: { sep:string, str?:string, hex?:string, dec?:string } = { sep: ", " };
+            var format: { sep:string, str?:string, hex?:string, dec?:string, uuid?:string } = { sep: ", " };
             if (parts.length > 1)
                 parts[1].split(",").map(x => x.split("=")).forEach(kv => format[kv[0]] = kv.length > 1 ? kv[1] : true);
             parts[0].split(".").forEach(k => {
@@ -140,6 +140,8 @@ export class ParsedTreeHandler {
                 return s`"${asciiEncode(currItem.bytes)}"`;
             else if (format.hex && currItem.type === ObjectType.TypedArray)
                 return s`${hexEncode(currItem.bytes)}`;
+            else if (format.uuid && currItem.type === ObjectType.TypedArray && currItem.bytes.byteLength === 16)
+                return s`${uuidEncode(currItem.bytes, format.uuid === "ms")}`;
             else if (format.dec && currItem.type === ObjectType.Primitive && Number.isInteger(currItem.primitiveValue))
                 return s`${currItem.primitiveValue}`;
             else if (currItem.type === ObjectType.Array) {
