@@ -85,7 +85,10 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
 
         Object.keys(obj).filter(x => x[0] !== "_").forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], path.concat(key), noLazy));
 
-        Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor").forEach(propName => {
+        const propNames = obj.constructor !== Object ?
+            Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor") : [];
+
+        for (const propName of propNames) {
             var ksyInstanceData = ksyType && ksyType.instancesByJsName[propName];
             var eagerLoad = ksyInstanceData && ksyInstanceData["-webide-parse-mode"] === "eager";
 
@@ -93,7 +96,7 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
                 result.object.fields[propName] = exportValue(obj[propName], obj._debug["_m_" + propName], path.concat(propName), noLazy);
             else
                 result.object.instances[propName] = <IInstance>{ path: path.concat(propName), offset: 0 };
-        });
+        }
     }
     else
         console.log(`Unknown object type: ${result.type}`);
