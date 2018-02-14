@@ -35,7 +35,7 @@ body { color:#333 }
 .form-control { padding: 6px 12px; height:34px }
 .modal-footer, .modal-body { padding: 15px }
 .input-group-addon { padding: 8px 8px }
-#noscript, #unsupportedBrowser { background: #ffee00; z-index:999; position:fixed; left:0; right:0; padding:10px; text-align:center }
+#noscript, #unsupportedBrowser { background: #ffee00; z-index:10000; position:fixed; left:0; right:0; padding:10px; text-align:center }
 #noscript a, #unsupportedBrowser a { color: black; text-decoration: underline }
 #unsupportedBrowser .closeBtn { float:right; margin-top: 1px; cursor: pointer }
 .marker_solution { background:rgba(255, 80, 80, 0.3); }
