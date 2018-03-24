@@ -16,14 +16,17 @@ export function exportToJson(useHex: boolean = false) {
             var keys: any[] = isArray ? value.arrayItems : Object.keys(value.object.fields);
             if (keys.length > 0) {
                 result += `\n${childPad}`;
+                let nextItemPrefix = "";
                 keys.forEach((arrItem, i) => {
-                    result += (isArray ? "" : `"${arrItem}": `);
-                    expToNative(isArray ? arrItem : value.object.fields[arrItem], padLvl + 1);
+                    const propValue: IExportedValue = isArray ? arrItem : value.object.fields[arrItem];
+                    if (propValue.type === ObjectType.Undefined) return true;
+                    result += nextItemPrefix + (isArray ? "" : `"${arrItem}": `);
+                    expToNative(propValue, padLvl + 1);
                     var lineCont = isArray && arrItem.type === ObjectType.Primitive && typeof arrItem.primitiveValue !== "string" && i % 16 !== 15;
                     var last = i === keys.length - 1;
-                    result += last ? "\n" : "," + (lineCont ? " " : `\n${childPad}`);
+                    nextItemPrefix = "," + (lineCont ? " " : `\n${childPad}`);
                 });
-                result += `${pad}`;
+                result += `\n${pad}`;
             }
             result += isArray ? "]" : "}";
         } else if (value.type === ObjectType.TypedArray) {
