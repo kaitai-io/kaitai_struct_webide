@@ -118,7 +118,7 @@ export class ParsedTreeHandler {
             var currItem = obj;
             var parts = g1.split(":");
 
-            var format: { sep:string, str?:string, hex?:string, dec?:string, uuid?:string } = { sep: ", " };
+            var format: { sep:string, str?:string, hex?:string, dec?:string, uuid?:string, flags?:string } = { sep: ", " };
             if (parts.length > 1)
                 parts[1].split(",").map(x => x.split("=")).forEach(kv => format[kv[0]] = kv.length > 1 ? kv[1] : true);
             parts[0].split(".").forEach(k => {
@@ -134,7 +134,10 @@ export class ParsedTreeHandler {
 
             if (!currItem) return "";
 
-            if (currItem.type === ObjectType.Object)
+            if (format.flags && currItem.type === ObjectType.Object) {
+                const values = Object.keys(currItem.object.fields).filter(x => currItem.object.fields[x].primitiveValue === true);
+                return values.length > 0 ? values.map(x => s`<span class="flags">${x}</span>`).join("|") : "🚫";
+            } else if (currItem.type === ObjectType.Object)
                 return this.reprObject(currItem);
             else if (format.str && currItem.type === ObjectType.TypedArray)
                 return s`"${asciiEncode(currItem.bytes)}"`;
