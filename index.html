@@ -25,8 +25,7 @@
     <script src="lib/_npm/requirejs/require.js"></script>
     <script src="lib/_npm/jquery/jquery.min.js"></script>
     <script src="lib/_npm/bootstrap/js/bootstrap.min.js"></script>
-    <script src="lib/_npm/yamljs/yaml.js"></script>
-    <script src="lib/_npm/ace/ace.js"></script>
+    <script src="lib/_npm/monaco/loader.js"></script>
 
     <script src="js/autorefresh.js"></script>
     <script src="js/extensions.js"></script>
@@ -37,10 +36,30 @@
         ["bowser", "jstree", "localforage", "goldenlayout", "vue", "kaitai-struct-compiler", "dateformat"].forEach(
             name => paths[name] = `../../lib/_npm/${name}/${name}`);
         paths["big-integer"] = "../../lib/_npm/BigInteger/BigInteger";
+        paths["vs"] = "../../lib/_npm/monaco";
 
         requirejs.config({ baseUrl: "js/v1/", paths: paths });
         require(["app.unsupportedBrowser"]);
+        require(["../../lib/_npm/js-yaml/js-yaml"], (thing) => {
+            window.YAML = thing;
+        });
+        require(["vs/editor/editor.main"], () => {
+            require(["vs/language/yaml/monaco.contribution", "vs/language/yaml/ksySchema"], () => {
+                monaco.languages.yaml.yamlDefaults.setDiagnosticsOptions({
+                    enableSchemaRequest: true,
+                    validate: true,
+                    schemas: [
+                        {
+                            uri: `http://myserver/ksy-schema.json`,
+                            fileMatch: [monaco.Uri.parse("inmemory://model/main").toString()],
+                            schema: ksySchema
+                        }
+                    ]
+                });
+            });
         require(["jstree", "app"]);
+
+        });
     </script>
 </head>
 <body>

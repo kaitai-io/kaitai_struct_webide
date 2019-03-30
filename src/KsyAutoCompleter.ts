@@ -1,4 +1,6 @@
 import * as ace from "ace/ace";
+import * as monaco from "monaco/monaco";
+
 
 interface ISuggestionData {
     regex: RegExp;
@@ -41,7 +43,7 @@ class YamlHelper {
 
 export class KsyAutoCompleter {
     suggestionData: ISuggestionData[];
-    editor: AceAjax.Editor;
+    editor: monaco.editor.IStandaloneCodeEditor;
     ksy: any;
     context: IContext;
 
@@ -75,11 +77,11 @@ export class KsyAutoCompleter {
         this.initWithSuggestionList(suggestionList);
     }
 
-    static async setup(editor: AceAjax.Editor) {
+    static async setup(editor: monaco.editor.IStandaloneCodeEditor) {
         const completer = new KsyAutoCompleter();
         editor["completers"] = [completer];
-        await loader.getLoadedModule("ace/ext-language_tools");
-        editor.setOptions({ enableBasicAutocompletion: true, enableLiveAutocompletion: true });
+        // await loader.getLoadedModule("ace/ext-language_tools");
+        // editor.setOptions({ enableBasicAutocompletion: true, enableLiveAutocompletion: true });
         //console.log("auto completer", editor);
         return completer;
     }
@@ -101,7 +103,7 @@ export class KsyAutoCompleter {
         //console.log("suggestionData", this.suggestionData);
     }
 
-    getCompletions(editor: AceAjax.Editor, session: any, pos: { start: number, end: number }, prefix: string, callback: any) {
+    getCompletions(editor: monaco.editor.IStandaloneCodeEditor, session: any, pos: { start: number, end: number }, prefix: string, callback: any) {
         var suggestions: IAceSuggestion[] = [];
 
         try {
