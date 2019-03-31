@@ -26,7 +26,7 @@ export class LayoutManager<T> {
 
     addEditorTab(title: string, data: string, lang: string = null, parent: string = "codeTab") {
         var componentName = `dynComp${this.dynCompId++}`;
-        this.addEditor(componentName, lang, true, (editor: any) => editor.setValue(data, -1));
+        this.addEditor(componentName, lang, true, (editor: any) => editor.setValue(data));
         this.getLayoutNodeById(parent).addChild({ type: "component", componentName, title });
     }
 

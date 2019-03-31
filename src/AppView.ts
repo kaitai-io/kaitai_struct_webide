@@ -93,7 +93,7 @@ export class AppView {
     addFileView(title: string, content: string, lang: string) {
         const component = this.layout.files.addComponent(title, { isClosable: true });
         const editor = LayoutHelper.setupEditor(component, lang);
-        editor.setValue(content, -1);
+        editor.setValue(content);
         return editor;
     }
 }

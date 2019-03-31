@@ -1081,12 +1081,6 @@ declare namespace monaco.editor {
         theme?: string;
     }
 
-    export interface IStandaloneCodeEditor extends IStandaloneCodeEditor {
-        addCommand(keybinding: number, handler: ICommandHandler, context?: string): string | null;
-        createContextKey<T>(key: string, defaultValue: T): IContextKey<T>;
-        addAction(descriptor: IActionDescriptor): IDisposable;
-    }
-
     export interface IStandaloneDiffEditor extends IDiffEditor {
         addCommand(keybinding: number, handler: ICommandHandler, context?: string): string | null;
         createContextKey<T>(key: string, defaultValue: T): IContextKey<T>;
@@ -4085,6 +4079,10 @@ declare namespace monaco.editor {
          * Apply the same font settings as the editor to `target`.
          */
         applyFontInfo(target: HTMLElement): void;
+
+        addCommand(keybinding: number, handler: ICommandHandler, context?: string): string | null;
+        createContextKey<T>(key: string, defaultValue: T): IContextKey<T>;
+        addAction(descriptor: IActionDescriptor): IDisposable;
     }
 
     /**

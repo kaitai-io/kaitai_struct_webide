@@ -1,6 +1,5 @@
-import * as ace from "ace/ace";
 import * as monaco from "monaco/monaco";
-
+declare class YAML {static safeLoad(str: string): any;} // to make the linter shut-up
 
 interface ISuggestionData {
     regex: RegExp;
@@ -108,8 +107,8 @@ export class KsyAutoCompleter {
 
         try {
             this.editor = editor;
-            this.ksy = YAML.parse(editor.getValue(), false, null, true);
-            this.context = this.getContext(editor.getSelectionRange().start.row + 1);
+            this.ksy = YAML.safeLoad(editor.getModel().getValue());
+            this.context = this.getContext(editor.getSelection().startLineNumber + 1);
             //console.log("context", this.context);
 
             if (this.context.current) {
@@ -134,14 +133,14 @@ export class KsyAutoCompleter {
 
     getContext(row: number) {
         const lineDict = YamlHelper.getLineInfoFromYaml(this.ksy);
-        var linePadding = KsyAutoCompleter.getPaddingLen(this.editor.session.getLine(row - 1));
+        var linePadding = KsyAutoCompleter.getPaddingLen(this.editor.getModel().getLineContent(row - 1));
 
         var result = <IContext> {};
         if (lineDict[row])
             result.current = lineDict[row--];
 
         while(true && row >= 0) {
-            var line = this.editor.session.getLine(row - 1);
+            var line = this.editor.getModel().getLineContent(row - 1);
             if (KsyAutoCompleter.getPaddingLen(line) < linePadding && lineDict[row]) {
                 // "seq/0/id" and "seq/0" are on the same line, but we want to get "seq/0", not "seq/0/id"
                 result.parent = line.trim().startsWith("- ") ? KsyAutoCompleter.getParentPath(lineDict[row]) : lineDict[row];

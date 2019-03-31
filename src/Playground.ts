@@ -1,6 +1,6 @@
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");
-import { YAML } from "yamljs";
+import { YAML } from "js-yaml";
 import { TemplateCompiler, ITemplateSchema } from "./worker/TemplateCompiler";
 import { ExpressionParser } from "./worker/ExpressionLanguage/ExpressionParser";
 

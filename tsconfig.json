@@ -13,11 +13,11 @@
     "sourceMap": true,
     "target": "es2017",
     "outDir": "js/",
-    "lib": ["es2017", "dom"]
+    "lib": ["es2017", "dom"],
   },
   "include": [
     "src/**/*",
-    "lib/ts-types/"
+    "lib/ts-types/*",
   ],
   "exclude": [
     "src/worker/ImportLoader.ts"

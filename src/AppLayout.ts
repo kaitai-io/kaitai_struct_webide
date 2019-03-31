@@ -1,5 +1,4 @@
 ﻿import { LayoutManager, Container, Component, ClosableComponent } from "./LayoutManagerV2";
-import * as ace from "ace/ace";
 import * as monaco from "monaco/monaco";
 
 export class Layout {
@@ -59,13 +58,6 @@ export class LayoutHelper {
             language: lang,
             theme: "vs-dark"
         });
-        // var editor = ace.edit(parent.element);
-        // editor.setTheme("ace/theme/monokai");
-        // editor.getSession().setMode(`ace/mode/${lang}`);
-        // if (lang === "yaml")
-        //     editor.setOption("tabSize", 2);
-        // editor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
-        // parent.container.on("resize", () => editor.resize());
         return editor;
     }
 }
