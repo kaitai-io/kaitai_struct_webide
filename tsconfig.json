@@ -17,7 +17,7 @@
   },
   "include": [
     "src/**/*",
-    "lib/ts-types/*",
+    "lib/ts-types/"
   ],
   "exclude": [
     "src/worker/ImportLoader.ts"

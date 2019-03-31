@@ -23,6 +23,7 @@
     <link rel="stylesheet" type="text/css" href="lib/_npm/font-awesome/css/font-awesome.min.css" />
 
     <script src="lib/_npm/requirejs/require.js"></script>
+
     <script src="lib/_npm/jquery/jquery.min.js"></script>
     <script src="lib/_npm/bootstrap/js/bootstrap.min.js"></script>
     <script src="lib/_npm/monaco/loader.js"></script>
@@ -40,8 +41,8 @@
 
         requirejs.config({ baseUrl: "js/v1/", paths: paths });
         require(["app.unsupportedBrowser"]);
-        require(["../../lib/_npm/js-yaml/js-yaml"], (thing) => {
-            window.YAML = thing;
+        require(["../../lib/_npm/js-yaml/js-yaml"], (YAML) => {
+            window.YAML = YAML;
         });
         require(["vs/editor/editor.main"], () => {
             require(["vs/language/yaml/monaco.contribution", "vs/language/yaml/ksySchema"], () => {
@@ -56,10 +57,9 @@
                         }
                     ]
                 });
-            });
-        require(["jstree", "app"]);
-
+            })
         });
+        require(["jstree", "app"]);
     </script>
 </head>
 <body>

@@ -3,7 +3,7 @@
 
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");
-import { YAML } from "js-yaml";
+import * as YAML from "js-yaml";
 import { ObjectExporter } from "./ObjectExporter";
 import { IKaitaiServices, IExportOptions, ILazyArrayExportOptions } from "./WorkerShared";
 import { JsonExporter } from "./JsonExporter";
@@ -72,7 +72,7 @@ class KaitaiServices implements IKaitaiServices {
 
     public async setKsys(ksyCodes: { [fn: string]: string }) {
         for (const importFn of Object.keys(ksyCodes))
-            this.ksys[importFn] = YAML.parse(ksyCodes[importFn]);
+            this.ksys[importFn] = YAML.safeLoad(ksyCodes[importFn]);
         return await this.getMissingImports();
     }
 
@@ -82,7 +82,7 @@ class KaitaiServices implements IKaitaiServices {
 
         var releaseCode, debugCode;
         if (template) {
-            const templateSchema = YAML.parse(template);
+            const templateSchema = YAML.safeLoad(template);
             releaseCode = await this.templateCompiler.compile(templateSchema, ksy, this, false);
             debugCode = await this.templateCompiler.compile(templateSchema, ksy, this, true);
         }
@@ -143,7 +143,7 @@ class KaitaiServices implements IKaitaiServices {
     }
 
     async generateParser(ksyContent: string, lang: string, debug: boolean): Promise<{ [fileName: string]: string; }> {
-        const ksy = YAML.parse(ksyContent);
+        const ksy = YAML.safeLoad(ksyContent);
         const compiledCode = await this.kaitaiCompiler.compile(lang, ksy, this, debug);
         return compiledCode;
     }

@@ -1,6 +1,4 @@
-﻿import KaitaiStream = require("KaitaiStream");
-
-// issue: https://github.com/Microsoft/TypeScript/issues/582
+﻿// issue: https://github.com/Microsoft/TypeScript/issues/582
 var myself = <Worker><any>self;
 
 var wi = {
