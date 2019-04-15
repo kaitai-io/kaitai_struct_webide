@@ -250,7 +250,9 @@ out/
 # Generated file
 js/
 files/
-lib/_npm/
+lib/_npm
+!lib/_npm/vs/
+!lib/_npm/monaco/
 *.pyc
 .serve_files_secret
 \.DS_Store

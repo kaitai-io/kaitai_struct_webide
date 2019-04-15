@@ -1,4 +1,6 @@
-﻿// issue: https://github.com/Microsoft/TypeScript/issues/582
+﻿// tslint:ignore
+
+// issue: https://github.com/Microsoft/TypeScript/issues/582
 var myself = <Worker><any>self;
 
 var wi = {
