@@ -251,9 +251,11 @@ out/
 js/
 files/
 lib/_npm
-!lib/_npm/vs/
-!lib/_npm/monaco/
 *.pyc
 .serve_files_secret
 \.DS_Store
 playground/*.js*
+
+# this SHOULD keep critical files ... but it doesn't for some reason
+!lib/_npm/vs
+!lib/_npm/monaco

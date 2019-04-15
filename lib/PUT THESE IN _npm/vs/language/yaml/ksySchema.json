@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "JSON Schema for .ksy.json files",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "endian": { "enum": [ "le", "be" ] },
+        "application": { "type": "string" },
+        "file-extension": { "type": "string" }
+      },
+      "required": ["id"]
+    },
+    "seq": { "$ref": "#/definitions/AttrsSpec" },
+    "types": { "$ref": "#/definitions/TypesSpec" },
+    "enums": { "$ref": "#/definitions/EnumsSpec" },
+    "instances": { "$ref": "#/definitions/InstancesSpec" }
+  },
+  "definitions": {
+    "TypeSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "seq": { "$ref": "#/definitions/AttrsSpec" },
+        "types": { "$ref": "#/definitions/TypesSpec" },
+        "enums": { "$ref": "#/definitions/EnumsSpec" },
+        "instances": { "$ref": "#/definitions/InstancesSpec" }
+      }
+    },
+    "TypesSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^([a-z0-9_])+$": { "$ref": "#/definitions/TypeSpec" } }
+    },
+    "AttrSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "contents": {
+          "anyOf": [
+            { "type": "string" },
+            {
+              "type": "array",
+              "items": { "$ref": "#/definitions/StringOrInteger" }
+            }
+          ]
+        },
+        "type": {
+          "anyOf": [
+            { "type": "string" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "switch-on": {
+                  "type": "string",
+                  "pattern": "^[a-z_][a-z0-9_.]*$"
+                },
+                "cases": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^.*$": {
+                      "type": "string",
+                      "pattern": "^[a-z_][a-z0-9_.]*$"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "repeat": { "enum": [ "eos", "expr", "until" ] },
+        "repeat-expr": { "$ref": "#/definitions/StringOrInteger" },
+        "repeat-until": { "type": "string" },
+        "size": { "$ref": "#/definitions/StringOrInteger" },
+        "size-eos": { "type": "boolean" },
+        "encoding": { "enum": [ "ASCII", "UTF-8", "iso8859-1" ] },
+        "process": {
+          "type": "string",
+          "pattern": "^zlib|(xor|rol|ror)\\(.*\\)$"
+        },
+        "enum": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "if": { "type": "string" },
+        "doc": { "type": "string" },
+        "terminator": { "type": "integer" },
+        "consume": { "type": "boolean" },
+        "include": { "type": "boolean" },
+        "eos-error": { "type": "boolean" },
+        "io": { "type": "string" },
+        "pos": { "$ref": "#/definitions/StringOrInteger" },
+        "value": { "$ref": "#/definitions/StringOrInteger" }
+      }
+    },
+    "AttrsSpec": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/AttrSpec" }
+    },
+    "InstancesSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^([a-z0-9_])+$": { "$ref": "#/definitions/AttrSpec" } }
+    },
+    "EnumSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^([a-z0-9_])+$": { "type": "string" } }
+    },
+    "EnumsSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^([a-z0-9_])+$": { "$ref": "#/definitions/EnumSpec" } }
+    },
+    "StringOrInteger": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "integer" }
+      ]
+    }
+  }
+}
