@@ -5,33 +5,111 @@
   "additionalProperties": false,
   "properties": {
     "meta": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "id": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9_]*$"
-        },
-        "endian": { "enum": [ "le", "be" ] },
-        "application": { "type": "string" },
-        "file-extension": { "type": "string" }
-      },
+      "$ref": "#/definitions/MetaSpec",
       "required": ["id"]
     },
+    "doc": { "type": "string" },
+    "doc-ref": { "type": "string" },
+    "params": { "$ref": "#/definitions/ParamsSpec" },
     "seq": { "$ref": "#/definitions/AttrsSpec" },
     "types": { "$ref": "#/definitions/TypesSpec" },
     "enums": { "$ref": "#/definitions/EnumsSpec" },
     "instances": { "$ref": "#/definitions/InstancesSpec" }
   },
+  "patternProperties": {
+    "^-.*$": { "$ref": "#/definitions/StringOrInteger" }
+  },
   "definitions": {
+    "MetaSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/Identifier" },
+        "title": { "type": "string" },
+        "application": {
+          "anyOf": [
+            { "type": "string" },
+            {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          ]
+        },
+        "file-extension": {
+          "anyOf": [
+            { "type": "string" },
+            {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          ]
+        },
+        "xref": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^.*$": {
+              "anyOf": [
+                { "$ref": "#/definitions/AnyScalar" },
+                {
+                  "type": "array",
+                  "items": { "$ref": "#/definitions/AnyScalar" }
+                }
+              ]
+            }
+          }
+        },
+        "license": { "type": "string" },
+        "ks-version": {
+          "anyOf": [
+            { "type": "string" },
+            { "type": "number" }
+          ]
+        },
+        "imports": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(.*/)?[a-z][a-z0-9_]*$"
+          }
+        },
+        "encoding": { "type": "string" },
+        "endian": {
+          "anyOf": [
+            { "enum": [ "le", "be" ] },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "switch-on": { "type": "string" },
+                "cases": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^.*$": { "enum": [ "le", "be" ] }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
     "TypeSpec": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "meta": { "$ref": "#/definitions/MetaSpec" },
+        "params": { "$ref": "#/definitions/ParamsSpec" },
         "seq": { "$ref": "#/definitions/AttrsSpec" },
         "types": { "$ref": "#/definitions/TypesSpec" },
         "enums": { "$ref": "#/definitions/EnumsSpec" },
-        "instances": { "$ref": "#/definitions/InstancesSpec" }
+        "instances": { "$ref": "#/definitions/InstancesSpec" },
+        "doc": { "type": "string" },
+        "doc-ref": { "type": "string" }
+      },
+      "patternProperties": {
+        "^-.*$": { "$ref": "#/definitions/StringOrInteger" }
       }
     },
     "TypesSpec": {
@@ -39,14 +117,27 @@
       "additionalProperties": false,
       "patternProperties": { "^([a-z0-9_])+$": { "$ref": "#/definitions/TypeSpec" } }
     },
+    "ParamSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/Identifier" },
+        "type": { "type": "string" },
+        "doc": { "type": "string" },
+        "doc-ref": { "type": "string" }
+      },
+      "required": ["id"]
+    },
+    "ParamsSpec": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/ParamSpec" }
+    },
     "AttrSpec": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "id": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9_]*$"
-        },
+        "id": { "$ref": "#/definitions/Identifier" },
+        "-orig-id": { "type": "string" },
         "contents": {
           "anyOf": [
             { "type": "string" },
@@ -63,10 +154,7 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "switch-on": {
-                  "type": "string",
-                  "pattern": "^[a-z_][a-z0-9_.]*$"
-                },
+                "switch-on": { "type": "string" },
                 "cases": {
                   "type": "object",
                   "additionalProperties": false,
@@ -83,27 +171,39 @@
         },
         "repeat": { "enum": [ "eos", "expr", "until" ] },
         "repeat-expr": { "$ref": "#/definitions/StringOrInteger" },
-        "repeat-until": { "type": "string" },
+        "repeat-until": {
+          "anyOf": [
+            { "type": "string" },
+            { "type": "boolean" }
+          ]
+        },
         "size": { "$ref": "#/definitions/StringOrInteger" },
         "size-eos": { "type": "boolean" },
-        "encoding": { "enum": [ "ASCII", "UTF-8", "iso8859-1" ] },
+        "encoding": { "type": "string" },
         "process": {
           "type": "string",
           "pattern": "^zlib|(xor|rol|ror)\\(.*\\)$"
         },
-        "enum": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9_]*$"
+        "enum": { "$ref": "#/definitions/Identifier" },
+        "if": {
+          "anyOf": [
+            { "type": "string" },
+            { "type": "boolean" }
+          ]
         },
-        "if": { "type": "string" },
         "doc": { "type": "string" },
-        "terminator": { "type": "integer" },
+        "doc-ref": { "type": "string" },
+        "terminator": { "$ref": "#/definitions/StringOrInteger" },
         "consume": { "type": "boolean" },
         "include": { "type": "boolean" },
+        "pad-right": { "$ref": "#/definitions/StringOrInteger" },
         "eos-error": { "type": "boolean" },
         "io": { "type": "string" },
         "pos": { "$ref": "#/definitions/StringOrInteger" },
         "value": { "$ref": "#/definitions/StringOrInteger" }
+      },
+      "patternProperties": {
+        "^-.*$": { "$ref": "#/definitions/StringOrInteger" }
       }
     },
     "AttrsSpec": {
@@ -115,20 +215,56 @@
       "additionalProperties": false,
       "patternProperties": { "^([a-z0-9_])+$": { "$ref": "#/definitions/AttrSpec" } }
     },
+    "EnumValueSpec": {
+      "$ref": "#/definitions/Identifier",
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": { "$ref": "#/definitions/Identifier" },
+            "doc": { "type": "string" },
+            "doc-ref": { "type": "string" },
+            "-orig-id": { "type": "string" }
+          },
+          "patternProperties": {
+            "^-.*$": { "$ref": "#/definitions/StringOrInteger" }
+          }
+        }
+      ]
+    },
     "EnumSpec": {
       "type": "object",
       "additionalProperties": false,
-      "patternProperties": { "^([a-z0-9_])+$": { "type": "string" } }
+      "patternProperties": { "^.*$": { "$ref": "#/definitions/EnumValueSpec" } }
     },
     "EnumsSpec": {
       "type": "object",
       "additionalProperties": false,
       "patternProperties": { "^([a-z0-9_])+$": { "$ref": "#/definitions/EnumSpec" } }
     },
+    "Identifier": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        { "type": "boolean" }
+      ]
+    },
     "StringOrInteger": {
       "anyOf": [
         { "type": "string" },
         { "type": "integer" }
+      ]
+    },
+    "AnyScalar": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "integer" },
+        { "type": "boolean" },
+        { "type": "null" }
       ]
     }
   }
