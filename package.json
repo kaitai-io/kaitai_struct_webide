@@ -19,7 +19,7 @@
     "kaitai-struct": "next",
     "kaitai-struct-compiler": "^0.8.0-SNAPSHOT.20180126.2450",
     "localforage": "^1.5.0",
-    "monaco-editor": "^0.16.1",
+    "monaco-editor": "^0.16.2",
     "monaco-yaml": "^2.1.0",
     "pako": "^1.0.6",
     "require-from-string": "^1.2.1",

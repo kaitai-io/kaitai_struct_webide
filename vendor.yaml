@@ -1,31 +1,25 @@
 libs:
-  Ace:
-    website: https://ace.c9.io/
-    source: https://github.com/ajaxorg/ace
-    licenseName: BSD-3-Clause
-    licenseUrl: https://raw.githubusercontent.com/ajaxorg/ace/master/LICENSE
-    distDir: ace
-    npmDir: ace-builds
-    files: 
+  Monaco:
+    website: https://microsoft.github.io/monaco-editor/index.html
+    source: https://github.com/Microsoft/monaco-editor
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/Microsoft/monaco-editor/master/LICENSE.md
+    distDir: monaco
+    npmDir: monaco-editor
+    files:
         - LICENSE
-        - src/ace.js
-        - src/ext-searchbox.js
-        - src/mode-c_cpp.js
-        - src/mode-csharp.js
-        - src/mode-dot.js
-        - src/mode-java.js
-        - src/mode-javascript.js
-        - src/mode-json.js
-        - src/mode-perl.js
-        - src/mode-php.js
-        - src/mode-python.js
-        - src/mode-ruby.js
-        - src/mode-yaml.js
-        - src/theme-monokai.js
-        - src/theme-textmate.js
-        - src/worker-javascript.js
-        - src/worker-json.js
-        - src/ext-language_tools.js
+        - min/*
+
+  Monaco-Yaml:
+    source: https://github.com/pengx17/monaco-yaml
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/pengx17/monaco-yaml/master/LICENSE.md
+    npmDir: monaco-yaml
+    files:
+        - dev/monaco.contribution.js
+        - dev/yamlMode.js
+        - dev/yamlWorker.js
+
 
   BigInteger.js:
     source: https://github.com/peterolson/BigInteger.js
@@ -42,7 +36,7 @@ libs:
     licenseUrl: https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE
     npmDir: bootstrap
     files: [LICENSE, dist/*]
-    
+
   Bootswatch:
     website: https://bootswatch.com/
     source: https://github.com/thomaspark/bootswatch
@@ -177,9 +171,10 @@ libs:
     npmDir: kaitai-struct
     files: [LICENSE, KaitaiStream.js]
 
-  yaml.js:
-    source: https://github.com/jeremyfa/yaml.js
+  js-yaml:
+    website: http://nodeca.github.io/js-yaml/
+    source: https://github.com/nodeca/js-yaml
     licenseName: MIT
-    licenseUrl: https://raw.githubusercontent.com/jeremyfa/yaml.js/develop/LICENSE
-    npmDir: yamljs
-    files: [LICENSE, dist/yaml.js]
+    licenseUrl: https://raw.githubusercontent.com/nodeca/js-yaml/master/LICENSE
+    npmDir: js-yaml
+    files: [LICENSE, dist/js-yaml.js]

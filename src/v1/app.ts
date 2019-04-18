@@ -308,12 +308,6 @@ $(() => {
 
     app.refreshSelectionInput();
 
-    // app.ui.genCodeDebugViewer.commands.addCommand({ name: "compile", bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
-    //     exec: function (editor: any) { app.reparse(); } });
-    // app.ui.ksyEditor.addCommand(
-    //     { name: "compile", bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
-    //     exec: function (editor: any) { app.recompile(); } });
-
     app.ui.ksyEditor.addAction({
         id: "recompile-ksy",
         label: "recompile ksy file",

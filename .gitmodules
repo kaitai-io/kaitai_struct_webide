@@ -1,3 +1,7 @@
 [submodule "formats"]
 	path = formats
 	url = https://github.com/kaitai-io/kaitai_struct_formats/
+
+[submodule "src/Schema"]
+	path = src/Schema
+	url = https://github.com/dar2355/Ksy-Schema.git

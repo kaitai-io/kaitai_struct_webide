@@ -255,7 +255,3 @@ lib/_npm
 .serve_files_secret
 \.DS_Store
 playground/*.js*
-
-# this SHOULD keep critical files ... but it doesn't for some reason
-!lib/_npm/vs
-!lib/_npm/monaco

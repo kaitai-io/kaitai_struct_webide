@@ -1,12 +1,5 @@
 # 3rd-party libraries
 
-## Ace
-Website: https://ace.c9.io/
-
-Source: https://github.com/ajaxorg/ace
-
-License: BSD-3-Clause (https://raw.githubusercontent.com/ajaxorg/ace/master/LICENSE)
-
 ## BigInteger.js
 Source: https://github.com/peterolson/BigInteger.js
 
@@ -50,6 +43,13 @@ Source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
 
 License: Apache-2.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE)
 
+## Monaco
+Website: https://microsoft.github.io/monaco-editor/index.html
+
+Source: https://github.com/Microsoft/monaco-editor
+
+License: MIT (https://raw.githubusercontent.com/Microsoft/monaco-editor/master/LICENSE.md)
+
 ## Vue.js
 Source: https://github.com/vuejs/vue
 
@@ -71,6 +71,13 @@ Website: https://jquery.com/
 Source: https://github.com/jquery/jquery
 
 License: MIT (https://raw.githubusercontent.com/jquery/jquery/master/LICENSE.txt)
+
+## js-yaml
+Website: http://nodeca.github.io/js-yaml/
+
+Source: https://github.com/nodeca/js-yaml
+
+License: MIT (https://raw.githubusercontent.com/nodeca/js-yaml/master/LICENSE)
 
 ## jsTree
 Website: https://www.jstree.com/
@@ -108,8 +115,3 @@ License: Unlicense (https://raw.githubusercontent.com/inexorabletash/text-encodi
 Source: https://github.com/Teun/thenBy.js
 
 License: Apache-2.0 (https://raw.githubusercontent.com/Teun/thenBy.js/master/LICENSE.TXT)
-
-## yaml.js
-Source: https://github.com/jeremyfa/yaml.js
-
-License: MIT (https://raw.githubusercontent.com/jeremyfa/yaml.js/develop/LICENSE)
