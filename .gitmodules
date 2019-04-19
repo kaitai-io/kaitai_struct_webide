@@ -4,4 +4,4 @@
 
 [submodule "src/Schema"]
 	path = src/Schema
-	url = https://github.com/dar2355/Ksy-Schema.git
+	url = https://github.com/kaitai-io/ksy_schema
