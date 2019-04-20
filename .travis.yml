@@ -5,7 +5,7 @@ sudo: false
 language: javascript
 
 install:
-  - apt-get install -y python-ruamel.yaml
+  - pip install -r requirements.txt
   - npm install
   - 'if [[ "$TRAVIS_BRANCH" = stable ]]; then npm install kaitai-struct-compiler@latest && npm install kaitai-struct@latest && python vendor_build.py; fi'
 
