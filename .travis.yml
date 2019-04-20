@@ -1,8 +1,10 @@
 # version 2
-dist: trusty
+dist: xenial
 sudo: false
 
-language: javascript
+language: node_js
+cache: npm
+node_js: 8
 
 install:
   - pip install --user -r requirements.txt
