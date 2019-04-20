@@ -2,7 +2,7 @@
 
 import os
 import glob
-import yaml
+import ruamel.yaml as yaml
 
 with open('vendor.yaml') as f: libs = yaml.safe_load(f)['libs']
 

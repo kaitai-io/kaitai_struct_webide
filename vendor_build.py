@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
-import yaml
+
+import ruamel.yaml as yaml
 import glob
 import shutil
 import os
@@ -10,7 +11,7 @@ def mkdir_recursive(path):
         mkdir_recursive(sub_path)
     if not os.path.exists(path):
         os.mkdir(path)
-        
+
 def recursive_overwrite(src, dest):
     #print '    recursive_overwrite %s, %s' % (src, dest)
 
@@ -19,7 +20,7 @@ def recursive_overwrite(src, dest):
 
     if not os.path.exists(destDir):
         os.makedirs(destDir)
-        
+
     if isDir:
         for f in os.listdir(src):
             #print '       f: %s' % f
@@ -39,12 +40,12 @@ for (libName, lib) in sortedLibs:
             allFilesInDir = file.endswith('/*')
             if allFilesInDir:
                 file = file.replace('/*', '')
-                
+
             srcPattern = './node_modules/%s/%s' % (lib['npmDir'], file)
             if os.path.isdir(srcPattern) and not allFilesInDir:
                 recursive_overwrite(srcPattern, distDir + file + '/')
             else:
-                recursive_overwrite(srcPattern, distDir)            
+                recursive_overwrite(srcPattern, distDir)
 
 #print 'Processing lib_src...'
 #recursive_overwrite('lib_src', 'lib')
