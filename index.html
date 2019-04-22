@@ -48,10 +48,8 @@
         require(["vs/editor/editor.main",], () => {
             require([
                 "vs/language/yaml/monaco.contribution",
-                "../../js/ksy_schema",
-            ], function(a, b) {
-                console.log("!!!a=", a);
-                console.log("!!!b=", b);
+                "../../out/js/ksy_schema",
+            ], function(_, ksySchema) {
                 monaco.languages.yaml.yamlDefaults.setDiagnosticsOptions({
                     enableSchemaRequest: true,
                     validate: true,

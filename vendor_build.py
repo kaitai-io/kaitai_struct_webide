@@ -59,17 +59,11 @@ with open('src/Schema/ksy_schema.json', 'rt') as f:
     schema = f.read()
 
 schema = """
-(function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define('ksy_schema',["require", "exports"], factory);
-    }
-})(function (require, exports) {
-exports.ksy_schema =
-""" + schema + "\n});"
+define(function(){
+
+return """ + schema + """
+
+});"""
 
 mkdir_recursive('./out/js')
 with open('out/js/ksy_schema.js', 'wt') as f:
