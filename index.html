@@ -38,7 +38,7 @@
             name => paths[name] = `../../lib/_npm/${name}/${name}`);
         paths["big-integer"] = "../../lib/_npm/BigInteger/BigInteger";
         paths["vs"] = "../../lib/_npm/monaco/vs";
-        paths["vs/language/yaml"] = "../../../lib/_npm/monaco-yaml"
+        paths["vs/language/yaml"] = "../../lib/_npm/monaco-yaml"
 
         requirejs.config({ baseUrl: "js/v1/", paths: paths });
         require(["app.unsupportedBrowser"]);
