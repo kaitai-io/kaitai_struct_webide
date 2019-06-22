@@ -16,11 +16,11 @@ export class EditorChangeHandler {
     editDelay: Delayed;
     internalChange: boolean;
 
-    constructor(public editor: AceAjax.Editor, delay: number, public changeCallback: (newContent: string, userChange: boolean) => void) {
+    constructor(public editor: monaco.editor.IStandaloneCodeEditor, delay: number, public changeCallback: (newContent: string, userChange: boolean) => void) {
         this.editDelay = new Delayed(delay);
 
         if (this.editor)
-            this.editor.on("change", () => this.editDelay.do(() =>
+            this.editor.getModel().onDidChangeContent( () => this.editDelay.do(() =>
                 this.changeCallback(this.editor.getValue(), !this.internalChange)));
     }
 
@@ -29,7 +29,7 @@ export class EditorChangeHandler {
 
         if (this.editor.getValue() !== newContent) {
             this.internalChange = true;
-            this.editor.setValue(newContent, -1);
+            this.editor.setValue(newContent);
             this.internalChange = false;
         }
     }

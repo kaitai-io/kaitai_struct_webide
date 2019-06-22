@@ -1,7 +1,5 @@
 /// <reference path="../lib/ts-types/ace.d.ts" />
 
-import * as ace from "ace/ace";
-
 declare var YAML: any;
 
 interface ISuggestionData {

@@ -250,7 +250,7 @@ out/
 # Generated file
 js/
 files/
-lib/_npm/
+lib/_npm
 *.pyc
 .serve_files_secret
 \.DS_Store

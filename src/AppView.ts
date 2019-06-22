@@ -1,3 +1,4 @@
+import * as monaco from "monaco/monaco";
 import * as Vue from "vue";
 import * as $ from "jquery";
 import { Layout, LayoutHelper } from "./AppLayout";
@@ -16,10 +17,10 @@ export class AppView {
     layout: Layout;
 
     fileTree: FileTree;
-    ksyEditor: AceAjax.Editor;
-    templateEditor: AceAjax.Editor;
-    jsCode: AceAjax.Editor;
-    jsCodeDebug: AceAjax.Editor;
+    ksyEditor: monaco.editor.IStandaloneCodeEditor;
+    templateEditor: monaco.editor.IStandaloneCodeEditor;
+    jsCode: monaco.editor.IStandaloneCodeEditor;
+    jsCodeDebug: monaco.editor.IStandaloneCodeEditor;
     binaryPanel: BinaryPanel;
     hexViewer: HexViewer;
     aboutModal: AboutModal;
@@ -92,7 +93,7 @@ export class AppView {
     addFileView(title: string, content: string, lang: string) {
         const component = this.layout.files.addComponent(title, { isClosable: true });
         const editor = LayoutHelper.setupEditor(component, lang);
-        editor.setValue(content, -1);
+        editor.setValue(content);
         return editor;
     }
 }

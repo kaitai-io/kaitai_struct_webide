@@ -10,6 +10,8 @@ class AmdModule {
      }
 }
 
+declare function importScripts(...urls: string[]): void;
+
 const isWorker = typeof window === "undefined";
 
 this["module"] = { exports: null };

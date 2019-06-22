@@ -26,7 +26,7 @@ export class LayoutManager<T> {
 
     addEditorTab(title: string, data: string, lang: string = null, parent: string = "codeTab") {
         var componentName = `dynComp${this.dynCompId++}`;
-        this.addEditor(componentName, lang, true, (editor: any) => editor.setValue(data, -1));
+        this.addEditor(componentName, lang, true, (editor: any) => editor.setValue(data));
         this.getLayoutNodeById(parent).addChild({ type: "component", componentName, title });
     }
 
@@ -37,7 +37,7 @@ export class LayoutManager<T> {
             //console.log("addComponent id", name, container.getElement());
             container.getElement().attr("id", name);
             if (generatorCallback) {
-                container.on("resize", () => { if (editor && editor.resize) editor.resize(); });
+                container.on("resize", () => { if (editor && editor.layout) editor.layout(); });
                 container.on("open", () => { self.ui[name] = editor = generatorCallback(container) || container; });
             } else
                 self.ui[name + "Cont"] = container;
@@ -53,17 +53,27 @@ export class LayoutManager<T> {
         });
     }
 
-    addEditor(name: string, lang: string, isReadOnly: boolean = false, callback: ((editor: AceAjax.Editor) => void) = null) {
+    addEditor(name: string, lang: string, isReadOnly: boolean = false, callback: ((editor: monaco.editor.IStandaloneCodeEditor) => void) = null) {
         this.addComponent(name, container => {
-            var editor = ace.edit(container.getElement().get(0));
-            editor.setTheme("ace/theme/monokai");
-            editor.getSession().setMode(`ace/mode/${lang}`);
-            if (lang === "yaml")
-                editor.setOption("tabSize", 2);
-            editor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
-            editor.setReadOnly(isReadOnly);
-            if (callback)
-                callback(editor);
+            let editor;
+            if (name === "ksyEditor") {
+                const uri = monaco.Uri.parse("inmemory://model/main");
+                editor = monaco.editor.create(container.getElement().get(0), {
+                    language: lang,
+                    theme: "vs-dark",
+                    showFoldingControls: "always",
+                    model: monaco.editor.createModel("", lang, uri)
+                });
+            } else {
+                editor = monaco.editor.create(container.getElement().get(0), {
+                    language: lang,
+                    theme: "vs-dark",
+                });
+            }
+
+            console.log(editor.getModel().uri.toString());
+            editor.getModel().updateOptions({ tabSize: 2 });
+
             return editor;
         });
     }
@@ -71,9 +81,10 @@ export class LayoutManager<T> {
 
 export class UI {
     layout: LayoutManager<UI>;
-    ksyEditor: AceAjax.Editor;
-    genCodeViewer: AceAjax.Editor;
-    genCodeDebugViewer: AceAjax.Editor;
+    ksyEditor: monaco.editor.IStandaloneCodeEditor;
+    genCodeViewer: monaco.editor.IStandaloneCodeEditor;
+
+    genCodeDebugViewer: monaco.editor.IStandaloneCodeEditor;
     parsedDataTreeCont: GoldenLayout.Container;
     parsedDataTreeHandler: ParsedTreeHandler;
     hexViewer: HexViewer;

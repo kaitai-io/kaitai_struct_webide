@@ -14,11 +14,11 @@
     <link rel="stylesheet" type="text/css" href="css/v2.css" />
     
     <script src="lib/_npm/smooth-scrollbar/smooth-scrollbar.js"></script>
-    <script src="lib/yaml.js"></script>
     <script src="js/extensions.js"></script>
     <script src="js/kaitaiFsFiles.js"></script>
     <script src="js/AmdLoader.js"></script>
     <script src="lib/thenBy.js"></script>
+
     <script>
         async function init(){
             loader.paths = {
@@ -28,7 +28,8 @@
                 bootstrap: "lib/_npm/bootstrap/js/bootstrap.min",
                 "yamljs": "lib/yaml",
                 "KaitaiStream": "lib/_npm/kaitai-struct/KaitaiStream",
-                "kaitai-struct-compiler": "lib/_npm/kaitai-struct-compiler/kaitai-struct-compiler"
+                "kaitai-struct-compiler": "lib/_npm/kaitai-struct-compiler/kaitai-struct-compiler",
+                monaco: "lib/_npm/monaco/loader"
             };
             ["bowser", "jstree", "localforage", "goldenlayout", "vue", "dateformat"].forEach(
                 name => loader.paths[name] = `lib/_npm/${name}/${name}`);
@@ -36,7 +37,7 @@
             let componentLoader = (await loader.getLoadedModule('ui/ComponentLoader')).exports.componentLoader;
             //console.log('componentLoader', componentLoader);
             loader.beforeLoadHook = async module => {
-                // console.log('module loading: ', module.url);
+                console.log('module loading: ', module.url);
                 if(/ui.(Parts|Components)/.exec(module.url)){
                     //console.log('load template for', module.url);
                     await componentLoader.loadTemplate(module.url.replace(/\.js$/, ".html").replace(/js\/ui/, "src/ui"));

@@ -168,8 +168,8 @@ class AppController {
 
             const compilationResult = await this.sandbox.kaitaiServices.compile(mainKsyUri, template);
             console.log("compilationResult", compilationResult);
-            this.view.jsCode.setValue(Object.values(compilationResult.releaseCode).join("\n"), -1);
-            this.view.jsCodeDebug.setValue(compilationResult.debugCodeAll, -1);
+            this.view.jsCode.setValue(Object.values(compilationResult.releaseCode).join("\n"));
+            this.view.jsCodeDebug.setValue(compilationResult.debugCodeAll);
             await this.reparse();
         } catch (e) {
             if (e instanceof ParseError) {

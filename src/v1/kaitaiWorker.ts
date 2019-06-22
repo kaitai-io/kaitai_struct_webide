@@ -1,4 +1,6 @@
-﻿// issue: https://github.com/Microsoft/TypeScript/issues/582
+﻿// tslint:ignore
+
+// issue: https://github.com/Microsoft/TypeScript/issues/582
 var myself = <Worker><any>self;
 
 var wi = {
@@ -13,6 +15,7 @@ var wi = {
 var hooks = { nodeFilter: <(obj: any) => any> null };
 
 declare function importScripts(...urls: string[]): void;
+declare class KaitaiStream {constructor(...args: any[])}
 
 interface IDebugInfo {
     start: number;

@@ -1,6 +1,7 @@
 ﻿import { fss, IFsItem } from "./app.files";
 import { performanceHelper } from "./utils/PerformanceHelper";
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
+declare class YAML {static safeLoad(str: string): any;} // to make the linter shut-up
 
 class SchemaUtils {
     static ksyNameToJsName(ksyName: string, isProp: boolean) {
@@ -58,7 +59,7 @@ class JsImporter implements IYamlImporter {
 
         console.log(`import yaml: ${name}, mode: ${mode}, loadFn: ${loadFn}, root:`, this.rootFsItem);
         let ksyContent = await fss[this.rootFsItem.fsType].get(`${loadFn}.ksy`);
-        var ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
+        var ksyModel = <KsySchema.IKsyFile>YAML.safeLoad(<string>ksyContent);
         return ksyModel;
     }
 }
@@ -78,11 +79,11 @@ export class CompilerService {
         this.jsImporter.rootFsItem = srcYamlFsItem;
 
         try {
-            this.ksySchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
+            this.ksySchema = <KsySchema.IKsyFile>YAML.safeLoad(srcYaml);
             this.ksyTypes = SchemaUtils.collectKsyTypes(this.ksySchema);
 
             // we have to modify the schema (add typesByJsName for example) before sending into the compiler so we need a copy
-            var compilerSchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
+            var compilerSchema = <KsySchema.IKsyFile>YAML.safeLoad(srcYaml);
         } catch (parseErr) {
             return Promise.reject(new CompilationError("yaml", parseErr));
         }

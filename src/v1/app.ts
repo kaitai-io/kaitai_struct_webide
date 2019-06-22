@@ -73,12 +73,57 @@ class AppController {
     compile(srcYamlFsItem: IFsItem, srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
         return this.compilerService.compile(srcYamlFsItem, srcYaml, kslang, debug).then(result => {
             ga("compile", "success");
+            // clear error
+            monaco.editor.setModelMarkers(this.ui.ksyEditor.getModel(), "err check", []);
             return result;
         }, (error: CompilationError) => {
+            // ANCHOR IN-EDITOR ERROR REPORTING
+            //console.log(error.error.s$1.split(" "));
+            this.showError(error);
             ga("compile", "error", `${error.type}: ${error.error}`);
             this.errors.handle(error.error);
             return Promise.reject(error);
         });
+    }
+
+    showError(error: CompilationError) {
+        console.log(error);
+        if (!error.error.s$1) return;
+
+        let path = error.error.s$1.split(" ")[0].split("/");
+            path.shift();
+            for (const [i, route] of path.entries()) {
+                if (parseInt(route) >= 0) {
+                    if (route !== "0") path.splice(i, 1, ...(new Array(parseInt(route)).fill("  },")));
+                    else path.splice(i, 1);
+                }
+            }
+            if (path[path.length - 1] === "  },") path.push("  },");
+
+            let location;
+            let searchItem = 0;
+            console.log(path);
+            for (const [i, line] of this.ui.ksyEditor.getValue().split("\n").entries()) {
+                // console.log(line);
+                if (line.includes(path[searchItem])) {
+                    console.log(line);
+                    searchItem++;
+                    if (searchItem === path.length) {
+                        console.log(line,"found!");
+                        location = [i, line.indexOf(path[searchItem - 1])];
+                    }
+                }
+            }
+            console.log(location);
+
+            monaco.editor.setModelMarkers(this.ui.ksyEditor.getModel(), "err check", [{
+                message: error.error.msg$4,
+                startLineNumber: location[0] + 1,
+                endLineNumber: location[0] + 1,
+                startColumn: location[1] + 1,
+                endColumn: 100,
+                severity: 8
+            }]);
     }
 
     async recompile() {
@@ -100,8 +145,8 @@ class AppController {
         var fileNames = Object.keys(compiled.release);
         let debugUserTypes = localStorage.getItem("userTypes") || "";
         if (debugUserTypes) debugUserTypes += "\n\n";
-        this.ui.genCodeViewer.setValue(debugUserTypes + fileNames.map(x => compiled.release[x]).join(""), -1);
-        this.ui.genCodeDebugViewer.setValue(debugUserTypes + fileNames.map(x => compiled.debug[x]).join(""), -1);
+        this.ui.genCodeViewer.setValue(debugUserTypes + fileNames.map(x => compiled.release[x]).join(""));
+        this.ui.genCodeDebugViewer.setValue(debugUserTypes + fileNames.map(x => compiled.debug[x]).join(""));
         await this.reparse();
     }
 
@@ -163,7 +208,7 @@ class AppController {
             this.lastKsyFsItem = fsItem;
             this.lastKsyContent = <string>content;
             if (this.ui.ksyEditor.getValue() !== content)
-                this.ui.ksyEditor.setValue(content, -1);
+                this.ui.ksyEditor.setValue(content);
             var ksyEditor = this.ui.layout.getLayoutNodeById("ksyEditor");
             (<any>ksyEditor).container.setTitle(fsItem.fn);
         } else {
@@ -263,10 +308,12 @@ $(() => {
 
     app.refreshSelectionInput();
 
-    app.ui.genCodeDebugViewer.commands.addCommand({ name: "compile", bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
-        exec: function (editor: any) { app.reparse(); } });
-    app.ui.ksyEditor.commands.addCommand({ name: "compile", bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
-        exec: function (editor: any) { app.recompile(); } });
+    app.ui.ksyEditor.addAction({
+        id: "recompile-ksy",
+        label: "recompile ksy file",
+        keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter ],
+        run() { app.recompile(); }
+    });
 
     initFileDrop("fileDrop", (files: any) => app.addNewFiles(files));
 
@@ -286,7 +333,7 @@ $(() => {
 
     var editDelay = new Delayed(500);
     if (!("noAutoCompile" in qs))
-        app.ui.ksyEditor.on("change", () => editDelay.do(() => app.recompile()));
+        app.ui.ksyEditor.onDidChangeModelContent(() => editDelay.do(() => app.recompile()));
 
     var inputContextMenu = $("#inputContextMenu");
     var downloadInput = $("#inputContextMenu .downloadItem");

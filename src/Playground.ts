@@ -1,6 +1,6 @@
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");
-import { YAML } from "yamljs";
+import * as YAML from "js-yaml";
 import { TemplateCompiler, ITemplateSchema } from "./worker/TemplateCompiler";
 import { ExpressionParser } from "./worker/ExpressionLanguage/ExpressionParser";
 
@@ -31,8 +31,8 @@ async function run() {
 
     const ksyContent = await (await fetch("template_compiler/test.ksy")).text();
     const templateContent = await (await fetch("template_compiler/test.kcy.yaml")).text();
-    const ksy = <KsySchema.IKsyFile>YAML.parse(ksyContent, null, null, true);
-    const kcy = <ITemplateSchema>YAML.parse(templateContent);
+    const ksy = <KsySchema.IKsyFile>YAML.safeLoad(ksyContent);
+    const kcy = <ITemplateSchema>YAML.safeLoad(templateContent);
 
     const compiledTemplate = TemplateCompiler.compileTemplateSchema(kcy);
     console.log("compiledTemplate", compiledTemplate);
