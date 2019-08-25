@@ -56,7 +56,7 @@ export class EventSilencer {
 
 export class Convert {
     static utf8StrToBytes(str: string): Uint8Array {
-        return new TextEncoder("utf-8").encode(str);
+        return new TextEncoder().encode(str);
     }
 }
 
