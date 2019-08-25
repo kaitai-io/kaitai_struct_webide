@@ -95,9 +95,8 @@ if '--compile' in sys.argv:
     compileProcess = subprocess.Popen(compileCmd, shell=True)
 
 sys.dont_write_bytecode = True
-import genKaitaiFsFiles
-genKaitaiFsFiles.generate('')
-
+subprocess.call(['node', './genKaitaiFsFiles.js', '.'])
+    
 print "Please use 127.0.0.1:%d on Windows (using localhost makes 1sec delay)" % PORT
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):

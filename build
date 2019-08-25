@@ -5,7 +5,7 @@ TSC=node_modules/.bin/tsc
 
 mkdir -p "$OUT_DIR/js"
 
-./genKaitaiFsFiles.py "$OUT_DIR"
+node ./genKaitaiFsFiles.js "$OUT_DIR"
 
 "$TSC" --outDir $OUT_DIR/js/ --noEmitOnError
 if [ -f "tsconfig.worker.json" ]; then
