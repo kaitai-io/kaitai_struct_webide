@@ -4,6 +4,6 @@ export class Conversion {
     }
 
     static strToUtf8Bytes(str: string) {
-        return new TextEncoder("utf-8").encode(str).buffer;
+        return new TextEncoder().encode(str).buffer;
     }
 }

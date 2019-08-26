@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "tslint": "^5.7.0",
-    "typescript": "^2.5.2"
+    "typescript": "^2.9.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
