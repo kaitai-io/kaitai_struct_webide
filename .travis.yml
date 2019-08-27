@@ -9,7 +9,7 @@ node_js: 10
 install:
   - pip install --user -r requirements.txt
   - npm install
-  - 'if [[ "$TRAVIS_BRANCH" = stable ]]; then npm install kaitai-struct-compiler@latest && npm install kaitai-struct@latest && python vendor_build.py; fi'
+  - 'if [[ "$TRAVIS_BRANCH" = stable ]]; then npm install kaitai-struct-compiler@latest && npm install kaitai-struct@latest && node vendor_build.js; fi'
 
 script:
   - '[ "$TRAVIS_BRANCH" = stable ] && export GA_ID=UA-76299550-2 || export GA_ID=UA-76299550-3'
