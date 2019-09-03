@@ -45,11 +45,20 @@ function fetchGitCommitInfo() {
                 reject(err);
             } else {
                 const [commitId, commitTs] = stdout.trim().split(",");
-                const commitDate = Date.parse(commitTs);
+                const commitDate = new Date(Number(commitTs)*1000);
                 resolve({ commitId, commitDate });
             }
         })
     );
+}
+
+function formatCommitDate(d) {
+    return String(d.getUTCFullYear()).padStart(2, '0') + '-'
+         + String(d.getUTCMonth() + 1).padStart(2, '0') + '-'
+         + String(d.getUTCDate()).padStart(2, '0') + ' '
+         + String(d.getUTCHours()).padStart(2, '0') + ':'
+         + String(d.getUTCMinutes()).padStart(2, '0') + ':'
+         + String(d.getUTCSeconds()).padStart(2, '0');
 }
 
 async function main() {
@@ -69,7 +78,7 @@ async function main() {
             )
             .replace(
                 'kaitaiIde.commitDate = "";',
-                `kaitaiIde.commitDate = "${commitDate}";`
+                `kaitaiIde.commitDate = "${formatCommitDate(commitDate)}";`
             )
     );
 }
