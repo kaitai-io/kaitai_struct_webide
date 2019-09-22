@@ -12,6 +12,9 @@
 <template>
     <div class="infoPanel">
         <selection-input :start="selectionStart" :end="selectionEnd" @selection-changed="selectionChanged"></selection-input>
+        <div id="selectionLengthDiv">
+          Selection length: <span>{{selectionEnd-selectionStart+1}}</span>
+        </div>
         <div id="disableLazyParsingDiv">
             <input type="checkbox" id="disableLazyParsing" v-model="disableLazyParsing" />
             <label for="disableLazyParsing">disable lazy parsing</label>
