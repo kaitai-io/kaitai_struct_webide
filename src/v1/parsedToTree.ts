@@ -277,7 +277,7 @@ export class ParsedTreeHandler {
 
                         var start = exp.ioOffset + exp.start;
                         var end = exp.ioOffset + exp.end - 1;
-                        if (start <= lastEnd || start > end) continue;
+                        if (Number.isNaN(start) || Number.isNaN(end) || start <= lastEnd || start > end) continue;
                         lastEnd = end;
 
                         intervals.push(<IParsedTreeInterval>{ start: start, end: end, exp: exp });
