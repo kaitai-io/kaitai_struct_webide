@@ -41,10 +41,10 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         self.send_response(statusCode)
         self.end_headers()
         self.wfile.write(json.dumps(result))
-        
+
     def close_request(self):
         print "Close"
-        
+
     def do_GET(self):
         if self.path == '/onchange':
             lastChange = getLastChange(watchDirs)
@@ -66,16 +66,29 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 if not re.match('^[a-zA-Z0-9_]+$', challName):
                     self.resp(400, {'status': 'error', 'error': 'badChallName'});
                     return
-                    
+
                 with open('user.ksy', 'wt') as f: f.write(input['yaml'])
                 checkRes = json.loads(subprocess.check_output('node checker.js user.ksy practice\%s\input.bin practice\%s\check.json' % (challName, challName)));
-                    
+
                 self.resp(200, {'status': 'ok', 'check_res': checkRes});
             except Exception as e:
                 print e
                 self.resp(400, {'status': 'exception'});
         else:
             return SimpleHTTPServer.SimpleHTTPRequestHandler.do_POST(self)
+
+    extensions_map = {
+        '.manifest': 'text/cache-manifest',
+        '.html': 'text/html',
+        '.png': 'image/png',
+        '.jpg': 'image/jpg',
+        '.svg':	'image/svg+xml',
+        '.css':	'text/css',
+        '.js':	'application/javascript',
+        '.json': 'application/json',
+        '.xml': 'application/xml',
+        '': 'application/octet-stream', # Default
+    }
 
 if '--compile' in sys.argv:
     print "Starting typescript compiler..."
@@ -84,7 +97,7 @@ if '--compile' in sys.argv:
 sys.dont_write_bytecode = True
 import genKaitaiFsFiles
 genKaitaiFsFiles.generate('')
-    
+
 print "Please use 127.0.0.1:%d on Windows (using localhost makes 1sec delay)" % PORT
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
@@ -97,7 +110,7 @@ try:
     ThreadedHTTPServer(("", PORT), MyHandler).serve_forever()
 except KeyboardInterrupt:
     pass
-    
+
 if compileProcess:
     print "Waiting for compiler to stop..."
     compileProcess.wait()
