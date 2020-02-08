@@ -82,9 +82,9 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         '.html': 'text/html',
         '.png': 'image/png',
         '.jpg': 'image/jpg',
-        '.svg':	'image/svg+xml',
-        '.css':	'text/css',
-        '.js':	'application/javascript',
+        '.svg': 'image/svg+xml',
+        '.css': 'text/css',
+        '.js': 'application/javascript',
         '.json': 'application/json',
         '.xml': 'application/xml',
         '': 'application/octet-stream', # Default
