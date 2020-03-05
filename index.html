@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Kaitai Web IDE</title>    
+    <title>Kaitai Web IDE</title>
     <script>
         // HTTPS redirect
         var loc = location.toString();
@@ -58,7 +58,7 @@
         Drag &amp; drop a file here<br />to upload
     </div>
 </div>
-    
+
 <div id="infoPanel">
     <selection-input :start="selectionStart" :end="selectionEnd" @selectionChanged="selectionChanged"></selection-input>
     <div id="selectionLengthDiv">
@@ -84,8 +84,8 @@
         <a id="aboutWebIde" @click="about" href="#">about webide</a>
     </div>
 </div>
-    
-<converter-panel id="converterPanel" :model="model"></converter-panel>    
+
+<converter-panel id="converterPanel" :model="model"></converter-panel>
 
 <div id="fileTreeCont">
     <div id="fileTree" class="fileTree">
@@ -109,6 +109,7 @@
             <ul class="dropdown-menu">
                 <li><a tabindex="-1" href="#" data-kslang="cpp_stl" data-acelang="c_cpp">CPP-STL</a></li>
                 <li><a tabindex="-1" href="#" data-kslang="csharp" data-acelang="csharp">C#</a></li>
+                <li><a tabindex="-1" href="#" data-kslang="go" data-acelang="golang">Go</a></li>
                 <li><a tabindex="-1" href="#" data-kslang="graphviz" data-acelang="dot">Graphviz</a></li>
                 <li><a tabindex="-1" href="#" data-kslang="java" data-acelang="java">Java</a></li>
                 <li><a tabindex="-1" href="#" data-kslang="java" data-ksdebug="true" data-acelang="java">Java (debug)</a></li>
@@ -155,7 +156,7 @@
         </div>
     </div>
 </div>
-    
+
 <div class="modal fade" id="welcomeModal" tabindex="-1" role="dialog" aria-labelledby="welcomeModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -164,24 +165,24 @@
                     <h4 class="modal-title" id="welcomeModalLabel">Hey there!</h4>
                 </div>
                 <div class="form-group">
-                    If this is the first time you are using Kaitai WebIDE then I recommend scrolling through our 
+                    If this is the first time you are using Kaitai WebIDE then I recommend scrolling through our
                     <a href="https://github.com/kaitai-io/kaitai_struct_webide/wiki/Features" target="_blank">Features page</a>.
                 </div>
                 <div class="form-group">
-                    You can read more about Kaitai Struct on our website (<a href="http://kaitai.io" target="_blank">kaitai.io</a>) and 
+                    You can read more about Kaitai Struct on our website (<a href="http://kaitai.io" target="_blank">kaitai.io</a>) and
                     learn the basics of using it by reading <a href="http://doc.kaitai.io" target="_blank">our documentation</a>.
                 </div>
                 <div class="form-group">
-                    We would be pleased if you could visit us and share your thoughts about Kaitai Struct or WebIDE in our 
+                    We would be pleased if you could visit us and share your thoughts about Kaitai Struct or WebIDE in our
                     <a href="https://gitter.im/kaitai_struct/Lobby" target="_blank">Gitter chatroom</a>.
                 </div>
                 <div class="form-group">
-                    You can view the source code or create issues on Github 
+                    You can view the source code or create issues on Github
                     for the <a href="https://github.com/kaitai-io/kaitai_struct_webide" target="_blank">WebIDE</a> or
                     <a href="https://github.com/kaitai-io/kaitai_struct" target="_blank">Kaitai Struct</a>.
                 </div>
                 <div class="form-group">
-                    Kaitai WebIDE was made possible by using 
+                    Kaitai WebIDE was made possible by using
                     <a href="https://github.com/kaitai-io/kaitai_struct_webide/blob/master/docs/wiki/3rd-party-libraries.md" target="_blank">open-source libraries listed here</a>
                     (<a href="LICENSE-3RD-PARTY.txt" target="_blank">licensing information</a>).
                 </div>
@@ -209,6 +210,6 @@
             </div>
         </div>
     </div>
-</div>    
+</div>
 </body>
 </html>
