@@ -247,7 +247,12 @@ export function initFileTree() {
         setEnabled(uiFiles.cloneKsyFile, isLocal && isKsy);
         setEnabled(uiFiles.deleteItem, isLocal);
         setEnabled(uiFiles.generateParser, isKsy);
-        uiFiles.fileTreeContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
+
+        uiFiles.fileTreeContextMenu.css({ display: "block", visibility: "hidden", "z-index": -1 }); // still invisible but has width & height
+        var x = Math.min(e.pageX, $(window).width() - uiFiles.fileTreeContextMenu.width());
+        var h = uiFiles.fileTreeContextMenu.height();
+        var y = e.pageY > ($(window).height() - h) ? e.pageY - h : e.pageY;
+        uiFiles.fileTreeContextMenu.css({ visibility: '', "z-index": '', left: x, top: y });
         return false;
     });
 
