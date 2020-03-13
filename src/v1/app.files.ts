@@ -261,6 +261,11 @@ export function initFileTree() {
         var el = $(e.currentTarget);
         if (!el.hasClass("disabled")) {
             var menu = el.find("> .dropdown-menu");
+            var hideTimeout = menu.data("hide-timeout");
+            if (typeof hideTimeout === "number") {
+                clearTimeout(hideTimeout);
+                menu.data("hide-timeout", null);
+            }
             menu.css({ display: "block", visibility: "hidden", "z-index": -1 });
             var itemPos = el.offset();
             var menuW = menu.outerWidth();
@@ -279,7 +284,9 @@ export function initFileTree() {
     }).mouseleave(e => {
         var el = $(e.currentTarget);
         var menu = el.find("> .dropdown-menu");
-        menu.css({ display: 'none' });
+        menu.data("hide-timeout", setTimeout(() => {
+            menu.css({ display: 'none' });
+        }, 300));
     });
 
     function ctxAction(obj: JQuery, callback: (e: JQueryEventObject) => void) {
