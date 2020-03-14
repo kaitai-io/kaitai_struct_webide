@@ -293,11 +293,11 @@ $(() => {
     $("#hexViewer").on("contextmenu", e => {
         downloadInput.toggleClass("disabled", app.ui.hexViewer.selectionStart === -1);
 
-        inputContextMenu.css({ display: "block", visibility: "hidden", "z-index": -1 });
+        inputContextMenu.css({ display: "block" });
         var x = Math.min(e.pageX, $(window).width() - inputContextMenu.width());
         var h = inputContextMenu.height();
         var y = e.pageY > ($(window).height() - h) ? e.pageY - h : e.pageY;
-        inputContextMenu.css({ visibility: '', "z-index": '', left: x, top: y });
+        inputContextMenu.css({ left: x, top: y });
         return false;
     });
 

@@ -249,11 +249,11 @@ export function initFileTree() {
         setEnabled(uiFiles.deleteItem, isLocal);
         setEnabled(uiFiles.generateParser, isKsy);
 
-        uiFiles.fileTreeContextMenu.css({ display: "block", visibility: "hidden", "z-index": -1 }); // still invisible but has width & height
+        uiFiles.fileTreeContextMenu.css({ display: "block" }); // necessary for obtaining width & height
         var x = Math.min(e.pageX, $(window).width() - uiFiles.fileTreeContextMenu.width());
         var h = uiFiles.fileTreeContextMenu.height();
         var y = e.pageY > ($(window).height() - h) ? e.pageY - h : e.pageY;
-        uiFiles.fileTreeContextMenu.css({ visibility: '', "z-index": '', left: x, top: y });
+        uiFiles.fileTreeContextMenu.css({ left: x, top: y });
         return false;
     });
 
@@ -266,7 +266,7 @@ export function initFileTree() {
                 clearTimeout(hideTimeout);
                 menu.data("hide-timeout", null);
             }
-            menu.css({ display: "block", visibility: "hidden", "z-index": -1 });
+            menu.css({ display: "block" });
             var itemPos = el.offset();
             var menuW = menu.outerWidth();
             var menuH = menu.outerHeight();
@@ -278,7 +278,7 @@ export function initFileTree() {
                     : $(window).height() - menuH;
             x -= itemPos.left;
             y -= itemPos.top;
-            menu.css({ visibility: '', "z-index": '', left: x, top: y });
+            menu.css({ left: x, top: y });
         }
 
     }).mouseleave(e => {
