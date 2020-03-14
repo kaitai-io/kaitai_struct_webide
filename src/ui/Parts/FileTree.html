@@ -7,16 +7,16 @@
 
 <template>
     <div class="fileTree">
-        <tree-view :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu" 
+        <tree-view :model="fsTree" ref="fsTree" @item-dblclick="openFile" @item-contextmenu="showContextMenu"
                 :whole-row="true" @selected="fsItemSelected">
             <template scope="_">
-                <a :class="{bold: _.vm.open}"> 
-                    <i class="glyphicon" :class="[_.model.icon]" v-if="_.model.icon"></i> 
-                    <i class="glyphicon glyphicon-file" v-else-if="!_.model.isFolder"></i> 
-                    <i class="glyphicon glyphicon-folder-open" v-else-if="_.vm.open"></i> 
-                    <i class="glyphicon glyphicon-folder-close" v-else></i> 
-                    <span class="nodeText">{{_.model.text}}</span> 
-                </a> 
+                <a :class="{bold: _.vm.open}">
+                    <i class="glyphicon" :class="[_.model.icon]" v-if="_.model.icon"></i>
+                    <i class="glyphicon glyphicon-file" v-else-if="!_.model.isFolder"></i>
+                    <i class="glyphicon glyphicon-folder-open" v-else-if="_.vm.open"></i>
+                    <i class="glyphicon glyphicon-folder-close" v-else></i>
+                    <span class="nodeText">{{_.model.text}}</span>
+                </a>
             </template>
         </tree-view>
         <div class="footer btn-group" role="group">
@@ -29,7 +29,7 @@
             <button type="button" class="btn btn-default" @click="downloadFile" :disabled="!canDownloadFile">
                 <i class="glyphicon glyphicon-cloud-download"></i>
             </button>
-        </div>        
+        </div>
         <context-menu ref="ctxMenu">
             <template scope="_">
                 <menu-item icon="glyphicon-pencil" @click="openNode">Open</menu-item>
@@ -41,6 +41,7 @@
                     <template slot="submenu">
                         <menu-item @click="generateParser('cpp_stl', 'c_cpp')">CPP-STL</menu-item>
                         <menu-item @click="generateParser('csharp')">C#</menu-item>
+                        <menu-item @click="generateParser('go', 'golang')">Go</a></menu-item>
                         <menu-item @click="generateParser('graphviz', 'dot')">Graphiz</menu-item>
                         <menu-item @click="generateParser('java')">Java</menu-item>
                         <menu-item @click="generateParser('java', true)">Java (debug)</menu-item>

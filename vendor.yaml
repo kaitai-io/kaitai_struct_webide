@@ -6,13 +6,14 @@ libs:
     licenseUrl: https://raw.githubusercontent.com/ajaxorg/ace/master/LICENSE
     distDir: ace
     npmDir: ace-builds
-    files: 
+    files:
         - LICENSE
         - src/ace.js
         - src/ext-searchbox.js
         - src/mode-c_cpp.js
         - src/mode-csharp.js
         - src/mode-dot.js
+        - src/mode-golang.js
         - src/mode-java.js
         - src/mode-javascript.js
         - src/mode-json.js
@@ -42,7 +43,7 @@ libs:
     licenseUrl: https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE
     npmDir: bootstrap
     files: [LICENSE, dist/*]
-    
+
   Bootswatch:
     website: https://bootswatch.com/
     source: https://github.com/thomaspark/bootswatch
@@ -66,14 +67,14 @@ libs:
     licenseUrl: https://raw.githubusercontent.com/felixge/node-dateformat/master/LICENSE
     npmDir: dateformat
     files: [LICENSE, lib/dateformat.js]
-    
+
   Font Awesome:
     website: http://fontawesome.io/
     source: https://github.com/FortAwesome/Font-Awesome
     licenseUrl: http://fontawesome.io/license/
     npmDir: font-awesome
     files: [css, fonts]
-    
+
   GoldenLayout:
     website: https://www.golden-layout.com/
     source: https://github.com/deepstreamIO/golden-layout
@@ -133,7 +134,7 @@ libs:
     licenseUrl: https://raw.githubusercontent.com/idiotWu/smooth-scrollbar/develop/LICENSE
     npmDir: smooth-scrollbar
     files: [LICENSE, dist/*]
-    
+
   text-encoding:
     source: https://github.com/inexorabletash/text-encoding
     licenseName: Unlicense
@@ -148,7 +149,7 @@ libs:
     distDir: thenBy
     npmDir: thenby
     files: [LICENSE.TXT, thenBy.min.js, thenBy.module.js]
-    
+
   Vue.js:
     source: https://github.com/vuejs/vue
     licenseName: MIT
