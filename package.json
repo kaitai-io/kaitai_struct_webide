@@ -33,7 +33,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "python vendor_build.py"
+    "install": "pip install -r requirements.txt; python vendor_build.py"
   },
   "repository": {
     "type": "git",
