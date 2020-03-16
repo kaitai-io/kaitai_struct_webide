@@ -151,6 +151,11 @@ var fileTreeCont: JQuery;
 export function initFileTree() {
     fileTreeCont = app.ui.fileTreeCont.find(".fileTree");
 
+    if (!kaitaiRoot.children["formats"]) {
+        console.error("'formats' node is missing from js/kaitaiFsFiles.js, are you sure 'formats' git submodule is initialized? Try run 'git submodule init; git submodule update --recursive; ./genKaitaiFsFiles.py'!");
+        (<any>kaitaiRoot.children["formats"]) = {};
+    }
+
     app.ui.fileTree = fileTreeCont.jstree({
         core: {
             check_callback: function (operation: string, node: any, node_parent: any, node_position: number, more: boolean) {
