@@ -292,7 +292,12 @@ $(() => {
     var downloadInput = $("#inputContextMenu .downloadItem");
     $("#hexViewer").on("contextmenu", e => {
         downloadInput.toggleClass("disabled", app.ui.hexViewer.selectionStart === -1);
-        inputContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
+
+        inputContextMenu.css({ display: "block" });
+        var x = Math.min(e.pageX, $(window).width() - inputContextMenu.width());
+        var h = inputContextMenu.height();
+        var y = e.pageY > ($(window).height() - h) ? e.pageY - h : e.pageY;
+        inputContextMenu.css({ left: x, top: y });
         return false;
     });
 

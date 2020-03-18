@@ -202,6 +202,7 @@ export function initFileTree() {
 
     var uiFiles = {
         fileTreeContextMenu: $("#fileTreeContextMenu"),
+        dropdownSubmenus: $("#fileTreeContextMenu .dropdown-submenu"),
         openItem: $("#fileTreeContextMenu .openItem"),
         createFolder: $("#fileTreeContextMenu .createFolder"),
         createKsyFile: $("#fileTreeContextMenu .createKsyFile"),
@@ -252,8 +253,45 @@ export function initFileTree() {
         setEnabled(uiFiles.cloneKsyFile, isLocal && isKsy);
         setEnabled(uiFiles.deleteItem, isLocal);
         setEnabled(uiFiles.generateParser, isKsy);
-        uiFiles.fileTreeContextMenu.css({ display: "block", left: e.pageX, top: e.pageY });
+
+        uiFiles.fileTreeContextMenu.css({ display: "block" }); // necessary for obtaining width & height
+        var x = Math.min(e.pageX, $(window).width() - uiFiles.fileTreeContextMenu.width());
+        var h = uiFiles.fileTreeContextMenu.height();
+        var y = e.pageY > ($(window).height() - h) ? e.pageY - h : e.pageY;
+        uiFiles.fileTreeContextMenu.css({ left: x, top: y });
         return false;
+    });
+
+    uiFiles.dropdownSubmenus.mouseenter(e => {
+        var el = $(e.currentTarget);
+        if (!el.hasClass("disabled")) {
+            var menu = el.find("> .dropdown-menu");
+            var hideTimeout = menu.data("hide-timeout");
+            if (typeof hideTimeout === "number") {
+                clearTimeout(hideTimeout);
+                menu.data("hide-timeout", null);
+            }
+            menu.css({ display: "block" });
+            var itemPos = el.offset();
+            var menuW = menu.outerWidth();
+            var menuH = menu.outerHeight();
+            var x = itemPos.left + el.width() + menuW <= $(window).width() ? itemPos.left + el.width() : itemPos.left - menuW;
+            var y = itemPos.top + menuH <= $(window).height()
+                ? itemPos.top
+                : itemPos.top >= menuH
+                    ? itemPos.top + el.height() - menu.height()
+                    : $(window).height() - menuH;
+            x -= itemPos.left;
+            y -= itemPos.top;
+            menu.css({ left: x, top: y });
+        }
+
+    }).mouseleave(e => {
+        var el = $(e.currentTarget);
+        var menu = el.find("> .dropdown-menu");
+        menu.data("hide-timeout", setTimeout(() => {
+            menu.css({ display: 'none' });
+        }, 300));
     });
 
     function ctxAction(obj: JQuery, callback: (e: JQueryEventObject) => void) {
