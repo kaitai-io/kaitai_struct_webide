@@ -36,7 +36,7 @@ export class Converter {
         return str + "...";
     }
 
-    static unixToWinTs(wints: int): int {
+    static unixToWinTs(wints: number): number {
       var unixEpoch = new Date(1970, 1, 1).getTime()
       var winEpoch = new Date(1601, 1, 1).getTime()
       var epochDeltaInSec = (unixEpoch - winEpoch) / 1_000
