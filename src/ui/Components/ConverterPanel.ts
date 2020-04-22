@@ -36,12 +36,12 @@ export class Converter {
         return str + "...";
     }
 
-    static unixToWinTs(wints: number): number {
+    static fileToUnixTime(filetime: number): number {
       var unixEpoch = new Date(1970, 1, 1).getTime()
-      var winEpoch = new Date(1601, 1, 1).getTime()
-      var epochDeltaInSec = (unixEpoch - winEpoch) / 1_000
-      var winTsInSec = wints / 10_000_000
-      return winTsInSec - epochDeltaInSec
+      var filetimeEpoch = new Date(1601, 1, 1).getTime()
+      var epochDeltaInSec = (unixEpoch - filetimeEpoch) / 1_000
+      var filetimeInSec = filetime / 10_000_000
+      return filetimeInSec - epochDeltaInSec
     }
 }
 
@@ -56,7 +56,7 @@ export class ConverterPanelModel {
     float: string = "";
     double: string = "";
     unixts: string = "";
-    wints: string = "";
+    filets: string = "";
     ascii: string = "";
     utf8: string = "";
     utf16le: string = "";
@@ -85,7 +85,7 @@ export class ConverterPanelModel {
         this.unixts = u32le ? dateFormat(new Date(parseInt(u32le) * 1000), "yyyy-mm-dd HH:MM:ss") : "";
 
         var u64le = Converter.numConv(data, 8, false, false);
-        this.wints = u64le ? dateFormat(new Date(Converter.unixToWinTs(parseInt(u64le)) * 1000), "yyyy-mm-dd HH:MM:ss") : "";
+        this.filets = u64le ? dateFormat(new Date(Converter.fileToUnixTime(parseInt(u64le)) * 1000), "yyyy-mm-dd HH:MM:ss") : "";
 
         try {
             this.ascii = Converter.strDecode(data, "ascii");
