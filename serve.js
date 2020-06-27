@@ -2,6 +2,7 @@ const { readdirSync, statSync } = require("fs");
 const { join } = require("path");
 const express = require("express");
 const ts = require("typescript");
+const genKaitaiFsFiles = require("./genKaitaiFsFiles");
 
 const port = 8000;
 const watchPattern = /(\.html$)|(^js\/)|(^css\/)$/;
@@ -81,6 +82,7 @@ app.get("/onchange", (req, res, next) => {
 app.use(express.static("."));
 
 function main() {
+    genKaitaiFsFiles('');
     if (process.argv.includes("--compile")) {
         startWatcher();
     }
