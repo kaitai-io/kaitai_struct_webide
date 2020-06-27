@@ -36,4 +36,8 @@ function main() {
     generate(outDir);
 }
 
-main();
+if (!module.parent) {
+    main();
+}
+
+module.exports = generate;
