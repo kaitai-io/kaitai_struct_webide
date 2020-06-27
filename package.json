@@ -28,12 +28,13 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "express": "^4.17.1",
     "tslint": "^5.7.0",
     "typescript": "^2.9.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "pip install -r requirements.txt; python vendor_build.py"
+    "install": "node vendor_build.js"
   },
   "repository": {
     "type": "git",

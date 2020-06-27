@@ -5,7 +5,7 @@ TSC=node_modules/.bin/tsc
 
 mkdir -p "$OUT_DIR/js"
 
-./genKaitaiFsFiles.py "$OUT_DIR"
+node ./genKaitaiFsFiles.js "$OUT_DIR"
 
 "$TSC" --outDir $OUT_DIR/js/ --noEmitOnError
 if [ -f "tsconfig.worker.json" ]; then
@@ -29,4 +29,4 @@ cp -r src/ui/Components/*.html "$OUT_DIR/src/ui/Components"
 mkdir -p "$OUT_DIR/src/ui/Parts"
 cp -r src/ui/Parts/*.html "$OUT_DIR/src/ui/Parts"
 
-./build.py "$OUT_DIR"
+node ./build.js "$OUT_DIR"

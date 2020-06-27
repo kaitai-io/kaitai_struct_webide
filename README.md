@@ -21,14 +21,14 @@ Online editor / visualizer for Kaitai Struct .ksy files
 
 - Clone stable release: `git clone https://github.com/kaitai-io/ide-kaitai-io.github.io` or
     - Devel release: `git clone https://github.com/kaitai-io/ide-devel-kaitai-io.github.io`
-- Serve on a webserver (ex. `python -mSimpleHTTPServer` or `python serve.py`)
+- Serve on a webserver (ex. `python -mSimpleHTTPServer` or `node serve.js`)
 - Go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 ## compile and run locally
 
 - `git clone --recursive https://github.com/kaitai-io/kaitai_struct_webide`
 - `npm install`
-- `python serve.py --compile`
+- `node serve.js --compile`
 - Go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 ## screenshots
