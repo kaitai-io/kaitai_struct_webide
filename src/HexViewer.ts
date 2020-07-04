@@ -125,10 +125,12 @@ export class HexViewer {
         if ("dataOffset" in cell) {
             if (e.type === "mousedown") {
                 this.canDeselect = this.selectionStart === cell.dataOffset && this.selectionEnd === cell.dataOffset;
-                this.selectionDragStart = cell.dataOffset;
+                this.selectionDragStart = e.shiftKey
+                    ? this.selectionDragStart
+                    : cell.dataOffset;
                 this.selectionDragEnd = cell.dataOffset;
                 this.content.on("mousemove", evt => this.cellMouseAction(evt));
-                this.setSelection(cell.dataOffset, cell.dataOffset);
+                this.setSelection(this.selectionDragStart, this.selectionDragEnd);
             }
             else if (e.type === "mousemove") {
                 this.selectionDragEnd = cell.dataOffset;
@@ -196,9 +198,7 @@ export class HexViewer {
                 );
                 this.setSelection(
                     smaller,
-                    smaller < this.selectionDragStart
-                        ? larger - 1
-                        : larger
+                    larger
                 );
             }
             this.selectionDragEnd = newSel;
