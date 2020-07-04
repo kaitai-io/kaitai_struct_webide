@@ -56,7 +56,7 @@ export class ConverterPanelModel {
     float: string = "";
     double: string = "";
     unixts: string = "";
-    filets: string = "";
+    filetime: string = "";
     ascii: string = "";
     utf8: string = "";
     utf16le: string = "";
@@ -85,7 +85,7 @@ export class ConverterPanelModel {
         this.unixts = u32le ? dateFormat(new Date(parseInt(u32le) * 1000), "yyyy-mm-dd HH:MM:ss") : "";
 
         var u64le = Converter.numConv(data, 8, false, false);
-        this.filets = u64le ? dateFormat(new Date(Converter.fileToUnixTime(parseInt(u64le)) * 1000), "yyyy-mm-dd HH:MM:ss") : "";
+        this.filetime = u64le ? dateFormat(new Date(Converter.fileToUnixTime(parseInt(u64le)) * 1000), "yyyy-mm-dd HH:MM:ss") : "";
 
         try {
             this.ascii = Converter.strDecode(data, "ascii");
