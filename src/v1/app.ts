@@ -215,7 +215,7 @@ class AppController {
         this.refreshSelectionInput();
 
         if (this.ui.parsedDataTreeHandler && hasSelection && !this.selectedInTree) {
-            var intervals = this.ui.parsedDataTreeHandler.intervalHandler.searchRange(this.ui.hexViewer.mouseDownOffset || start);
+            var intervals = this.ui.parsedDataTreeHandler.intervalHandler.searchRange(this.ui.hexViewer.selectionStart || start);
             if (intervals.items.length > 0) {
                 //console.log("selected node", intervals[0].id);
                 this.blockRecursive = true;
