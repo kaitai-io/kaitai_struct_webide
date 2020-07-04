@@ -100,11 +100,11 @@ export class HexViewer {
     private content: JQuery;
     private contentOuter: JQuery;
 
-    public mouseDownOffset: number;
     private canDeselect: boolean;
-
     public selectionStart: number = -1;
     public selectionEnd: number = -1;
+    public selectionDragStart: number;
+    public selectionDragEnd: number = 0;
     public onSelectionChanged: (() => void);
 
     private isRecursive: boolean;
@@ -125,15 +125,17 @@ export class HexViewer {
         if ("dataOffset" in cell) {
             if (e.type === "mousedown") {
                 this.canDeselect = this.selectionStart === cell.dataOffset && this.selectionEnd === cell.dataOffset;
-                this.mouseDownOffset = cell.dataOffset;
+                this.selectionDragStart = cell.dataOffset;
+                this.selectionDragEnd = cell.dataOffset;
                 this.content.on("mousemove", evt => this.cellMouseAction(evt));
                 this.setSelection(cell.dataOffset, cell.dataOffset);
             }
             else if (e.type === "mousemove") {
-                this.setSelection(this.mouseDownOffset, cell.dataOffset);
+                this.selectionDragEnd = cell.dataOffset;
+                this.setSelection(this.selectionDragStart, cell.dataOffset);
                 this.canDeselect = false;
             }
-            else if (e.type === "mouseup" && this.canDeselect && this.mouseDownOffset === cell.dataOffset)
+            else if (e.type === "mouseup" && this.canDeselect && this.selectionDragStart === cell.dataOffset)
                 this.deselect();
 
             this.contentOuter.focus();
@@ -177,12 +179,29 @@ export class HexViewer {
                 e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : null;
 
             if (selDiff === null) return;
-
-            var newSel = this.selectionStart + selDiff;
+            var newSel = this.selectionDragEnd + selDiff;
             if (newSel < 0) newSel = 0;
             else if (newSel >= this.dataProvider.length) newSel = this.dataProvider.length - 1;
-
-            this.setSelection(newSel);
+            if (!e.shiftKey) {
+                this.selectionDragStart = newSel;
+                this.setSelection(newSel);
+            } else {
+                var smaller = Math.min(
+                    this.selectionDragStart,
+                    newSel
+                );
+                var larger = Math.max(
+                    this.selectionDragStart,
+                    newSel
+                );
+                this.setSelection(
+                    smaller,
+                    smaller < this.selectionDragStart
+                        ? larger - 1
+                        : larger
+                );
+            }
+            this.selectionDragEnd = newSel;
             return false;
         });
     }
