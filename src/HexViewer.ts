@@ -103,8 +103,7 @@ export class HexViewer {
     private canDeselect: boolean;
     public selectionStart: number = -1;
     public selectionEnd: number = -1;
-    public selectionDragStart: number;
-    public selectionDragEnd: number = 0;
+    public selectionCursor: number = -1;
     public onSelectionChanged: (() => void);
 
     private isRecursive: boolean;
@@ -125,19 +124,18 @@ export class HexViewer {
         if ("dataOffset" in cell) {
             if (e.type === "mousedown") {
                 this.canDeselect = this.selectionStart === cell.dataOffset && this.selectionEnd === cell.dataOffset;
-                this.selectionDragStart = e.shiftKey
-                    ? this.selectionDragStart
-                    : cell.dataOffset;
-                this.selectionDragEnd = cell.dataOffset;
                 this.content.on("mousemove", evt => this.cellMouseAction(evt));
-                this.setSelection(this.selectionDragStart, this.selectionDragEnd);
+                if (e.shiftKey) {
+                    this.shiftCursor(cell.dataOffset);
+                } else {
+                    this.setCursor(cell.dataOffset);
+                }
             }
             else if (e.type === "mousemove") {
-                this.selectionDragEnd = cell.dataOffset;
-                this.setSelection(this.selectionDragStart, cell.dataOffset);
+                this.shiftCursor(cell.dataOffset);
                 this.canDeselect = false;
             }
-            else if (e.type === "mouseup" && this.canDeselect && this.selectionDragStart === cell.dataOffset)
+            else if (e.type === "mouseup" && this.canDeselect && this.selectionStart === cell.dataOffset)
                 this.deselect();
 
             this.contentOuter.focus();
@@ -181,27 +179,12 @@ export class HexViewer {
                 e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : null;
 
             if (selDiff === null) return;
-            var newSel = this.selectionDragEnd + selDiff;
-            if (newSel < 0) newSel = 0;
-            else if (newSel >= this.dataProvider.length) newSel = this.dataProvider.length - 1;
-            if (!e.shiftKey) {
-                this.selectionDragStart = newSel;
-                this.setSelection(newSel);
+            var newSel = this.selectionCursor + selDiff;
+            if (e.shiftKey) {
+                this.shiftCursor(newSel);
             } else {
-                var smaller = Math.min(
-                    this.selectionDragStart,
-                    newSel
-                );
-                var larger = Math.max(
-                    this.selectionDragStart,
-                    newSel
-                );
-                this.setSelection(
-                    smaller,
-                    larger
-                );
+                this.setCursor(newSel);
             }
-            this.selectionDragEnd = newSel;
             return false;
         });
     }
@@ -275,8 +258,10 @@ export class HexViewer {
                 hexCell.cell.dataOffset = asciiCell.dataOffset = dataOffset;
 
                 var isSelected = this.selectionStart <= dataOffset && dataOffset <= this.selectionEnd;
-                $(hexCell.cell).toggleClass("selected", isSelected);
-                $(asciiCell).toggleClass("selected", isSelected);
+                var isCursor = dataOffset === this.selectionCursor;
+                var targets = [hexCell.cell, asciiCell];
+                $(targets).toggleClass("selected", isSelected);
+                $(targets).toggleClass("cursor", isCursor);
 
                 var skipInt = 0;
                 for (var level = 0; level < this.maxLevel; level++) {
@@ -284,8 +269,16 @@ export class HexViewer {
                     var intIn = int && int.start <= dataOffset && dataOffset <= int.end;
                     var intStart = intIn && int.start === dataOffset;
                     var intEnd = intIn && int.end === dataOffset;
-                    hexCell.levels[level].className = `l${this.maxLevel - 1 - level} ${((intBaseIdx + intIdx) % 2 === 0) ? "even" : "odd"}` +
-                        (intIn ? ` m${level}` : "") + (intStart ? " start" : "") + (intEnd ? " end" : "") + (isSelected ? " selected" : "");
+                    var classes = [
+                        `l${this.maxLevel - 1 - level}`,
+                        `${((intBaseIdx + intIdx) % 2 === 0) ? "even" : "odd"}`,
+                    ];
+                    if(intIn) classes.push(`m${level}`);
+                    if(intStart) classes.push("start");
+                    if(intEnd) classes.push("end");
+                    if(isSelected) classes.push("selected");
+                    if(isCursor) classes.push("cursor");
+                    hexCell.levels[level].className = classes.join(" ");
 
                     if (intEnd)
                         skipInt++;
@@ -310,16 +303,49 @@ export class HexViewer {
     }
 
     public deselect() {
-        this.setSelection(-1, -1);
+        this.setCursor(-1);
     }
 
-    public setSelection(start: number, end?: number) {
+    public setCursor (cursor: number) {
+        this.selectionCursor = cursor;
+        this.setSelection(
+            this.selectionCursor
+        );
+    }
+
+    public shiftCursor (cursor: number) {
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
+        if (this.selectionCursor === end) {
+            end = cursor;
+        } else if (this.selectionCursor === start) {
+            start = cursor;
+        }
+        this.selectionCursor = cursor;
+        this.setSelection(
+            Math.max(0, start),
+            end
+        );
+    }
+
+    public setSelection(start: number, end?: number, cursor?: number) {
         if (this.isRecursive) return;
         end = end || start;
 
         var oldStart = this.selectionStart, oldEnd = this.selectionEnd;
-        this.selectionStart = start < end ? start : end;
-        this.selectionEnd = Math.min(start < end ? end : start, this.dataProvider.length - 1);
+        this.selectionStart = Math.min(start, end);
+        this.selectionEnd = Math.min(
+            Math.max(start, end),
+            this.dataProvider.length - 1
+        );
+
+        // is cursor out of bounds because called externally?
+        if (
+            this.selectionCursor < this.selectionStart
+            || this.selectionCursor > this.selectionEnd
+        ) cursor = this.selectionEnd;
+        if (cursor) this.selectionCursor = cursor;
+
         if (this.selectionStart !== oldStart || this.selectionEnd !== oldEnd) {
             this.isRecursive = true;
             try {
