@@ -42,22 +42,22 @@ class JsImporter implements IYamlImporter {
 
     async importYaml(name: string, mode: string) {
         var loadFn;
-        if (mode === "abs")
-            loadFn = name;
-        else {
+        var importedFsType = this.rootFsItem.fsType;
+        if (mode === "abs") {
+            loadFn = "/formats/" + name;
+            importedFsType = "kaitai";
+        } else {
             var fnParts = this.rootFsItem.fn.split("/");
             fnParts.pop();
             loadFn = fnParts.join("/") + "/" + name;
+
+            if (loadFn.startsWith("/")) {
+                loadFn = loadFn.substr(1);
+            }
         }
 
-        if (loadFn.startsWith("/"))
-            loadFn = loadFn.substr(1);
-
-        if (this.rootFsItem.fsType === "kaitai" && mode === "abs")
-            loadFn = "/formats/" + loadFn;
-
         console.log(`import yaml: ${name}, mode: ${mode}, loadFn: ${loadFn}, root:`, this.rootFsItem);
-        let ksyContent = await fss[this.rootFsItem.fsType].get(`${loadFn}.ksy`);
+        let ksyContent = await fss[importedFsType].get(`${loadFn}.ksy`);
         var ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
         return ksyModel;
     }
