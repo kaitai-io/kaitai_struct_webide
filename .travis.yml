@@ -24,4 +24,4 @@ after_success:
       -r ide-kaitai-io.github.io \
       -d "$([ "$TRAVIS_BRANCH" != stable ] && echo devel)" \
       -m "Regen $TRAVIS_BRANCH kaitai-io/kaitai_struct_webide@$TRAVIS_COMMIT" \
-      -- --exclude=.git --exclude=CNAME --exclude=.nojekyll --exclude=devel out
+      -- --exclude=.git --exclude=CNAME --exclude=.nojekyll --exclude=devel out/
