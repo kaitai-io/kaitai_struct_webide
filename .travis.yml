@@ -18,4 +18,15 @@ script:
   - ./build
 
 after_success:
-  - ./publish
+  - ./push_artifacts/git_config_kaitai_bot
+  - ./push_artifacts/publish \
+      -o kaitai-io \
+      -r ide-kaitai-io.github.io \
+      -d "$([ "$TRAVIS_BRANCH" != stable ] && echo devel)" \
+      -m "Regen $TRAVIS_BRANCH kaitai-io/kaitai_struct_webide@$TRAVIS_COMMIT" \
+      -- \
+      --exclude=.git \
+      --exclude=CNAME \
+      --exclude=.nojekyll \
+      --exclude=devel \
+      out
