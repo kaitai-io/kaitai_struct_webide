@@ -21,8 +21,8 @@ Online editor / visualizer for Kaitai Struct .ksy files
 
 - Clone deploy version: `git clone https://github.com/kaitai-io/ide-kaitai-io.github.io`
     - stable release: `/`, devel release: `/devel/`,
-- Serve on a webserver (ex. `python -mSimpleHTTPServer` or `node serve.js`)
-- Go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+- Serve on a webserver (e.g. `python3 -m http.server 8000`)
+- Go to [http://localhost:8000/](http://localhost:8000/)
 
 ## compile and run locally
 
