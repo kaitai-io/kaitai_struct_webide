@@ -17,6 +17,8 @@ libs:
         - src/mode-java.js
         - src/mode-javascript.js
         - src/mode-json.js
+        - src/mode-lua.js
+        - src/mode-nim.js
         - src/mode-perl.js
         - src/mode-php.js
         - src/mode-python.js
