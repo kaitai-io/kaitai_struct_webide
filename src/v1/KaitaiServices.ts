@@ -72,22 +72,14 @@ export class CompilerService {
     ksySchema: KsySchema.IKsyFile;
     ksyTypes: IKsyTypes;
 
-    async compile(srcYamlFsItem: IFsItem, srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
+    compile(srcYamlFsItem: IFsItem, srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
         var perfYamlParse = performanceHelper.measureAction("YAML parsing");
 
         this.jsImporter.rootFsItem = srcYamlFsItem;
 
         try {
             this.ksySchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
-            if (this.ksySchema.meta.imports) {
-                let imports = this.ksySchema.meta.imports.map(item => this.jsImporter.importYaml(item, "rel"))
-                let importedSchemas = await Promise.all(imports)
-                let allSchemes = [...importedSchemas, this.ksySchema]
-                this.ksyTypes = {}
-                Object.assign(this.ksyTypes, ...allSchemes.map(item => SchemaUtils.collectKsyTypes(item)))
-            } else {
-                this.ksyTypes = SchemaUtils.collectKsyTypes(this.ksySchema);
-            }
+            this.ksyTypes = SchemaUtils.collectKsyTypes(this.ksySchema);
 
             // we have to modify the schema (add typesByJsName for example) before sending into the compiler so we need a copy
             var compilerSchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
