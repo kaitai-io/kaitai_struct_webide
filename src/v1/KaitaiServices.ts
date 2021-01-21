@@ -44,7 +44,7 @@ class JsImporter implements IYamlImporter {
         var loadFn;
         var importedFsType = this.rootFsItem.fsType;
         if (mode === "abs") {
-            loadFn = "/formats/" + name;
+            loadFn = "formats/" + name;
             importedFsType = "kaitai";
         } else {
             var fnParts = this.rootFsItem.fn.split("/");
