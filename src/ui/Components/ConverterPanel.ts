@@ -35,6 +35,14 @@ export class Converter {
                 return str.substring(0, i);
         return str + "...";
     }
+
+    static fileToUnixTime(filetime: number): number {
+      var unixEpoch = new Date(1970, 1, 1).getTime()
+      var filetimeEpoch = new Date(1601, 1, 1).getTime()
+      var epochDeltaInSec = (unixEpoch - filetimeEpoch) / 1_000
+      var filetimeInSec = filetime / 10_000_000
+      return filetimeInSec - epochDeltaInSec
+    }
 }
 
 export class ConverterPanelModel {
@@ -48,6 +56,7 @@ export class ConverterPanelModel {
     float: string = "";
     double: string = "";
     unixts: string = "";
+    filetime: string = "";
     ascii: string = "";
     utf8: string = "";
     utf16le: string = "";
@@ -74,6 +83,9 @@ export class ConverterPanelModel {
 
         var u32le = Converter.numConv(data, 4, false, false);
         this.unixts = u32le ? dateFormat(new Date(parseInt(u32le) * 1000), "yyyy-mm-dd HH:MM:ss") : "";
+
+        var u64le = Converter.numConv(data, 8, false, false);
+        this.filetime = u64le ? dateFormat(new Date(Converter.fileToUnixTime(parseInt(u64le)) * 1000), "yyyy-mm-dd HH:MM:ss") : "";
 
         try {
             this.ascii = Converter.strDecode(data, "ascii");
