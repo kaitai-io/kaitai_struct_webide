@@ -24,20 +24,20 @@ if os.path.isfile(secretFn):
 else:
     secret = os.urandom(16).encode('hex')
     with open(secretFn, 'wt') as f: f.write(secret)
-    
+
 print "Mappings:"
 for mapping in mappings.values():
     if not 'secret' in mapping:
         mapping['secret'] = secret
     print " - %s (secret: %s)" % (mapping['path'], mapping['secret'])
-    
+
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def handleCors(self):
         origin = self.headers.getheader('origin')
         if origin in allowedOrigins:
             self.send_header("Access-Control-Allow-Origin", origin)
-            self.send_header("Access-Control-Allow-Methods", "OPTIONS, GET, PUT, DELETE");
-            self.send_header("Access-Control-Allow-Headers", "Authorization, X-Requested-With");
+            self.send_header("Access-Control-Allow-Methods", "OPTIONS, GET, PUT, DELETE")
+            self.send_header("Access-Control-Allow-Headers", "Authorization, X-Requested-With")
 
     def respRaw(self, statusCode, contentType = None, result = None):
         self.send_response(statusCode)
@@ -52,7 +52,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def resp(self, statusCode, result):
         self.respRaw(statusCode, 'application/json', json.dumps(result))
-        
+
     def handleRequest(self):
         try:
             if '..' in self.path:
@@ -64,7 +64,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 if self.headers.getheader('Authorization') != 'MappingSecret ' + mappingData['secret']:
                     self.respRaw(403)
                     return
-                
+
                 localBaseDir = mappingData['path']
                 if not localBaseDir:
                     self.resp(200, {'errorCode': 'unknown_mapping'})
@@ -98,7 +98,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         except Exception as e:
             traceback.print_exc()
             self.resp(500, {'errorCode': 'unknown_error'})
-        
+
     def do_GET(self):
         self.handleRequest()
 
