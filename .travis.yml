@@ -2,6 +2,11 @@
 dist: xenial
 sudo: false
 
+branches:
+  only:
+    - master
+    - stable
+
 language: node_js
 cache: npm
 node_js: 10
