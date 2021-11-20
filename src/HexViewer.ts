@@ -271,13 +271,13 @@ export class HexViewer {
                     var intEnd = intIn && int.end === dataOffset;
                     var classes = [
                         `l${this.maxLevel - 1 - level}`,
-                        `${((intBaseIdx + intIdx) % 2 === 0) ? "even" : "odd"}`,
+                        (intBaseIdx + intIdx) % 2 === 0 ? "even" : "odd",
                     ];
-                    if(intIn) classes.push(`m${level}`);
-                    if(intStart) classes.push("start");
-                    if(intEnd) classes.push("end");
-                    if(isSelected) classes.push("selected");
-                    if(isCursor) classes.push("cursor");
+                    if (intIn) classes.push(`m${level}`);
+                    if (intStart) classes.push("start");
+                    if (intEnd) classes.push("end");
+                    if (isSelected) classes.push("selected");
+                    if (isCursor) classes.push("cursor");
                     hexCell.levels[level].className = classes.join(" ");
 
                     if (intEnd)
