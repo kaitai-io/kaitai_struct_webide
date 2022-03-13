@@ -1,5 +1,5 @@
 ﻿.hexViewer * { box-sizing: content-box }
-.hexViewer { background: white; color: #333; font-family: Courier,monospace; font-size: 12px; overflow-y: scroll; overflow-x: auto }
+.hexViewer { background: white; color: #333; font-family: Courier,monospace; font-size: 12px; font-variant-ligatures: none; overflow-y: scroll; overflow-x: auto }
 .hexViewer .heightbox { height:10000px; background:blue; float:left }
 .hexViewer .contentOuter {position: relative;height:100%; overflow: hidden; min-width:560px; outline: none !important }
 .hexViewer .content { margin-left: 8px; }
