@@ -86,6 +86,12 @@ libs:
     npmDir: golden-layout
     files: [LICENSE, dist/goldenlayout.js, src/css/goldenlayout-base.css, src/css/goldenlayout-dark-theme.css]
 
+  hansken-js:
+    source: https://github.com/NetherlandsForensicInstitute/hansken-js
+    licenseUrl: https://raw.githubusercontent.com/NetherlandsForensicInstitute/hansken-js/master/LICENSE
+    npmDir: hansken-js
+    files: [LICENSE, dist/amd/hansken-js.js]
+
   jQuery:
     website: https://jquery.com/
     source: https://github.com/jquery/jquery

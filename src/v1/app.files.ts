@@ -1,5 +1,6 @@
 ﻿import * as localforage from "localforage";
 import dateFormat = require("dateformat");
+import {HanskenClient} from "hansken-js";
 
 import { ga, app } from "./app";
 import { IJSTreeNode } from "./parsedToTree";
@@ -100,19 +101,102 @@ class StaticFs implements IFileSystem {
     put(fn: string, data: any) { this.files[fn] = data; return Promise.resolve(null); }
 }
 
+class HanskenStorageFs implements IFileSystem {
+    private client: any;
+    private query: string;
+    
+    constructor(public gatekeeperUrl: string, keystoreUrl: string, query: string) {
+        this.client = new HanskenClient(gatekeeperUrl, keystoreUrl);
+        this.query = query;
+    }
+
+    private root: IFsItem;
+
+    async getRootNode() {
+        if (!this.root)
+            this.root = await this.client.projects().then(async (projects: any[]) => {
+                return Promise.all(projects.map(project => {
+                    return this.client.project(project.id).search().traces({
+                        query: {
+                            human: query
+                        },
+                        select: ['name', 'data']
+                    }).then((results: any) => {
+                        if (results.totalResults === 0) {
+                            // Return project without children when search returned zero results
+                            return {project};
+                        }
+
+                        const traceItems = results.traces.reduce((traceItems: any, traceResult: any) => {
+                            Object.keys(traceResult.trace.system.extracted.data).forEach(dataType => {
+                                traceItems[`${traceResult.trace.name} / ${dataType}`] = <IFsItem>{fn: `${project.id}/${traceResult.trace.uid}/${dataType}`, fsType: "hansken", type: "file" };
+                            });
+                            return traceItems;
+                        }, {});
+
+                        return {
+                            project,
+                            projectRoot: <IFsItem>{fn: project.id, fsType: "hansken", type: "folder", children: traceItems}
+                        };
+                    }, () => {
+                        // Return project without children when search failed due to broken or missing index
+                        return {project};
+                    });
+                }));
+            }).then((projectItems: any[]) => {
+                return <IFsItem>{ fsType: "hansken", type: "folder", children: projectItems.reduce((children: any, projectItem: any) => {
+                    if (projectItem.projectRoot) { // Filters broken projects
+                        children[projectItem.project.name] = projectItem.projectRoot;
+                    }
+                    return children;
+                }, {})};
+            });
+        return this.root;
+    }
+
+    setRootNode(newRoot: IFsItem) {
+    }
+
+    get(fn: string): Promise<string | ArrayBuffer> {
+        const slash = fn.indexOf('/');
+        const lastSlash = fn.lastIndexOf('/');
+        if (slash === -1 || slash != 36 || fn.length < 36 * 2 || slash === lastSlash) {
+            return Promise.reject();    
+        }
+        const projectId = fn.substring(0, slash);
+        const traceUid = fn.substring(slash + 1, lastSlash);
+        const dataType = fn.substring(lastSlash + 1);
+        
+        return this.client.project(projectId).data(traceUid, dataType);
+    }
+
+    put(fn: string, data: any): Promise<IFsItem> {
+        return Promise.reject();
+    }
+}
+
 var kaitaiRoot = <IFsItem>{ fsType: "kaitai" };
 kaitaiFsFiles.forEach(fn => fsHelper.selectNode(kaitaiRoot, fn));
 var kaitaiFs = new KaitaiFs(kaitaiRoot);
 var staticFs = new StaticFs();
 
 var localFs = new LocalStorageFs("fs");
+
+// http://localhost:8000/?query=data.mimeType:%27application/zip%27&gatekeeper=https://gatekeeper01.test.hansken.holmes.nl/gatekeeper&keystore=https://keystore01.test.hansken.holmes.nl/keystore
+let params = new URLSearchParams(window.location.search);
+const gatekeeperUrl = params.get("gatekeeper");
+const keystoreUrl = params.get("keystore");
+const query = params.get("query") || '';
+
+var hanskenFs = new HanskenStorageFs(gatekeeperUrl, keystoreUrl, query);
 /* tslint:disable */
 export var fss: {
     [name: string]: IFileSystem;
     local: LocalStorageFs;
+    hansken: HanskenStorageFs;
     kaitai: KaitaiFs;
     static: StaticFs;
-} = { local: localFs, kaitai: kaitaiFs, static: staticFs };
+} = { local: localFs, kaitai: kaitaiFs, static: staticFs, hansken: hanskenFs };
 /* tslint:enable */
 
 function genChildNode(obj: IFsItem, fn: string): any {
@@ -135,6 +219,14 @@ export async function refreshFsNodes() {
     app.ui.fileTree.delete_node(localStorageNode.children);
     if (root)
         genChildNodes(root).forEach((node: any) => app.ui.fileTree.create_node(localStorageNode, node));
+}
+
+export async function refreshHanskenNodes() {
+    var hanskenStorageNode = app.ui.fileTree.get_node("hanskenStorage");
+    var root = await hanskenFs.getRootNode();
+    app.ui.fileTree.delete_node(hanskenStorageNode.children);
+    if (root)
+        genChildNodes(root).forEach((node: any) => app.ui.fileTree.create_node(hanskenStorageNode, node));
 }
 
 export async function addKsyFile(parent: string | Element, ksyFn: string, content: string) {
@@ -176,13 +268,13 @@ export function initFileTree() {
                             text: "formats",
                             icon: "glyphicon glyphicon-book",
                             children: genChildNodes(kaitaiRoot.children["formats"]),
-                            state: { opened: true }
+                            state: { opened: false }
                         },
                         {
                             text: "samples",
                             icon: "glyphicon glyphicon-cd",
                             children: genChildNodes(kaitaiRoot.children["samples"]),
-                            state: { opened: true }
+                            state: { opened: false }
                         },
                     ]
                 },
@@ -193,12 +285,21 @@ export function initFileTree() {
                     state: { opened: true },
                     children: [],
                     data: { fsType: "local", type: "folder" }
+                },
+                {
+                    text: "Hansken",
+                    id: "hanskenStorage",
+                    icon: "glyphicon glyphicon-cloud",
+                    state: { opened: true },
+                    children: [],
+                    data: { fsType: "hansken", type: "folder" }
                 }
             ],
         },
         plugins: ["wholerow", "dnd"]
     }).jstree(true);
     refreshFsNodes();
+    refreshHanskenNodes();
 
     var uiFiles = {
         fileTreeContextMenu: $("#fileTreeContextMenu"),

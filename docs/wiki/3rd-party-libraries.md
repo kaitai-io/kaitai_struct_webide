@@ -65,6 +65,11 @@ Source: https://github.com/felixge/node-dateformat
 
 License: MIT (https://raw.githubusercontent.com/felixge/node-dateformat/master/LICENSE)
 
+## hansken-js
+Source: https://github.com/NetherlandsForensicInstitute/hansken-js
+
+License: undefined (https://raw.githubusercontent.com/NetherlandsForensicInstitute/hansken-js/master/LICENSE)
+
 ## jQuery
 Website: https://jquery.com/
 

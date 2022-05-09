@@ -30,7 +30,7 @@
                 "KaitaiStream": "lib/_npm/kaitai-struct/KaitaiStream",
                 "kaitai-struct-compiler": "lib/_npm/kaitai-struct-compiler/kaitai-struct-compiler"
             };
-            ["bowser", "jstree", "localforage", "goldenlayout", "vue", "dateformat"].forEach(
+            ["bowser", "jstree", "localforage", "goldenlayout", "vue", "dateformat", "hansken-js"].forEach(
                 name => loader.paths[name] = `lib/_npm/${name}/${name}`);
 
             let componentLoader = (await loader.getLoadedModule('ui/ComponentLoader')).exports.componentLoader;

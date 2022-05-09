@@ -13,6 +13,7 @@
     "dateformat": "^2.0.0",
     "font-awesome": "^4.7.0",
     "golden-layout": "^1.5.9",
+    "hansken-js": "file:/home/gertjan/Workspace/hansken-js",
     "jquery": "^3.5.0",
     "jstree": "^3.3.4",
     "kaitai-struct": "next",
