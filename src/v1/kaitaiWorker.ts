@@ -148,7 +148,7 @@ myself.onmessage = (ev: MessageEvent) => {
             msg.result = apiMethods[msg.type].apply(self, msg.args);
         } catch (error) {
             console.log("[Worker] Error", error);
-            msg.error = error.toString();
+            msg.error = error;
         }
     } else {
         msg.error = "msg.type is unknown";
