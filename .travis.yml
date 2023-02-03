@@ -31,7 +31,10 @@ after_success:
       -m "Regen $TRAVIS_BRANCH kaitai-io/kaitai_struct_webide@$TRAVIS_COMMIT"
       --
       --exclude=.git
-      --exclude=CNAME
+      --exclude=.travis.yml
       --exclude=.nojekyll
+      --exclude=CNAME
+      --exclude=favicon.ico
+      --exclude=favicon.ico.license
       --exclude=devel
       out/
