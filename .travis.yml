@@ -1,5 +1,4 @@
-# version 2
-dist: xenial
+dist: jammy
 sudo: false
 
 branches:
@@ -9,7 +8,7 @@ branches:
 
 language: node_js
 cache: npm
-node_js: 10
+node_js: 16
 
 install:
   - pip install --user -r requirements.txt
