@@ -45,7 +45,7 @@ async function run() {
     console.log("ksy", ksy);
 
     //const compilerKsy = cloneWithFilter(ksy, prop => !prop.startsWith("$"));
-    //const compiler = new KaitaiStructCompiler();
+    //const compiler = KaitaiStructCompiler;
     //console.log(ksy);
     //console.log(compilerKsy);
     //const compiled = await compiler.compile("javascript", compilerKsy, null, false);

@@ -9,10 +9,10 @@ interface IYamlImporter {
 }
 
 declare module "kaitai-struct-compiler" {
-    class KaitaiStructCompiler {
-        version: string;
-        buildDate: string;
-        compile(kslang: string, compilerSchema: any, jsImporter: IYamlImporter, isDebug: boolean): Promise<{ [filename: string]: string }>;
+    namespace KaitaiStructCompiler {
+        const version: string;
+        const buildDate: string;
+        function compile(kslang: string, compilerSchema: any, jsImporter: IYamlImporter, isDebug: boolean): Promise<{ [filename: string]: string }>;
     }
 
     export = KaitaiStructCompiler;

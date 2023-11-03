@@ -246,7 +246,7 @@ $(() => {
         .attr("href", `https://github.com/kaitai-io/kaitai_struct_webide/commit/${kaitaiIde.commitId}`)
         .text(kaitaiIde.commitId.substr(0,7));
     $("#webideCommitDate").text(kaitaiIde.commitDate);
-    $("#compilerVersion").text(new KaitaiStructCompiler().version + " (" + new KaitaiStructCompiler().buildDate + ")");
+    $("#compilerVersion").text(KaitaiStructCompiler.version + " (" + KaitaiStructCompiler.buildDate + ")");
 
     $("#welcomeDoNotShowAgain").click(() => localStorage.setItem("doNotShowWelcome", "true"));
     if (localStorage.getItem("doNotShowWelcome") !== "true")

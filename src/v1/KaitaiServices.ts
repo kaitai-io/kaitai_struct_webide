@@ -96,7 +96,7 @@ export class CompilerService {
         else {
             var perfCompile = performanceHelper.measureAction("Compilation");
 
-            var ks = new KaitaiStructCompiler();
+            var ks = KaitaiStructCompiler;
             var rReleasePromise = (debug === false || debug === "both") ? ks.compile(kslang, compilerSchema, this.jsImporter, false) : Promise.resolve(null);
             var rDebugPromise = (debug === true || debug === "both") ? ks.compile(kslang, compilerSchema, this.jsImporter, true) : Promise.resolve(null);
             //console.log("rReleasePromise", rReleasePromise, "rDebugPromise", rDebugPromise);

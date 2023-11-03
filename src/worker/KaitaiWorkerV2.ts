@@ -12,7 +12,7 @@ import { TemplateCompiler } from "./TemplateCompiler";
 import { IExportedValue } from "./WorkerShared";
 
 class KaitaiServices implements IKaitaiServices {
-    kaitaiCompiler: KaitaiStructCompiler;
+    kaitaiCompiler: typeof KaitaiStructCompiler;
     templateCompiler: TemplateCompiler;
 
     ksys: { [fn: string]: KsySchema.IKsyFile } = {};
@@ -27,7 +27,7 @@ class KaitaiServices implements IKaitaiServices {
     objectExporter: ObjectExporter;
 
     constructor() {
-        this.kaitaiCompiler = new KaitaiStructCompiler();
+        this.kaitaiCompiler = KaitaiStructCompiler;
         this.templateCompiler = new TemplateCompiler();
     }
 
