@@ -18,8 +18,8 @@ interface LocalForageOptions {
 }
 
 interface LocalForageDbMethods {
-    getItem<T>(key: string): Promise<T>;
-    getItem<T>(key: string, callback: (err: any, value: T) => void): void;
+    getItem<T>(key: string): Promise<T | null>;
+    getItem<T>(key: string, callback: (err: any, value: T | null) => void): void;
 
     setItem<T>(key: string, value: T): Promise<T>;
     setItem<T>(key: string, value: T, callback: (err: any, value: T) => void): void;
