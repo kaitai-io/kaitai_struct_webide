@@ -57,8 +57,15 @@ class JsImporter implements IYamlImporter {
         }
 
         console.log(`import yaml: ${name}, mode: ${mode}, loadFn: ${loadFn}, root:`, this.rootFsItem);
-        let ksyContent = await fss[importedFsType].get(`${loadFn}.ksy`);
-        var ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
+        const fn = `${loadFn}.ksy`;
+        const sourceAppendix = mode === 'abs' ? 'kaitai.io' : 'local storage';
+        let ksyContent;
+        try {
+            ksyContent = await fss[importedFsType].get(`${loadFn}.ksy`);
+        } catch (e) {
+            throw new Error(`failed to import spec ${fn} from ${sourceAppendix}${e.message ? ': ' + e.message : ''}`);
+        }
+        const ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
         return ksyModel;
     }
 }
