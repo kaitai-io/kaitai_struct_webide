@@ -1,0 +1,56 @@
+name: build
+
+on:
+  push:
+    branches:
+      - master
+      - stable
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+      - run: npm install
+      - name: Use stable versions of KSC and JS runtime
+        run: |
+          npm install kaitai-struct-compiler@latest kaitai-struct@latest
+          node vendor_build.js
+        if: github.ref == 'refs/heads/stable'
+      - name: Set up environment variables for stable deployment
+        run: |
+          echo 'GA_ID=UA-76299550-2' >> "$GITHUB_ENV"
+          echo 'SENTRY_ENV=stable' >> "$GITHUB_ENV"
+        if: github.ref == 'refs/heads/stable'
+      - name: Set up environment variables for devel deployment
+        run: |
+          echo 'GA_ID=UA-76299550-3' >> "$GITHUB_ENV"
+          echo 'SENTRY_ENV=devel' >> "$GITHUB_ENV"
+        if: github.ref == 'refs/heads/master'
+      - name: Build
+        env:
+          SENTRY_DSN: 'https://a01cdb58ab3e43dd9ce695dd20a19d00@sentry.io/202888'
+        run: ./build
+      - name: Deploy
+        env:
+          BOT_SSH_KEY: ${{secrets.BOT_SSH_KEY}}
+          OUTDIR: ${{ github.ref == 'refs/heads/master' && 'devel' || '' }}
+        run: |
+          ./push_artifacts/git_config_kaitai_bot
+          ./push_artifacts/publish \
+            -o kaitai-io \
+            -r ide-kaitai-io.github.io \
+            -d "$OUTDIR" \
+            -m "Regen ${GITHUB_REF#refs/heads/*} $GITHUB_REPOSITORY@$GITHUB_SHA" \
+            -- \
+            --exclude=.git \
+            --exclude=.github \
+            --exclude=.nojekyll \
+            --exclude=CNAME \
+            --exclude=favicon.ico \
+            --exclude=favicon.ico.license \
+            --exclude=devel \
+            out/
