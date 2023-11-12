@@ -49,10 +49,11 @@ jobs:
             -m "Regen ${GITHUB_REF#refs/heads/*} $GITHUB_REPOSITORY@$GITHUB_SHA" \
             -- \
             --exclude=.git \
-            --exclude=.github \
+            --exclude=.github/ \
             --exclude=.nojekyll \
+            --exclude=_build/ \
             --exclude=CNAME \
             --exclude=favicon.ico \
             --exclude=favicon.ico.license \
-            --exclude=devel \
+            --exclude=devel/ \
             out/
