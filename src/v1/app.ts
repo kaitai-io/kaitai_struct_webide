@@ -123,23 +123,23 @@ class AppController {
             //console.log("reparse exportedRoot", exportedRoot);
 
             this.ui.parsedDataTreeHandler = new ParsedTreeHandler(this.ui.parsedDataTreeCont.getElement(), exportedRoot, this.compilerService.ksyTypes);
-            await this.ui.parsedDataTreeHandler.initNodeReopenHandling();
-            this.ui.hexViewer.onSelectionChanged();
 
-            this.ui.parsedDataTreeHandler.jstree.on("select_node.jstree", (e, selectNodeArgs) => {
-                var node = <IParsedTreeNode>selectNodeArgs.node;
-                //console.log("node", node);
-                var exp = this.ui.parsedDataTreeHandler.getNodeData(node).exported;
+            this.ui.parsedDataTreeHandler.jstree.on("state_ready.jstree", () => {
+                this.ui.parsedDataTreeHandler.jstree.on("select_node.jstree", (e, selectNodeArgs) => {
+                    var node = <IParsedTreeNode>selectNodeArgs.node;
+                    //console.log("node", node);
+                    var exp = this.ui.parsedDataTreeHandler.getNodeData(node).exported;
 
-                if (exp && exp.path)
-                    $("#parsedPath").text(exp.path.join("/"));
+                    if (exp && exp.path)
+                        $("#parsedPath").text(exp.path.join("/"));
 
-                if (!this.blockRecursive && exp && exp.start < exp.end) {
-                    this.selectedInTree = true;
-                    //console.log("setSelection", exp.ioOffset, exp.start);
-                    this.ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
-                    this.selectedInTree = false;
-                }
+                    if (!this.blockRecursive && exp && exp.start < exp.end) {
+                        this.selectedInTree = true;
+                        //console.log("setSelection", exp.ioOffset, exp.start);
+                        this.ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
+                        this.selectedInTree = false;
+                    }
+                });
             });
 
             this.errors.handle(null);
