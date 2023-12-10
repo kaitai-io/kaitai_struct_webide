@@ -38,7 +38,8 @@ class SchemaUtils {
 }
 
 class JsImporter implements IYamlImporter {
-    rootFsItem: IFsItem;
+    constructor(private rootFsItem: IFsItem, private ksyTypes: IKsyTypes) {
+    }
 
     async importYaml(name: string, mode: string) {
         var loadFn;
@@ -78,7 +79,11 @@ class JsImporter implements IYamlImporter {
             throw error;
         }
         const ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
-        return ksyModel;
+        Object.assign(this.ksyTypes, SchemaUtils.collectKsyTypes(ksyModel));
+
+        // we have to modify the schema (add typesByJsName for example) before sending into the compiler, so we need a copy
+        const compilerSchema = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
+        return compilerSchema;
     }
 }
 
@@ -87,24 +92,24 @@ export class CompilationError {
 }
 
 export class CompilerService {
-    jsImporter = new JsImporter();
+    jsImporter: JsImporter;
     ksySchema: KsySchema.IKsyFile;
     ksyTypes: IKsyTypes;
 
     compile(srcYamlFsItem: IFsItem, srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
         var perfYamlParse = performanceHelper.measureAction("YAML parsing");
 
-        this.jsImporter.rootFsItem = srcYamlFsItem;
-
         try {
             this.ksySchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
             this.ksyTypes = SchemaUtils.collectKsyTypes(this.ksySchema);
 
-            // we have to modify the schema (add typesByJsName for example) before sending into the compiler so we need a copy
+            // we have to modify the schema (add typesByJsName for example) before sending into the compiler, so we need a copy
             var compilerSchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
         } catch (parseErr) {
             return Promise.reject(new CompilationError("yaml", parseErr));
         }
+
+        this.jsImporter = new JsImporter(srcYamlFsItem, this.ksyTypes);
 
         perfYamlParse.done();
 
