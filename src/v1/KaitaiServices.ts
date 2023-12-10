@@ -63,7 +63,19 @@ class JsImporter implements IYamlImporter {
         try {
             ksyContent = await fss[importedFsType].get(`${loadFn}.ksy`);
         } catch (e) {
-            throw new Error(`failed to import spec ${fn} from ${sourceAppendix}${e.message ? ': ' + e.message : ''}`);
+            const error = new Error(`failed to import spec ${fn} from ${sourceAppendix}${e.message ? ': ' + e.message : ''}`);
+
+            // The default implementation of the Error.prototype.toString() method gives
+            // "Error: {message}", see
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/toString#description
+            // However, the error we're throwing here goes directly into the KSC code,
+            // which will add its own `error: ` prefix (as the severity of the problem),
+            // so the resulting message would contain `error: Error: ...`. By overriding
+            // toString() to omit the `Error: ` part, we can make the message a bit nicer.
+            error.toString = function () {
+                return this.message;
+            };
+            throw error;
         }
         const ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
         return ksyModel;
