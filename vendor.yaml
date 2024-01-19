@@ -28,6 +28,9 @@ libs:
         - src/theme-textmate.js
         - src/worker-javascript.js
         - src/worker-json.js
+        - src/worker-lua.js
+        - src/worker-php.js
+        - src/worker-yaml.js
         - src/ext-language_tools.js
 
   BigInteger.js:
