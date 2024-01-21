@@ -15,7 +15,7 @@ jobs:
           submodules: true
       - uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '20'
       - run: npm ci
       - name: Use stable versions of KSC and JS runtime
         run: |
