@@ -183,6 +183,13 @@ libs:
     npmDir: kaitai-struct
     files: [LICENSE, KaitaiStream.js]
 
+  js-yaml:
+    source: https://github.com/nodeca/js-yaml
+    licenseName: MIT
+    licenseUrl: https://github.com/nodeca/js-yaml/blob/master/LICENSE
+    npmDir: js-yaml
+    files: [LICENSE, dist/js-yaml.min.js]
+
   yaml.js:
     source: https://github.com/jeremyfa/yaml.js
     licenseName: MIT
