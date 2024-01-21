@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '16'
-      - run: npm install
+      - run: npm ci
       - name: Use stable versions of KSC and JS runtime
         run: |
           npm install kaitai-struct-compiler@latest kaitai-struct@latest
