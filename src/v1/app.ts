@@ -279,7 +279,8 @@ $(() => {
     app.formatReady = loadCachedFsItem(app.ksyFsItemName, "kaitai", "formats/archive/zip.ksy");
 
     app.inputReady.then(() => {
-        var storedSelection = JSON.parse(localStorage.getItem("selection"));
+        const value = localStorage.getItem("selection");
+        const storedSelection = value !== null ? JSON.parse(value) : null;
         if (storedSelection)
             app.ui.hexViewer.setSelection(storedSelection.start, storedSelection.end);
     });

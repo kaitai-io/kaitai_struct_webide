@@ -10,6 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "alwaysStrict": true,
+//    "strictNullChecks": true,
     "sourceMap": false,
     "target": "es2017",
     "outDir": "js/",

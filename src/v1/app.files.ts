@@ -67,7 +67,15 @@ class LocalStorageFs implements IFileSystem {
         return this.save();
     }
 
-    get(fn: string): Promise<string | ArrayBuffer> { return localforage.getItem<string|ArrayBuffer>(this.fileKey(fn)); }
+    get(fn: string): Promise<string | ArrayBuffer> {
+        return localforage.getItem<string | ArrayBuffer>(this.fileKey(fn))
+            .then(content => {
+                if (content === null) {
+                    throw new Error('file not found');
+                }
+                return content;
+            });
+    }
 
     put(fn: string, data: any): Promise<IFsItem> {
         return this.getRootNode().then(root => {
@@ -84,7 +92,25 @@ class KaitaiFs implements IFileSystem {
 
     get(fn: string): Promise<string|ArrayBuffer> {
         if (fn.toLowerCase().endsWith(".ksy"))
-            return Promise.resolve<string>(<any>$.ajax({ url: fn }));
+            return fetch(fn)
+                .then(response => {
+                    if (!response.ok) {
+                        let msg;
+                        if (response.status === 404) {
+                            msg = 'file not found';
+                        } else {
+                            const textAppendix = response.statusText ? ` (${response.statusText})` : '';
+                            msg = `server responded with HTTP status ${response.status}${textAppendix}`;
+                        }
+                        throw new Error(msg);
+                    }
+                    return response.text();
+                }, err => {
+                    if (err instanceof TypeError) {
+                        throw new Error(`cannot reach the server (message: ${err.message}), check your internet connection`);
+                    }
+                    throw err;
+                });
         else
             return downloadFile(fn);
     }
