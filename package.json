@@ -24,7 +24,7 @@
     "smooth-scrollbar": "^7.4.1",
     "text-encoding": "^0.6.4",
     "thenby": "^1.2.3",
-    "vue": "^2.4.4",
+    "vue": "^3.0.0",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
