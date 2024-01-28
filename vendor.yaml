@@ -190,6 +190,8 @@ libs:
     npmDir: js-yaml
     files: [LICENSE, dist/js-yaml.min.js]
 
+  # FIXME: remove when no longer referenced by src/KaitaiSandbox.ts and src/worker/ImportLoader.ts
+  #        (see https://github.com/kaitai-io/kaitai_struct_webide/issues/168)
   yaml.js:
     source: https://github.com/jeremyfa/yaml.js
     licenseName: MIT
