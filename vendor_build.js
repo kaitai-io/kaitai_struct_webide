@@ -1,5 +1,5 @@
-const YAML = require("yamljs");
-const { copyFileSync, readdirSync, statSync, mkdirSync } = require("fs");
+const jsyaml = require("js-yaml");
+const { readFileSync, copyFileSync, readdirSync, statSync, mkdirSync } = require("fs");
 const { join, basename, dirname } = require("path");
 const firstBy = require("thenby");
 
@@ -28,7 +28,9 @@ function copyOverwrite(src, dst) {
 }
 
 function main() {
-    const vendor = YAML.load("vendor.yaml");
+    const filename = "vendor.yaml";
+    const vendorYaml = readFileSync(filename, "utf8");
+    const vendor = jsyaml.load(vendorYaml, { schema: jsyaml.CORE_SCHEMA, filename });
     const sortedLibs = Object.entries(vendor["libs"]).sort(
         firstBy(([, lib]) => lib["priority"])
     );
