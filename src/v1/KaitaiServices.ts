@@ -1,6 +1,7 @@
 ﻿import { fss, IFsItem } from "./app.files";
 import { performanceHelper } from "./utils/PerformanceHelper";
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
+import * as jsyaml from "js-yaml";
 
 class SchemaUtils {
     static ksyNameToJsName(ksyName: string, isProp: boolean) {
@@ -62,7 +63,7 @@ class JsImporter implements IYamlImporter {
         const sourceAppendix = mode === 'abs' ? 'kaitai.io' : 'local storage';
         let ksyContent;
         try {
-            ksyContent = await fss[importedFsType].get(`${loadFn}.ksy`);
+            ksyContent = await fss[importedFsType].get(fn);
         } catch (e) {
             const error = new Error(`failed to import spec ${fn} from ${sourceAppendix}${e.message ? ': ' + e.message : ''}`);
 
@@ -78,11 +79,11 @@ class JsImporter implements IYamlImporter {
             };
             throw error;
         }
-        const ksyModel = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
+        const ksyModel = <KsySchema.IKsyFile>parseYaml(<string>ksyContent, fn);
         Object.assign(this.ksyTypes, SchemaUtils.collectKsyTypes(ksyModel));
 
         // we have to modify the schema (add typesByJsName for example) before sending into the compiler, so we need a copy
-        const compilerSchema = <KsySchema.IKsyFile>YAML.parse(<string>ksyContent);
+        const compilerSchema = <KsySchema.IKsyFile>parseYaml(<string>ksyContent, fn);
         return compilerSchema;
     }
 }
@@ -100,11 +101,11 @@ export class CompilerService {
         var perfYamlParse = performanceHelper.measureAction("YAML parsing");
 
         try {
-            this.ksySchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
+            this.ksySchema = <KsySchema.IKsyFile>parseYaml(srcYaml, srcYamlFsItem.fn);
             this.ksyTypes = SchemaUtils.collectKsyTypes(this.ksySchema);
 
             // we have to modify the schema (add typesByJsName for example) before sending into the compiler, so we need a copy
-            var compilerSchema = <KsySchema.IKsyFile>YAML.parse(srcYaml);
+            var compilerSchema = <KsySchema.IKsyFile>parseYaml(srcYaml, srcYamlFsItem.fn);
         } catch (parseErr) {
             return Promise.reject(new CompilationError("yaml", parseErr));
         }
@@ -131,4 +132,12 @@ export class CompilerService {
                 }).catch(compileErr => Promise.reject(new CompilationError("kaitai", compileErr)));
         }
     }
+}
+
+function parseYaml(yamlContents: string, filename: string) {
+    const options = {
+        schema: jsyaml.CORE_SCHEMA,
+        filename: filename,
+    };
+    return jsyaml.load(yamlContents, options);
 }

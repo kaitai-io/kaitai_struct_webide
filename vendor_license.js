@@ -1,4 +1,4 @@
-const YAML = require("yamljs");
+const jsyaml = require("js-yaml");
 const { readdirSync, readFileSync, writeFileSync, statSync } = require("fs");
 const { join, basename } = require("path");
 const firstBy = require("thenby");
@@ -15,7 +15,9 @@ function findLicenses(dst) {
 }
 
 function main() {
-    const vendor = YAML.load("vendor.yaml");
+    const filename = "vendor.yaml";
+    const vendorYaml = readFileSync(filename, "utf8");
+    const vendor = jsyaml.load(vendorYaml, { schema: jsyaml.CORE_SCHEMA, filename });
     let licResult = "";
     let wikiResult = "# 3rd-party libraries\n\n";
     const sortedLibs = Object.entries(vendor["libs"]).sort(

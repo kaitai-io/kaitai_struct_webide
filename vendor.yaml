@@ -183,6 +183,15 @@ libs:
     npmDir: kaitai-struct
     files: [LICENSE, KaitaiStream.js]
 
+  js-yaml:
+    source: https://github.com/nodeca/js-yaml
+    licenseName: MIT
+    licenseUrl: https://github.com/nodeca/js-yaml/blob/master/LICENSE
+    npmDir: js-yaml
+    files: [LICENSE, dist/js-yaml.min.js]
+
+  # FIXME: remove when no longer referenced by src/KaitaiSandbox.ts and src/worker/ImportLoader.ts
+  #        (see https://github.com/kaitai-io/kaitai_struct_webide/issues/168)
   yaml.js:
     source: https://github.com/jeremyfa/yaml.js
     licenseName: MIT

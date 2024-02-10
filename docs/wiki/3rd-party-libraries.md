@@ -72,6 +72,11 @@ Source: https://github.com/jquery/jquery
 
 License: MIT (https://raw.githubusercontent.com/jquery/jquery/master/LICENSE.txt)
 
+## js-yaml
+Source: https://github.com/nodeca/js-yaml
+
+License: MIT (https://github.com/nodeca/js-yaml/blob/master/LICENSE)
+
 ## jsTree
 Website: https://www.jstree.com/
 
