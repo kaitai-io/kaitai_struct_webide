@@ -1,4 +1,4 @@
-﻿// Type definitions for jsTree v3.3.2 
+// Type definitions for jsTree v3.3.2 
 // Project: http://www.jstree.com/
 // Definitions by: Adam Pluciński <https://github.com/adaskothebeast>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
@@ -814,7 +814,8 @@ interface JSTree extends JQuery {
     * @param  {Boolean} as_dom
     * @return {Object|jQuery}
     */
-    get_node: (obj: any, as_dom?: boolean) => any;
+    get_node(obj: any, as_dom?: false): Record<string, any>;
+    get_node(obj: any, as_dom: true): JQuery;
 
     /**
     * get the path to a node, either consisting of node texts, or of node IDs, optionally glued together (otherwise an array)

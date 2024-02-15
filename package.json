@@ -15,7 +15,7 @@
     "golden-layout": "^1.5.9",
     "jquery": "^3.5.0",
     "js-yaml": "^4.1.0",
-    "jstree": "^3.3.4",
+    "jstree": "^3.3.16",
     "kaitai-struct": "next",
     "kaitai-struct-compiler": "next",
     "localforage": "^1.5.0",
