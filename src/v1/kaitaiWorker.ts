@@ -82,6 +82,10 @@ function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
     }
     else if (result.type === ObjectType.Array) {
         result.arrayItems = (<any[]>obj).map((item, i) => exportValue(item, debug && debug.arr && debug.arr[i], hasRawAttr, path.concat(i.toString()), noLazy));
+        if (result.incomplete && debug && debug.arr) {
+            debug.end = inferDebugEnd(debug.arr);
+            result.end = debug.end;
+        }
     }
     else if (result.type === ObjectType.Object) {
         const hasSubstream = hasRawAttr && obj._io;
@@ -99,6 +103,11 @@ function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
         const fieldNamesArr = Array.from(fieldNames).filter(x => x[0] !== "_");
         fieldNamesArr
             .forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], fieldNames.has(`_raw_${key}`), path.concat(key), noLazy));
+
+        if (result.incomplete && !hasSubstream && obj._debug) {
+            debug.end = inferDebugEnd(fieldNamesArr.map(key => <IDebugInfo>obj._debug[key]));
+            result.end = debug.end;
+        }
 
         const propNames = obj.constructor !== Object ?
             Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor") : [];
@@ -119,6 +128,15 @@ function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
         console.log(`Unknown object type: ${result.type}`);
 
     return result;
+}
+
+function inferDebugEnd(debugs: IDebugInfo[]): number {
+    const inferredEnd = debugs
+        .reduce((acc, debug) => debug && debug.end > acc ? debug.end : acc, Number.NEGATIVE_INFINITY);
+    if (inferredEnd === Number.NEGATIVE_INFINITY) {
+        return;
+    }
+    return inferredEnd;
 }
 
 function adjustDebug(debug: IDebugInfo): void {
