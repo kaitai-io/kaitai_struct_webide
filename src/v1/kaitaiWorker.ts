@@ -117,7 +117,7 @@ function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
             const parseMode = ksyInstanceData["-webide-parse-mode"];
             const eagerLoad = parseMode === "eager" || (parseMode !== "lazy" && ksyInstanceData.value);
 
-            if (eagerLoad || noLazy) {
+            if (Object.prototype.hasOwnProperty.call(obj, `_m_${propName}`) || eagerLoad || noLazy) {
                 const instHasRawAttr = Object.prototype.hasOwnProperty.call(obj, `_raw__m_${propName}`);
                 result.object.fields[propName] = exportValue(obj[propName], obj._debug["_m_" + propName], instHasRawAttr, path.concat(propName), noLazy);
             } else
