@@ -36,7 +36,7 @@ function getObjectType(obj: any) {
         return ObjectType.Object;
 }
 
-function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boolean): IExportedValue {
+function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: string[], noLazy: boolean): IExportedValue {
     adjustDebug(debug);
     var result: IExportedValue = {
         start: debug && debug.start,
@@ -81,9 +81,14 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         }
     }
     else if (result.type === ObjectType.Array) {
-        result.arrayItems = (<any[]>obj).map((item, i) => exportValue(item, debug && debug.arr && debug.arr[i], path.concat(i.toString()), noLazy));
+        result.arrayItems = (<any[]>obj).map((item, i) => exportValue(item, debug && debug.arr && debug.arr[i], hasRawAttr, path.concat(i.toString()), noLazy));
     }
     else if (result.type === ObjectType.Object) {
+        const hasSubstream = hasRawAttr && obj._io;
+        if (result.incomplete && hasSubstream) {
+            debug.end = debug.start + obj._io.size;
+            result.end = debug.end;
+        }
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
         const ksyType = wi.ksyTypes[result.object.class];
 
@@ -93,7 +98,7 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         }
         const fieldNamesArr = Array.from(fieldNames).filter(x => x[0] !== "_");
         fieldNamesArr
-            .forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], path.concat(key), noLazy));
+            .forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], fieldNames.has(`_raw_${key}`), path.concat(key), noLazy));
 
         const propNames = obj.constructor !== Object ?
             Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor") : [];
@@ -103,9 +108,10 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
             const parseMode = ksyInstanceData["-webide-parse-mode"];
             const eagerLoad = parseMode === "eager" || (parseMode !== "lazy" && ksyInstanceData.value);
 
-            if (eagerLoad || noLazy)
-                result.object.fields[propName] = exportValue(obj[propName], obj._debug["_m_" + propName], path.concat(propName), noLazy);
-            else
+            if (eagerLoad || noLazy) {
+                const instHasRawAttr = Object.prototype.hasOwnProperty.call(obj, `_raw__m_${propName}`);
+                result.object.fields[propName] = exportValue(obj[propName], obj._debug["_m_" + propName], instHasRawAttr, path.concat(propName), noLazy);
+            } else
                 result.object.instances[propName] = <IInstance>{ path: path.concat(propName), offset: 0 };
         }
     }
@@ -146,7 +152,7 @@ var apiMethods = {
         }
         if (hooks.nodeFilter)
             wi.root = hooks.nodeFilter(wi.root);
-        wi.exported = exportValue(wi.root, { start: 0, end: wi.inputBuffer.byteLength, ioOffset: 0, incomplete: error !== undefined }, [], eagerMode);
+        wi.exported = exportValue(wi.root, { start: 0, end: wi.inputBuffer.byteLength, ioOffset: 0, incomplete: error !== undefined }, false, [], eagerMode);
         //console.log("parse before return", performance.now() - start, "date", Date.now());
         return {
             result: wi.exported,
@@ -158,8 +164,9 @@ var apiMethods = {
         var parent: any = null;
         path.forEach(key => { parent = obj; obj = obj[key]; });
 
+        const instHasRawAttr = Object.prototype.hasOwnProperty.call(obj, `_raw__m_${path[path.length - 1]}`);
         var debug = <IDebugInfo>parent._debug["_m_" + path[path.length - 1]];
-        wi.exported = exportValue(obj, debug, path, false); //
+        wi.exported = exportValue(obj, debug, instHasRawAttr, path, false);
         return {
             result: wi.exported,
         };
