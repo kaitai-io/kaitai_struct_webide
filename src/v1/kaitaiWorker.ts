@@ -1,4 +1,4 @@
-﻿// issue: https://github.com/Microsoft/TypeScript/issues/582
+// issue: https://github.com/Microsoft/TypeScript/issues/582
 var myself = <Worker><any>self;
 
 var wi = {
@@ -18,6 +18,7 @@ interface IDebugInfo {
     start: number;
     end: number;
     ioOffset: number;
+    incomplete: boolean;
     arr?: IDebugInfo[];
     enumName?: string;
 }
@@ -36,9 +37,11 @@ function getObjectType(obj: any) {
 }
 
 function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boolean): IExportedValue {
-    var result = <IExportedValue>{
+    adjustDebug(debug);
+    var result: IExportedValue = {
         start: debug && debug.start,
         end: debug && debug.end,
+        incomplete: debug && debug.incomplete,
         ioOffset: debug && debug.ioOffset,
         path: path,
         type: getObjectType(obj)
@@ -120,6 +123,13 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
     return result;
 }
 
+function adjustDebug(debug: IDebugInfo): void {
+    if (!debug || Object.prototype.hasOwnProperty.call(debug, 'incomplete')) {
+        return;
+    }
+    debug.incomplete = (debug.start != null && debug.end == null);
+}
+
 importScripts("../entities.js");
 importScripts("../../lib/_npm/kaitai-struct/KaitaiStream.js");
 
@@ -144,7 +154,7 @@ var apiMethods = {
         }
         if (hooks.nodeFilter)
             wi.root = hooks.nodeFilter(wi.root);
-        wi.exported = exportValue(wi.root, <IDebugInfo>{ start: 0, end: wi.inputBuffer.byteLength }, [], eagerMode);
+        wi.exported = exportValue(wi.root, <IDebugInfo>{ start: 0, end: wi.inputBuffer.byteLength, incomplete: error !== undefined }, [], eagerMode);
         //console.log("parse before return", performance.now() - start, "date", Date.now());
         return {
             result: wi.exported,

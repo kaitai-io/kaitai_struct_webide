@@ -1,4 +1,4 @@
-﻿class ObjectType {
+class ObjectType {
     public static Primitive = "Primitive";
     public static Array = "Array";
     public static TypedArray = "TypedArray";
@@ -39,6 +39,7 @@ interface IExportedValue {
     ioOffset: number;
     start: number;
     end: number;
+    incomplete: boolean;
 
     primitiveValue?: any;
     arrayItems?: IExportedValue[];

@@ -1,4 +1,4 @@
-﻿import { IInterval, IntervalHandler } from "../utils/IntervalHelper";
+import { IInterval, IntervalHandler } from "../utils/IntervalHelper";
 import { s, htmlescape, asciiEncode, hexEncode, uuidEncode, collectAllObjects } from "../utils";
 import { workerMethods } from "./app.worker";
 import { app } from "./app";
@@ -221,6 +221,18 @@ export class ParsedTreeHandler {
         }
         else
             text = (showProp ? s`<span class="propName">${propName}</span> = ` : "") + this.primitiveToText(item);
+
+        if (item.incomplete) {
+            const showAsError =
+                item.type === ObjectType.Undefined ||
+                (item.type === ObjectType.Object && Object.keys(item.object.fields).length === 0);
+
+            if (showAsError) {
+                text += ` <i class="glyphicon glyphicon-exclamation-sign fail-color" title="parsing of this field failed"></i>`;
+            } else {
+                text += ` <i class="glyphicon glyphicon-alert alert-color" title="parsing was interrupted by an error, data may be incomplete"></i>`;
+            }
+        }
 
         return <IParsedTreeNode>{ text: text, children: isObject || isArray, data: this.addNodeData({ exported: item }) };
     }
