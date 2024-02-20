@@ -126,12 +126,20 @@ class AppController {
 
             this.ui.parsedDataTreeHandler.jstree.on("state_ready.jstree", () => {
                 this.ui.parsedDataTreeHandler.jstree.on("select_node.jstree", (e, selectNodeArgs) => {
-                    var node = <IParsedTreeNode>selectNodeArgs.node;
+                    const node = <IParsedTreeNode>selectNodeArgs.node;
                     //console.log("node", node);
-                    var exp = this.ui.parsedDataTreeHandler.getNodeData(node).exported;
+                    const exp = this.ui.parsedDataTreeHandler.getNodeData(node).exported;
 
                     if (exp && exp.path)
                         $("#parsedPath").text(exp.path.join("/"));
+
+                    if (exp) {
+                        if (exp.instanceError !== undefined) {
+                            app.errors.handle(exp.instanceError);
+                        } else if (exp.validationError !== undefined) {
+                            app.errors.handle(exp.validationError);
+                        }
+                    }
 
                     if (!this.blockRecursive && exp && exp.start < exp.end) {
                         this.selectedInTree = true;
