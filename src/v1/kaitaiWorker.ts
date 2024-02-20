@@ -119,10 +119,9 @@ function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
             const parseMode = ksyInstanceData["-webide-parse-mode"];
             const eagerLoad = parseMode === "eager" || (parseMode !== "lazy" && ksyInstanceData.value);
 
-            if (Object.prototype.hasOwnProperty.call(obj, `_m_${propName}`) || eagerLoad || noLazy) {
-                const instHasRawAttr = Object.prototype.hasOwnProperty.call(obj, `_raw__m_${propName}`);
-                result.object.fields[propName] = exportValue(obj[propName], obj._debug["_m_" + propName], instHasRawAttr, path.concat(propName), noLazy);
-            } else
+            if (Object.prototype.hasOwnProperty.call(obj, `_m_${propName}`) || eagerLoad || noLazy)
+                result.object.fields[propName] = fetchInstance(obj, propName, path, noLazy);
+            else
                 result.object.instances[propName] = <IInstance>{ path: path.concat(propName), offset: 0 };
         }
     }
@@ -139,6 +138,30 @@ function inferDebugEnd(debugs: IDebugInfo[]): number {
         return;
     }
     return inferredEnd;
+}
+
+function fetchInstance(obj: any, propName: string, objPath: string[], noLazy: boolean): IExportedValue {
+    let value;
+    let instanceError: Error;
+    try {
+        value = obj[propName];
+    } catch (e) {
+        instanceError = e;
+    }
+    if (instanceError !== undefined) {
+        try {
+            // retry once (important for validation errors)
+            value = obj[propName];
+        } catch (e) {}
+    }
+
+    const instHasRawAttr = Object.prototype.hasOwnProperty.call(obj, `_raw__m_${propName}`);
+    const debugInfo = <IDebugInfo>obj._debug[`_m_${propName}`];
+    const exported = exportValue(value, debugInfo, instHasRawAttr, objPath.concat(propName), noLazy);
+    if (instanceError !== undefined) {
+        exported.instanceError = instanceError;
+    }
+    return exported;
 }
 
 function adjustDebug(debug: IDebugInfo): void {
@@ -180,15 +203,13 @@ var apiMethods = {
         };
     },
     get: (path: string[]) => {
-        var obj = wi.root;
-        var parent: any = null;
-        path.forEach(key => { parent = obj; obj = obj[key]; });
+        let parent = wi.root;
+        const parentPath = path.slice(0, -1);
+        parentPath.forEach(key => parent = parent[key]);
+        const propName = path[path.length - 1];
 
-        const instHasRawAttr = Object.prototype.hasOwnProperty.call(obj, `_raw__m_${path[path.length - 1]}`);
-        var debug = <IDebugInfo>parent._debug["_m_" + path[path.length - 1]];
-        wi.exported = exportValue(obj, debug, instHasRawAttr, path, false);
         return {
-            result: wi.exported,
+            result: fetchInstance(parent, propName, parentPath, false),
         };
     }
 };

@@ -222,9 +222,12 @@ export class ParsedTreeHandler {
         else
             text = (showProp ? s`<span class="propName">${propName}</span> = ` : "") + this.primitiveToText(item);
 
-        if (item.incomplete || item.validationError !== undefined) {
+        if (item.incomplete || item.validationError !== undefined || item.instanceError !== undefined) {
             const validationError = item.validationError !== undefined ?
                 `${item.validationError.name}: ${item.validationError.message}` :
+                undefined;
+            const instanceError = item.instanceError !== undefined ?
+                `${item.instanceError.name}: ${item.instanceError.message}` :
                 undefined;
 
             const showAsError =
@@ -234,17 +237,29 @@ export class ParsedTreeHandler {
 
             const icon = document.createElement('i');
             icon.classList.add('glyphicon');
-            icon.classList.add(showAsError ? 'fail-color' : 'alert-color');
+            if (instanceError !== undefined) {
+                icon.classList.add('instance-fail-color');
+            } else {
+                icon.classList.add(showAsError ? 'fail-color' : 'alert-color');
+            }
 
-            if (validationError !== undefined) {
+            if (validationError !== undefined && (instanceError === undefined || item.instanceError === item.validationError)) {
                 icon.classList.add('glyphicon-remove');
-                icon.title = `validation of this field failed with "${validationError}"`;
+                const action = instanceError !== undefined ?
+                    "validation of this instance parsed on explicit request" :
+                    "validation of this field";
+                icon.title = `${action} failed with "${validationError}"`;
             } else if (showAsError) {
                 icon.classList.add('glyphicon-exclamation-sign');
-                icon.title = `parsing of this field failed`;
+                if (instanceError !== undefined) {
+                    icon.title = `explicit parsing of this instance failed with "${instanceError}"`;
+                } else {
+                    icon.title = `parsing of this field failed`;
+                }
             } else {
                 icon.classList.add('glyphicon-alert');
-                icon.title = `parsing was interrupted by an error, data may be incomplete`;
+                const instanceAppendix = instanceError !== undefined ? "explicit " : "";
+                icon.title = `${instanceAppendix}parsing was interrupted by an error, data may be incomplete`;
             }
 
             text += ` ${icon.outerHTML}`;
