@@ -84,14 +84,6 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         result.arrayItems = (<any[]>obj).map((item, i) => exportValue(item, debug && debug.arr && debug.arr[i], path.concat(i.toString()), noLazy));
     }
     else if (result.type === ObjectType.Object) {
-        var childIoOffset = obj._io ? obj._io._byteOffset : 0;
-
-        if (result.start === childIoOffset) { // new KaitaiStream was used, fix start position
-            result.ioOffset = childIoOffset;
-            result.start -= childIoOffset;
-            result.end -= childIoOffset;
-        }
-
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
         const ksyType = wi.ksyTypes[result.object.class];
 
@@ -154,7 +146,7 @@ var apiMethods = {
         }
         if (hooks.nodeFilter)
             wi.root = hooks.nodeFilter(wi.root);
-        wi.exported = exportValue(wi.root, <IDebugInfo>{ start: 0, end: wi.inputBuffer.byteLength, incomplete: error !== undefined }, [], eagerMode);
+        wi.exported = exportValue(wi.root, { start: 0, end: wi.inputBuffer.byteLength, ioOffset: 0, incomplete: error !== undefined }, [], eagerMode);
         //console.log("parse before return", performance.now() - start, "date", Date.now());
         return {
             result: wi.exported,
