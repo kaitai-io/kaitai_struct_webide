@@ -18,6 +18,7 @@ interface IDebugInfo {
     start: number;
     end: number;
     ioOffset: number;
+    validationError?: Error;
     incomplete: boolean;
     arr?: IDebugInfo[];
     enumName?: string;
@@ -42,6 +43,7 @@ function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
         start: debug && debug.start,
         end: debug && debug.end,
         incomplete: debug && debug.incomplete,
+        validationError: (debug && debug.validationError) || undefined,
         ioOffset: debug && debug.ioOffset,
         path: path,
         type: getObjectType(obj)

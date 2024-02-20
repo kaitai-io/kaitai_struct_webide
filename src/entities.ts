@@ -40,6 +40,7 @@ interface IExportedValue {
     start: number;
     end: number;
     incomplete: boolean;
+    validationError?: Error;
 
     primitiveValue?: any;
     arrayItems?: IExportedValue[];
