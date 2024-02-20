@@ -297,7 +297,7 @@ export class ParsedTreeHandler {
         var expNode = isRoot ? this.exportedRoot : nodeData.exported;
 
         var isInstance = !expNode;
-        var valuePromise = isInstance ? this.getProp(nodeData.instance.path).then(exp => nodeData.exported = exp) : Promise.resolve(expNode);
+        var valuePromise = isInstance ? this.getProp(nodeData.instance.path).then(({ result: exp }) => nodeData.exported = exp) : Promise.resolve(expNode);
         return valuePromise.then(valueExp => {
             if (isRoot || isInstance) {
                 this.fillKsyTypes(valueExp);

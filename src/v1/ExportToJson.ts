@@ -1,4 +1,4 @@
-﻿import { workerMethods } from "./app.worker";
+import { workerMethods } from "./app.worker";
 
 export function exportToJson(useHex: boolean = false) {
     var indentLen = 2;
@@ -44,9 +44,16 @@ export function exportToJson(useHex: boolean = false) {
         }
     }
 
-    return workerMethods.reparse(true).then(exportedRoot => {
-        console.log("exported", exportedRoot);
-        expToNative(exportedRoot);
-        return result;
-    });
+    return workerMethods.reparse(true)
+        .then(response => {
+            if (response.error) {
+                throw response.error;
+            }
+            return response.result;
+        })
+        .then(exportedRoot => {
+            console.log("exported", exportedRoot);
+            expToNative(exportedRoot);
+            return result;
+        });
 }

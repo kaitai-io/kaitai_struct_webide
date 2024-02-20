@@ -16,6 +16,11 @@ interface IWorkerMessage {
 }
 /* tslint:enable */
 
+interface IWorkerResponse {
+    result: any;
+    error: any;
+}
+
 interface IInstance {
     path: string[];
     offset: number;

@@ -1,4 +1,4 @@
-﻿import * as localforage from "localforage";
+import * as localforage from "localforage";
 import * as Vue from "vue";
 
 import { UI } from "./app.layout";
@@ -118,7 +118,7 @@ class AppController {
             let jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
             await workerMethods.initCode(debugCode, jsClassName, this.compilerService.ksyTypes);
 
-            let exportedRoot = await workerMethods.reparse(this.vm.disableLazyParsing);
+            const { result: exportedRoot, error: parseError } = await workerMethods.reparse(this.vm.disableLazyParsing);
             kaitaiIde.root = exportedRoot;
             //console.log("reparse exportedRoot", exportedRoot);
 
@@ -142,7 +142,7 @@ class AppController {
                 });
             });
 
-            this.errors.handle(null);
+            this.errors.handle(parseError);
         } catch(error) {
             this.errors.handle(error);
         }

@@ -1,4 +1,4 @@
-﻿var worker = new Worker("js/v1/kaitaiWorker.js");
+var worker = new Worker("js/v1/kaitaiWorker.js");
 
 var msgHandlers: { [msgId: number]: (msg: IWorkerMessage) => void } = {};
 
@@ -10,16 +10,20 @@ worker.onmessage = (ev: MessageEvent) => {
 };
 
 var lastMsgId = 0;
-function workerCall(request: IWorkerMessage) {
-    return new Promise<any>((resolve, reject) => {
+function workerCall(request: IWorkerMessage): Promise<IWorkerResponse> {
+    return new Promise((resolve, reject) => {
         request.msgId = ++lastMsgId;
         msgHandlers[request.msgId] = response => {
             if (response.error) {
                 console.log("error", response.error);
-                reject(response.error);
             }
-            else
-                resolve(response.result);
+
+            if (response.error && (response.result === undefined || response.result === null)) {
+                reject(response.error);
+            } else {
+                const { result, error } = response;
+                resolve({ result, error });
+            }
 
             //console.info(`[performance] [${(new Date()).format("H:i:s.u")}] Got worker response: ${Date.now()}.`);
         };
@@ -29,15 +33,15 @@ function workerCall(request: IWorkerMessage) {
 
 export var workerMethods = {
     initCode: (sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes) => {
-        return <Promise<void>>workerCall({ type: "initCode", args: [sourceCode, mainClassName, ksyTypes] });
+        return workerCall({ type: "initCode", args: [sourceCode, mainClassName, ksyTypes] });
     },
     setInput: (inputBuffer: ArrayBuffer) => {
-        return <Promise<void>>workerCall({ type: "setInput", args: [inputBuffer] });
+        return workerCall({ type: "setInput", args: [inputBuffer] });
     },
     reparse: (eagerMode: boolean) => {
-        return <Promise<IExportedValue>>workerCall({ type: "reparse", args: [eagerMode] });
+        return workerCall({ type: "reparse", args: [eagerMode] });
     },
     get: (path: string[]) => {
-        return <Promise<IExportedValue>>workerCall({ type: "get", args: [path] });
+        return workerCall({ type: "get", args: [path] });
     }
 };

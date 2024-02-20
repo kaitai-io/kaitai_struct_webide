@@ -130,12 +130,20 @@ var apiMethods = {
         //var start = performance.now();
         wi.ioInput = new KaitaiStream(wi.inputBuffer, 0);
         wi.root = new wi.MainClass(wi.ioInput);
-        wi.root._read();
+        let error;
+        try {
+            wi.root._read();
+        } catch (e) {
+            error = e;
+        }
         if (hooks.nodeFilter)
             wi.root = hooks.nodeFilter(wi.root);
         wi.exported = exportValue(wi.root, <IDebugInfo>{ start: 0, end: wi.inputBuffer.byteLength }, [], eagerMode);
         //console.log("parse before return", performance.now() - start, "date", Date.now());
-        return wi.exported;
+        return {
+            result: wi.exported,
+            error,
+        };
     },
     get: (path: string[]) => {
         var obj = wi.root;
@@ -144,7 +152,9 @@ var apiMethods = {
 
         var debug = <IDebugInfo>parent._debug["_m_" + path[path.length - 1]];
         wi.exported = exportValue(obj, debug, path, false); //
-        return wi.exported;
+        return {
+            result: wi.exported,
+        };
     }
 };
 
@@ -154,7 +164,12 @@ myself.onmessage = (ev: MessageEvent) => {
 
     if (apiMethods.hasOwnProperty(msg.type)) {
         try {
-            msg.result = apiMethods[msg.type].apply(self, msg.args);
+            const ret = apiMethods[msg.type].apply(self, msg.args);
+            if (ret) {
+                const { result, error } =  ret;
+                msg.result = result;
+                msg.error = error;
+            }
         } catch (error) {
             console.log("[Worker] Error", error);
             msg.error = error;
