@@ -90,9 +90,15 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         }
 
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
-        var ksyType = wi.ksyTypes[result.object.class];
+        const ksyType = wi.ksyTypes[result.object.class];
 
-        Object.keys(obj).filter(x => x[0] !== "_").forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], path.concat(key), noLazy));
+        const fieldNames = new Set<string>(Object.keys(obj));
+        if (obj._debug) {
+            Object.keys(obj._debug).forEach(k => fieldNames.add(k));
+        }
+        const fieldNamesArr = Array.from(fieldNames).filter(x => x[0] !== "_");
+        fieldNamesArr
+            .forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], path.concat(key), noLazy));
 
         const propNames = obj.constructor !== Object ?
             Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor") : [];
