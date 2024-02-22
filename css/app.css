@@ -1,4 +1,4 @@
-﻿/*.lm_content>div { height: 100%; width: 100% }*/
+/*.lm_content>div { height: 100%; width: 100% }*/
 .lm_splitter.lm_horizontal .lm_drag_handle { left:-5px; width:15px }
 .lm_splitter.lm_vertical .lm_drag_handle { top:-5px; height:15px }
 .errorWindow { background: white; font-family: Courier,monospace; font-size: 12px; white-space: pre-wrap; overflow-y: scroll; }
@@ -9,6 +9,9 @@
 #parsedDataTree.jstree-default>.jstree-container-ul>.jstree-node { margin-left: 0 }
 #parsedDataTree.jstree-default .jstree-ocl { background-position-y: -8px; width:18px; }
 #parsedDataTree .missing { font-family: Arial; color: #c00000; }
+.alert-color { color: #FFC20A; }
+.fail-color { color: #FF4136; }
+.instance-fail-color { color: #0074D9; }
 #fileDrop { display:none; font-family: Arial; position: fixed; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0,0,0,0.8); z-index: 9999 }
 #fileDrop>div { border:2px dashed white; border-radius:25px; width:500px; margin-left:-250px; height:180px; margin-top:-100px; position:fixed; top:50%; left:50%; color:white; text-align:center; font-size:22px; padding-top:65px }
 #fileTree { font-family:Arial; font-size:12px }

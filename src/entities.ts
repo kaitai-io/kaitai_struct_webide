@@ -1,4 +1,4 @@
-﻿class ObjectType {
+class ObjectType {
     public static Primitive = "Primitive";
     public static Array = "Array";
     public static TypedArray = "TypedArray";
@@ -15,6 +15,11 @@ interface IWorkerMessage {
     error?: any;
 }
 /* tslint:enable */
+
+interface IWorkerResponse {
+    result: any;
+    error: any;
+}
 
 interface IInstance {
     path: string[];
@@ -34,6 +39,9 @@ interface IExportedValue {
     ioOffset: number;
     start: number;
     end: number;
+    incomplete: boolean;
+    validationError?: Error;
+    instanceError?: Error;
 
     primitiveValue?: any;
     arrayItems?: IExportedValue[];

@@ -1,4 +1,4 @@
-﻿// issue: https://github.com/Microsoft/TypeScript/issues/582
+// issue: https://github.com/Microsoft/TypeScript/issues/582
 var myself = <Worker><any>self;
 
 var wi = {
@@ -18,6 +18,8 @@ interface IDebugInfo {
     start: number;
     end: number;
     ioOffset: number;
+    validationError?: Error;
+    incomplete: boolean;
     arr?: IDebugInfo[];
     enumName?: string;
 }
@@ -35,10 +37,13 @@ function getObjectType(obj: any) {
         return ObjectType.Object;
 }
 
-function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boolean): IExportedValue {
-    var result = <IExportedValue>{
+function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: string[], noLazy: boolean): IExportedValue {
+    adjustDebug(debug);
+    var result: IExportedValue = {
         start: debug && debug.start,
         end: debug && debug.end,
+        incomplete: debug && debug.incomplete,
+        validationError: (debug && debug.validationError) || undefined,
         ioOffset: debug && debug.ioOffset,
         path: path,
         type: getObjectType(obj)
@@ -78,21 +83,33 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         }
     }
     else if (result.type === ObjectType.Array) {
-        result.arrayItems = (<any[]>obj).map((item, i) => exportValue(item, debug && debug.arr && debug.arr[i], path.concat(i.toString()), noLazy));
+        result.arrayItems = (<any[]>obj).map((item, i) => exportValue(item, debug && debug.arr && debug.arr[i], hasRawAttr, path.concat(i.toString()), noLazy));
+        if (result.incomplete && debug && debug.arr) {
+            debug.end = inferDebugEnd(debug.arr);
+            result.end = debug.end;
+        }
     }
     else if (result.type === ObjectType.Object) {
-        var childIoOffset = obj._io ? obj._io._byteOffset : 0;
-
-        if (result.start === childIoOffset) { // new KaitaiStream was used, fix start position
-            result.ioOffset = childIoOffset;
-            result.start -= childIoOffset;
-            result.end -= childIoOffset;
+        const hasSubstream = hasRawAttr && obj._io;
+        if (result.incomplete && hasSubstream) {
+            debug.end = debug.start + obj._io.size;
+            result.end = debug.end;
         }
-
         result.object = { class: obj.constructor.name, instances: {}, fields: {} };
-        var ksyType = wi.ksyTypes[result.object.class];
+        const ksyType = wi.ksyTypes[result.object.class];
 
-        Object.keys(obj).filter(x => x[0] !== "_").forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], path.concat(key), noLazy));
+        const fieldNames = new Set<string>(Object.keys(obj));
+        if (obj._debug) {
+            Object.keys(obj._debug).forEach(k => fieldNames.add(k));
+        }
+        const fieldNamesArr = Array.from(fieldNames).filter(x => x[0] !== "_");
+        fieldNamesArr
+            .forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], fieldNames.has(`_raw_${key}`), path.concat(key), noLazy));
+
+        if (result.incomplete && !hasSubstream && obj._debug) {
+            debug.end = inferDebugEnd(fieldNamesArr.map(key => <IDebugInfo>obj._debug[key]));
+            result.end = debug.end;
+        }
 
         const propNames = obj.constructor !== Object ?
             Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor") : [];
@@ -102,8 +119,8 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
             const parseMode = ksyInstanceData["-webide-parse-mode"];
             const eagerLoad = parseMode === "eager" || (parseMode !== "lazy" && ksyInstanceData.value);
 
-            if (eagerLoad || noLazy)
-                result.object.fields[propName] = exportValue(obj[propName], obj._debug["_m_" + propName], path.concat(propName), noLazy);
+            if (Object.prototype.hasOwnProperty.call(obj, `_m_${propName}`) || eagerLoad || noLazy)
+                result.object.fields[propName] = fetchInstance(obj, propName, path, noLazy);
             else
                 result.object.instances[propName] = <IInstance>{ path: path.concat(propName), offset: 0 };
         }
@@ -112,6 +129,46 @@ function exportValue(obj: any, debug: IDebugInfo, path: string[], noLazy?: boole
         console.log(`Unknown object type: ${result.type}`);
 
     return result;
+}
+
+function inferDebugEnd(debugs: IDebugInfo[]): number {
+    const inferredEnd = debugs
+        .reduce((acc, debug) => debug && debug.end > acc ? debug.end : acc, Number.NEGATIVE_INFINITY);
+    if (inferredEnd === Number.NEGATIVE_INFINITY) {
+        return;
+    }
+    return inferredEnd;
+}
+
+function fetchInstance(obj: any, propName: string, objPath: string[], noLazy: boolean): IExportedValue {
+    let value;
+    let instanceError: Error;
+    try {
+        value = obj[propName];
+    } catch (e) {
+        instanceError = e;
+    }
+    if (instanceError !== undefined) {
+        try {
+            // retry once (important for validation errors)
+            value = obj[propName];
+        } catch (e) {}
+    }
+
+    const instHasRawAttr = Object.prototype.hasOwnProperty.call(obj, `_raw__m_${propName}`);
+    const debugInfo = <IDebugInfo>obj._debug[`_m_${propName}`];
+    const exported = exportValue(value, debugInfo, instHasRawAttr, objPath.concat(propName), noLazy);
+    if (instanceError !== undefined) {
+        exported.instanceError = instanceError;
+    }
+    return exported;
+}
+
+function adjustDebug(debug: IDebugInfo): void {
+    if (!debug || Object.prototype.hasOwnProperty.call(debug, 'incomplete')) {
+        return;
+    }
+    debug.incomplete = (debug.start != null && debug.end == null);
 }
 
 importScripts("../entities.js");
@@ -130,21 +187,30 @@ var apiMethods = {
         //var start = performance.now();
         wi.ioInput = new KaitaiStream(wi.inputBuffer, 0);
         wi.root = new wi.MainClass(wi.ioInput);
-        wi.root._read();
+        let error;
+        try {
+            wi.root._read();
+        } catch (e) {
+            error = e;
+        }
         if (hooks.nodeFilter)
             wi.root = hooks.nodeFilter(wi.root);
-        wi.exported = exportValue(wi.root, <IDebugInfo>{ start: 0, end: wi.inputBuffer.byteLength }, [], eagerMode);
+        wi.exported = exportValue(wi.root, { start: 0, end: wi.inputBuffer.byteLength, ioOffset: 0, incomplete: error !== undefined }, false, [], eagerMode);
         //console.log("parse before return", performance.now() - start, "date", Date.now());
-        return wi.exported;
+        return {
+            result: wi.exported,
+            error,
+        };
     },
     get: (path: string[]) => {
-        var obj = wi.root;
-        var parent: any = null;
-        path.forEach(key => { parent = obj; obj = obj[key]; });
+        let parent = wi.root;
+        const parentPath = path.slice(0, -1);
+        parentPath.forEach(key => parent = parent[key]);
+        const propName = path[path.length - 1];
 
-        var debug = <IDebugInfo>parent._debug["_m_" + path[path.length - 1]];
-        wi.exported = exportValue(obj, debug, path, false); //
-        return wi.exported;
+        return {
+            result: fetchInstance(parent, propName, parentPath, false),
+        };
     }
 };
 
@@ -154,7 +220,12 @@ myself.onmessage = (ev: MessageEvent) => {
 
     if (apiMethods.hasOwnProperty(msg.type)) {
         try {
-            msg.result = apiMethods[msg.type].apply(self, msg.args);
+            const ret = apiMethods[msg.type].apply(self, msg.args);
+            if (ret) {
+                const { result, error } =  ret;
+                msg.result = result;
+                msg.error = error;
+            }
         } catch (error) {
             console.log("[Worker] Error", error);
             msg.error = error;
