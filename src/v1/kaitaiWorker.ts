@@ -115,7 +115,7 @@ function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
             Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor") : [];
 
         for (const propName of propNames) {
-            const ksyInstanceData = ksyType && ksyType.instancesByJsName[propName] || {};
+            const ksyInstanceData = ksyType && ksyType.instancesByJsName && ksyType.instancesByJsName[propName] || {};
             const parseMode = ksyInstanceData["-webide-parse-mode"];
             const eagerLoad = parseMode === "eager" || (parseMode !== "lazy" && ksyInstanceData.value);
 
