@@ -1,21 +1,7 @@
 const { readFileSync, writeFileSync } = require("fs");
 const { exec } = require("child_process");
 
-const { GA_ID, SENTRY_DSN, SENTRY_ENV } = process.env;
-
-const GA_TEMPLATE = GA_ID ? `
-    <!-- Google Analytics -->
-    <script>
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','https://www.google-analytics.com/analytics.js','_ga');
-
-            _ga('create', '${GA_ID}', 'auto');
-            _ga('send', 'pageview');
-    </script>
-    <!-- End Google Analytics -->
-` : "";
+const { SENTRY_DSN, SENTRY_ENV } = process.env;
 
 const SENTRY_TEMPLATE = SENTRY_DSN && SENTRY_ENV ? `
     <script src="https://cdn.ravenjs.com/3.17.0/raven.min.js" crossorigin="anonymous"></script>
@@ -64,7 +50,7 @@ function formatCommitDate(d) {
 async function main() {
     const { commitId, commitDate } = await fetchGitCommitInfo();
     const scriptAppend =
-        SENTRY_TEMPLATE.replace("{{SENTRY_RELEASE}}", commitId) + GA_TEMPLATE;
+        SENTRY_TEMPLATE.replace("{{SENTRY_RELEASE}}", commitId);
     if (scriptAppend) {
         fileAction(outDir + "/index.html", html =>
             appendAfter(html, "<!-- SCRIPT_INJECTION_POINT -->", scriptAppend)

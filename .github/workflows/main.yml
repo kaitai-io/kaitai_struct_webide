@@ -24,12 +24,10 @@ jobs:
         if: github.ref == 'refs/heads/stable'
       - name: Set up environment variables for stable deployment
         run: |
-          echo 'GA_ID=UA-76299550-2' >> "$GITHUB_ENV"
           echo 'SENTRY_ENV=stable' >> "$GITHUB_ENV"
         if: github.ref == 'refs/heads/stable'
       - name: Set up environment variables for devel deployment
         run: |
-          echo 'GA_ID=UA-76299550-3' >> "$GITHUB_ENV"
           echo 'SENTRY_ENV=devel' >> "$GITHUB_ENV"
         if: github.ref == 'refs/heads/master'
       - name: Build

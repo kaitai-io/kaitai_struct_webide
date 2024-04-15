@@ -19,12 +19,6 @@ import KaitaiStructCompiler = require("kaitai-struct-compiler");
 
 $.jstree.defaults.core.force_text = true;
 
-export function ga(category: string, action: string, label?: string, value?: number) {
-    console.log(`[GA Event] cat:${category} act:${action} lab:${label || ""}`);
-    if (typeof window["_ga"] !== "undefined")
-        window["_ga"]("send", "event", category, action, label, value);
-}
-
 const qs = {};
 location.search.substr(1).split("&").map(x => x.split("=")).forEach(x => qs[x[0]] = x[1]);
 
@@ -72,10 +66,8 @@ class AppController {
 
     compile(srcYamlFsItem: IFsItem, srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
         return this.compilerService.compile(srcYamlFsItem, srcYaml, kslang, debug).then(result => {
-            ga("compile", "success");
             return result;
         }, (error: CompilationError) => {
-            ga("compile", "error", `${error.type}: ${error.error}`);
             this.errors.handle(error.error);
             return Promise.reject(error);
         });
@@ -331,7 +323,4 @@ $(() => {
     });
 
     kaitaiIde.app = app;
-
-    precallHook(app.ui.layout.layout.constructor["__lm"].controls, "DragProxy", () => ga("layout", "window_drag"));
-    $("body").on("mousedown", ".lm_drag_handle", () => { ga("layout", "splitter_drag"); });
 });

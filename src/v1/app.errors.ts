@@ -1,5 +1,5 @@
 ﻿import { htmlescape } from "../utils";
-import { app, ga } from "./app";
+import { app } from "./app";
 
 export class ErrorWindowHandler {
     lastErrWndSize = 100; // 34
@@ -18,8 +18,8 @@ export class ErrorWindowHandler {
             this.errorWnd.getElement().addClass("errorWindow");
         }
         this.errorWnd.on("resize", () => this.lastErrWndSize = this.errorWnd.getElement().outerHeight());
-        this.errorWnd.on("destroy", () => { ga("errorwnd", "destroy"); this.errorWnd = null; });
-        this.errorWnd.on("close", () => { ga("errorwnd", "close"); this.errorWnd = null; });
+        this.errorWnd.on("destroy", () => { this.errorWnd = null; });
+        this.errorWnd.on("close", () => { this.errorWnd = null; });
         this.errorWnd.getElement().empty().append($("<div>").html(htmlescape(errMsg).replace(/\n|\\n/g, "<br>")));
     }
 
@@ -46,4 +46,3 @@ export class ErrorWindowHandler {
         }
     }
 }
-
