@@ -1,19 +1,16 @@
-﻿
-import { AppView } from "./AppView";
-import { ISandboxMethods } from "./worker/WorkerShared";
-import { IDataProvider } from "./HexViewer";
-import { localSettings } from "./LocalSettings";
-import { FsTreeNode, fss } from "./ui/Parts/FileTree";
-import { Delayed, EventSilencer } from "./utils";
-import { SandboxHandler } from "./SandboxHandler";
-import { ParsedTreeNode, ParsedTreeRootNode } from "./ui/Parts/ParsedTree";
-import { IExportedValue } from "worker/WorkerShared";
-import { ParsedMap } from "./ParsedMap";
-import { InitKaitaiSandbox, ParseError, InitKaitaiWithoutSandbox } from "./KaitaiSandbox";
-import { Conversion } from "./utils/Conversion";
-import { IDataFiles } from "./utils/FileUtils";
-import { FsUri } from "./FileSystem/FsUri";
-import { EditorChangeHandler } from "./ui/UIHelper";
+﻿import {AppView} from "./AppView";
+import {ISandboxMethods} from "../worker/WorkerShared";
+import {IDataProvider} from "../HexViewer";
+import {localSettings} from "./LocalSettings";
+import {fss, FsTreeNode} from "./ui/Parts/FileTree";
+import {ParsedTreeNode, ParsedTreeRootNode} from "./ui/Parts/ParsedTree";
+import {IExportedValue} from "src/worker/WorkerShared";
+import {ParsedMap} from "./ParsedMap";
+import {InitKaitaiSandbox, ParseError} from "./KaitaiSandbox";
+import {Conversion} from "./utils/Conversion";
+import {IDataFiles} from "./utils/FileUtils";
+import {FsUri} from "./FileSystem/FsUri";
+import {EditorChangeHandler} from "./ui/UIHelper";
 
 class AppController {
     view: AppView;

@@ -255,3 +255,6 @@ lib/_npm/
 .serve_files_secret
 \.DS_Store
 playground/*.js*
+
+# Jetbrains IDE's
+.idea

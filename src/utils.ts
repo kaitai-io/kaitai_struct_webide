@@ -54,12 +54,6 @@ export class EventSilencer {
     }
 }
 
-export class Convert {
-    static utf8StrToBytes(str: string): Uint8Array {
-        return new TextEncoder().encode(str);
-    }
-}
-
 export function asciiEncode(bytes: Uint8Array) {
     var len = bytes.byteLength;
     var binary = "";

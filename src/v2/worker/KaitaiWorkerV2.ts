@@ -1,15 +1,15 @@
-/// <reference path="../../lib/ts-types/kaitai.d.ts" />
-/// <reference path="../KsySchema.ts" />
+/// <reference path="../../../lib/ts-types/kaitai.d.ts" />
+/// <reference path="../../KsySchema.ts" />
 
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");
 import { YAML } from "yamljs";
 import { ObjectExporter } from "./ObjectExporter";
-import { IKaitaiServices, IExportOptions, ILazyArrayExportOptions } from "./WorkerShared";
+import { IKaitaiServices, IExportOptions, ILazyArrayExportOptions } from "../../worker/WorkerShared";
 import { JsonExporter } from "./JsonExporter";
 import { SchemaUtils } from "./SchemaUtils";
 import { TemplateCompiler } from "./TemplateCompiler";
-import { IExportedValue } from "./WorkerShared";
+import { IExportedValue } from "../../worker/WorkerShared";
 
 class KaitaiServices implements IKaitaiServices {
     kaitaiCompiler: typeof KaitaiStructCompiler;

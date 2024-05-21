@@ -1,7 +1,7 @@
 import * as Vue from "vue";
-import Component from "./../Component";
+import Component from "../../../ui/Component";
 import { TreeView, ITreeNode } from "../Components/TreeView";
-import { ObjectType, IExportedValue, IInstance } from "../../worker/WorkerShared";
+import { ObjectType, IExportedValue, IInstance } from "../../../worker/WorkerShared";
 
 export class LazyArrayNode implements ITreeNode {
     nodeType = "LazyArray";

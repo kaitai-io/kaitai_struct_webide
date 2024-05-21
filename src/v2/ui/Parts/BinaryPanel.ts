@@ -1,6 +1,6 @@
 import * as Vue from "vue";
-import Component from "../Component";
-import { HexViewer, IDataProvider } from "../../HexViewer";
+import Component from "../../../ui/Component";
+import { HexViewer, IDataProvider } from "../../../HexViewer";
 import { ContextMenu } from "../Components/ContextMenu";
 import { FileUtils } from "../../utils/FileUtils";
 import { FsUri } from "../../FileSystem/FsUri";

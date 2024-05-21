@@ -1,6 +1,6 @@
-﻿///<reference path="../../../lib/ts-types/vue.d.ts"/>
+﻿///<reference path="../../../../lib/ts-types/vue.d.ts"/>
 import * as Vue from "vue";
-import Component from "../Component";
+import Component from "../../../ui/Component";
 import UIHelper from "../UIHelper";
 
 @Component
