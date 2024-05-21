@@ -1,4 +1,4 @@
-﻿import { Delayed } from "../utils";
+﻿import { Delayed } from "../../utils";
 
 export default class UIHelper {
     static findParent<T>(base: Vue, type: new () => T): T {

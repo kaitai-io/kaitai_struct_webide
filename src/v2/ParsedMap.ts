@@ -1,5 +1,5 @@
-import { IntervalHandler, IInterval } from "./utils/IntervalHelper";
-import { IExportedValue, ObjectType, IExportedObject } from "worker/WorkerShared";
+import {IInterval, IntervalHandler} from "../utils/IntervalHelper";
+import {IExportedValue, ObjectType} from "../worker/WorkerShared";
 
 interface IParsedTreeInterval extends IInterval {
     exp: IExportedValue;

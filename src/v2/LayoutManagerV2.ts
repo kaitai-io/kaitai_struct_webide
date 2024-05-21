@@ -1,4 +1,4 @@
-﻿﻿import * as GoldenLayout from "goldenlayout";
+﻿import * as GoldenLayout from "goldenlayout";
 
 export class LayoutItem {
     constructor(public parent: Container, public contentItem: GoldenLayout.ContentItem) { }

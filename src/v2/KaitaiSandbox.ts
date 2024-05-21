@@ -1,5 +1,5 @@
 import { SandboxHandler } from "./SandboxHandler";
-import { ISandboxMethods } from "./worker/WorkerShared";
+import { ISandboxMethods } from "../worker/WorkerShared";
 
 export class ParseError extends Error {
     constructor(text: string, public value: { message: string, parsedLine: number, snippet: string }) {
@@ -13,7 +13,7 @@ export async function InitKaitaiSandbox() {
 
     const sandbox = handler.createProxy<ISandboxMethods>();
     const npmDir = "lib/_npm";
-    await sandbox.loadScript(new URL("js/AmdLoader.js", location.href).href);
+    await sandbox.loadScript(new URL("js/v2/AmdLoader.js", location.href).href);
     await sandbox.eval(`
         loader.projectBase = "${window.location.href}";
         loader.paths = {

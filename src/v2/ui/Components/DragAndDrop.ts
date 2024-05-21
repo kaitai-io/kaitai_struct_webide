@@ -1,6 +1,6 @@
 import * as Vue from "vue";
 import * as $ from "jquery";
-import Component from "../Component";
+import Component from "../../../ui/Component";
 import { FileUtils } from "../../utils/FileUtils";
 
 @Component

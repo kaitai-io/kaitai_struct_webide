@@ -1,5 +1,5 @@
 import * as Vue from "vue";
-import Component from "../Component";
+import Component from "../../../ui/Component";
 import * as $ from "jquery";
 import "bootstrap";
 import { localSettings } from "../../LocalSettings";

@@ -1,9 +1,9 @@
 import * as Vue from "vue";
-import Component from "../Component";
-import { IInterval } from "../../utils/IntervalHelper";
+import Component from "../../../ui/Component";
+import { IInterval } from "../../../utils/IntervalHelper";
 import { AboutModal } from "./AboutModal";
-import "../Components/Stepper";
-import "../Components/SelectionInput";
+import "../../../ui/Components/Stepper";
+import "../../../ui/Components/SelectionInput";
 
 @Component
 export class InfoPanel extends Vue {

@@ -1,24 +1,22 @@
-﻿import { IFileSystem } from "./../../FileSystem/Common";
-import { GithubClient } from "./../../FileSystem/GithubClient";
-import { GithubFileSystem } from "./../../FileSystem/GithubFileSystem";
-import { BrowserFileSystem, BrowserLegacyFileSystem } from "./../../FileSystem/BrowserFileSystem";
-import { RemoteFileSystem } from "./../../FileSystem/RemoteFileSystem";
-import { StaticFileSystem } from "./../../FileSystem/StaticFileSystem";
+﻿import { IFileSystem } from "../../FileSystem/Common";
+import { GithubClient } from "../../FileSystem/GithubClient";
+import { GithubFileSystem } from "../../FileSystem/GithubFileSystem";
+import { BrowserFileSystem, BrowserLegacyFileSystem } from "../../FileSystem/BrowserFileSystem";
+import { RemoteFileSystem } from "../../FileSystem/RemoteFileSystem";
+import { StaticFileSystem } from "../../FileSystem/StaticFileSystem";
 import { HttpFileSystem } from "../../FileSystem/HttpFileSystem";
-import { FsUri } from "./../../FileSystem/FsUri";
-import { FsSelector } from "./../../FileSystem/FsSelector";
-import { TreeView } from "./../Components/TreeView";
+import { FsUri } from "../../FileSystem/FsUri";
+import { FsSelector } from "../../FileSystem/FsSelector";
+import { TreeView } from "../Components/TreeView";
 import * as Vue from "vue";
-import Component from "./../Component";
+import Component from "../../../ui/Component";
 
-import { ContextMenu } from "./../Components/ContextMenu";
+import { ContextMenu } from "../Components/ContextMenu";
 import "../Components/ContextMenu";
 import { InputModal } from "../Components/InputModal";
 import "../Components/InputModal";
 import "../Components/TreeView";
-import dateFormat = require("dateformat");
 
-import { saveFile, Convert } from "../../utils";
 import { ITreeNode } from "../Components/TreeView";
 import { FileUtils } from "../../utils/FileUtils";
 import { Conversion } from "../../utils/Conversion";
