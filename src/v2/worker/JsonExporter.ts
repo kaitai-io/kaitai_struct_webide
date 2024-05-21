@@ -1,4 +1,4 @@
-import { IExportedValue, ObjectType } from "../../worker/WorkerShared";
+import { IExportedValue, ObjectType } from "./WorkerShared";
 
 export class JsonExporter {
     result = "";

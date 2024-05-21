@@ -1,10 +1,9 @@
 ﻿import {AppView} from "./AppView";
-import {ISandboxMethods} from "../worker/WorkerShared";
+import {ISandboxMethods, IExportedValue} from "./worker/WorkerShared";
 import {IDataProvider} from "../HexViewer";
 import {localSettings} from "./LocalSettings";
 import {fss, FsTreeNode} from "./ui/Parts/FileTree";
 import {ParsedTreeNode, ParsedTreeRootNode} from "./ui/Parts/ParsedTree";
-import {IExportedValue} from "src/worker/WorkerShared";
 import {ParsedMap} from "./ParsedMap";
 import {InitKaitaiSandbox, ParseError} from "./KaitaiSandbox";
 import {Conversion} from "./utils/Conversion";

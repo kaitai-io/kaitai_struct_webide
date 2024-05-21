@@ -1,4 +1,4 @@
-import { IKsyTypes } from "../../worker/WorkerShared";
+import { IKsyTypes } from "./WorkerShared";
 
 function ucFirst(str: string) { return str.charAt(0).toUpperCase() + str.slice(1); }
 

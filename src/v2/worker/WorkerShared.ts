@@ -1,4 +1,4 @@
-/// <reference path="../KsySchema.ts" />
+/// <reference path="../../KsySchema.ts" />
 
 export enum ObjectType {
     Primitive = "Primitive",

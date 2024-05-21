@@ -5,11 +5,11 @@ import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import KaitaiStream = require("KaitaiStream");
 import { YAML } from "yamljs";
 import { ObjectExporter } from "./ObjectExporter";
-import { IKaitaiServices, IExportOptions, ILazyArrayExportOptions } from "../../worker/WorkerShared";
+import { IKaitaiServices, IExportOptions, ILazyArrayExportOptions } from "./WorkerShared";
 import { JsonExporter } from "./JsonExporter";
 import { SchemaUtils } from "./SchemaUtils";
 import { TemplateCompiler } from "./TemplateCompiler";
-import { IExportedValue } from "../../worker/WorkerShared";
+import { IExportedValue } from "./WorkerShared";
 
 class KaitaiServices implements IKaitaiServices {
     kaitaiCompiler: typeof KaitaiStructCompiler;
