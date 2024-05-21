@@ -1,5 +1,5 @@
 import { SandboxHandler } from "./SandboxHandler";
-import { ISandboxMethods } from "../worker/WorkerShared";
+import { ISandboxMethods } from "./worker/WorkerShared";
 
 export class ParseError extends Error {
     constructor(text: string, public value: { message: string, parsedLine: number, snippet: string }) {
