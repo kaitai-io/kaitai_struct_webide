@@ -1,0 +1,19 @@
+#!/bin/sh -e
+
+# Script for copying V2 related files to build folder
+# TODO: Should be removed after removing V2
+
+echo "[build_v2_related] Running"
+
+OUT_DIR=out
+
+cp -r \
+	v2.html \
+	"$OUT_DIR"
+
+mkdir -p "$OUT_DIR/src/v2/ui/Components"
+cp -r src/v2/ui/Components/*.html "$OUT_DIR/src/v2/ui/Components"
+mkdir -p "$OUT_DIR/src/v2/ui/Parts"
+cp -r src/v2/ui/Parts/*.html "$OUT_DIR/src/v2/ui/Parts"
+
+echo "[build_v2_related] Finished"

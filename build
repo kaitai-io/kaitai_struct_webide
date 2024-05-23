@@ -5,17 +5,18 @@ TSC=node_modules/.bin/tsc
 
 mkdir -p "$OUT_DIR/js"
 
+echo "[build] Generating formats from repository"
 node ./genKaitaiFsFiles.js "$OUT_DIR"
 
+echo "[build] Copying tsconfig.worker.json"
 "$TSC" --outDir $OUT_DIR/js/ --noEmitOnError
 if [ -f "tsconfig.worker.json" ]; then
     "$TSC" -p tsconfig.worker.json --outDir $OUT_DIR/js/worker/ --noEmitOnError
 fi
 
+echo "[build] Copying basic files: index.html, css, formats, samples, lib, LICENSE"
 cp -r \
 	index.html \
-	v2.html \
-	Playground.html \
 	LICENSE-3RD-PARTY.txt \
 	css \
 	formats \
@@ -23,10 +24,13 @@ cp -r \
 	lib \
 	"$OUT_DIR"
 
+echo "[build] Copying templates for V1"
 mkdir -p "$OUT_DIR/src/ui/Components"
 cp -r src/ui/Components/*.html "$OUT_DIR/src/ui/Components"
-
 mkdir -p "$OUT_DIR/src/ui/Parts"
 cp -r src/ui/Parts/*.html "$OUT_DIR/src/ui/Parts"
+
+#TODO: REMOVE build_v2_related AFTER REMOVING V2
+./build_v2_related
 
 node ./build.js "$OUT_DIR"
