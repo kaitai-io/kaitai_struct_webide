@@ -1,5 +1,5 @@
 import {workerMethods} from "./app.worker";
-import {mapToGenericObject} from "./utils/ExportedValueMapper";
+import {mapToGenericObject} from "./utils/ExportedValueMappers";
 
 export function exportToJson(useHex: boolean = false) {
     const overrideDefaultNumbersWithHex = (key: string, value: any) => {
