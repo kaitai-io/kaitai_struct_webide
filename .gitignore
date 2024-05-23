@@ -258,3 +258,6 @@ playground/*.js*
 
 # Jetbrains IDE's
 .idea
+
+# VSCode
+.vscode
