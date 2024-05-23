@@ -261,3 +261,5 @@ playground/*.js*
 
 # VSCode
 .vscode
+*.csproj
+*.sln
