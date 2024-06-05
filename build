@@ -30,7 +30,4 @@ cp -r src/ui/Components/*.html "$OUT_DIR/src/ui/Components"
 mkdir -p "$OUT_DIR/src/ui/Parts"
 cp -r src/ui/Parts/*.html "$OUT_DIR/src/ui/Parts"
 
-#TODO: REMOVE build_v2_related AFTER REMOVING V2
-./build_v2_related
-
 node ./build.js "$OUT_DIR"
