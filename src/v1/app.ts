@@ -2,7 +2,7 @@ import * as localforage from "localforage";
 import * as Vue from "vue";
 
 import {UI} from "./app.layout";
-import {addKsyFile, IFsItem, initFileTree, refreshFsNodes} from "./app.files";
+import {addKsyFile, initFileTree, refreshFsNodes} from "./app.files";
 import {IParsedTreeNode, ParsedTreeHandler} from "./parsedToTree";
 import {workerMethods} from "./app.worker";
 import {IDataProvider} from "../HexViewer";
