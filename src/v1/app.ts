@@ -1,19 +1,21 @@
 import * as localforage from "localforage";
 import * as Vue from "vue";
 
-import { UI } from "./app.layout";
-import { IFsItem, fss, addKsyFile, refreshFsNodes, initFileTree } from "./app.files";
-import { ParsedTreeHandler, IParsedTreeNode } from "./parsedToTree";
-import { workerMethods } from "./app.worker";
-import { IDataProvider } from "../HexViewer";
-import { initFileDrop } from "./FileDrop";
-import { IFileProcessItem, saveFile, Delayed } from "../utils";
-import { componentLoader } from "../ui/ComponentLoader";
-import { ConverterPanelModel } from "../ui/Components/ConverterPanel";
-import { exportToJson } from "./ExportToJson";
+import {UI} from "./app.layout";
+import {addKsyFile, IFsItem, initFileTree, refreshFsNodes} from "./app.files";
+import {IParsedTreeNode, ParsedTreeHandler} from "./parsedToTree";
+import {workerMethods} from "./app.worker";
+import {IDataProvider} from "../HexViewer";
+import {initFileDrop} from "./FileDrop";
+import {Delayed, IFileProcessItem, saveFile} from "../utils";
+import {componentLoader} from "../ui/ComponentLoader";
+import {ConverterPanelModel} from "../ui/Components/ConverterPanel";
+import {exportToJson} from "./ExportToJson";
 import Component from "../ui/Component";
-import { CompilerService, CompilationError } from "./KaitaiServices";
-import { ErrorWindowHandler } from "./app.errors";
+import {CompilationError, CompilerService} from "./KaitaiServices";
+import {ErrorWindowHandler} from "./app.errors";
+import {fileSystemsManager} from "./FileSystems/FileSystemManager";
+import {FILE_SYSTEM_TYPE_KAITAI, IFsItem} from "./FileSystems/FileSystemsTypes";
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
 
 $.jstree.defaults.core.force_text = true;
@@ -39,10 +41,21 @@ class AppVM extends Vue {
 
     disableLazyParsing: boolean = false;
 
-    public selectInterval(interval: IInterval) { this.selectionChanged(interval.start, interval.end); }
-    public selectionChanged(start: number, end: number) { this.ui.hexViewer.setSelection(start, end); }
-    public exportToJson(hex: boolean) { exportToJson(hex).then(json => this.ui.layout.addEditorTab("json export", json, "json")); }
-    public about() { (<any>$("#welcomeModal")).modal(); }
+    public selectInterval(interval: IInterval) {
+        this.selectionChanged(interval.start, interval.end);
+    }
+
+    public selectionChanged(start: number, end: number) {
+        this.ui.hexViewer.setSelection(start, end);
+    }
+
+    public exportToJson(hex: boolean) {
+        exportToJson(hex).then(json => this.ui.layout.addEditorTab("json export", json, "json"));
+    }
+
+    public about() {
+        (<any>$("#welcomeModal")).modal();
+    }
 }
 
 class AppController {
@@ -61,7 +74,10 @@ class AppController {
     dataProvider: IDataProvider;
     ksyFsItemName = "ksyFsItem";
     lastKsyContent: string = null;
-    isKsyFile(fn: string) { return fn.toLowerCase().endsWith(".ksy"); }
+
+    isKsyFile(fn: string) {
+        return fn.toLowerCase().endsWith(".ksy");
+    }
 
     compile(srcYamlFsItem: IFsItem, srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
         return this.compilerService.compile(srcYamlFsItem, srcYaml, kslang, debug).then(result => {
@@ -77,13 +93,13 @@ class AppController {
         var srcYaml = this.ui.ksyEditor.getValue();
         var changed = this.lastKsyContent !== srcYaml;
 
-        if (changed && (ksyFsItem.fsType === "kaitai" || ksyFsItem.fsType === "static")) {
+        if (changed && ksyFsItem.fsType === FILE_SYSTEM_TYPE_KAITAI) {
             let fsItem = await addKsyFile("localStorage", ksyFsItem.fn.replace(".ksy", "_modified.ksy"), srcYaml);
             localforage.setItem(this.ksyFsItemName, fsItem);
         }
 
         if (changed)
-            await fss[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml);
+            await fileSystemsManager[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml);
 
         let compiled = await this.compile(ksyFsItem, srcYaml, "javascript", "both");
         if (!compiled) return;
@@ -109,7 +125,7 @@ class AppController {
             let jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
             await workerMethods.initCode(debugCode, jsClassName, this.compilerService.ksyTypes);
 
-            const { result: exportedRoot, error: parseError } = await workerMethods.reparse(this.vm.disableLazyParsing);
+            const {result: exportedRoot, error: parseError} = await workerMethods.reparse(this.vm.disableLazyParsing);
             kaitaiIde.root = exportedRoot;
             //console.log("reparse exportedRoot", exportedRoot);
 
@@ -142,7 +158,7 @@ class AppController {
             });
 
             this.errors.handle(parseError);
-        } catch(error) {
+        } catch (error) {
             this.errors.handle(error);
         }
     }
@@ -155,7 +171,7 @@ class AppController {
         if (!fsItem || fsItem.type !== "file")
             return;
 
-        var contentRaw = await fss[fsItem.fsType].get(fsItem.fn);
+        var contentRaw = await fileSystemsManager[fsItem.fsType].get(fsItem.fn);
         if (this.isKsyFile(fsItem.fn)) {
             let content = <string>contentRaw;
             localforage.setItem(this.ksyFsItemName, fsItem);
@@ -192,7 +208,7 @@ class AppController {
 
     addNewFiles(files: IFileProcessItem[]) {
         return Promise.all(files.map(file => (this.isKsyFile(file.file.name) ? <Promise<any>>file.read("text") : file.read("arrayBuffer"))
-            .then(content => fss.local.put(file.file.name, content))))
+            .then(content => fileSystemsManager.local.put(file.file.name, content))))
             .then(fsItems => {
                 refreshFsNodes();
                 return fsItems.length === 1 ? this.loadFsItem(fsItems[0]) : Promise.resolve(null);
@@ -206,7 +222,7 @@ class AppController {
 
     onHexViewerSelectionChanged() {
         //console.log("setSelection", ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
-        localStorage.setItem("selection", JSON.stringify({ start: this.ui.hexViewer.selectionStart, end: this.ui.hexViewer.selectionEnd }));
+        localStorage.setItem("selection", JSON.stringify({start: this.ui.hexViewer.selectionStart, end: this.ui.hexViewer.selectionEnd}));
 
         var start = this.ui.hexViewer.selectionStart;
         var hasSelection = start !== -1;
@@ -232,6 +248,7 @@ var kaitaiIde = window["kaitaiIde"] = <any>{};
 kaitaiIde.version = "0.1";
 kaitaiIde.commitId = "";
 kaitaiIde.commitDate = "";
+
 //localStorage.setItem("lastVersion", kaitaiIde.version);
 
 interface IInterval {
@@ -243,7 +260,7 @@ $(() => {
     $("#webIdeVersion").text(kaitaiIde.version);
     $("#webideCommitId")
         .attr("href", `https://github.com/kaitai-io/kaitai_struct_webide/commit/${kaitaiIde.commitId}`)
-        .text(kaitaiIde.commitId.substr(0,7));
+        .text(kaitaiIde.commitId.substr(0, 7));
     $("#webideCommitDate").text(kaitaiIde.commitDate);
     $("#compilerVersion").text(KaitaiStructCompiler.version + " (" + KaitaiStructCompiler.buildDate + ")");
 
@@ -253,7 +270,7 @@ $(() => {
 
     app.init();
     componentLoader.load(["Components/ConverterPanel", "Components/Stepper", "Components/SelectionInput"]).then(() => {
-        new Vue({ data: { model: app.vm.converterPanelModel } }).$mount("#converterPanel");
+        new Vue({data: {model: app.vm.converterPanelModel}}).$mount("#converterPanel");
         app.vm.$mount("#infoPanel");
         app.vm.$watch("disableLazyParsing", () => app.reparse());
     });
@@ -262,16 +279,24 @@ $(() => {
 
     app.refreshSelectionInput();
 
-    app.ui.genCodeDebugViewer.commands.addCommand({ name: "compile", bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
-        exec: function (editor: any) { app.reparse(); } });
-    app.ui.ksyEditor.commands.addCommand({ name: "compile", bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
-        exec: function (editor: any) { app.recompile(); } });
+    app.ui.genCodeDebugViewer.commands.addCommand({
+        name: "compile", bindKey: {win: "Ctrl-Enter", mac: "Command-Enter"},
+        exec: function (editor: any) {
+            app.reparse();
+        }
+    });
+    app.ui.ksyEditor.commands.addCommand({
+        name: "compile", bindKey: {win: "Ctrl-Enter", mac: "Command-Enter"},
+        exec: function (editor: any) {
+            app.recompile();
+        }
+    });
 
     initFileDrop("fileDrop", (files: any) => app.addNewFiles(files));
 
     async function loadCachedFsItem(cacheKey: string, defFsType: string, defSample: string) {
-        let fsItem = <IFsItem> await localforage.getItem(cacheKey);
-        await app.loadFsItem(fsItem || <IFsItem>{ fsType: defFsType, fn: defSample, type: "file" }, false);
+        let fsItem = <IFsItem>await localforage.getItem(cacheKey);
+        await app.loadFsItem(fsItem || <IFsItem>{fsType: defFsType, fn: defSample, type: "file"}, false);
     }
 
     app.inputReady = loadCachedFsItem("inputFsItem", "kaitai", "samples/sample1.zip");
@@ -293,11 +318,11 @@ $(() => {
     $("#hexViewer").on("contextmenu", e => {
         downloadInput.toggleClass("disabled", app.ui.hexViewer.selectionStart === -1);
 
-        inputContextMenu.css({ display: "block" });
+        inputContextMenu.css({display: "block"});
         var x = Math.min(e.pageX, $(window).width() - inputContextMenu.width());
         var h = inputContextMenu.height();
         var y = e.pageY > ($(window).height() - h) ? e.pageY - h : e.pageY;
-        inputContextMenu.css({ left: x, top: y });
+        inputContextMenu.css({left: x, top: y});
         return false;
     });
 

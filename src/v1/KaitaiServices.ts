@@ -1,7 +1,8 @@
-﻿import { fss, IFsItem } from "./app.files";
-import { performanceHelper } from "./utils/PerformanceHelper";
+﻿import { performanceHelper } from "./utils/PerformanceHelper";
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
 import * as jsyaml from "js-yaml";
+import {fileSystemsManager} from "./FileSystems/FileSystemManager";
+import {IFsItem} from "./FileSystems/FileSystemsTypes";
 
 class SchemaUtils {
     static ksyNameToJsName(ksyName: string, isProp: boolean) {
@@ -63,7 +64,7 @@ class JsImporter implements IYamlImporter {
         const sourceAppendix = mode === 'abs' ? 'kaitai.io' : 'local storage';
         let ksyContent;
         try {
-            ksyContent = await fss[importedFsType].get(fn);
+            ksyContent = await fileSystemsManager[importedFsType].get(fn);
         } catch (e) {
             const error = new Error(`failed to import spec ${fn} from ${sourceAppendix}${e.message ? ': ' + e.message : ''}`);
 
