@@ -17,6 +17,8 @@ import {ErrorWindowHandler} from "./app.errors";
 import {fileSystemsManager} from "./FileSystems/FileSystemManager";
 import {FILE_SYSTEM_TYPE_KAITAI, IFsItem} from "./FileSystems/FileSystemsTypes";
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
+import {ArrayUtils} from "./utils/ArrayUtils";
+import {StringUtils} from "./utils/StringUtils";
 
 $.jstree.defaults.core.force_text = true;
 
@@ -122,7 +124,7 @@ class AppController {
             await Promise.all([this.inputReady, this.formatReady]);
 
             let debugCode = this.ui.genCodeDebugViewer.getValue();
-            let jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => x.ucFirst()).join("");
+            let jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => StringUtils.ucFirst(x)).join("");
             await workerMethods.initCode(debugCode, jsClassName, this.compilerService.ksyTypes);
 
             const {result: exportedRoot, error: parseError} = await workerMethods.reparse(this.vm.disableLazyParsing);
@@ -342,7 +344,7 @@ $(() => {
 
     ctxAction(downloadInput, e => {
         var start = app.ui.hexViewer.selectionStart, end = app.ui.hexViewer.selectionEnd;
-        var newFn = `${app.inputFsItem.fn.split("/").last()}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
+        var newFn = `${ArrayUtils.last(app.inputFsItem.fn.split("/"))}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
         saveFile(new Uint8Array(app.inputContent, start, end - start + 1), newFn);
     });
 

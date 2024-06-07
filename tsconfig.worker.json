@@ -16,8 +16,7 @@
     "lib": ["es2017", "webworker"]
   },
   "include": [
-    "src/extensions.ts",
     "src/worker/*",
     "lib/ts-types/kaitai.d.ts"
   ]
-} 
+}

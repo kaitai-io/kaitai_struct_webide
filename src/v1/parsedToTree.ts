@@ -2,6 +2,8 @@ import { IInterval, IntervalHandler } from "../utils/IntervalHelper";
 import { s, htmlescape, asciiEncode, hexEncode, uuidEncode, collectAllObjects } from "../utils";
 import { workerMethods } from "./app.worker";
 import { app } from "./app";
+import {ArrayUtils} from "./utils/ArrayUtils";
+import {StringUtils} from "./utils/StringUtils";
 
 interface IParsedTreeNodeData {
     exported?: IExportedValue;
@@ -147,7 +149,7 @@ export class ParsedTreeHandler {
         var repr = obj.object.ksyType && obj.object.ksyType["-webide-representation"];
         if (!repr) return "";
 
-        function ksyNameToJsName(ksyName: string) { return ksyName.split("_").map((x, i) => (i === 0 ? x : x.ucFirst())).join(""); }
+        function ksyNameToJsName(ksyName: string) { return ksyName.split("_").map((x, i) => (i === 0 ? x : StringUtils.ucFirst(x))).join(""); }
 
         return htmlescape(repr).replace(/{(.*?)}/g, (g0, g1: string) => {
             var currItem = obj;
@@ -208,7 +210,7 @@ export class ParsedTreeHandler {
     }
 
     childItemToNode(item: IExportedValue, showProp: boolean) {
-        var propName = item.path.last();
+        var propName = ArrayUtils.last(item.path);
         var isObject = item.type === ObjectType.Object;
         var isArray = item.type === ObjectType.Array;
 

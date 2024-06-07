@@ -7,6 +7,7 @@ import {IJSTreeNode} from "./parsedToTree";
 import {getSummaryIfPresent, mapToJSTreeNodes} from "./FileSystems/FileSystemHelper";
 import {FILE_SYSTEM_TYPE_LOCAL, IFsItem, IFsItemSummary, ITEM_MODE_DIRECTORY} from "./FileSystems/FileSystemsTypes";
 import dateFormat = require("dateformat");
+import {ArrayUtils} from "./utils/ArrayUtils";
 
 let fileTreeCont: JQuery;
 
@@ -19,7 +20,7 @@ export async function refreshFsNodes() {
 }
 
 export async function addKsyFile(parent: string | Element, ksyFn: string, content: string) {
-    let name = ksyFn.split("/").last();
+    const name = ArrayUtils.last(ksyFn.split("/"));
     let fsItem = await fileSystemsManager.local.put(name, content);
     app.ui.fileTree.create_node(app.ui.fileTree.get_node(parent), {text: name, data: fsItem, icon: "glyphicon glyphicon-list-alt"},
         "last", (node: any) => app.ui.fileTree.activate_node(node, null));
@@ -216,7 +217,7 @@ export function initFileTree() {
         app.ui.fileTree.get_selected().forEach(nodeId => {
             const fsItem = <IFsItem>app.ui.fileTree.get_node(nodeId).data;
             fileSystemsManager[fsItem.fsType].get(fsItem.fn)
-                .then(content => saveFile(content, fsItem.fn.split("/").last()));
+                .then(content => saveFile(content, ArrayUtils.last(fsItem.fn.split("/"))));
         });
     }
 

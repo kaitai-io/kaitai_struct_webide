@@ -1,5 +1,7 @@
 ﻿import * as Vue from "vue";
 import * as $ from "jquery";
+import {ArrayUtils} from "../v1/utils/ArrayUtils";
+import {RegexUtils} from "../v1/utils/RegexUtils";
 
 declare function require(deps: string[], callback: (obj: any[]) => void): void;
 
@@ -29,14 +31,16 @@ class ComponentLoader {
     }
 
     async loadTemplate(url: string): Promise<void> {
-        var html = await Promise.resolve($.get(url));
+        const html = await Promise.resolve($.get(url));
+        const htmlTagRegex = new RegExp("(?:^|\n)<(.*?)( [^]*?)?>([^]*?)\n</", "gm");
 
-        new RegExp("(?:^|\n)<(.*?)( [^]*?)?>([^]*?)\n</", "gm").matches(html).forEach(tagMatch => {
+        RegexUtils.matches(htmlTagRegex, html).forEach(tagMatch => {
             var tag = tagMatch[1], content = tagMatch[3], attrs: any = {};
-            /\s(\w+)="(\w+)"/g.matches(tagMatch[2]).forEach(attrMatch => attrs[attrMatch[1]] = attrMatch[2]);
+            var attributeRegex = /\s(\w+)="(\w+)"/g;
+            RegexUtils.matches(attributeRegex, tagMatch[2]).forEach(attrMatch => attrs[attrMatch[1]] = attrMatch[2]);
 
             if (tag === "template") {
-                var jsClassName = attrs.id || url.split("/").last().replace(".html", "");
+                var jsClassName = attrs.id || ArrayUtils.last(url.split("/")).replace(".html", "");
                 var template = this.templates[jsClassName] = content.replace(/<!--nobr-->\s*/gi, "");
                 if (this.templatePromises[jsClassName]) {
                     for (var resolve of this.templatePromises[jsClassName])
