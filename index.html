@@ -31,11 +31,18 @@
     <script src="js/entities.js"></script>
     <script src="js/kaitaiFsFiles.js"></script>
     <script>
-        var paths = {};
-        ["bowser", "jstree", "localforage", "goldenlayout", "vue", "kaitai-struct-compiler", "dateformat"].forEach(
-            name => paths[name] = `../../lib/_npm/${name}/${name}`);
-        paths["big-integer"] = "../../lib/_npm/BigInteger/BigInteger";
-        paths["js-yaml"] = "../../lib/_npm/js-yaml/js-yaml.min";
+        const customLibrarFolderPath = "../../lib/_npm"
+        const paths = {
+            "bowser": `${customLibrarFolderPath}/bowser/bowser`,
+            "jstree": `${customLibrarFolderPath}/jstree/jstree`,
+            "localforage": `${customLibrarFolderPath}/localforage/localforage`,
+            "goldenlayout": `${customLibrarFolderPath}/goldenlayout/goldenlayout`,
+            "vue": `${customLibrarFolderPath}/vue/vue`,
+            "kaitai-struct-compiler": `${customLibrarFolderPath}/kaitai-struct-compiler/kaitai-struct-compiler`,
+            "dateformat": `${customLibrarFolderPath}/dateformat/dateformat`,
+            "big-integer": `${customLibrarFolderPath}/BigInteger/BigInteger`,
+            "js-yaml": `${customLibrarFolderPath}/js-yaml/js-yaml.min`,
+        };
 
         requirejs.config({ baseUrl: "js/v1/", paths: paths });
         require(["app.unsupportedBrowser"]);
