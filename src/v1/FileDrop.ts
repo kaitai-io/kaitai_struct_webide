@@ -1,4 +1,5 @@
-﻿import { processFiles, IFileProcessCallback } from "../utils";
+﻿import { IFileProcessCallback } from "../utils";
+import {FileActionsWrapper} from "./utils/Files/FileActionsWrapper";
 
 export function initFileDrop(containerId: string, callback: IFileProcessCallback) {
     var dragLeaveClear: number;
@@ -28,7 +29,7 @@ export function initFileDrop(containerId: string, callback: IFileProcessCallback
         event.stopPropagation();
         fileDropShadow.hide();
         var files = (<DragEvent>event.originalEvent).dataTransfer.files;
-        var resFiles = processFiles(files);
+        const resFiles = FileActionsWrapper.processUploadedFiles(files);
         callback(resFiles);
     });
 }

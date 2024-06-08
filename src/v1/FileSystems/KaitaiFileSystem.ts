@@ -1,6 +1,6 @@
 import {findOrCreateFsPath, mapToJSTreeNodes} from "./FileSystemHelper";
 import {FILE_SYSTEM_TYPE_KAITAI, IFileSystem, IFsItem, IJSTreeNodeHelper} from "./FileSystemsTypes";
-import {FileActionsWrapper} from "../utils/FileActionsWrapper";
+import {FileActionsWrapper} from "../utils/Files/FileActionsWrapper";
 
 declare var kaitaiFsFiles: string[];
 

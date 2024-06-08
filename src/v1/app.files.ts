@@ -8,7 +8,7 @@ import {getSummaryIfPresent, mapToJSTreeNodes} from "./FileSystems/FileSystemHel
 import {FILE_SYSTEM_TYPE_LOCAL, IFsItem, IFsItemSummary, ITEM_MODE_DIRECTORY} from "./FileSystems/FileSystemsTypes";
 import dateFormat = require("dateformat");
 import {ArrayUtils} from "./utils/Misc/ArrayUtils";
-import {FileActionsWrapper} from "./utils/FileActionsWrapper";
+import {FileActionsWrapper} from "./utils/Files/FileActionsWrapper";
 
 let fileTreeCont: JQuery;
 

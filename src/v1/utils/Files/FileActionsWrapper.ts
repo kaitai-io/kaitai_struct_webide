@@ -1,3 +1,5 @@
+import {IFileProcessItem, readBlob} from "../../../utils";
+
 export class FileActionsWrapper {
 
     public static downloadFile(url: string) {
@@ -16,12 +18,23 @@ export class FileActionsWrapper {
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style.display = "none";
-        var blob = new Blob([data], { type: "octet/stream" });
+        var blob = new Blob([data], {type: "octet/stream"});
         var url = window.URL.createObjectURL(blob);
         a.href = url;
         a.download = filename;
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
+    }
+
+    public static processUploadedFiles(files: FileList): IFileProcessItem[] {
+        const processSingleFile = (file: File): IFileProcessItem => ({
+            file: file,
+            read: function (mode: "arrayBuffer" | "text" | "dataUrl") {
+                return <Promise<any>>readBlob(this.file, mode);
+            }
+        });
+
+        return Array.from(files).map(processSingleFile);
     }
 }

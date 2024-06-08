@@ -1,4 +1,6 @@
-﻿export class Delayed {
+﻿import {FileActionsWrapper} from "./v1/utils/Files/FileActionsWrapper";
+
+export class Delayed {
     private timeout: number;
 
     constructor(public delay: number) { }
@@ -80,18 +82,9 @@ export interface IFileProcessCallback {
     (files: IFileProcessItem[]): void;
 }
 
-export function processFiles(files: FileList) {
-    var resFiles = <IFileProcessItem[]>[];
-    for (var i = 0; i < files.length; i++) {
-        var file = files[i];
-        resFiles.push({ file: file, read: function (mode: "arrayBuffer" | "text" | "dataUrl") { return <Promise<any>>readBlob(this.file, mode); } });
-    }
-    return resFiles;
-}
-
 export function openFilesWithDialog(callback: IFileProcessCallback) {
     $(`<input type="file" multiple />`).on("change", e => {
-        var files = processFiles((<any>e.target).files);
+        const files = FileActionsWrapper.processUploadedFiles((<any>e.target).files);
         callback(files);
     }).click();
 }

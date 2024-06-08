@@ -20,7 +20,7 @@ import {ArrayUtils} from "./utils/Misc/ArrayUtils";
 import {StringUtils} from "./utils/Misc/StringUtils";
 import {CompilerService} from "./utils/Compilation/CompilerService";
 import {CompilationError} from "./utils/Compilation/CompilationError";
-import {FileActionsWrapper} from "./utils/FileActionsWrapper";
+import {FileActionsWrapper} from "./utils/Files/FileActionsWrapper";
 
 $.jstree.defaults.core.force_text = true;
 
