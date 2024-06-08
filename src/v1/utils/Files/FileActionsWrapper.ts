@@ -33,6 +33,7 @@ export class FileActionsWrapper {
     }
 
     public static processFilesFromDropEvent(event: Event, callback: IFileProcessCallback): void {
+        // @ts-ignore - Property 'originalEvent' does not exist on type 'Event'.
         const dragEvent = event.originalEvent as DragEvent;
         const files = dragEvent.dataTransfer.files;
         FileActionsWrapper.processUploadedFilesWithCallback(files, callback);

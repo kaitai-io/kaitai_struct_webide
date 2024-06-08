@@ -5,7 +5,7 @@ export const initFileDrop = (containerId: string, callback: IFileProcessCallback
     let dragLeaveClear: number;
     const fileDropShadow = $("#" + containerId);
 
-    const dragover = (event): boolean => {
+    const dragover = (event: Event): boolean => {
         event.preventDefault();
         event.stopPropagation();
 
@@ -18,7 +18,7 @@ export const initFileDrop = (containerId: string, callback: IFileProcessCallback
         return false;
     };
 
-    const dragleave = (event) => {
+    const dragleave = (event: Event) => {
         event.preventDefault();
         event.stopPropagation();
 
@@ -30,7 +30,7 @@ export const initFileDrop = (containerId: string, callback: IFileProcessCallback
         }, 100);
     };
 
-    const drop = (event) => {
+    const drop = (event: Event) => {
         event.preventDefault();
         event.stopPropagation();
         fileDropShadow.hide();
