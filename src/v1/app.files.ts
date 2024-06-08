@@ -182,10 +182,12 @@ export function initFileTree() {
         fileSystemsManager[fsItem.fsType].get(fsItem.fn).then((content: string) => {
             return app.compilerService.compile(fsItem, content, linkData.kslang, !!linkData.ksdebug).then((compiled: any) => {
                 Object.keys(compiled).forEach(fileName => {
-                    //var title = fsItem.fn.split("/").last() + " [" + $(e.target).text() + "]" + (compiled.length == 1 ? "" : ` ${i + 1}/${compiled.length}`);
-                    //addEditorTab(title, compItem, linkData.acelang);
-
-                    app.ui.layout.addEditorTab(fileName, compiled[fileName], linkData.acelang);
+                    const options = {
+                        lang: linkData.acelang,
+                        isReadOnly: true,
+                        data: compiled[fileName]
+                    };
+                    app.ui.layoutManager.addDynamicAceCodeEditorTab(fileName, options);
                 });
             });
         });

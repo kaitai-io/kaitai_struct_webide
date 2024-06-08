@@ -11,7 +11,7 @@ export class ErrorWindowHandler {
         console.error.apply(window, args);
         var errMsg = args.filter(x => typeof x !== 'object').join(" ");
         if (!this.errorWnd) {
-            var newPanel = app.ui.layout.addPanel();
+            var newPanel = app.ui.layoutManager.addPanel();
             this.parentContainer.addChild({ type: "component", componentName: newPanel.componentName, title: "Errors" });
             this.errorWnd = await newPanel.donePromise;
             this.errorWnd.setSize(0, this.lastErrWndSize);

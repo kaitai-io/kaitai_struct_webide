@@ -56,7 +56,15 @@ class AppVM extends Vue {
     }
 
     public exportToJson(hex: boolean) {
-        exportToJson(hex).then(json => this.ui.layout.addEditorTab("json export", json, "json"));
+        exportToJson(hex)
+            .then(json => {
+                const options = {
+                    lang: "json",
+                    isReadOnly: true,
+                    data: json
+                };
+                this.ui.layoutManager.addDynamicAceCodeEditorTab("json export", options);
+            });
     }
 
     public about() {
@@ -73,7 +81,7 @@ class AppController {
     init() {
         this.vm.ui = this.ui;
         this.ui.init();
-        this.errors = new ErrorWindowHandler(this.ui.layout.getLayoutNodeById("mainArea"));
+        this.errors = new ErrorWindowHandler(this.ui.layoutManager.getLayoutNodeById("mainArea"));
         initFileTree();
     }
 
@@ -185,7 +193,7 @@ class AppController {
             this.lastKsyContent = <string>content;
             if (this.ui.ksyEditor.getValue() !== content)
                 this.ui.ksyEditor.setValue(content, -1);
-            var ksyEditor = this.ui.layout.getLayoutNodeById("ksyEditor");
+            var ksyEditor = this.ui.layoutManager.getLayoutNodeById("ksyEditor");
             (<any>ksyEditor).container.setTitle(fsItem.fn);
         } else {
             let content = <ArrayBuffer>contentRaw;
@@ -202,7 +210,7 @@ class AppController {
             };
 
             this.ui.hexViewer.setDataProvider(this.dataProvider);
-            this.ui.layout.getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
+            this.ui.layoutManager.getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
             await workerMethods.setInput(content);
 
             if (refreshGui) {
