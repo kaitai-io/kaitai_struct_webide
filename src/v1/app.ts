@@ -12,13 +12,14 @@ import {componentLoader} from "../ui/ComponentLoader";
 import {ConverterPanelModel} from "../ui/Components/ConverterPanel";
 import {exportToJson} from "./ExportToJson";
 import Component from "../ui/Component";
-import {CompilationError, CompilerService} from "./KaitaiServices";
 import {ErrorWindowHandler} from "./app.errors";
 import {fileSystemsManager} from "./FileSystems/FileSystemManager";
 import {FILE_SYSTEM_TYPE_KAITAI, IFsItem} from "./FileSystems/FileSystemsTypes";
 import KaitaiStructCompiler = require("kaitai-struct-compiler");
-import {ArrayUtils} from "./utils/ArrayUtils";
-import {StringUtils} from "./utils/StringUtils";
+import {ArrayUtils} from "./utils/Misc/ArrayUtils";
+import {StringUtils} from "./utils/Misc/StringUtils";
+import {CompilerService} from "./utils/Compilation/CompilerService";
+import {CompilationError} from "./utils/Compilation/CompilationError";
 
 $.jstree.defaults.core.force_text = true;
 

@@ -1,7 +1,7 @@
 ﻿import * as Vue from "vue";
 import * as $ from "jquery";
-import {ArrayUtils} from "../v1/utils/ArrayUtils";
-import {RegexUtils} from "../v1/utils/RegexUtils";
+import {ArrayUtils} from "../v1/utils/Misc/ArrayUtils";
+import {RegexUtils} from "../v1/utils/Misc/RegexUtils";
 
 declare function require(deps: string[], callback: (obj: any[]) => void): void;
 

@@ -2,8 +2,8 @@ import { IInterval, IntervalHandler } from "../utils/IntervalHelper";
 import { s, htmlescape, asciiEncode, hexEncode, uuidEncode, collectAllObjects } from "../utils";
 import { workerMethods } from "./app.worker";
 import { app } from "./app";
-import {ArrayUtils} from "./utils/ArrayUtils";
-import {StringUtils} from "./utils/StringUtils";
+import {ArrayUtils} from "./utils/Misc/ArrayUtils";
+import {StringUtils} from "./utils/Misc/StringUtils";
 
 interface IParsedTreeNodeData {
     exported?: IExportedValue;
