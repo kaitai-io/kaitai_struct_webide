@@ -22,6 +22,7 @@ import {CompilerService} from "./utils/Compilation/CompilerService";
 import {CompilationError} from "./utils/Compilation/CompilationError";
 import {FileActionsWrapper} from "./utils/Files/FileActionsWrapper";
 import {IFileProcessItem} from "./utils/Files/Types";
+import "../extensions";
 
 $.jstree.defaults.core.force_text = true;
 
