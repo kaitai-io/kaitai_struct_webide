@@ -1,5 +1,5 @@
 ﻿import {app} from "./app";
-import {openFilesWithDialog, saveFile} from "../utils";
+import {openFilesWithDialog} from "../utils";
 import {fileSystemsManager} from "./FileSystems/FileSystemManager";
 import {initKaitaiFsTreeData} from "./FileSystems/KaitaiFileSystem";
 import {initLocalStorageFsTreeData} from "./FileSystems/LocalStorageFileSystem";
@@ -8,6 +8,7 @@ import {getSummaryIfPresent, mapToJSTreeNodes} from "./FileSystems/FileSystemHel
 import {FILE_SYSTEM_TYPE_LOCAL, IFsItem, IFsItemSummary, ITEM_MODE_DIRECTORY} from "./FileSystems/FileSystemsTypes";
 import dateFormat = require("dateformat");
 import {ArrayUtils} from "./utils/Misc/ArrayUtils";
+import {FileActionsWrapper} from "./utils/FileActionsWrapper";
 
 let fileTreeCont: JQuery;
 
@@ -217,7 +218,7 @@ export function initFileTree() {
         app.ui.fileTree.get_selected().forEach(nodeId => {
             const fsItem = <IFsItem>app.ui.fileTree.get_node(nodeId).data;
             fileSystemsManager[fsItem.fsType].get(fsItem.fn)
-                .then(content => saveFile(content, ArrayUtils.last(fsItem.fn.split("/"))));
+                .then(content => FileActionsWrapper.saveFile(content, ArrayUtils.last(fsItem.fn.split("/"))));
         });
     }
 

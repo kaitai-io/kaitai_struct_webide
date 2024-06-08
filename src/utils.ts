@@ -1,29 +1,4 @@
-﻿export function downloadFile(url: string) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.responseType = "arraybuffer";
-
-    return new Promise<ArrayBuffer>((resolve, reject) => {
-        xhr.onload = e => resolve(xhr.response);
-        xhr.onerror = reject;
-        xhr.send();
-    });
-}
-
-export function saveFile(data: ArrayBuffer | Uint8Array | string, filename: string) {
-    var a = document.createElement("a");
-    document.body.appendChild(a);
-    a.style.display = "none";
-    var blob = new Blob([data], { type: "octet/stream" });
-    var url = window.URL.createObjectURL(blob);
-    a.href = url;
-    a.download = filename;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-}
-
-export class Delayed {
+﻿export class Delayed {
     private timeout: number;
 
     constructor(public delay: number) { }
@@ -39,20 +14,6 @@ export class Delayed {
     }
 }
 
-export class EventSilencer {
-    silence = false;
-
-    silenceThis(callback: () => void) {
-        this.silence = true;
-        callback();
-        this.silence = false;
-    }
-
-    do(callback: () => void) {
-        if (!this.silence)
-            callback();
-    }
-}
 
 export function asciiEncode(bytes: Uint8Array) {
     var len = bytes.byteLength;
@@ -155,13 +116,4 @@ export function collectAllObjects(root: IExportedValue): IExportedValue[] {
 
     process(root);
     return objects;
-}
-
-export function precallHook(parent: any, name: string, callback: () => void) {
-    var original = parent[name];
-    parent[name] = function() {
-        callback();
-        original.apply(this, arguments);
-    };
-    parent[name].prototype = original.prototype;
 }

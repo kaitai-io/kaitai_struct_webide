@@ -1,6 +1,6 @@
-import {downloadFile} from "../../utils";
 import {findOrCreateFsPath, mapToJSTreeNodes} from "./FileSystemHelper";
 import {FILE_SYSTEM_TYPE_KAITAI, IFileSystem, IFsItem, IJSTreeNodeHelper} from "./FileSystemsTypes";
+import {FileActionsWrapper} from "../utils/FileActionsWrapper";
 
 declare var kaitaiFsFiles: string[];
 
@@ -37,7 +37,7 @@ export class KaitaiFileSystem implements IFileSystem {
                     throw err;
                 });
         else
-            return downloadFile(fn);
+            return FileActionsWrapper.downloadFile(fn);
     }
 
     put(fn: string, data: any) {

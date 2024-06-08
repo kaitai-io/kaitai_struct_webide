@@ -7,7 +7,7 @@ import {IParsedTreeNode, ParsedTreeHandler} from "./parsedToTree";
 import {workerMethods} from "./app.worker";
 import {IDataProvider} from "../HexViewer";
 import {initFileDrop} from "./FileDrop";
-import {Delayed, IFileProcessItem, saveFile} from "../utils";
+import {Delayed, IFileProcessItem} from "../utils";
 import {componentLoader} from "../ui/ComponentLoader";
 import {ConverterPanelModel} from "../ui/Components/ConverterPanel";
 import {exportToJson} from "./ExportToJson";
@@ -20,6 +20,7 @@ import {ArrayUtils} from "./utils/Misc/ArrayUtils";
 import {StringUtils} from "./utils/Misc/StringUtils";
 import {CompilerService} from "./utils/Compilation/CompilerService";
 import {CompilationError} from "./utils/Compilation/CompilationError";
+import {FileActionsWrapper} from "./utils/FileActionsWrapper";
 
 $.jstree.defaults.core.force_text = true;
 
@@ -346,7 +347,7 @@ $(() => {
     ctxAction(downloadInput, e => {
         var start = app.ui.hexViewer.selectionStart, end = app.ui.hexViewer.selectionEnd;
         var newFn = `${ArrayUtils.last(app.inputFsItem.fn.split("/"))}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
-        saveFile(new Uint8Array(app.inputContent, start, end - start + 1), newFn);
+        FileActionsWrapper.saveFile(new Uint8Array(app.inputContent, start, end - start + 1), newFn);
     });
 
     kaitaiIde.app = app;
