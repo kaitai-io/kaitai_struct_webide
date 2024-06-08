@@ -1,9 +1,10 @@
 import { IInterval, IntervalHandler } from "../utils/IntervalHelper";
-import { s, htmlescape, asciiEncode, hexEncode, uuidEncode, collectAllObjects } from "../utils";
+import { s, htmlescape, asciiEncode, hexEncode, uuidEncode } from "../utils";
 import { workerMethods } from "./app.worker";
 import { app } from "./app";
 import {ArrayUtils} from "./utils/Misc/ArrayUtils";
 import {StringUtils} from "./utils/Misc/StringUtils";
+import {flattenIExportedValue} from "./utils/ExportedValueMappers";
 
 interface IParsedTreeNodeData {
     exported?: IExportedValue;
@@ -349,7 +350,7 @@ export class ParsedTreeHandler {
 
                 var intervals: IParsedTreeInterval[] = [];
                 var fillIntervals = (rootExp: IExportedValue) => {
-                    var objects = collectAllObjects(rootExp);
+                    var objects = flattenIExportedValue(rootExp);
 
                     var lastEnd = -1;
                     for (let exp of objects) {
