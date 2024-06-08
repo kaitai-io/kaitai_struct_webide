@@ -1,5 +1,4 @@
 ﻿import {app} from "./app";
-import {openFilesWithDialog} from "../utils";
 import {fileSystemsManager} from "./FileSystems/FileSystemManager";
 import {initKaitaiFsTreeData} from "./FileSystems/KaitaiFileSystem";
 import {initLocalStorageFsTreeData} from "./FileSystems/LocalStorageFileSystem";
@@ -9,6 +8,7 @@ import {FILE_SYSTEM_TYPE_LOCAL, IFsItem, IFsItemSummary, ITEM_MODE_DIRECTORY} fr
 import dateFormat = require("dateformat");
 import {ArrayUtils} from "./utils/Misc/ArrayUtils";
 import {FileActionsWrapper} from "./utils/Files/FileActionsWrapper";
+import {openUploadFilesOperatingSystemModal} from "./JQueryComponents/Files/UploadFilesOSModal";
 
 let fileTreeCont: JQuery;
 
@@ -225,7 +225,7 @@ export function initFileTree() {
     ctxAction(uiFiles.downloadItem, () => downloadFiles());
     uiFiles.downloadFile.on("click", () => downloadFiles());
 
-    uiFiles.uploadFile.on("click", () => openFilesWithDialog(files => app.addNewFiles(files)));
+    uiFiles.uploadFile.on("click", () => openUploadFilesOperatingSystemModal(files => app.addNewFiles(files)));
 
     $("#newKsyModal").on("shown.bs.modal", () => {
         $("#newKsyModal input").focus();

@@ -6,8 +6,8 @@ import {addKsyFile, initFileTree, refreshFsNodes} from "./app.files";
 import {IParsedTreeNode, ParsedTreeHandler} from "./parsedToTree";
 import {workerMethods} from "./app.worker";
 import {IDataProvider} from "../HexViewer";
-import {initFileDrop} from "./FileDrop";
-import {Delayed, IFileProcessItem} from "../utils";
+import {initFileDrop} from "./JQueryComponents/Files/FileDrop";
+import {Delayed} from "../utils";
 import {componentLoader} from "../ui/ComponentLoader";
 import {ConverterPanelModel} from "../ui/Components/ConverterPanel";
 import {exportToJson} from "./ExportToJson";
@@ -21,6 +21,7 @@ import {StringUtils} from "./utils/Misc/StringUtils";
 import {CompilerService} from "./utils/Compilation/CompilerService";
 import {CompilationError} from "./utils/Compilation/CompilationError";
 import {FileActionsWrapper} from "./utils/Files/FileActionsWrapper";
+import {IFileProcessItem} from "./utils/Files/Types";
 
 $.jstree.defaults.core.force_text = true;
 

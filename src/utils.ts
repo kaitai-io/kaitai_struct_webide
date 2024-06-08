@@ -1,6 +1,4 @@
-﻿import {FileActionsWrapper} from "./v1/utils/Files/FileActionsWrapper";
-
-export class Delayed {
+﻿export class Delayed {
     private timeout: number;
 
     constructor(public delay: number) { }
@@ -54,39 +52,8 @@ export function arrayBufferToBase64(buffer: ArrayBuffer) {
     return window.btoa(binary);
 }
 
-export function readBlob(blob: Blob, mode: "arrayBuffer" | "text" | "dataUrl", ...args: any[]): Promise<string|ArrayBuffer> {
-    return new Promise(function (resolve, reject) {
-        var reader = new FileReader();
-        reader.onload = function () { resolve(reader.result); };
-        reader.onerror = function (e) { reject(e); };
-        reader["readAs" + mode[0].toUpperCase() + mode.substr(1)](blob, ...args);
-    });
-}
-
 export function htmlescape(str: string) {
     return $("<div/>").text(str).html();
-}
-
-export interface IFileReader {
-    (mode: "arrayBuffer"): Promise<ArrayBuffer>;
-    (mode: "text"): Promise<string>;
-    (mode: "dataUrl"): Promise<string>;
-}
-
-export interface IFileProcessItem {
-    file: File;
-    read: IFileReader;
-}
-
-export interface IFileProcessCallback {
-    (files: IFileProcessItem[]): void;
-}
-
-export function openFilesWithDialog(callback: IFileProcessCallback) {
-    $(`<input type="file" multiple />`).on("change", e => {
-        const files = FileActionsWrapper.processUploadedFiles((<any>e.target).files);
-        callback(files);
-    }).click();
 }
 
 export function s(strings: TemplateStringsArray, ...values: any[]) {
