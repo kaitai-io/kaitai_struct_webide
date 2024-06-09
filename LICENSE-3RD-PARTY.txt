@@ -159,7 +159,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 License name: MIT
   License URL: https://raw.githubusercontent.com/deepstreamIO/golden-layout/master/LICENSE
-  License applies to files under the folder lib/_npm/goldenlayout/
+  License applies to files under the folder lib/_npm/golden-layout/
 
 Website: https://www.golden-layout.com/
 Source: https://github.com/deepstreamIO/golden-layout

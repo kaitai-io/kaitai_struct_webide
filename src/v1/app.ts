@@ -1,7 +1,6 @@
 import * as localforage from "localforage";
 import * as Vue from "vue";
 
-import {UI} from "./app.layout";
 import {addKsyFile, initFileTree, refreshFsNodes} from "./app.files";
 import {IParsedTreeNode, ParsedTreeHandler} from "./parsedToTree";
 import {workerMethods} from "./app.worker";
@@ -23,6 +22,7 @@ import {CompilationError} from "./utils/Compilation/CompilationError";
 import {FileActionsWrapper} from "./utils/Files/FileActionsWrapper";
 import {IFileProcessItem} from "./utils/Files/Types";
 import "../extensions";
+import {GoldenLayoutUI} from "./GoldenLayout/GoldenLayoutUI";
 
 $.jstree.defaults.core.force_text = true;
 
@@ -36,7 +36,7 @@ interface IInterval {
 
 @Component
 class AppVM extends Vue {
-    ui: UI;
+    ui: GoldenLayoutUI;
     converterPanelModel = new ConverterPanelModel();
 
     selectionStart: number = -1;
@@ -74,7 +74,7 @@ class AppVM extends Vue {
 
 class AppController {
     compilerService = new CompilerService();
-    ui = new UI();
+    ui = new GoldenLayoutUI();
     vm = new AppVM();
     errors: ErrorWindowHandler = null;
 

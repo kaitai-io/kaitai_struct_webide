@@ -18,7 +18,8 @@
   },
   "include": [
     "src/**/*",
-    "lib/ts-types/"
+    "lib/ts-types/",
+    "lib/_npm/"
   ],
   "exclude": [
   ]

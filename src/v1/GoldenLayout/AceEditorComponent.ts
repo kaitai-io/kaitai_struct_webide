@@ -1,4 +1,4 @@
-import * as GoldenLayout from "goldenlayout";
+import GoldenLayout from "golden-layout";
 
 export interface IAceEditorComponentOptions {
     lang: string;
@@ -8,7 +8,6 @@ export interface IAceEditorComponentOptions {
 
 export const AceEditorComponent = (container: GoldenLayout.Container, {isReadOnly, lang, data}: IAceEditorComponentOptions) => {
     const editor = ace.edit(container.getElement().get(0));
-
     editor.setTheme("ace/theme/monokai");
     editor.getSession().setMode(`ace/mode/${lang}`);
 

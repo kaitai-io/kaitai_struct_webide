@@ -5,7 +5,7 @@
     "doc": "docs"
   },
   "dependencies": {
-    "ace-builds": "^1.4.12",
+    "ace-builds": "^1.34.2",
     "big-integer": "^1.6.25",
     "bootstrap": "^3.4.1",
     "bootswatch": "^3.3.7",

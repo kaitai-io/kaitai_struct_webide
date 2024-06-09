@@ -1,5 +1,6 @@
 ﻿import { htmlescape } from "../utils";
 import { app } from "./app";
+import GoldenLayout from "golden-layout";
 
 export class ErrorWindowHandler {
     lastErrWndSize = 100; // 34

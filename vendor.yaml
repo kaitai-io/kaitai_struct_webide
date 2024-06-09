@@ -85,9 +85,9 @@ libs:
     source: https://github.com/deepstreamIO/golden-layout
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/deepstreamIO/golden-layout/master/LICENSE
-    distDir: goldenlayout
+    distDir: golden-layout
     npmDir: golden-layout
-    files: [LICENSE, dist/goldenlayout.js, src/css/goldenlayout-base.css, src/css/goldenlayout-dark-theme.css]
+    files: [LICENSE, dist/goldenlayout.js, src/css/goldenlayout-base.css, src/css/goldenlayout-dark-theme.css, index.d.ts]
 
   jQuery:
     website: https://jquery.com/

@@ -1,14 +1,14 @@
-import * as GoldenLayout from "goldenlayout";
 import {AceEditorComponent, IAceEditorComponentOptions} from "./AceEditorComponent";
+import GoldenLayout from "golden-layout";
 
-export class LayoutManager<T> {
+export class GoldenLayoutWrapper<T> {
     dynCompId = 1;
 
-    constructor(public ui: T, public layout: GoldenLayout) {
+    constructor(public ui: T, public goldenLayout: GoldenLayout) {
     }
 
     getLayoutNodeById(id: string): GoldenLayout.ContentItem {
-        return (<any>this.layout)._getAllContentItems().filter((x: any) => x.config.id === id || x.componentName === id)[0];
+        return (<any>this.goldenLayout)._getAllContentItems().filter((x: any) => x.config.id === id || x.componentName === id)[0];
     }
 
     addPanel() {
@@ -16,7 +16,7 @@ export class LayoutManager<T> {
         return {
             componentName,
             donePromise: <Promise<GoldenLayout.Container>>new Promise((resolve, reject) => {
-                this.layout.registerComponent(componentName, function (container: GoldenLayout.Container, componentState: any) {
+                this.goldenLayout.registerComponent(componentName, function (container: GoldenLayout.Container, componentState: any) {
                     resolve(container);
                 });
             })
@@ -27,7 +27,7 @@ export class LayoutManager<T> {
         var editor: any;
 
         var self = this;
-        this.layout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
+        this.goldenLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
             //console.log("addComponent id", name, container.getElement());
             container.getElement().attr("id", name);
             if (generatorCallback) {
@@ -44,7 +44,7 @@ export class LayoutManager<T> {
 
     addExistingDiv(name: string) {
         var self = this;
-        this.layout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
+        this.goldenLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
             self.ui[name + "Cont"] = container;
             self.ui[name] = $(`#${name}`).appendTo(container.getElement());
             $(() => self.ui[name].show());
