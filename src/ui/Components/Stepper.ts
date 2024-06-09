@@ -1,5 +1,4 @@
-﻿///<reference path="../../../lib/ts-types/vue.d.ts"/>
-import * as Vue from "vue";
+﻿import * as Vue from "vue";
 import Component from "../Component";
 
 @Component({ props: ["items"] })
