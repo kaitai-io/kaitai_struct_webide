@@ -9,7 +9,7 @@ import {initFileDrop} from "./JQueryComponents/Files/FileDrop";
 import {Delayed} from "../utils";
 import {componentLoader} from "../ui/ComponentLoader";
 import {ConverterPanelModel} from "../ui/Components/ConverterPanel";
-import {exportToJson} from "./ExportToJson";
+import {exportToJson} from "./utils/ExportToJson";
 import Component from "../ui/Component";
 import {ErrorWindowHandler} from "./app.errors";
 import {fileSystemsManager} from "./FileSystems/FileSystemManager";
