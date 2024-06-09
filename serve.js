@@ -16,8 +16,10 @@ const tsFormatHost = {
 const app = express();
 
 function reportDiagnostic(diagnostic) {
+    const filePath = diagnostic.file.fileName;
+    const errorLine = diagnostic.file.text.substring(0, diagnostic.file.start).split("\n").length;
     console.error(
-        `Error ${diagnostic.code}:`,
+        `Error ${diagnostic.code}: ${filePath}:${errorLine}`,
         ts.flattenDiagnosticMessageText(
             diagnostic.messageText,
             tsFormatHost.getNewLine()
