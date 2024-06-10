@@ -18,7 +18,7 @@
     "jstree": "^3.3.16",
     "kaitai-struct": "next",
     "kaitai-struct-compiler": "next",
-    "localforage": "^1.5.0",
+    "localforage": "^1.10.0",
     "pako": "^1.0.6",
     "require-from-string": "^1.2.1",
     "requirejs": "^2.3.5",

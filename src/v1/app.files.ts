@@ -75,7 +75,6 @@ export function initFileTree() {
 
     function saveTree() {
         const localRootNode = app.ui.fileTree.get_json()[1];
-        console.log(localRootNode);
         const convertedLocalRootNode = convertTreeNode(localRootNode);
         fileSystemsManager.local.setRootNode(convertedLocalRootNode);
     }

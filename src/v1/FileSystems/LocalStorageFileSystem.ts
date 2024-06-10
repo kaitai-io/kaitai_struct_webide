@@ -1,6 +1,6 @@
 import {findOrCreateFsPath} from "./FileSystemHelper";
-import * as localforage from "localforage";
 import {FILE_SYSTEM_TYPE_LOCAL, IFileSystem, IFsItem, IJSTreeNodeHelper, ITEM_MODE_DIRECTORY} from "./FileSystemsTypes";
+import {LocalForageWrapper} from "../utils/LocalForageWrapper";
 
 export class LocalStorageFileSystem implements IFileSystem {
     constructor(public prefix: string) {
@@ -17,13 +17,16 @@ export class LocalStorageFileSystem implements IFileSystem {
     }
 
     private save() {
-        return localforage.setItem(this.filesKey(), this.root);
+        return LocalForageWrapper.saveFsItem(this.filesKey(), this.root);
     }
 
     async getRootNode() {
-        if (!this.root)
-            this.root = await localforage.getItem<IFsItem>(this.filesKey()) ||
-                <IFsItem>{fsType: FILE_SYSTEM_TYPE_LOCAL, type: ITEM_MODE_DIRECTORY, children: {}};
+        if (!this.root) {
+            const defaultItem: IFsItem = {fsType: FILE_SYSTEM_TYPE_LOCAL, type: ITEM_MODE_DIRECTORY, children: {}};
+            const storedItem = await LocalForageWrapper.getFsItem(this.filesKey());
+            this.root = storedItem || defaultItem;
+        }
+
         return this.root;
     }
 
@@ -33,7 +36,7 @@ export class LocalStorageFileSystem implements IFileSystem {
     }
 
     get(fn: string): Promise<string | ArrayBuffer> {
-        return localforage.getItem<string | ArrayBuffer>(this.fileKey(fn))
+        return LocalForageWrapper.getFile(this.fileKey(fn))
             .then(content => {
                 if (content === null) {
                     throw new Error("file not found");
@@ -45,7 +48,7 @@ export class LocalStorageFileSystem implements IFileSystem {
     put(fn: string, data: any): Promise<IFsItem> {
         return this.getRootNode().then(root => {
             const node = findOrCreateFsPath(root, fn);
-            const saveFileAction = localforage.setItem(this.fileKey(fn), data);
+            const saveFileAction = LocalForageWrapper.saveFile(this.fileKey(fn), data);
             const updateFileTreeAction = this.save();
             return Promise.all([saveFileAction, updateFileTreeAction])
                 .then(_ => node);

@@ -1,4 +1,3 @@
-import * as localforage from "localforage";
 import * as Vue from "vue";
 
 import {addKsyFile, initFileTree, refreshFsNodes} from "./app.files";
@@ -23,6 +22,7 @@ import {FileActionsWrapper} from "./utils/Files/FileActionsWrapper";
 import {IFileProcessItem} from "./utils/Files/Types";
 import "../extensions";
 import {GoldenLayoutUI} from "./GoldenLayout/GoldenLayoutUI";
+import {LocalForageWrapper} from "./utils/LocalForageWrapper";
 
 $.jstree.defaults.core.force_text = true;
 
@@ -103,13 +103,13 @@ class AppController {
     }
 
     async recompile() {
-        let ksyFsItem = await localforage.getItem<IFsItem>(this.ksyFsItemName);
-        var srcYaml = this.ui.ksyEditor.getValue();
-        var changed = this.lastKsyContent !== srcYaml;
+        let ksyFsItem = await LocalForageWrapper.getFsItem(this.ksyFsItemName);
+        const srcYaml = this.ui.ksyEditor.getValue();
+        const changed = this.lastKsyContent !== srcYaml;
 
         if (changed && ksyFsItem.fsType === FILE_SYSTEM_TYPE_KAITAI) {
             let fsItem = await addKsyFile("localStorage", ksyFsItem.fn.replace(".ksy", "_modified.ksy"), srcYaml);
-            localforage.setItem(this.ksyFsItemName, fsItem);
+            await LocalForageWrapper.saveFsItem(this.ksyFsItemName, fsItem);
         }
 
         if (changed)
@@ -188,7 +188,7 @@ class AppController {
         var contentRaw = await fileSystemsManager[fsItem.fsType].get(fsItem.fn);
         if (this.isKsyFile(fsItem.fn)) {
             let content = <string>contentRaw;
-            localforage.setItem(this.ksyFsItemName, fsItem);
+            await LocalForageWrapper.saveFsItem(this.ksyFsItemName, fsItem);
             this.lastKsyFsItem = fsItem;
             this.lastKsyContent = <string>content;
             if (this.ui.ksyEditor.getValue() !== content)
@@ -200,7 +200,7 @@ class AppController {
             this.inputFsItem = fsItem;
             this.inputContent = content;
 
-            localforage.setItem("inputFsItem", fsItem);
+            await LocalForageWrapper.saveFsItem("inputFsItem", fsItem);
 
             this.dataProvider = {
                 length: content.byteLength,
@@ -309,7 +309,7 @@ $(() => {
     initFileDrop("fileDrop", (files: any) => app.addNewFiles(files));
 
     async function loadCachedFsItem(cacheKey: string, defFsType: string, defSample: string) {
-        let fsItem = <IFsItem>await localforage.getItem(cacheKey);
+        let fsItem = await LocalForageWrapper.getFsItem(cacheKey);
         await app.loadFsItem(fsItem || <IFsItem>{fsType: defFsType, fn: defSample, type: "file"}, false);
     }
 
