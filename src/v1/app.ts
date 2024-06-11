@@ -1,8 +1,26 @@
-import * as Vue from "vue";
+import "bootswatch/darkly/bootstrap.min.css";
+import "./../../css/contextmenu.css";
+import "golden-layout/src/css/goldenlayout-base.css";
+import "golden-layout/src/css/goldenlayout-dark-theme.css";
+import "./../../css/HexViewer.css";
+import "./../../css/app.css";
+import "jstree/dist/themes/default/style.min.css";
+import "jstree/dist/themes/default-dark/style.min.css";
+import "font-awesome/css/font-awesome.min.css";
+
+import "./ImportJQuery";
+import "./app.unsupportedBrowser";
+import "bootstrap";
+import "jstree";
+
+
+
+import Vue from "vue";
+
 
 import {addKsyFile, initFileTree, refreshFsNodes} from "./app.files";
 import {IParsedTreeNode, ParsedTreeHandler} from "./parsedToTree";
-import {workerMethods} from "./app.worker";
+import {codeExecutionWorkerApi} from "./Workers/WorkerApi";
 import {IDataProvider} from "../HexViewer";
 import {initFileDrop} from "./JQueryComponents/Files/FileDrop";
 import {Delayed} from "../utils";
@@ -13,7 +31,7 @@ import Component from "../ui/Component";
 import {ErrorWindowHandler} from "./app.errors";
 import {fileSystemsManager} from "./FileSystems/FileSystemManager";
 import {FILE_SYSTEM_TYPE_KAITAI, IFsItem} from "./FileSystems/FileSystemsTypes";
-import KaitaiStructCompiler = require("kaitai-struct-compiler");
+import KaitaiStructCompiler from "kaitai-struct-compiler";
 import {ArrayUtils} from "./utils/Misc/ArrayUtils";
 import {StringUtils} from "./utils/Misc/StringUtils";
 import {CompilerService} from "./utils/Compilation/CompilerService";
@@ -137,9 +155,9 @@ class AppController {
 
             let debugCode = this.ui.genCodeDebugViewer.getValue();
             let jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => StringUtils.ucFirst(x)).join("");
-            await workerMethods.initCode(debugCode, jsClassName, this.compilerService.ksyTypes);
+            await codeExecutionWorkerApi.initCodeAction(debugCode, jsClassName, this.compilerService.ksyTypes);
 
-            const {result: exportedRoot, error: parseError} = await workerMethods.reparse(this.vm.disableLazyParsing);
+            const {result: exportedRoot, error: parseError} = await codeExecutionWorkerApi.reparseAction(this.vm.disableLazyParsing);
             kaitaiIde.root = exportedRoot;
             //console.log("reparse exportedRoot", exportedRoot);
 
@@ -211,7 +229,7 @@ class AppController {
 
             this.ui.hexViewer.setDataProvider(this.dataProvider);
             this.ui.layoutManager.getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
-            await workerMethods.setInput(content);
+            await codeExecutionWorkerApi.setInputAction(content);
 
             if (refreshGui) {
                 await this.reparse();
@@ -284,8 +302,8 @@ $(() => {
 
     app.init();
     componentLoader.load(["Components/ConverterPanel", "Components/Stepper", "Components/SelectionInput"]).then(() => {
-        new Vue({data: {model: app.vm.converterPanelModel}}).$mount("#converterPanel");
-        app.vm.$mount("#infoPanel");
+        // new Vue({data: {model: app.vm.converterPanelModel}}).$mount("#converterPanel");
+        // app.vm.$mount("#infoPanel");
         app.vm.$watch("disableLazyParsing", () => app.reparse());
     });
 

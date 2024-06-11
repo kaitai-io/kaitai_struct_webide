@@ -4,7 +4,7 @@
  *   (c) 2015-2017 Evan You
  *   @license MIT
  */
-import * as Vue from "vue";
+import Vue from "vue";
 import { ComponentOptions } from "vue";
 import {componentLoader} from "./ComponentLoader";
 export const $internalHooks = [
@@ -68,7 +68,7 @@ export function componentFactory(
     if (!options.props["model"])
         options.props["model"] = Object;
 
-    if (componentLoader.templates[options.name])
+    if (componentLoader?.templates[options.name])
         options.template = componentLoader.templates[options.name];
     //else
     //    console.error(`Missing template for component: ${options.name}`);

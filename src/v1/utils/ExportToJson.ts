@@ -1,4 +1,4 @@
-import {workerMethods} from "../app.worker";
+import {codeExecutionWorkerApi} from "../Workers/WorkerApi";
 import {mapToGenericObject} from "./ExportedValueMappers";
 
 export function exportToJson(useHex: boolean = false) {
@@ -20,7 +20,7 @@ export function exportToJson(useHex: boolean = false) {
         return JSON.stringify(genericObject, hexReplacer, 2);
     };
 
-    return workerMethods.reparse(true)
+    return codeExecutionWorkerApi.reparseAction(true)
         .then(getResultOrThrowError)
         .then(mapResultToJson);
 }

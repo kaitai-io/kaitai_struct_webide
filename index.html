@@ -12,43 +12,23 @@
 
     <!-- SCRIPT_INJECTION_POINT -->
 
-    <link rel="stylesheet" type="text/css" href="lib/_npm/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="css/contextmenu.css" />
-    <link rel="stylesheet" type="text/css" href="lib/_npm/golden-layout/goldenlayout-base.css" />
-    <link rel="stylesheet" type="text/css" href="lib/_npm/golden-layout/goldenlayout-dark-theme.css" />
-    <link rel="stylesheet" type="text/css" href="css/HexViewer.css" />
-    <link rel="stylesheet" type="text/css" href="css/app.css" />
-    <link rel="stylesheet" type="text/css" href="lib/_npm/jstree/themes/default/style.min.css" />
-    <link rel="stylesheet" type="text/css" href="lib/_npm/jstree/themes/default-dark/style.min.css" />
-    <link rel="stylesheet" type="text/css" href="lib/_npm/font-awesome/css/font-awesome.min.css" />
+<!--    <link rel="stylesheet" type="text/css" href="/lib/_npm/bootstrap/css/bootstrap.min.css" />-->
+<!--    <link rel="stylesheet" type="text/css" href="css/contextmenu.css" />-->
+<!--    <link rel="stylesheet" type="text/css" href="lib/_npm/golden-layout/goldenlayout-base.css" />-->
+<!--    <link rel="stylesheet" type="text/css" href="lib/_npm/golden-layout/goldenlayout-dark-theme.css" />-->
+<!--    <link rel="stylesheet" type="text/css" href="css/HexViewer.css" />-->
+<!--    <link rel="stylesheet" type="text/css" href="css/app.css" />-->
+<!--    <link rel="stylesheet" type="text/css" href="lib/_npm/jstree/themes/default/style.min.css" />-->
+<!--    <link rel="stylesheet" type="text/css" href="lib/_npm/jstree/themes/default-dark/style.min.css" />-->
+<!--    <link rel="stylesheet" type="text/css" href="lib/_npm/font-awesome/css/font-awesome.min.css" />-->
 
-    <script src="lib/_npm/requirejs/require.js"></script>
     <script src="lib/_npm/jquery/jquery.min.js"></script>
     <script src="lib/_npm/bootstrap/js/bootstrap.min.js"></script>
     <script src="lib/_npm/ace/ace.js"></script>
 
-    <script src="js/autorefresh.js"></script>
-    <script src="js/entities.js"></script>
+<!--    <script src="js/entities.js"></script>-->
     <script src="js/kaitaiFsFiles.js"></script>
-    <script>
-        const customLibrarFolderPath = "../../lib/_npm"
-        const paths = {
-            "bowser": `${customLibrarFolderPath}/bowser/bowser`,
-            "jstree": `${customLibrarFolderPath}/jstree/jstree`,
-            "localforage": `${customLibrarFolderPath}/localforage/localforage`,
-            "golden-layout": `${customLibrarFolderPath}/golden-layout/goldenlayout`,
-            "vue": `${customLibrarFolderPath}/vue/vue`,
-            "kaitai-struct-compiler": `${customLibrarFolderPath}/kaitai-struct-compiler/kaitai-struct-compiler`,
-            "dateformat": `${customLibrarFolderPath}/dateformat/dateformat`,
-            "big-integer": `${customLibrarFolderPath}/BigInteger/BigInteger`,
-            "js-yaml": `${customLibrarFolderPath}/js-yaml/js-yaml.min`,
-        };
 
-        requirejs.config({ baseUrl: "js/v1/", paths: paths });
-        require(["app.unsupportedBrowser"]);
-        require(["jstree", "app"]);
-
-    </script>
 </head>
 <body>
 <div id="unsupportedBrowser">
@@ -67,7 +47,8 @@
 </div>
 
 <div id="infoPanel">
-    <selection-input :start="selectionStart" :end="selectionEnd" @selectionChanged="selectionChanged"></selection-input>
+<!--    <selection-input :start="selectionStart" :end="selectionEnd" @selectionChanged="selectionChanged"></selection-input>-->
+    <div id="SelectionInput"></div>
     <div id="selectionLengthDiv">
       Selection length: <span>{{selectionEnd-selectionStart+1}}</span>
     </div>
@@ -77,22 +58,23 @@
     </div>
     <div id="unparsedDiv">
         Unparsed parts:
-        <stepper :items="unparsed" @changed="selectInterval"></stepper>
+<!--        <stepper :items="unparsed" @changed="selectInterval"></stepper>-->
     </div>
     <div id="bytesDiv">
         Byte arrays:
-        <stepper :items="byteArrays" @changed="selectInterval"></stepper>
+<!--        <stepper :items="byteArrays" @changed="selectInterval"></stepper>-->
     </div>
     <div id="parsedPathDiv">Selected: <span id="parsedPath"></span></div>
     <div id="exportToJsonDiv">
-        <a @click="exportToJson(false)" href="#">export to JSON</a> (<a @click="exportToJson(true)" href="#">hex</a>)
+        <a onclick="kaitaiIde.app.vm.exportToJson(false)" href="#">export to JSON</a> (<a onclick="kaitaiIde.app.vm.exportToJson(true)" href="#">hex</a>)
     </div>
     <div>
         <a id="aboutWebIde" @click="about" href="#">about webide</a>
     </div>
 </div>
 
-<converter-panel id="converterPanel" :model="model"></converter-panel>
+<!--<converter-panel id="converterPanel" :model="model"></converter-panel>-->
+<div id="converterPanel"></div>
 
 <div id="fileTreeCont">
     <div id="fileTree" class="fileTree">
@@ -220,5 +202,7 @@
         </div>
     </div>
 </div>
+<script type="module" src="src/v1/app.ts"></script>
+
 </body>
 </html>

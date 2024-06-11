@@ -1,4 +1,5 @@
 import {AbstractExportedValueMapper} from "./AbstractExportedValueMapper";
+import {IExportedValue} from "../../../entities";
 
 export class FlattenExportedValueMapper extends AbstractExportedValueMapper<IExportedValue[]> {
 

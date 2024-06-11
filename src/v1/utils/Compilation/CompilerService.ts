@@ -2,7 +2,7 @@ import {JsImporter} from "./JsImporter";
 import {IFsItem} from "../../FileSystems/FileSystemsTypes";
 import {performanceHelper} from "../PerformanceHelper";
 import {SchemaUtils} from "./SchemaUtils";
-import KaitaiStructCompiler = require("kaitai-struct-compiler");
+import KaitaiStructCompiler from "kaitai-struct-compiler";
 import {CompilationError} from "./CompilationError";
 import {YamlParser} from "./YamlParser";
 export class CompilerService {

@@ -6,11 +6,12 @@
   },
   "dependencies": {
     "ace-builds": "^1.34.2",
+    "ace-linters": "^1.2.2",
     "big-integer": "^1.6.25",
     "bootstrap": "^3.4.1",
     "bootswatch": "^3.3.7",
     "bowser": "^1.7.3",
-    "dateformat": "^2.0.0",
+    "dateformat": "^5.0.3",
     "font-awesome": "^4.7.0",
     "golden-layout": "^1.5.9",
     "jquery": "^3.5.0",
@@ -29,16 +30,33 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "serve": "^14.2.3",
+    "@parcel/optimizer-data-url": "^2.12.0",
+    "@parcel/transformer-inline-string": "^2.12.0",
+    "@types/dateformat": "^5.0.2",
+    "assert": "^2.1.0",
+    "browserify-zlib": "^0.2.0",
+    "buffer": "^6.0.3",
+    "console-browserify": "^1.2.0",
+    "events": "^3.3.0",
     "express": "^4.17.1",
+    "parcel": "^2.12.0",
+    "parcel-reporter-static-files-copy": "^1.5.3",
+    "process": "^0.11.10",
+    "serve": "^14.2.3",
+    "stream-browserify": "^3.0.0",
+    "string_decoder": "^1.3.0",
     "tslint": "^5.7.0",
-    "typescript": "^2.9.2"
+    "typescript": "^2.9.2",
+    "url": "^0.11.3",
+    "util": "^0.12.5"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "node vendor_build.js",
     "run": "node serve.js --compile",
-    "clean-build-run-prod": "(rm -dr out || true) && sh build && serve out"
+    "serve": "serve dist",
+    "parcel-run": "parcel index.html",
+    "parcel-build": "parcel build index.html"
   },
   "repository": {
     "type": "git",
@@ -49,5 +67,15 @@
   "bugs": {
     "url": "https://github.com/kaitai-io/kaitai_struct_webide/issues"
   },
-  "homepage": "https://github.com/kaitai-io/kaitai_struct_webide#readme"
+  "homepage": "https://github.com/kaitai-io/kaitai_struct_webide#readme",
+  "staticFiles": [
+    {
+      "staticPath": "formats",
+      "staticOutPath": "formats"
+    },
+    {
+      "staticPath": "samples",
+      "staticOutPath": "samples"
+    }
+  ]
 }

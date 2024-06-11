@@ -1,10 +1,11 @@
 import { IInterval, IntervalHandler } from "../utils/IntervalHelper";
 import { s, htmlescape, asciiEncode, hexEncode, uuidEncode } from "../utils";
-import { workerMethods } from "./app.worker";
+import { codeExecutionWorkerApi } from "./Workers/WorkerApi";
 import { app } from "./app";
 import {ArrayUtils} from "./utils/Misc/ArrayUtils";
 import {StringUtils} from "./utils/Misc/StringUtils";
 import {flattenIExportedValue} from "./utils/ExportedValueMappers";
+import {IExportedValue, ObjectType} from "../entities";
 
 interface IParsedTreeNodeData {
     exported?: IExportedValue;
@@ -326,7 +327,7 @@ export class ParsedTreeHandler {
     }
 
     getProp(path: string[]) {
-        return workerMethods.get(path);
+        return codeExecutionWorkerApi.getPropertyByPathAction(path);
     }
 
     fillKsyTypes(val: IExportedValue) {

@@ -1,7 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "module": "amd",
+    "module": "ESNext",
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "noEmitOnError": false,

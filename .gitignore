@@ -246,6 +246,8 @@ user.ksy
 
 # Our complete HTML build
 out/
+dist
+.parcel-cache
 
 # Generated file
 js/

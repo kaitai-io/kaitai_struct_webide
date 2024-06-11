@@ -1,4 +1,4 @@
-class ObjectType {
+export class ObjectType {
     public static Primitive = "Primitive";
     public static Array = "Array";
     public static TypedArray = "TypedArray";
@@ -6,34 +6,19 @@ class ObjectType {
     public static Undefined = "Undefined";
 }
 
-/* tslint:disable */
-interface IWorkerMessage {
-    type: "initCode" | "setInput" | "reparse" | "get";
-    msgId?: number;
-    args?: any[];
-    result?: any;
-    error?: any;
-}
-/* tslint:enable */
-
-interface IWorkerResponse {
-    result: any;
-    error: any;
-}
-
-interface IInstance {
+export interface IInstance {
     path: string[];
     offset: number;
 }
 
-interface IExportedObject {
+export interface IExportedObject {
     class?: string;
     ksyType?: KsySchema.IType;
     fields?: { [name: string]: IExportedValue; };
     instances?: { [name: string]: IInstance; };
 }
 
-interface IExportedValue {
+export interface IExportedValue {
     type: ObjectType;
     path: string[];
     ioOffset: number;
@@ -55,4 +40,3 @@ interface IExportedValue {
     parent?: IExportedValue;
 }
 
-interface IKsyTypes { [name: string]: KsySchema.IType; }

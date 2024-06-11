@@ -1,33 +1,29 @@
-﻿import * as Vue from "vue";
+﻿import Vue from "vue";
 import * as $ from "jquery";
 import {ArrayUtils} from "../v1/utils/Misc/ArrayUtils";
 import {RegexUtils} from "../v1/utils/Misc/RegexUtils";
+import {Stepper} from "./Components/Stepper";
+import {ConverterPanel} from "./Components/ConverterPanel";
+import {SelectionInput} from "./Components/SelectionInput";
 
-declare function require(deps: string[], callback: (obj: any[]) => void): void;
 
 class ComponentLoader {
     templates: { [name: string]: string } = {};
     templatePromises: { [name: string]: ((template: string) => void)[] } = {};
 
-    load(names: string[]): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            require(names.map(name => `./${name}`), (...modules: any[]) => {
-                Promise.all(names.map((name, i) =>
-                    this.loadTemplateAndSet(`src/ui/${name}.html`, modules[i]))).then(() => resolve());
-            });
-        });
-    }
+    async load(names: string[]): Promise<void> {
+        const stepperTemplate = await this.loadTemplate("src/ui/Stepper.html");
+        const converterTemplate = await this.loadTemplate("src/ui/Stepper.html");
+        const selectionTemplate = await this.loadTemplate("src/ui/Stepper.html");
+        Stepper.options.template = stepperTemplate;
+        ConverterPanel.options.template = converterTemplate;
+        SelectionInput.options.template = selectionTemplate;
+        this.templates = {
+            "Components/Stepper": stepperTemplate,
+            "Components/ConverterPanel": ConverterPanel,
+            "Components/SelectionInput": SelectionInput,
+        }
 
-    onLoad(name: string): Promise<string> {
-        if (!name) throw Error("Invalid component name!");
-
-        if (this.templates[name])
-            return Promise.resolve(this.templates[name]);
-
-        return new Promise<string>((resolve, reject) => {
-            this.templatePromises[name] = this.templatePromises[name] || [];
-            this.templatePromises[name].push(resolve);
-        });
     }
 
     async loadTemplate(url: string): Promise<void> {
@@ -54,18 +50,6 @@ class ComponentLoader {
         });
     }
 
-    async loadTemplateAndSet(url: string, module: any): Promise<void> {
-        await this.loadTemplate(url);
-
-        for (var componentName of Object.keys(module)) {
-            if (!this.templates[componentName])
-                continue;
-                //throw new Error(`Template not found for component: ${componentName}`);
-            module[componentName].options.template = this.templates[componentName];
-        }
-    }
 }
-
-window["vue"] = Vue;
 
 export var componentLoader = new ComponentLoader();

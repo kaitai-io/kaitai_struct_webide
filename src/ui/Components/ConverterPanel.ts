@@ -1,7 +1,7 @@
-﻿import * as Vue from "vue";
+﻿import Vue from "vue";
 import * as bigInt from "big-integer";
 import Component from "../Component";
-import dateFormat = require("dateformat");
+import dateFormat from "dateformat";
 import { IDataProvider } from "../../HexViewer";
 
 export class Converter {

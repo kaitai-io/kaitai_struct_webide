@@ -23,7 +23,8 @@
 .hexViewer .hexcell.cell7 { margin-right: 4px; }
 
 .hexViewer span { display: inline-block; }
-.hexViewer .hexcell { width: 14px; height:15px }
+/*TODO: After bundling CSS this class was shrinking cells, meaby invastigate further at some point?*/
+/*.hexViewer .hexcell { width: 14px; height:15px }*/
 .hexViewer .l0, .hexViewer .l1, .hexViewer .l2 { margin-top: 1px; margin-bottom: 1px }
 .hexViewer .m0 { margin-top: 0px; margin-bottom: 0px; border-width:1px 0; border-style:solid; border-color:white }
 .hexViewer .hexPart>span { margin-top: 0px; margin-bottom: 0px; }

@@ -1,8 +1,8 @@
 import {findOrCreateFsPath, mapToJSTreeNodes} from "./FileSystemHelper";
 import {FILE_SYSTEM_TYPE_KAITAI, IFileSystem, IFsItem, IJSTreeNodeHelper} from "./FileSystemsTypes";
 import {FileActionsWrapper} from "../utils/Files/FileActionsWrapper";
+import {kaitaiFsFiles} from "../../kaitaiFsFiles";
 
-declare var kaitaiFsFiles: string[];
 
 export class KaitaiFileSystem implements IFileSystem {
     constructor(public files: IFsItem) {
@@ -77,7 +77,7 @@ export const initKaitaiFsTreeData = (kaitaiFs: KaitaiFileSystem): IJSTreeNodeHel
 
 export const initKaitaiFs = () => {
     const kaitaiRoot = <IFsItem>{fsType: FILE_SYSTEM_TYPE_KAITAI};
-    kaitaiFsFiles.forEach(fn => findOrCreateFsPath(kaitaiRoot, fn));
+    (kaitaiFsFiles || []).forEach(fn => findOrCreateFsPath(kaitaiRoot, fn));
     return new KaitaiFileSystem(kaitaiRoot);
 };
 

@@ -34,7 +34,7 @@ export class GoldenLayoutUI {
             return hexViewer;
         });
         this.layoutManager.addComponent("errorWindow", cont => {
-            cont.getElement().append($("<div />"));
+            cont.getElement().append($("<div></div>"));
         });
         this.layoutManager.addComponent("parsedDataTree");
         this.layoutManager.addComponent("fileTreeCont", cont => cont.getElement().append($("#fileTreeCont").children()));

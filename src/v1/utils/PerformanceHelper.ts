@@ -1,4 +1,4 @@
-﻿import dateFormat = require("dateformat");
+﻿import dateFormat from "dateformat";
 
 class PerformanceHelper {
     public logPerformance: boolean = true;
