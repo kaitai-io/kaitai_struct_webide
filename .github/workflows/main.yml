@@ -1,29 +1,10 @@
 name: build
 
-# If this CI run was triggered via `repository_dispatch` from
-# https://github.com/kaitai-io/kaitai_struct, change the run name so that it's
-# not just "rebuild". Otherwise, return an empty string so that GitHub keeps the
-# default name.
-run-name: |
-  ${{ (github.event_name == 'repository_dispatch' &&
-        github.event.action == 'rebuild' &&
-        github.event.client_payload.ksc_version) &&
-      format('Build with kaitai-struct-compiler {0}', github.event.client_payload.ksc_version) ||
-      '' }}
-
 on:
   push:
     branches:
       - master
       - stable
-
-  # Allow this workflow to be run on the `master` branch when a webhook event
-  # called `repository_dispatch` is triggered. This is used from the CI workflow
-  # in https://github.com/kaitai-io/kaitai_struct to rebuild the devel Web IDE
-  # after a new version of KSC is published to npm.
-  repository_dispatch:
-    types:
-      - rebuild
 
 jobs:
   build:
@@ -35,21 +16,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Use appropriate versions of KSC and JS runtime
-        env:
-          DIST_TAG: ${{ github.ref == 'refs/heads/master' && 'next' || 'latest' }}
-        # `--package-lock-only` means that it only updates `package-lock.json`
-        # (and `package.json`) without touching `node_modules/` at all.
-        run: |
-          npm install --package-lock-only kaitai-struct-compiler@"$DIST_TAG" kaitai-struct@"$DIST_TAG"
-
-      # NOTE: it's important that `npm ci` is run *after* the adjustment of
-      # KSC's and JS runtime's versions so that the `install` script (`node
-      # vendor_build.js`) copies the correct versions into the `lib/_npm/`
-      # folder which will be deployed.
       - run: npm ci
-
+      - name: Use stable versions of KSC and JS runtime
+        run: |
+          npm install kaitai-struct-compiler@latest kaitai-struct@latest
+          npm run generate-license
+          npm run generate-formats
+          npm run parcel-build
+        if: github.ref == 'refs/heads/stable'
       - name: Set up environment variables for stable deployment
         run: |
           echo 'SENTRY_ENV=stable' >> "$GITHUB_ENV"
@@ -58,11 +32,10 @@ jobs:
         run: |
           echo 'SENTRY_ENV=devel' >> "$GITHUB_ENV"
         if: github.ref == 'refs/heads/master'
-
       - name: Build
         env:
           SENTRY_DSN: 'https://a01cdb58ab3e43dd9ce695dd20a19d00@sentry.io/202888'
-        run: ./build
+        run: node build.js "dist"
       - name: Deploy
         env:
           BOT_SSH_KEY: ${{secrets.BOT_SSH_KEY}}
@@ -83,4 +56,4 @@ jobs:
             --exclude=favicon.ico \
             --exclude=favicon.ico.license \
             --exclude=devel/ \
-            out/
+            dist/

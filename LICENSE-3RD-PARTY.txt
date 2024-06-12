@@ -3,7 +3,7 @@
 
 License name: BSD-3-Clause
   License URL: https://raw.githubusercontent.com/ajaxorg/ace/master/LICENSE
-  License applies to files under the folder lib/_npm/ace/
+  License applies to files used for generating minified sources.
 
 Website: https://ace.c9.io/
 Source: https://github.com/ajaxorg/ace
@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 License name: Unlicense
   License URL: https://raw.githubusercontent.com/peterolson/BigInteger.js/master/LICENSE
-  License applies to files under the folder lib/_npm/BigInteger/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/peterolson/BigInteger.js
 ================================================================================
@@ -74,7 +74,7 @@ For more information, please refer to <http://unlicense.org>
 
 License name: MIT
   License URL: https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE
-  License applies to files under the folder lib/_npm/bootstrap/
+  License applies to files used for generating minified sources.
 
 Website: http://getbootstrap.com/
 Source: https://github.com/twbs/bootstrap
@@ -107,7 +107,7 @@ THE SOFTWARE.
 
 License name: MIT
   License URL: https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE
-  License applies to files under the folder lib/_npm/bootstrap/css//
+  License applies to files used for generating minified sources.
 
 Website: https://bootswatch.com/
 Source: https://github.com/thomaspark/bootswatch
@@ -136,30 +136,11 @@ THE SOFTWARE.
 ================================================================================
 
 ================================================================================
-                                DefinitelyTyped
-
-License name: MIT
-  License URL: https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/LICENSE
-  License applies to files under the folder lib/ts-types/
-
-Source: https://github.com/DefinitelyTyped/DefinitelyTyped
-================================================================================
-This project is licensed under the MIT license.
-Copyrights are respective of each contributor listed at the beginning of each definition file.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-================================================================================
-
-================================================================================
                                   GoldenLayout
 
 License name: MIT
   License URL: https://raw.githubusercontent.com/deepstreamIO/golden-layout/master/LICENSE
-  License applies to files under the folder lib/_npm/golden-layout/
+  License applies to files used for generating minified sources.
 
 Website: https://www.golden-layout.com/
 Source: https://github.com/deepstreamIO/golden-layout
@@ -192,7 +173,7 @@ SOFTWARE.
 
 License name: GPL-3.0
   License URL: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE
-  License applies to files under the folder lib/_npm/kaitai-struct-compiler/
+  License applies to files used for generating minified sources.
 
 Website: http://kaitai.io/
 Source: https://github.com/kaitai-io/kaitai_struct_compiler
@@ -878,7 +859,7 @@ Public License instead of this License.  But first, please read
 
 License name: Apache-2.0
   License URL: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE
-  License applies to files under the folder lib/_npm/kaitai-struct/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
 ================================================================================
@@ -1090,7 +1071,7 @@ Apache License
 
 License name: MIT
   License URL: https://raw.githubusercontent.com/vuejs/vue/dev/LICENSE
-  License applies to files under the folder lib/_npm/vue/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/vuejs/vue
 ================================================================================
@@ -1122,7 +1103,7 @@ THE SOFTWARE.
 
 License name: MIT
   License URL: https://raw.githubusercontent.com/ded/bowser/master/LICENSE
-  License applies to files under the folder lib/_npm/bowser/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/ded/bowser
 ================================================================================
@@ -1172,7 +1153,7 @@ Original Author, when distributed with the Software.
 
 License name: MIT
   License URL: https://raw.githubusercontent.com/felixge/node-dateformat/master/LICENSE
-  License applies to files under the folder lib/_npm/dateformat/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/felixge/node-dateformat
 ================================================================================
@@ -1203,7 +1184,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 License name: MIT
   License URL: https://raw.githubusercontent.com/jquery/jquery/master/LICENSE.txt
-  License applies to files under the folder lib/_npm/jquery/
+  License applies to files used for generating minified sources.
 
 Website: https://jquery.com/
 Source: https://github.com/jquery/jquery
@@ -1235,7 +1216,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 License name: MIT
   License URL: https://github.com/nodeca/js-yaml/blob/master/LICENSE
-  License applies to files under the folder lib/_npm/js-yaml/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/nodeca/js-yaml
 ================================================================================
@@ -1267,7 +1248,7 @@ THE SOFTWARE.
 
 License name: MIT
   License URL: https://raw.githubusercontent.com/vakata/jstree/master/LICENSE-MIT
-  License applies to files under the folder lib/_npm/jstree/
+  License applies to files used for generating minified sources.
 
 Website: https://www.jstree.com/
 Source: https://github.com/vakata/jstree
@@ -1301,7 +1282,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 License name: Apache-2.0
   License URL: https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
-  License applies to files under the folder lib/_npm/localforage/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/localForage/localForage
 ================================================================================
@@ -1513,7 +1494,7 @@ Apache License
 
 License name: MIT
   License URL: https://raw.githubusercontent.com/nodeca/pako/master/LICENSE
-  License applies to files under the folder lib/_npm/pako/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/nodeca/pako
 ================================================================================
@@ -1545,7 +1526,7 @@ THE SOFTWARE.
 
 License name: MIT
   License URL: https://raw.githubusercontent.com/floatdrop/require-from-string/master/LICENSE
-  License applies to files under the folder lib/_npm/require-from-string/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/floatdrop/require-from-string
 ================================================================================
@@ -1577,7 +1558,7 @@ THE SOFTWARE.
 
 License name: MIT
   License URL: https://raw.githubusercontent.com/idiotWu/smooth-scrollbar/develop/LICENSE
-  License applies to files under the folder lib/_npm/smooth-scrollbar/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/idiotWu/smooth-scrollbar
 ================================================================================
@@ -1609,7 +1590,7 @@ SOFTWARE.
 
 License name: Unlicense
   License URL: https://raw.githubusercontent.com/inexorabletash/text-encoding/master/LICENSE.md
-  License applies to files under the folder lib/_npm/text-encoding/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/inexorabletash/text-encoding
 ================================================================================
@@ -1649,7 +1630,7 @@ For more information, please refer to <http://unlicense.org/>
 
 License name: Apache-2.0
   License URL: https://raw.githubusercontent.com/Teun/thenBy.js/master/LICENSE.TXT
-  License applies to files under the folder lib/_npm/thenBy/
+  License applies to files used for generating minified sources.
 
 Source: https://github.com/Teun/thenBy.js
 ================================================================================
@@ -1854,34 +1835,4 @@ Apache License
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-================================================================================
-
-================================================================================
-                                    yaml.js
-
-License name: MIT
-  License URL: https://raw.githubusercontent.com/jeremyfa/yaml.js/develop/LICENSE
-  License applies to files under the folder lib/_npm/yamljs/
-
-Source: https://github.com/jeremyfa/yaml.js
-================================================================================
-Copyright (c) 2010 Jeremy Faivre
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is furnished
-to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
 ================================================================================

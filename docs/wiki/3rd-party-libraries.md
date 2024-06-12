@@ -26,11 +26,6 @@ Source: https://github.com/thomaspark/bootswatch
 
 License: MIT (https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE)
 
-## DefinitelyTyped
-Source: https://github.com/DefinitelyTyped/DefinitelyTyped
-
-License: MIT (https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/LICENSE)
-
 ## GoldenLayout
 Website: https://www.golden-layout.com/
 
@@ -113,8 +108,3 @@ License: Unlicense (https://raw.githubusercontent.com/inexorabletash/text-encodi
 Source: https://github.com/Teun/thenBy.js
 
 License: Apache-2.0 (https://raw.githubusercontent.com/Teun/thenBy.js/master/LICENSE.TXT)
-
-## yaml.js
-Source: https://github.com/jeremyfa/yaml.js
-
-License: MIT (https://raw.githubusercontent.com/jeremyfa/yaml.js/develop/LICENSE)

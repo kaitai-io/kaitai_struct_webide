@@ -25,7 +25,7 @@ function main() {
     );
     for (const [libName, lib] of sortedLibs) {
         console.log("Processing", libName);
-        const distDir = `lib/${lib["npmDir"] ? "_npm/" : ""}${lib["distDir"] || lib["npmDir"]}/`;
+        const distDir = `./node_modules/${lib["npmDir"]}/`;
         const licFns = findLicenses(distDir);
 
         if (licFns.length != 1) {
@@ -38,7 +38,7 @@ function main() {
         licResult += "\n";
         licResult += `License name: ${lib["licenseName"]}\n`;
         licResult += `  License URL: ${lib["licenseUrl"]}\n`;
-        licResult += `  License applies to files under the folder ${distDir}\n`;
+        licResult += `  License applies to files used for generating minified sources.\n`;
         licResult += "\n";
 
         wikiResult += `## ${libName}\n`;

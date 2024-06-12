@@ -17,9 +17,7 @@
     "lib": ["es2017", "dom"]
   },
   "include": [
-    "src/**/*",
-    "lib/ts-types/",
-    "lib/_npm/"
+    "src/**/*"
   ],
   "exclude": [
   ]

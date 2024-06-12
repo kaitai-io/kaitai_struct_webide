@@ -28,7 +28,8 @@ Online editor / visualizer for Kaitai Struct .ksy files
 
 - `git clone --recursive https://github.com/kaitai-io/kaitai_struct_webide`
 - `npm install`
-- `node serve.js --compile`
+- `npm run generate-formats`
+- `npm run parcel-run`
 - Go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 ## screenshots

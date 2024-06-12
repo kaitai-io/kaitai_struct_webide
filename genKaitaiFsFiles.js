@@ -26,11 +26,15 @@ function generate(outDir) {
         .concat(recursiveFind("samples/", /.+/))
         .map(path => path.replace(/\\/g,'/'));
     files.sort();
-
-    const js = `var kaitaiFsFiles = ${JSON.stringify(files, null, 4)};`;
+    const info = `/* Generated file do not push changes to repo,
+ * To regenerate formats, run command:
+ *   npm run generate-formats
+ */
+ `
+    const js = `export const kaitaiFsFiles: string[] = ${JSON.stringify(files, null, 4)};`;
 
     mkdirSync(outDir + "js", { recursive: true });
-    writeFileSync(outDir + "js/kaitaiFsFiles.js", js);
+    writeFileSync(outDir + "src/kaitaiFsFiles.ts", info + js);
 }
 
 function main() {

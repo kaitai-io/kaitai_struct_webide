@@ -52,8 +52,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "node vendor_build.js",
-    "run": "node serve.js --compile",
+    "generate-formats": "node genKaitaiFsFiles.js",
+    "generate-license": "node vendor_license.js",
     "serve": "serve dist",
     "parcel-run": "parcel index.html",
     "parcel-build": "parcel build index.html"
