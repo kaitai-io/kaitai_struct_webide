@@ -48,9 +48,10 @@ export class KaitaiFileSystem implements IFileSystem {
 export const initKaitaiFsTreeData = (kaitaiFs: KaitaiFileSystem): IJSTreeNodeHelper => {
     const root = kaitaiFs.files;
 
-    if (!root.children["formats"]) {
+    if (!root.children.hasOwnProperty("formats") || !root.children.hasOwnProperty("samples")) {
         console.error("'formats' node is missing from js/kaitaiFsFiles.js, are you sure 'formats' git submodule is initialized? Try run 'git submodule init; git submodule update --recursive; ./genKaitaiFsFiles.py'!");
-        (<any>root.children["formats"]) = {};
+        root.children["formats"] = {};
+        root.children["samples"] = {};
     }
 
 
@@ -76,7 +77,7 @@ export const initKaitaiFsTreeData = (kaitaiFs: KaitaiFileSystem): IJSTreeNodeHel
 };
 
 export const initKaitaiFs = () => {
-    const kaitaiRoot = <IFsItem>{fsType: FILE_SYSTEM_TYPE_KAITAI};
+    const kaitaiRoot = <IFsItem>{fsType: FILE_SYSTEM_TYPE_KAITAI, children: {}};
     (kaitaiFsFiles || []).forEach(fn => findOrCreateFsPath(kaitaiRoot, fn));
     return new KaitaiFileSystem(kaitaiRoot);
 };

@@ -26,7 +26,7 @@ function generate(outDir) {
         .concat(recursiveFind("samples/", /.+/))
         .map(path => path.replace(/\\/g,'/'));
     files.sort();
-    const info = `/* Generated file do not push changes to repo,
+    const info = `/* Generated file do not push changes to repo!
  * To regenerate formats, run command:
  *   npm run generate-formats
  */
