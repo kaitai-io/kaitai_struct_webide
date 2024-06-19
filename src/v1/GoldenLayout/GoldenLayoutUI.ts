@@ -39,7 +39,7 @@ export class GoldenLayoutUI {
         this.layoutManager.addComponent("parsedDataTree");
         this.layoutManager.addComponent("fileTreeCont", cont => cont.getElement().append($("#fileTreeCont").children()));
         this.layoutManager.addExistingDiv("infoPanel");
-        this.layoutManager.addExistingDiv("converterPanel");
+        this.layoutManager.addComponent("converterPanel", cont => cont.getElement().append($("#converter-panel")));
     }
 
     init() {

@@ -1,0 +1,62 @@
+<script setup lang="ts">
+
+</script>
+
+<template>
+  <div id="fileTreeCont">
+    <div id="fileTree" class="fileTree">
+
+    </div>
+    <div class="footer btn-group" role="group">
+      <button id="createLocalKsyFile" type="button" class="btn btn-default"><i
+          class="glyphicon glyphicon-file"></i></button>
+      <button id="uploadFile" type="button" class="btn btn-default"><i
+          class="glyphicon glyphicon-cloud-upload"></i></button>
+      <button id="downloadFile" type="button" class="btn btn-default disabled"><i
+          class="glyphicon glyphicon-cloud-download"></i></button>
+    </div>
+  </div>
+
+  <div id="fileTreeContextMenu" class="dropdown clearfix">
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
+        style="display:block;position:static;margin-bottom:5px;">
+      <li class="openItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-pencil"></i> Open</a></li>
+      <li class="createFolder"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-folder-open"></i> Create
+        folder</a></li>
+      <li class="createKsyFile"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-list-alt"></i> Create .ksy
+        file</a></li>
+      <li class="cloneKsyFile"><a tabindex="-1" href="#"><i class="glyphicon fa fa-clone"></i> Clone</a></li>
+      <li class="generateParser dropdown-submenu">
+        <a tabindex="-1" href="#"><i class="glyphicon glyphicon-flash"></i> Generate parser</a>
+        <ul class="dropdown-menu">
+          <li><a tabindex="-1" href="#" data-kslang="cpp_stl" data-acelang="c_cpp">CPP-STL</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="csharp" data-acelang="csharp">C#</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="go" data-acelang="golang">Go</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="graphviz" data-acelang="dot">Graphviz</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="java" data-acelang="java">Java</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="java" data-ksdebug="true" data-acelang="java">Java
+            (debug)</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="javascript" data-acelang="javascript">JavaScript</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="javascript" data-ksdebug="true"
+                 data-acelang="javascript">JavaScript (debug)</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="lua" data-acelang="lua">Lua</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="nim" data-acelang="nim">Nim</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="perl" data-acelang="perl">Perl</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="php" data-acelang="php">PHP</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="python" data-acelang="python">Python</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="ruby" data-acelang="ruby">Ruby</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="ruby" data-ksdebug="true" data-acelang="ruby">Ruby
+            (debug)</a></li>
+          <li><a tabindex="-1" href="#" data-kslang="json" data-acelang="json">JSON</a></li>
+        </ul>
+      </li>
+      <li class="downloadItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-cloud-download"></i>
+        Download</a></li>
+      <li class="deleteItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
+    </ul>
+  </div>
+</template>
+
+<style scoped>
+
+</style>

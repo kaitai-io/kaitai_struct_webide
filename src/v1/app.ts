@@ -9,14 +9,8 @@ import "jstree/dist/themes/default-dark/style.min.css";
 import "font-awesome/css/font-awesome.min.css";
 
 import "./ImportJQuery";
-import "./app.unsupportedBrowser";
 import "bootstrap";
 import "jstree";
-
-
-
-import Vue from "vue";
-
 
 import {addKsyFile, initFileTree, refreshFsNodes} from "./app.files";
 import {IParsedTreeNode, ParsedTreeHandler} from "./parsedToTree";
@@ -24,14 +18,11 @@ import {codeExecutionWorkerApi} from "./Workers/WorkerApi";
 import {IDataProvider} from "../HexViewer";
 import {initFileDrop} from "./JQueryComponents/Files/FileDrop";
 import {Delayed} from "../utils";
-import {componentLoader} from "../ui/ComponentLoader";
 import {ConverterPanelModel} from "../ui/Components/ConverterPanel";
 import {exportToJson} from "./utils/ExportToJson";
-import Component from "../ui/Component";
 import {ErrorWindowHandler} from "./app.errors";
 import {fileSystemsManager} from "./FileSystems/FileSystemManager";
 import {FILE_SYSTEM_TYPE_KAITAI, IFsItem} from "./FileSystems/FileSystemsTypes";
-import KaitaiStructCompiler from "kaitai-struct-compiler";
 import {ArrayUtils} from "./utils/Misc/ArrayUtils";
 import {StringUtils} from "./utils/Misc/StringUtils";
 import {CompilerService} from "./utils/Compilation/CompilerService";
@@ -41,6 +32,11 @@ import {IFileProcessItem} from "./utils/Files/Types";
 import "../extensions";
 import {GoldenLayoutUI} from "./GoldenLayout/GoldenLayoutUI";
 import {LocalForageWrapper} from "./utils/LocalForageWrapper";
+import {createApp} from "vue";
+import App from "../App.vue";
+
+const vueApp = createApp(App);
+vueApp.mount("body");
 
 $.jstree.defaults.core.force_text = true;
 
@@ -52,8 +48,7 @@ interface IInterval {
     end: number;
 }
 
-@Component
-class AppVM extends Vue {
+class AppVM {
     ui: GoldenLayoutUI;
     converterPanelModel = new ConverterPanelModel();
 
@@ -85,9 +80,7 @@ class AppVM extends Vue {
             });
     }
 
-    public about() {
-        (<any>$("#welcomeModal")).modal();
-    }
+
 }
 
 class AppController {
@@ -289,23 +282,17 @@ interface IInterval {
 }
 
 $(() => {
-    $("#webIdeVersion").text(kaitaiIde.version);
-    $("#webideCommitId")
-        .attr("href", `https://github.com/kaitai-io/kaitai_struct_webide/commit/${kaitaiIde.commitId}`)
-        .text(kaitaiIde.commitId.substr(0, 7));
-    $("#webideCommitDate").text(kaitaiIde.commitDate);
-    $("#compilerVersion").text(KaitaiStructCompiler.version + " (" + KaitaiStructCompiler.buildDate + ")");
+    // $("#webIdeVersion").text(kaitaiIde.version);
+    // $("#webideCommitId")
+    //     .attr("href", `https://github.com/kaitai-io/kaitai_struct_webide/commit/${kaitaiIde.commitId}`)
+    //     .text(kaitaiIde.commitId.substr(0, 7));
+    // $("#webideCommitDate").text(kaitaiIde.commitDate);
+    // $("#compilerVersion").text(KaitaiStructCompiler.version + " (" + KaitaiStructCompiler.buildDate + ")");
 
-    $("#welcomeDoNotShowAgain").click(() => localStorage.setItem("doNotShowWelcome", "true"));
     if (localStorage.getItem("doNotShowWelcome") !== "true")
         (<any>$("#welcomeModal")).modal();
 
     app.init();
-    componentLoader.load(["Components/ConverterPanel", "Components/Stepper", "Components/SelectionInput"]).then(() => {
-        // new Vue({data: {model: app.vm.converterPanelModel}}).$mount("#converterPanel");
-        // app.vm.$mount("#infoPanel");
-        app.vm.$watch("disableLazyParsing", () => app.reparse());
-    });
 
     app.ui.hexViewer.onSelectionChanged = () => app.onHexViewerSelectionChanged();
 

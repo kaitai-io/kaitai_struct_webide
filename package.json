@@ -26,12 +26,13 @@
     "smooth-scrollbar": "^7.4.1",
     "text-encoding": "^0.6.4",
     "thenby": "^1.2.3",
-    "vue": "^2.4.4",
+    "vue": "^3.4.29",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "@parcel/optimizer-data-url": "^2.12.0",
     "@parcel/transformer-inline-string": "^2.12.0",
+    "@parcel/transformer-vue": "^2.12.0",
     "@types/dateformat": "^5.0.2",
     "assert": "^2.1.0",
     "browserify-zlib": "^0.2.0",

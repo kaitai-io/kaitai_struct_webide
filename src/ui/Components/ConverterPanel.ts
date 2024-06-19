@@ -1,6 +1,4 @@
-﻿import Vue from "vue";
-import * as bigInt from "big-integer";
-import Component from "../Component";
+﻿import * as bigInt from "big-integer";
 import dateFormat from "dateformat";
 import { IDataProvider } from "../../HexViewer";
 
@@ -82,15 +80,5 @@ export class ConverterPanelModel {
         } catch (e) {
             console.log("refreshConverterPanel str", e);
         }
-    }
-}
-
-@Component
-export class ConverterPanel extends Vue {
-    model: ConverterPanelModel;
-
-    constructor() {
-        super();
-        this.model = this.model || new ConverterPanelModel();
     }
 }
