@@ -21,6 +21,5 @@
     "lib/ts-types/"
   ],
   "exclude": [
-    "src/worker/ImportLoader.ts"
   ]
 }
