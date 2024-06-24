@@ -27,7 +27,7 @@ export const GoldenLayoutUIConfig: GoldenLayout.Config = {
                                             {type: "component", componentName: "genCodeDebugViewer", title: "JS code (debug)", isClosable: false},
                                             {
                                                 type: "column", isClosable: false, id: "inputBinaryTab", title: "input binary", content: [
-                                                    {type: "component", componentName: "hexViewer", title: "hex viewer", isClosable: false},
+                                                    {type: "component", componentName: "hex-viewer", title: "hex viewer", isClosable: false},
                                                     {
                                                         type: "row", isClosable: false, height: 35, content: [
                                                             {

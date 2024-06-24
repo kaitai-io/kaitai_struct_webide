@@ -1,19 +1,19 @@
 <script setup lang="ts">
 
-import ConverterPanel from "./ui/Components/ConverterPanel.vue";
-import FileTree from "./ui/Components/FileTree.vue";
-import InfoPanel from "./ui/Components/InfoPanel.vue";
-import UnsupportedBrowser from "./ui/Components/UnsupportedBrowser.vue";
-import WelcomeModal from "./ui/Components/WelcomeModal.vue";
-import NoScript from "./ui/Components/NoScript.vue";
-import FileDrop from "./ui/Components/FileDrop.vue";
-import NewKsyModal from "./ui/Components/NewKsyModal.vue";
-import InputContextMenu from "./ui/Components/InputContextMenu.vue";
+import ConverterPanel from "./Components/ConverterPanel/ConverterPanel.vue";
+import FileTree from "./Components/FileTree/FileTree.vue";
+import InfoPanel from "./Components/InfoPanel.vue";
+import UnsupportedBrowser from "./Components/UnsupportedBrowser.vue";
+import WelcomeModal from "./Components/WelcomeModal.vue";
+import FileDrop from "./Components/FileDrop.vue";
+import NewKsyModal from "./Components/NewKsyModal.vue";
+import InputContextMenu from "./Components/InputContextMenu.vue";
+import HexViewer from "./Components/HexViewer/HexViewer.vue";
 </script>
 
 <template>
-  <NoScript/>
   <UnsupportedBrowser/>
+  <HexViewer/>
   <FileDrop/>
   <NewKsyModal/>
   <InputContextMenu/>

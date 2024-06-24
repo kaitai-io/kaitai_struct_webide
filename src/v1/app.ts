@@ -15,27 +15,28 @@ import "jstree";
 import {addKsyFile, initFileTree, refreshFsNodes} from "./app.files";
 import {IParsedTreeNode, ParsedTreeHandler} from "./parsedToTree";
 import {codeExecutionWorkerApi} from "./Workers/WorkerApi";
-import {IDataProvider} from "../HexViewer";
 import {initFileDrop} from "./JQueryComponents/Files/FileDrop";
 import {Delayed} from "../utils";
-import {ConverterPanelModel} from "../ui/Components/ConverterPanel";
 import {exportToJson} from "./utils/ExportToJson";
 import {ErrorWindowHandler} from "./app.errors";
 import {fileSystemsManager} from "./FileSystems/FileSystemManager";
 import {FILE_SYSTEM_TYPE_KAITAI, IFsItem} from "./FileSystems/FileSystemsTypes";
-import {ArrayUtils} from "./utils/Misc/ArrayUtils";
 import {StringUtils} from "./utils/Misc/StringUtils";
 import {CompilerService} from "./utils/Compilation/CompilerService";
 import {CompilationError} from "./utils/Compilation/CompilationError";
-import {FileActionsWrapper} from "./utils/Files/FileActionsWrapper";
 import {IFileProcessItem} from "./utils/Files/Types";
 import "../extensions";
 import {GoldenLayoutUI} from "./GoldenLayout/GoldenLayoutUI";
 import {LocalForageWrapper} from "./utils/LocalForageWrapper";
 import {createApp} from "vue";
 import App from "../App.vue";
+import {IAceEditorComponentOptions} from "./GoldenLayout/AceEditorComponent";
+import {createPinia} from "pinia";
+import {useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
+import {HEX_VIEWER_GO_TO_INDEX, MittEmitter} from "./utils/MittEmitter";
 
 const vueApp = createApp(App);
+vueApp.use(createPinia());
 vueApp.mount("body");
 
 $.jstree.defaults.core.force_text = true;
@@ -50,28 +51,17 @@ interface IInterval {
 
 class AppVM {
     ui: GoldenLayoutUI;
-    converterPanelModel = new ConverterPanelModel();
-
-    selectionStart: number = -1;
-    selectionEnd: number = -1;
 
     unparsed: IInterval[] = [];
     byteArrays: IInterval[] = [];
 
     disableLazyParsing: boolean = false;
 
-    public selectInterval(interval: IInterval) {
-        this.selectionChanged(interval.start, interval.end);
-    }
-
-    public selectionChanged(start: number, end: number) {
-        this.ui.hexViewer.setSelection(start, end);
-    }
 
     public exportToJson(hex: boolean) {
         exportToJson(hex)
-            .then(json => {
-                const options = {
+            .then((json: string) => {
+                const options: IAceEditorComponentOptions = {
                     lang: "json",
                     isReadOnly: true,
                     data: json
@@ -91,12 +81,10 @@ class AppController {
 
     init() {
         this.vm.ui = this.ui;
-        this.ui.init();
         this.errors = new ErrorWindowHandler(this.ui.layoutManager.getLayoutNodeById("mainArea"));
         initFileTree();
     }
 
-    dataProvider: IDataProvider;
     ksyFsItemName = "ksyFsItem";
     lastKsyContent: string = null;
 
@@ -150,8 +138,10 @@ class AppController {
             let jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => StringUtils.ucFirst(x)).join("");
             await codeExecutionWorkerApi.initCodeAction(debugCode, jsClassName, this.compilerService.ksyTypes);
 
-            const {result: exportedRoot, error: parseError} = await codeExecutionWorkerApi.reparseAction(this.vm.disableLazyParsing);
+            const {resultObject: exportedRoot, error: parseError} = await codeExecutionWorkerApi.reparseAction(this.vm.disableLazyParsing);
             kaitaiIde.root = exportedRoot;
+            const store = useCurrentBinaryFileStore();
+            store.updateParsedFile(exportedRoot);
             //console.log("reparse exportedRoot", exportedRoot);
 
             this.ui.parsedDataTreeHandler = new ParsedTreeHandler(this.ui.parsedDataTreeCont.getElement(), exportedRoot, this.compilerService.ksyTypes);
@@ -176,7 +166,13 @@ class AppController {
                     if (!this.blockRecursive && exp && exp.start < exp.end) {
                         this.selectedInTree = true;
                         //console.log("setSelection", exp.ioOffset, exp.start);
-                        this.ui.hexViewer.setSelection(exp.ioOffset + exp.start, exp.ioOffset + exp.end - 1);
+
+                        const start = exp.ioOffset + exp.start;
+                        const end = exp.ioOffset + exp.end - 1;
+                        const currentFileStore = useCurrentBinaryFileStore();
+                        currentFileStore.updateSelectionRange(start, end);
+                        MittEmitter.emit(HEX_VIEWER_GO_TO_INDEX, start);
+
                         this.selectedInTree = false;
                     }
                 });
@@ -210,23 +206,16 @@ class AppController {
             let content = <ArrayBuffer>contentRaw;
             this.inputFsItem = fsItem;
             this.inputContent = content;
+            const currentBinaryFileStore = useCurrentBinaryFileStore();
+            currentBinaryFileStore.newBinaryFileSelected(fsItem.fn || "", content);
 
             await LocalForageWrapper.saveFsItem("inputFsItem", fsItem);
 
-            this.dataProvider = {
-                length: content.byteLength,
-                get(offset, length) {
-                    return new Uint8Array(content, offset, length);
-                }
-            };
-
-            this.ui.hexViewer.setDataProvider(this.dataProvider);
             this.ui.layoutManager.getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
             await codeExecutionWorkerApi.setInputAction(content);
 
             if (refreshGui) {
                 await this.reparse();
-                this.ui.hexViewer.resize();
             }
         }
     }
@@ -240,31 +229,6 @@ class AppController {
             });
     }
 
-    refreshSelectionInput() {
-        this.vm.selectionStart = this.ui.hexViewer.selectionStart;
-        this.vm.selectionEnd = this.ui.hexViewer.selectionEnd;
-    }
-
-    onHexViewerSelectionChanged() {
-        //console.log("setSelection", ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
-        localStorage.setItem("selection", JSON.stringify({start: this.ui.hexViewer.selectionStart, end: this.ui.hexViewer.selectionEnd}));
-
-        var start = this.ui.hexViewer.selectionStart;
-        var hasSelection = start !== -1;
-
-        this.refreshSelectionInput();
-
-        if (this.ui.parsedDataTreeHandler && hasSelection && !this.selectedInTree) {
-            var intervals = this.ui.parsedDataTreeHandler.intervalHandler.searchRange(this.ui.hexViewer.mouseDownOffset || start);
-            if (intervals.items.length > 0) {
-                //console.log("selected node", intervals[0].id);
-                this.blockRecursive = true;
-                this.ui.parsedDataTreeHandler.activatePath(intervals.items[0].exp.path).then(() => this.blockRecursive = false);
-            }
-        }
-
-        this.vm.converterPanelModel.update(this.dataProvider, start);
-    }
 }
 
 export var app = new AppController();
@@ -282,21 +246,7 @@ interface IInterval {
 }
 
 $(() => {
-    // $("#webIdeVersion").text(kaitaiIde.version);
-    // $("#webideCommitId")
-    //     .attr("href", `https://github.com/kaitai-io/kaitai_struct_webide/commit/${kaitaiIde.commitId}`)
-    //     .text(kaitaiIde.commitId.substr(0, 7));
-    // $("#webideCommitDate").text(kaitaiIde.commitDate);
-    // $("#compilerVersion").text(KaitaiStructCompiler.version + " (" + KaitaiStructCompiler.buildDate + ")");
-
-    if (localStorage.getItem("doNotShowWelcome") !== "true")
-        (<any>$("#welcomeModal")).modal();
-
     app.init();
-
-    app.ui.hexViewer.onSelectionChanged = () => app.onHexViewerSelectionChanged();
-
-    app.refreshSelectionInput();
 
     app.ui.genCodeDebugViewer.commands.addCommand({
         name: "compile", bindKey: {win: "Ctrl-Enter", mac: "Command-Enter"},
@@ -321,49 +271,15 @@ $(() => {
     app.inputReady = loadCachedFsItem("inputFsItem", "kaitai", "samples/sample1.zip");
     app.formatReady = loadCachedFsItem(app.ksyFsItemName, "kaitai", "formats/archive/zip.ksy");
 
-    app.inputReady.then(() => {
-        const value = localStorage.getItem("selection");
-        const storedSelection = value !== null ? JSON.parse(value) : null;
-        if (storedSelection)
-            app.ui.hexViewer.setSelection(storedSelection.start, storedSelection.end);
-    });
-
     var editDelay = new Delayed(500);
     if (!("noAutoCompile" in qs))
         app.ui.ksyEditor.on("change", () => editDelay.do(() => app.recompile()));
-
-    var inputContextMenu = $("#inputContextMenu");
-    var downloadInput = $("#inputContextMenu .downloadItem");
-    $("#hexViewer").on("contextmenu", e => {
-        downloadInput.toggleClass("disabled", app.ui.hexViewer.selectionStart === -1);
-
-        inputContextMenu.css({display: "block"});
-        var x = Math.min(e.pageX, $(window).width() - inputContextMenu.width());
-        var h = inputContextMenu.height();
-        var y = e.pageY > ($(window).height() - h) ? e.pageY - h : e.pageY;
-        inputContextMenu.css({left: x, top: y});
-        return false;
-    });
-
-    function ctxAction(obj: JQuery, callback: (e: JQueryEventObject) => void) {
-        obj.find("a").on("click", e => {
-            if (!obj.hasClass("disabled")) {
-                inputContextMenu.hide();
-                callback(e);
-            }
-        });
-    }
 
     $(document).on("mousedown", e => {
         if ($(e.target).parents(".dropdown-menu").length === 0)
             $(".dropdown").hide();
     });
 
-    ctxAction(downloadInput, e => {
-        var start = app.ui.hexViewer.selectionStart, end = app.ui.hexViewer.selectionEnd;
-        var newFn = `${ArrayUtils.last(app.inputFsItem.fn.split("/"))}_0x${start.toString(16)}-0x${end.toString(16)}.bin`;
-        FileActionsWrapper.saveFile(new Uint8Array(app.inputContent, start, end - start + 1), newFn);
-    });
 
     kaitaiIde.app = app;
 });

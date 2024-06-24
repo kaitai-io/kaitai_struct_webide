@@ -1,29 +1,23 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {computed} from "vue";
+import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
+import {prepareEmptyModel, prepareModelData} from "./ConverterPanelModelFactory";
 
-const model = ref({
-  u8: 1,
-  s8: 1,
-  u16le: 1,
-  s16le: 1,
-  u32le: 1,
-  s32le: 1,
-  u64le: 1,
-  s64le: 1,
-  u16be: 1,
-  s16be: 1,
-  u32be: 1,
-  s32be: 1,
-  u64be: 1,
-  s64be: 1,
-  float: 1,
-  double: 1,
-  unixts: 1,
-  ascii: 1,
-  utf8: 1,
-  utf16le: 1,
-  utf16be: 1,
+const MAX_SELECTION_LENGTH_FOR_CONVERTER = 64
+
+const model = computed(() => {
+  const store = useCurrentBinaryFileStore();
+
+  const content = store.fileContent;
+  const offset = store.selectionStart;
+  const remainingFileContentLengthFromOffset = store.fileContent.byteLength - offset
+  const length = Math.min(remainingFileContentLengthFromOffset, MAX_SELECTION_LENGTH_FOR_CONVERTER);
+  if (offset === -1 || remainingFileContentLengthFromOffset < 0) return prepareEmptyModel();
+
+  const data = new Uint8Array(content, offset, length).slice(0);
+  return prepareModelData(data);
 });
+
 </script>
 
 <template>

@@ -3,7 +3,7 @@ import {IExportedValue} from "../../../entities";
 import {WorkerFunctionStack} from "./WorkerFunctionStack";
 import {IWorkerMessage, IWorkerMessageParse} from "./WorkerMessages";
 import {IWorkerResponse, IWorkerResponseInit, IWorkerResponseParse} from "./WorkerResponses";
-import {IKsyTypes, IWorkerApiMethods, PARSE_SCRIPTS, INIT_WORKER_SCRIPTS} from "./Types";
+import {IKsyTypes, IWorkerApiMethods, PARSE_SCRIPTS, INIT_WORKER_SCRIPTS, IWorkerParsedResponse} from "./Types";
 
 export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
     stack: WorkerFunctionStack;
@@ -33,7 +33,7 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
 
     reparseAction = (eagerMode: boolean): Promise<IWorkerParsedResponse> => {
         return new Promise<IWorkerParsedResponse>((resolve, reject) => {
-            const digestResponseFromWorkerFn = (response) => this.digestResponseFromWorker(response, resolve, reject);
+            const digestResponseFromWorkerFn = (response: IWorkerResponseParse) => this.digestResponseFromWorker(response, resolve, reject);
             const msgId = this.stack.pushFunctionToStack(digestResponseFromWorkerFn);
             const message = this.prepareIWorkerMessageParse(msgId, eagerMode);
             this.sendMessageToWorker(message);
@@ -94,7 +94,7 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
         if (error && (this.exported === undefined || this.exported === null)) {
             reject(error);
         } else {
-            const response: IWorkerParsedResponse = {result: this.exported, error};
+            const response: IWorkerParsedResponse = {resultObject: this.exported, error};
             resolve(response);
         }
     };

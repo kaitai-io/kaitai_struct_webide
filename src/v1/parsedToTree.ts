@@ -388,8 +388,6 @@ export class ParsedTreeHandler {
                 };
 
                 fillIntervals(valueExp);
-
-                app.ui.hexViewer.setIntervals(this.intervalHandler);
             }
 
             function fillParents(value: IExportedValue, parent: IExportedValue) {

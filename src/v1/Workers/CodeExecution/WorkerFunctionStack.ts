@@ -1,8 +1,8 @@
 import {IWorkerMessage} from "./WorkerMessages";
-import {IWorkerResponseParse} from "./WorkerResponses";
+import {IWorkerResponse, IWorkerResponseParse} from "./WorkerResponses";
 
 export class WorkerFunctionStack {
-    msgHandlers: { [msgId: number]: (msg: IWorkerMessage) => void } = {};
+    msgHandlers: { [msgId: number]: (msg: IWorkerResponse) => void } = {};
     lastMsgId = 0;
 
     pushFunctionToStack = (parseResponseFromWorker: (response: IWorkerResponseParse) => void): number => {

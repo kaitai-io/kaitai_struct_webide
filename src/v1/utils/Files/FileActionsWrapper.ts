@@ -1,4 +1,7 @@
 import {IFileProcessCallback, IFileProcessItem} from "./Types";
+import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
+import {ArrayUtils} from "../Misc/ArrayUtils";
+import {app} from "../../app";
 
 export class FileActionsWrapper {
 
@@ -39,6 +42,20 @@ export class FileActionsWrapper {
         FileActionsWrapper.processUploadedFilesWithCallback(files, callback);
     }
 
+    public static downloadBinFromSelection(): void {
+        const store = useCurrentBinaryFileStore();
+
+        const start = store.selectionStart;
+        const end = store.selectionEnd;
+        const fileDataLength = end - start + 1;
+
+        const fileName = ArrayUtils.last(app.inputFsItem.fn.split("/"));
+        const hexRange = `0x${start.toString(16)}-0x${end.toString(16)}`;
+        const downloadedFileName = `${fileName}_${hexRange}.bin`;
+
+        FileActionsWrapper.saveFile(new Uint8Array(app.inputContent, start, fileDataLength), downloadedFileName);
+    }
+
     private static processUploadedFiles(files: FileList): IFileProcessItem[] {
         const readBlobPromise = (blob: Blob, mode: "arrayBuffer" | "text" | "dataUrl", ...args: any[]): Promise<string | ArrayBuffer> => {
             return new Promise((resolve, reject) => {
@@ -69,6 +86,5 @@ export class FileActionsWrapper {
         const processedFiles = FileActionsWrapper.processUploadedFiles(files);
         callback(processedFiles);
     }
-
 
 }

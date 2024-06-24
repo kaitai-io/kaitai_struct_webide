@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+import FileTreeLanguagesDropdown from "./FileTreeGenerateParserDropdown.vue";
 </script>
 
 <template>
@@ -28,27 +29,7 @@
       <li class="cloneKsyFile"><a tabindex="-1" href="#"><i class="glyphicon fa fa-clone"></i> Clone</a></li>
       <li class="generateParser dropdown-submenu">
         <a tabindex="-1" href="#"><i class="glyphicon glyphicon-flash"></i> Generate parser</a>
-        <ul class="dropdown-menu">
-          <li><a tabindex="-1" href="#" data-kslang="cpp_stl" data-acelang="c_cpp">CPP-STL</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="csharp" data-acelang="csharp">C#</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="go" data-acelang="golang">Go</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="graphviz" data-acelang="dot">Graphviz</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="java" data-acelang="java">Java</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="java" data-ksdebug="true" data-acelang="java">Java
-            (debug)</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="javascript" data-acelang="javascript">JavaScript</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="javascript" data-ksdebug="true"
-                 data-acelang="javascript">JavaScript (debug)</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="lua" data-acelang="lua">Lua</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="nim" data-acelang="nim">Nim</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="perl" data-acelang="perl">Perl</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="php" data-acelang="php">PHP</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="python" data-acelang="python">Python</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="ruby" data-acelang="ruby">Ruby</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="ruby" data-ksdebug="true" data-acelang="ruby">Ruby
-            (debug)</a></li>
-          <li><a tabindex="-1" href="#" data-kslang="json" data-acelang="json">JSON</a></li>
-        </ul>
+        <FileTreeLanguagesDropdown/>
       </li>
       <li class="downloadItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-cloud-download"></i>
         Download</a></li>

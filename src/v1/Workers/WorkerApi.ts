@@ -1,7 +1,7 @@
 import {KaitaiCodeWorkerWrapper} from "./CodeExecution/KaitaiCodeWorkerWrapper";
 import {WorkerFunctionStack} from "./CodeExecution/WorkerFunctionStack";
 import {IWorkerMessageInit} from "./CodeExecution/WorkerMessages";
-import {INIT_WORKER_SCRIPTS} from "./CodeExecution/Types";
+import {INIT_WORKER_SCRIPTS, IWorkerApiMethods} from "./CodeExecution/Types";
 
 const codeExecutorWorker = new Worker(new URL("data-url:./CodeExecution/KaitaiCodeWorker.ts", import.meta.url));
 const workerFunctionStack = new WorkerFunctionStack();

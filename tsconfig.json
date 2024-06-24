@@ -14,7 +14,8 @@
     "sourceMap": false,
     "target": "es2017",
     "outDir": "js/",
-    "lib": ["es2017", "dom"]
+    "lib": ["es2017", "dom"],
+    "moduleResolution": "Node"
   },
   "include": [
     "src/**/*"

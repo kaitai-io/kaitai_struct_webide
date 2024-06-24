@@ -12,11 +12,11 @@ interface IDebugInfo {
 }
 
 export interface IParsingOptions {
-    eagerMode: boolean,
-    incomplete: boolean,
-    ksyTypes: IKsyTypes,
-    enums: any,
-    streamLength: number
+    eagerMode: boolean;
+    incomplete: boolean;
+    ksyTypes: IKsyTypes;
+    enums: any;
+    streamLength: number;
 }
 
 function getObjectType(obj: any) {

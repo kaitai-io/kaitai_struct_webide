@@ -1,17 +1,19 @@
 import {codeExecutionWorkerApi} from "../Workers/WorkerApi";
 import {mapToGenericObject} from "./ExportedValueMappers";
+import {IExportedValue} from "../../entities";
+import {IWorkerParsedResponse} from "../Workers/CodeExecution/Types";
 
-export function exportToJson(useHex: boolean = false) {
+export async function exportToJson(useHex: boolean = false): Promise<string> {
     const overrideDefaultNumbersWithHex = (key: string, value: any) => {
-        const isPropertyNumber = typeof value === "number"
+        const isPropertyNumber = typeof value === "number";
         return isPropertyNumber
             ? "0x" + value.toString(16)
             : value;
     };
 
-    const getResultOrThrowError = (response: IWorkerResponse) => {
+    const getResultOrThrowError = (response: IWorkerParsedResponse) => {
         if (response.error) throw response.error;
-        return response.result;
+        return response.resultObject;
     };
 
     const mapResultToJson = (objectToExport: IExportedValue) => {
@@ -20,7 +22,7 @@ export function exportToJson(useHex: boolean = false) {
         return JSON.stringify(genericObject, hexReplacer, 2);
     };
 
-    return codeExecutionWorkerApi.reparseAction(true)
-        .then(getResultOrThrowError)
-        .then(mapResultToJson);
+    let response = await codeExecutionWorkerApi.reparseAction(true);
+    let objectToExport: any = await getResultOrThrowError(response);
+    return mapResultToJson(objectToExport);
 }

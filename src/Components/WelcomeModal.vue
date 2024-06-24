@@ -1,18 +1,20 @@
 <script setup lang="ts">
 
-import {ref} from "vue";
-import {KaitaiIdeInfo} from "../../KaitaiIdeInfo";
+import {onMounted} from "vue";
+import {KaitaiIdeInfo} from "../KaitaiIdeInfo";
 import KaitaiStructCompiler from "kaitai-struct-compiler";
 
+onMounted(() => {
+  if (localStorage.getItem("doNotShowWelcome") !== "true") {
+    (<any>$("#welcomeModal")).modal();
+  }
+});
 
-const valueFromLocalStorage = localStorage.getItem("doNotShowWelcome") === "true";
-
-const isHidden = ref(valueFromLocalStorage);
 const dontShowAgain = () => {
-  console.log("DONT SHOW AGAIN");
   localStorage.setItem("doNotShowWelcome", "true");
-  isHidden.value = true;
 };
+
+
 </script>
 
 <template>
@@ -68,7 +70,9 @@ const dontShowAgain = () => {
               <span>Kaitai WebIDE version: </span>
               <span id="webIdeVersion">{{ KaitaiIdeInfo.version }}-SNAPSHOT</span>
               <a id="webideCommitId"
-                 :href="'https://github.com/kaitai-io/kaitai_struct_webide/commit/' + KaitaiIdeInfo.commitId">{{ KaitaiIdeInfo.commitId.substr(0, 7) }}</a>
+                 :href="'https://github.com/kaitai-io/kaitai_struct_webide/commit/' + KaitaiIdeInfo.commitId">{{
+                  KaitaiIdeInfo.commitId.substr(0, 7)
+                }}</a>
               (<span id="webideCommitDate"></span>,
               <a href="https://raw.githubusercontent.com/kaitai-io/kaitai_struct_webide/master/LICENSE"
                  target="_blank">license</a>)
