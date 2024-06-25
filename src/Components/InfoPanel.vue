@@ -3,9 +3,23 @@
 import {useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
 import {FileActionsWrapper} from "../v1/utils/Files/FileActionsWrapper";
 import {useHexViewerConfigStore} from "./HexViewer/Store/HexViewerConfigStore";
+import {computed} from "vue";
 
 const currentBinaryFileStore = useCurrentBinaryFileStore();
 const hexViewerConfigStore = useHexViewerConfigStore();
+
+const selectionPath = computed(() => {
+  if (!currentBinaryFileStore.parsedFileFlattened) return "";
+  const foundRange = currentBinaryFileStore.parsedFileFlattened
+      .find(range => {
+        const rangeStart =  range.start + range.ioOffset;
+        const rangeEnd =  range.end + range.ioOffset + 1;
+        return currentBinaryFileStore.selectionStart <= rangeStart && rangeEnd >= currentBinaryFileStore.selectionStart;
+      });
+  if (!foundRange) return "";
+
+  return (foundRange.path || []).join("/");
+});
 
 const about = () => {
   (<any>$("#welcomeModal")).modal();
@@ -14,12 +28,13 @@ const about = () => {
 
 <template>
   <div id="infoPanel">
+    <div>Selection: </div>
     <!--    <selection-input :start="selectionStart" :end="selectionEnd" @selectionChanged="selectionChanged"></selection-input>-->
     <div id="SelectionInput"></div>
     <div id="selectionLengthDiv">
-      Selection length: <span>{{
+      Selection <span>[{{
         currentBinaryFileStore.selectionEnd - currentBinaryFileStore.selectionStart + 1
-      }}</span>
+      }}] {{currentBinaryFileStore.selectionStart}} - {{currentBinaryFileStore.selectionEnd}}</span>
     </div>
     <div id="disableLazyParsingDiv">
       <input type="checkbox" id="disableLazyParsing" v-model="disableLazyParsing"/>
@@ -35,7 +50,7 @@ const about = () => {
       <!--      <Stepper/>-->
       <!--        <stepper :items="byteArrays" @changed="selectInterval"></stepper>-->
     </div>
-    <div id="parsedPathDiv">Selected: <span id="parsedPath"></span></div>
+    <div id="parsedPathDiv">Selected: <span id="parsedPath">{{ selectionPath }}</span></div>
     <div id="exportToJsonDiv">
       <a onclick="kaitaiIde.app.vm.exportToJson(false)" href="#">export to JSON</a> (<a
         onclick="kaitaiIde.app.vm.exportToJson(true)" href="#">hex</a>)
@@ -47,17 +62,23 @@ const about = () => {
       <br/>
       </span>
       <span>Set editor row size:
-      <a @click="hexViewerConfigStore.setRowSize(rowSize)" href="#" v-for="(rowSize) in [10, 16, 20, 32]">{{ rowSize }}&nbsp;</a>
+      <a @click="hexViewerConfigStore.setRowSize(rowSize)" href="#" v-for="(rowSize) in [1, 10, 16, 20, 32]">{{
+          rowSize
+        }}&nbsp;</a>
       </span>
       <br/>
-      <span>Set emoji mode:
-      <a @click="hexViewerConfigStore.setEmojiMode(false)" href="#">❌</a>
-      <a @click="hexViewerConfigStore.setEmojiMode(true)" href="#">🥰</a>
+      <span>
+        <a @click="hexViewerConfigStore.setEmojiMode(!hexViewerConfigStore.emojiMode)" href="#">
+          {{ hexViewerConfigStore.emojiMode ? "🥰" : "😭" }}
+        </a>
+        Emoji mode
       </span>
       <br/>
-      <span>Use decimals for addresses:
-      <a @click="hexViewerConfigStore.setUseHexForAddresses(false)" href="#">❌</a>
-      <a @click="hexViewerConfigStore.setUseHexForAddresses(true)" href="#">✅</a>
+      <span>
+        <a @click="hexViewerConfigStore.setUseHexForAddresses(!hexViewerConfigStore.useHexForAddresses)" href="#">
+          {{ hexViewerConfigStore.useHexForAddresses ? "✅" : "❎" }}
+        </a>
+        Use HEX for addresses
       </span>
     </div>
     <div>

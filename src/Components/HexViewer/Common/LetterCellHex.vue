@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import {
-  DragSelectionMoveEvent,
-  EndDragSelection,
-  SelectRangeToWhichByteBelongs,
-  SingleByteClickAction,
-  StartDragSelection
-} from "../Services/HexViewerActions";
 import LetterSpacer from "./LetterSpacer.vue";
 import {useHexViewerConfigStore} from "../Store/HexViewerConfigStore";
 import {computed} from "vue";
 import {OddStatus, ProcessedLetter, RangePlacementStatus} from "../Types";
+import {
+  DragSelectionMoveEvent,
+  EndDragSelection,
+  SelectRangeToWhichByteBelongs, SingleByteClickAction, StartDragSelection
+} from "../Services/HexViewerMouseActions";
 
 const store = useHexViewerConfigStore();
 

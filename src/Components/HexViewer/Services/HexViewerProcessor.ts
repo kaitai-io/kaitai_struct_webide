@@ -1,4 +1,3 @@
-
 import {convertByteToAsciiCharacter, convertByteToEmoji} from "./Convert";
 import {IExportedValueRange, OddStatus, ProcessedLetter, ProcessLettersConfig, RangePlacementStatus} from "../Types";
 
@@ -19,13 +18,13 @@ const fetchLetterOddEvenStatus = (matchingRange?: IExportedValueRange): OddStatu
 
 const fetchLetterPlacementStatus = (letterIndex: number, matchingRange?: IExportedValueRange): RangePlacementStatus => {
     if (!matchingRange) return RangePlacementStatus.NONE;
-    const isLeft = matchingRange.startIndex === letterIndex;
-    const isRight = matchingRange.endIndex === letterIndex;
-    if (isLeft && isRight) {
+    const matchOnTheLeft = matchingRange.startIndex === letterIndex;
+    const matchOnTheRight = matchingRange.endIndex === letterIndex;
+    if (matchOnTheLeft && matchOnTheRight) {
         return RangePlacementStatus.FULL_RANGE;
-    } else if (isLeft) {
+    } else if (matchOnTheLeft) {
         return RangePlacementStatus.START_OF_RANGE;
-    } else if (isRight) {
+    } else if (matchOnTheRight) {
         return RangePlacementStatus.END_OF_RANGE;
     } else {
         return RangePlacementStatus.MIDDLE;
@@ -44,6 +43,7 @@ const createSingleLetter = (letter: number, index: number, options: ProcessLette
         isSelected: isSelected,
         hex: mapLetterToHexOrEmoji(letter, emojiMode),
         char: convertByteToAsciiCharacter(letter),
+        range: matchingRange,
         oddStatus: fetchLetterOddEvenStatus(matchingRange),
         rangePlacement: fetchLetterPlacementStatus(letterIndex, matchingRange)
     };
@@ -60,6 +60,7 @@ export const createEmptyLettersToFillRow = (rowLettersCount: number, rowSize: nu
             isSelected: false,
             hex: "",
             char: "",
+            range: null,
             oddStatus: OddStatus.NONE,
             rangePlacement: RangePlacementStatus.NONE,
         };

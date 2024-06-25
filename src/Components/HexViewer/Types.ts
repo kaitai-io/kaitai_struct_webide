@@ -19,12 +19,14 @@ export interface ProcessedLetter {
     index: number;
     oddStatus: OddStatus;
     rangePlacement: RangePlacementStatus;
+    range?: IExportedValueRange;
 }
 
 export interface IExportedValueRange {
     startIndex: number;
     endIndex: number;
     isOdd: boolean;
+    path: string;
 }
 
 export interface IExportedValueRangesForRow {

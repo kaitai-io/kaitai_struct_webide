@@ -33,7 +33,7 @@ import App from "../App.vue";
 import {IAceEditorComponentOptions} from "./GoldenLayout/AceEditorComponent";
 import {createPinia} from "pinia";
 import {useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
-import {HEX_VIEWER_GO_TO_INDEX, MittEmitter} from "./utils/MittEmitter";
+import {TreeNodeSelected} from "../Components/ParsedTree/Services/ParsedTreeActions";
 
 const vueApp = createApp(App);
 vueApp.use(createPinia());
@@ -151,9 +151,7 @@ class AppController {
                     const node = <IParsedTreeNode>selectNodeArgs.node;
                     //console.log("node", node);
                     const exp = this.ui.parsedDataTreeHandler.getNodeData(node).exported;
-
-                    if (exp && exp.path)
-                        $("#parsedPath").text(exp.path.join("/"));
+                    TreeNodeSelected(exp);
 
                     if (exp) {
                         if (exp.instanceError !== undefined) {
@@ -165,14 +163,6 @@ class AppController {
 
                     if (!this.blockRecursive && exp && exp.start < exp.end) {
                         this.selectedInTree = true;
-                        //console.log("setSelection", exp.ioOffset, exp.start);
-
-                        const start = exp.ioOffset + exp.start;
-                        const end = exp.ioOffset + exp.end - 1;
-                        const currentFileStore = useCurrentBinaryFileStore();
-                        currentFileStore.updateSelectionRange(start, end);
-                        MittEmitter.emit(HEX_VIEWER_GO_TO_INDEX, start);
-
                         this.selectedInTree = false;
                     }
                 });

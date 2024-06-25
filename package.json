@@ -21,7 +21,6 @@
     "kaitai-struct": "next",
     "kaitai-struct-compiler": "next",
     "localforage": "^1.10.0",
-    "mitt": "^3.0.1",
     "pako": "^1.0.6",
     "pinia": "^2.1.7",
     "require-from-string": "^1.2.1",

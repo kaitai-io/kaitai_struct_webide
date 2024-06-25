@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {
-  SingleByteClickAction,
-  SelectRangeToWhichByteBelongs,
-  StartDragSelection,
-  DragSelectionMoveEvent,
-  EndDragSelection
-} from "../Services/HexViewerActions";
 import {ProcessedLetter} from "../Types";
+import {
+  DragSelectionMoveEvent,
+  EndDragSelection,
+  SelectRangeToWhichByteBelongs,
+  SingleByteClickAction,
+  StartDragSelection
+} from "../Services/HexViewerMouseActions";
 
 const props = defineProps<{
   interactive?: boolean

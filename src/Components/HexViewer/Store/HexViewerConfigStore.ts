@@ -1,7 +1,8 @@
 import {defineStore} from "pinia";
+import {ProcessedLetter} from "../Types";
 
 export interface HexViewerConfigStore {
-    selectionDragStart: number;
+    selectionDragStart: ProcessedLetter;
     rowSize: number;
     columns: number;
     emojiMode: boolean;
@@ -10,7 +11,6 @@ export interface HexViewerConfigStore {
 
 const serializeConfigToLocalStorage = (store: HexViewerConfigStore) => {
     const config = JSON.stringify({
-        selectionDragStart: store.selectionDragStart,
         rowSize: store.rowSize,
         columns: store.columns,
         emojiMode: store.emojiMode,
@@ -22,7 +22,7 @@ const serializeConfigToLocalStorage = (store: HexViewerConfigStore) => {
 export const useHexViewerConfigStore = defineStore("HexViewerStore", {
     state: (): HexViewerConfigStore => {
         return JSON.parse(localStorage.getItem("HexViewerStore")) || {
-            selectionDragStart: -1,
+            selectionDragStart: null,
             rowSize: 16,
             columns: 8,
             emojiMode: false,
@@ -30,7 +30,7 @@ export const useHexViewerConfigStore = defineStore("HexViewerStore", {
         };
     },
     actions: {
-        updateSelectionDragStart(point: number) {
+        updateSelectionDragStart(point: ProcessedLetter) {
             this.selectionDragStart = point;
             serializeConfigToLocalStorage(this);
         },

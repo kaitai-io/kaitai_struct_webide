@@ -17,7 +17,7 @@ const testRangeAgainstRow = (range: IExportedValueRange, rowStartIndex: number, 
 
     const endIndexInRow = range.endIndex >= rowStartIndex && range.endIndex <= rowEndIndex;
     const startIndexInRow = range.startIndex >= rowStartIndex && range.startIndex <= rowEndIndex;
-    const bothEndsInRow = range.startIndex < rowStartIndex && rowEndIndex < range.endIndex;
+    const bothEndsInRow = range.startIndex <= rowStartIndex && rowEndIndex <= range.endIndex;
 
     return endIndexInRow || startIndexInRow || bothEndsInRow
         ? TestRangeResult.MATCHING
@@ -50,7 +50,8 @@ const prepareGroupForRow = (rowIndex: number, ranges: IExportedValueRange[], row
 
 const groupRangesToRows = (ranges: IExportedValueRange[], rowSize: number = 16): IExportedValueRangesForRow[] => {
     const endRangeIndex = ranges[ranges.length - 1].endIndex;
-    const expectedNumberOfGroups = Math.ceil(endRangeIndex / (rowSize));
+    const maxBytesByLastRange = endRangeIndex + 1;
+    const expectedNumberOfGroups = Math.ceil(maxBytesByLastRange / rowSize);
 
     return Array.from(Array(expectedNumberOfGroups).keys())
         .map(rowIndex => prepareGroupForRow(rowIndex, ranges, rowSize));
@@ -63,6 +64,7 @@ export const prepareOddEvenRangesForRows = (flatExported: IExportedValue[], rowS
         startIndex: item.start + item.ioOffset,
         endIndex: item.end + item.ioOffset - 1,
         isOdd: index % 2 !== 0,
+        path: (item.path || []).join("/")
     }));
 
     return groupRangesToRows(ranges, rowSize);

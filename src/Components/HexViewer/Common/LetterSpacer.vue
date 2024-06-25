@@ -11,7 +11,6 @@
 .spacer {
   width: 10px;
   display: inline-block;
-  color: black;
   margin: 0;
   padding: 0;
 }
