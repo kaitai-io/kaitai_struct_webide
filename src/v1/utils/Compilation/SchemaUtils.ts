@@ -27,14 +27,11 @@ export class SchemaUtils {
     }
 
     static collectKsyTypes(schema: KsySchema.IKsyFile): IKsyTypes {
-        // Function was modifying input and the reason was:
-        // we have to modify the schema (add typesByJsName for example) before sending into the compiler, so we need a copy
-        const schemaTemp = {...schema};
         var types: IKsyTypes = {};
-        SchemaUtils.collectTypes(types, schemaTemp);
+        SchemaUtils.collectTypes(types, schema);
 
-        var typeName = SchemaUtils.ksyNameToJsName(schemaTemp.meta.id, false);
-        types[typeName] = schemaTemp;
+        var typeName = SchemaUtils.ksyNameToJsName(schema.meta.id, false);
+        types[typeName] = schema;
 
         return types;
     }

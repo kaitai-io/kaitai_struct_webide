@@ -29,7 +29,10 @@ export class LocalStorageApi {
     }
 
     public static storeIdeSettings = (store: IdeSettings): void => {
-        localStorage.setItem("ideSettings", JSON.stringify(store));
+        const state: IdeSettings = {
+            eagerMode: store.eagerMode
+        };
+        localStorage.setItem("ideSettings", JSON.stringify(state));
     }
 
     public static getDoNotShowWelcomeFlag = (): boolean => {

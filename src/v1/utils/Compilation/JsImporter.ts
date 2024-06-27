@@ -46,6 +46,9 @@ export class JsImporter implements IYamlImporter {
 
         const ksyModel = YamlParser.parseIKsyFile(<string>ksyContent, fn);
         Object.assign(this.ksyTypes, SchemaUtils.collectKsyTypes(ksyModel));
-        return ksyModel;
+
+        // we have to modify the schema (add typesByJsName for example) before sending into the compiler, so we need a copy
+        const compilerSchema = YamlParser.parseIKsyFile(<string>ksyContent, fn);
+        return compilerSchema;
     }
 }
