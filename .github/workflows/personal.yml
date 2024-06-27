@@ -39,7 +39,7 @@ jobs:
       - run: npm ci
       - name: Use stable versions of KSC and JS runtime
         run: |
-          npm install kaitai-struct-compiler@latest kaitai-struct@latest
+#          npm install kaitai-struct-compiler@latest kaitai-struct@latest
           npm run generate-license
           npm run generate-formats
           npm run parcel-build
