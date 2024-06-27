@@ -2,7 +2,7 @@
 
 import ConverterPanel from "./Components/ConverterPanel/ConverterPanel.vue";
 import FileTree from "./Components/FileTree/FileTree.vue";
-import InfoPanel from "./Components/InfoPanel.vue";
+import InfoPanel from "./Components/InfoPanel/InfoPanel.vue";
 import UnsupportedBrowser from "./Components/UnsupportedBrowser.vue";
 import WelcomeModal from "./Components/WelcomeModal.vue";
 import FileDrop from "./Components/FileDrop.vue";

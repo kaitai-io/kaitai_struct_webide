@@ -1,5 +1,6 @@
 import {convertByteToAsciiCharacter, convertByteToEmoji} from "./Convert";
-import {IExportedValueRange, OddStatus, ProcessedLetter, ProcessLettersConfig, RangePlacementStatus} from "../Types";
+import {IExportedValueOddRange, OddStatus, ProcessedLetter, ProcessLettersConfig, RangePlacementStatus} from "../Types";
+import {RangeHelper} from "../../../v1/utils/RangeHelper";
 
 const mapLetterToHexOrEmoji = (letter: number, emojiMode: boolean): string => {
     return emojiMode
@@ -8,7 +9,7 @@ const mapLetterToHexOrEmoji = (letter: number, emojiMode: boolean): string => {
 };
 
 
-const fetchLetterOddEvenStatus = (matchingRange?: IExportedValueRange): OddStatus => {
+const fetchLetterOddEvenStatus = (matchingRange?: IExportedValueOddRange): OddStatus => {
     if (!matchingRange) return OddStatus.NONE;
     return matchingRange.isOdd
         ? OddStatus.ODD
@@ -16,10 +17,10 @@ const fetchLetterOddEvenStatus = (matchingRange?: IExportedValueRange): OddStatu
 
 };
 
-const fetchLetterPlacementStatus = (letterIndex: number, matchingRange?: IExportedValueRange): RangePlacementStatus => {
+const fetchLetterPlacementStatus = (letterIndex: number, matchingRange?: IExportedValueOddRange): RangePlacementStatus => {
     if (!matchingRange) return RangePlacementStatus.NONE;
-    const matchOnTheLeft = matchingRange.startIndex === letterIndex;
-    const matchOnTheRight = matchingRange.endIndex === letterIndex;
+    const matchOnTheLeft = matchingRange.start === letterIndex;
+    const matchOnTheRight = matchingRange.end === letterIndex;
     if (matchOnTheLeft && matchOnTheRight) {
         return RangePlacementStatus.FULL_RANGE;
     } else if (matchOnTheLeft) {
@@ -32,11 +33,11 @@ const fetchLetterPlacementStatus = (letterIndex: number, matchingRange?: IExport
 };
 
 const createSingleLetter = (letter: number, index: number, options: ProcessLettersConfig) => {
-    const {selectionStart, selectionEnd, rowIndex, oddEvenRanges, emojiMode} = options;
+    const {selection, rowIndex, oddEvenRanges, emojiMode} = options;
 
     const letterIndex = index + rowIndex;
-    const isSelected = letterIndex >= selectionStart && letterIndex <= selectionEnd;
-    const matchingRange = (oddEvenRanges || []).find(flat => flat.startIndex <= letterIndex && flat.endIndex >= letterIndex);
+    const isSelected = RangeHelper.containsPoint(selection, letterIndex);
+    const matchingRange = (oddEvenRanges || []).find(flat => RangeHelper.containsPoint(flat, letterIndex));
 
     return {
         index: letterIndex,

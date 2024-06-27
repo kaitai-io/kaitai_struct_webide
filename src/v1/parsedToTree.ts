@@ -1,11 +1,10 @@
-import { IInterval, IntervalHandler } from "../utils/IntervalHelper";
-import { s, htmlescape, asciiEncode, hexEncode, uuidEncode } from "../utils";
-import { codeExecutionWorkerApi } from "./Workers/WorkerApi";
-import { app } from "./app";
+import {asciiEncode, hexEncode, htmlescape, s, uuidEncode} from "../utils";
+import {codeExecutionWorkerApi} from "./Workers/WorkerApi";
+import {app} from "./app";
 import {ArrayUtils} from "./utils/Misc/ArrayUtils";
 import {StringUtils} from "./utils/Misc/StringUtils";
-import {flattenIExportedValue} from "./utils/ExportedValueMappers";
-import {IExportedValue, ObjectType} from "../entities";
+import {IExportedValue, IInstance, ObjectType} from "../entities";
+import {IKsyTypes} from "./Workers/CodeExecution/Types";
 
 interface IParsedTreeNodeData {
     exported?: IExportedValue;
@@ -23,15 +22,11 @@ export interface IJSTreeNode<TData> {
     data?: TData;
 }
 
-export interface IParsedTreeNode extends IJSTreeNode<{idx:number}> { }
-
-interface IParsedTreeInterval extends IInterval {
-    exp: IExportedValue;
+export interface IParsedTreeNode extends IJSTreeNode<{ idx: number }> {
 }
 
 export class ParsedTreeHandler {
     public jstree: JSTree;
-    public intervalHandler: IntervalHandler<IParsedTreeInterval>;
 
     public constructor(public jsTreeElement: any, public exportedRoot: IExportedValue, public ksyTypes: IKsyTypes) {
         jsTreeElement.jstree("destroy");
@@ -39,13 +34,13 @@ export class ParsedTreeHandler {
             core: {
                 data: (node: IParsedTreeNode, cb: any) =>
                     this.getNode(node).then(x => cb(x), e => app.errors.handle(e)),
-                themes: { icons: false },
+                themes: {icons: false},
                 multiple: false,
                 force_text: false,
                 allow_reselect: true,
                 loaded_state: true,
             },
-            plugins: [ "state" ],
+            plugins: ["state"],
             state: {
                 preserve_loaded: true,
                 filter: function (state: Record<string, any>) {
@@ -92,7 +87,6 @@ export class ParsedTreeHandler {
                 this.jstree.select_node(focusedNode);
             }
         });
-        this.intervalHandler = new IntervalHandler<IParsedTreeInterval>();
     }
 
     updateActiveJstreeNode(): void {
@@ -111,7 +105,7 @@ export class ParsedTreeHandler {
         // As of jsTree 3.3.16, jsTree uses the `aria-activedescendant`
         // attribute as the only means of persisting the active node, so we
         // don't have much choice how to implement this.
-        this.jstree.get_container().attr('aria-activedescendant', selectedNode);
+        this.jstree.get_container().attr("aria-activedescendant", selectedNode);
     }
 
     primitiveToText(exported: IExportedValue, detailed: boolean = true): string {
@@ -128,8 +122,7 @@ export class ParsedTreeHandler {
                 value = s`${value}`;
 
             return `<span class="primitiveValue">${value}</span>`;
-        }
-        else if (exported.type === ObjectType.TypedArray) {
+        } else if (exported.type === ObjectType.TypedArray) {
             var text = "[";
             for (var i = 0; i < exported.bytes.byteLength; i++) {
                 if (i === 8) {
@@ -151,13 +144,15 @@ export class ParsedTreeHandler {
         var repr = obj.object.ksyType && obj.object.ksyType["-webide-representation"];
         if (!repr) return "";
 
-        function ksyNameToJsName(ksyName: string) { return ksyName.split("_").map((x, i) => (i === 0 ? x : StringUtils.ucFirst(x))).join(""); }
+        function ksyNameToJsName(ksyName: string) {
+            return ksyName.split("_").map((x, i) => (i === 0 ? x : StringUtils.ucFirst(x))).join("");
+        }
 
         return htmlescape(repr).replace(/{(.*?)}/g, (g0, g1: string) => {
             var currItem = obj;
             var parts = g1.split(":");
 
-            var format: { sep:string, str?:string, hex?:string, dec?:string, uuid?:string, flags?:string } = { sep: ", " };
+            var format: { sep: string, str?: string, hex?: string, dec?: string, uuid?: string, flags?: string } = {sep: ", "};
             if (parts.length > 1)
                 parts[1].split(",").map(x => x.split("=")).forEach(kv => format[kv[0]] = kv.length > 1 ? kv[1] : true);
             parts[0].split(".").forEach(k => {
@@ -189,8 +184,7 @@ export class ParsedTreeHandler {
             else if (currItem.type === ObjectType.Array) {
                 var escapedSep = s`${format.sep}`;
                 return currItem.arrayItems.map(item => this.reprObject(item)).join(escapedSep);
-            }
-            else
+            } else
                 return this.primitiveToText(currItem, false);
         });
     }
@@ -200,7 +194,7 @@ export class ParsedTreeHandler {
     addNodeData(data: IParsedTreeNodeData) {
         var idx = this.nodeDatas.length;
         this.nodeDatas.push(data);
-        return { idx: idx };
+        return {idx: idx};
     }
 
     getNodeData(node: IParsedTreeNode) {
@@ -222,8 +216,7 @@ export class ParsedTreeHandler {
         else if (isObject) {
             var repr = this.reprObject(item);
             text = s`${propName} [<span class="className">${item.object.class}</span>]` + (repr ? `: ${repr}` : "");
-        }
-        else
+        } else
             text = (showProp ? s`<span class="propName">${propName}</span> = ` : "") + this.primitiveToText(item);
 
         if (item.incomplete || item.validationError !== undefined || item.instanceError !== undefined) {
@@ -239,29 +232,29 @@ export class ParsedTreeHandler {
                 item.type === ObjectType.Undefined ||
                 (item.type === ObjectType.Object && Object.keys(item.object.fields).length === 0);
 
-            const icon = document.createElement('i');
-            icon.classList.add('glyphicon');
+            const icon = document.createElement("i");
+            icon.classList.add("glyphicon");
             if (instanceError !== undefined) {
-                icon.classList.add('instance-fail-color');
+                icon.classList.add("instance-fail-color");
             } else {
-                icon.classList.add(showAsError ? 'fail-color' : 'alert-color');
+                icon.classList.add(showAsError ? "fail-color" : "alert-color");
             }
 
             if (validationError !== undefined && (instanceError === undefined || item.instanceError === item.validationError)) {
-                icon.classList.add('glyphicon-remove');
+                icon.classList.add("glyphicon-remove");
                 const action = instanceError !== undefined ?
                     "validation of this instance parsed on explicit request" :
                     "validation of this field";
                 icon.title = `${action} failed with "${validationError}"`;
             } else if (showAsError) {
-                icon.classList.add('glyphicon-exclamation-sign');
+                icon.classList.add("glyphicon-exclamation-sign");
                 if (instanceError !== undefined) {
                     icon.title = `explicit parsing of this instance failed with "${instanceError}"`;
                 } else {
                     icon.title = `parsing of this field failed`;
                 }
             } else {
-                icon.classList.add('glyphicon-alert');
+                icon.classList.add("glyphicon-alert");
                 const instanceAppendix = instanceError !== undefined ? "explicit " : "";
                 icon.title = `${instanceAppendix}parsing was interrupted by an error, data may be incomplete`;
             }
@@ -269,7 +262,7 @@ export class ParsedTreeHandler {
             text += ` ${icon.outerHTML}`;
         }
 
-        return <IParsedTreeNode>{ text: text, children: isObject || isArray, data: this.addNodeData({ exported: item }) };
+        return <IParsedTreeNode>{text: text, children: isObject || isArray, data: this.addNodeData({exported: item})};
     }
 
     exportedToNodes(exported: IExportedValue, nodeData: IParsedTreeNodeData, showProp: boolean): IParsedTreeNode[] {
@@ -344,50 +337,12 @@ export class ParsedTreeHandler {
         var expNode = isRoot ? this.exportedRoot : nodeData.exported;
 
         var isInstance = !expNode;
-        var valuePromise = isInstance ? this.getProp(nodeData.instance.path).then(({ result: exp }) => nodeData.exported = exp) : Promise.resolve(expNode);
+        var valuePromise = isInstance
+            ? this.getProp(nodeData.instance.path).then(({result: exp}) => nodeData.exported = exp)
+            : Promise.resolve(expNode);
         return valuePromise.then(valueExp => {
             if (isRoot || isInstance) {
                 this.fillKsyTypes(valueExp);
-
-                var intervals: IParsedTreeInterval[] = [];
-                var fillIntervals = (rootExp: IExportedValue) => {
-                    var objects = flattenIExportedValue(rootExp);
-
-                    var lastEnd = -1;
-                    for (let exp of objects) {
-                        if (!(exp.type === ObjectType.Primitive || exp.type === ObjectType.TypedArray)) continue;
-
-                        var start = exp.ioOffset + exp.start;
-                        var end = exp.ioOffset + exp.end - 1;
-                        if (Number.isNaN(start) || Number.isNaN(end) || start <= lastEnd || start > end) continue;
-                        lastEnd = end;
-
-                        intervals.push(<IParsedTreeInterval>{ start: start, end: end, exp: exp });
-                    }
-
-                    if (!isInstance) {
-                        var nonParsed: IInterval[] = [];
-
-                        lastEnd = -1;
-                        for (var i of intervals){
-                            if (i.start !== lastEnd + 1)
-                                nonParsed.push({ start: lastEnd + 1, end: i.start - 1 });
-
-                            lastEnd = i.end;
-                        }
-
-                        app.vm.unparsed = nonParsed;
-                        app.vm.byteArrays = objects.filter(exp => exp.type === ObjectType.TypedArray && exp.bytes.length > 64).
-                            map(exp => ({ start: exp.ioOffset + exp.start, end: exp.ioOffset + exp.end - 1 }));
-                    }
-
-                    if (intervals.length > 400000)
-                        console.warn("Too many items for interval tree: " + intervals.length);
-                    else
-                        this.intervalHandler.addSorted(intervals);
-                };
-
-                fillIntervals(valueExp);
             }
 
             function fillParents(value: IExportedValue, parent: IExportedValue) {
@@ -418,7 +373,7 @@ export class ParsedTreeHandler {
         return ["inputField", ...path].join("-");
     }
 
-    activatePath(path: string|string[]): Promise<void> {
+    activatePath(path: string | string[]): Promise<void> {
         const pathParts = typeof path === "string" ? path.split("/") : path;
 
         const nodesToLoad: string[] = [];

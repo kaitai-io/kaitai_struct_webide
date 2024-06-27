@@ -5,6 +5,7 @@ import {SchemaUtils} from "./SchemaUtils";
 import KaitaiStructCompiler from "kaitai-struct-compiler";
 import {CompilationError} from "./CompilationError";
 import {YamlParser} from "./YamlParser";
+import {IKsyTypes} from "../../Workers/CodeExecution/Types";
 export class CompilerService {
     jsImporter: JsImporter;
     ksySchema: KsySchema.IKsyFile;

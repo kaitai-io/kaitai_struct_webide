@@ -32,8 +32,10 @@ import {createApp} from "vue";
 import App from "../App.vue";
 import {IAceEditorComponentOptions} from "./GoldenLayout/AceEditorComponent";
 import {createPinia} from "pinia";
-import {useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
-import {TreeNodeSelected} from "../Components/ParsedTree/Services/ParsedTreeActions";
+import {CurrentBinaryFile, useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
+import {PARSED_TREE_SOURCE, TreeNodeSelectedAction} from "../Components/ParsedTree/Services/ParsedTreeActions";
+import {useIdeSettingsStore} from "../Stores/IdeSettingsStore";
+import {RangeHelper} from "./utils/RangeHelper";
 
 const vueApp = createApp(App);
 vueApp.use(createPinia());
@@ -44,19 +46,9 @@ $.jstree.defaults.core.force_text = true;
 const qs = {};
 location.search.substr(1).split("&").map(x => x.split("=")).forEach(x => qs[x[0]] = x[1]);
 
-interface IInterval {
-    start: number;
-    end: number;
-}
 
 class AppVM {
     ui: GoldenLayoutUI;
-
-    unparsed: IInterval[] = [];
-    byteArrays: IInterval[] = [];
-
-    disableLazyParsing: boolean = false;
-
 
     public exportToJson(hex: boolean) {
         exportToJson(hex)
@@ -69,8 +61,6 @@ class AppVM {
                 this.ui.layoutManager.addDynamicAceCodeEditorTab("json export", options);
             });
     }
-
-
 }
 
 class AppController {
@@ -83,6 +73,11 @@ class AppController {
         this.vm.ui = this.ui;
         this.errors = new ErrorWindowHandler(this.ui.layoutManager.getLayoutNodeById("mainArea"));
         initFileTree();
+
+
+        useCurrentBinaryFileStore().$onAction(({name, store, args}) => {
+            this.handleSelectionUpdatedTreeEvents(name, args, store);
+        });
     }
 
     ksyFsItemName = "ksyFsItem";
@@ -125,8 +120,7 @@ class AppController {
         await this.reparse();
     }
 
-    blockRecursive = false;
-    selectedInTree = false;
+    blockFiringSelectionEvent = false;
     formatReady: Promise<any> = null;
     inputReady: Promise<any> = null;
 
@@ -138,7 +132,8 @@ class AppController {
             let jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => StringUtils.ucFirst(x)).join("");
             await codeExecutionWorkerApi.initCodeAction(debugCode, jsClassName, this.compilerService.ksyTypes);
 
-            const {resultObject: exportedRoot, error: parseError} = await codeExecutionWorkerApi.reparseAction(this.vm.disableLazyParsing);
+            const ideSettingsStore = useIdeSettingsStore();
+            const {resultObject: exportedRoot, error: parseError} = await codeExecutionWorkerApi.reparseAction(ideSettingsStore.eagerMode);
             kaitaiIde.root = exportedRoot;
             const store = useCurrentBinaryFileStore();
             store.updateParsedFile(exportedRoot);
@@ -149,9 +144,11 @@ class AppController {
             this.ui.parsedDataTreeHandler.jstree.on("state_ready.jstree", () => {
                 this.ui.parsedDataTreeHandler.jstree.on("select_node.jstree", (e, selectNodeArgs) => {
                     const node = <IParsedTreeNode>selectNodeArgs.node;
-                    //console.log("node", node);
                     const exp = this.ui.parsedDataTreeHandler.getNodeData(node).exported;
-                    TreeNodeSelected(exp);
+
+                    if (!this.blockFiringSelectionEvent) {
+                        TreeNodeSelectedAction(exp);
+                    }
 
                     if (exp) {
                         if (exp.instanceError !== undefined) {
@@ -159,11 +156,6 @@ class AppController {
                         } else if (exp.validationError !== undefined) {
                             app.errors.handle(exp.validationError);
                         }
-                    }
-
-                    if (!this.blockRecursive && exp && exp.start < exp.end) {
-                        this.selectedInTree = true;
-                        this.selectedInTree = false;
                     }
                 });
             });
@@ -197,7 +189,7 @@ class AppController {
             this.inputFsItem = fsItem;
             this.inputContent = content;
             const currentBinaryFileStore = useCurrentBinaryFileStore();
-            currentBinaryFileStore.newBinaryFileSelected(fsItem.fn || "", content);
+            currentBinaryFileStore.newBinaryFileSelected(fsItem.fn || "", content, "SOURCE_REPARSE");
 
             await LocalForageWrapper.saveFsItem("inputFsItem", fsItem);
 
@@ -219,9 +211,24 @@ class AppController {
             });
     }
 
+    handleSelectionUpdatedTreeEvents = async (eventName: string, args: any[], store: CurrentBinaryFile) => {
+        const isUpdateSelectionFunction = ["updateSelectionPoint"].indexOf(eventName) !== -1;
+        const sourceArgument = args.find(arg => typeof arg === "string" && arg.startsWith("SOURCE_"));
+        if (sourceArgument !== PARSED_TREE_SOURCE && isUpdateSelectionFunction && store.parsedFileFlatInfo) {
+            const newSelectionStart = args[0];
+            const node = store.parsedFileFlatInfo.leafs
+                .find(leaf => RangeHelper.exportedContainsPoint(leaf, newSelectionStart));
+            if (node && newSelectionStart !== store.selectionStart) {
+                this.blockFiringSelectionEvent = true;
+                await app.ui.parsedDataTreeHandler.activatePath(node.path);
+                this.blockFiringSelectionEvent = false;
+            }
+        }
+    };
+
 }
 
-export var app = new AppController();
+export const app = new AppController();
 
 var kaitaiIde = window["kaitaiIde"] = <any>{};
 kaitaiIde.version = "0.1";
@@ -229,11 +236,6 @@ kaitaiIde.commitId = "";
 kaitaiIde.commitDate = "";
 
 //localStorage.setItem("lastVersion", kaitaiIde.version);
-
-interface IInterval {
-    start: number;
-    end: number;
-}
 
 $(() => {
     app.init();

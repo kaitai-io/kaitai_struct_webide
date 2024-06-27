@@ -1,9 +1,8 @@
 import {NumberUtils} from "../../../v1/utils/Misc/NumberUtils";
 import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
-import {useHexViewerConfigStore} from "../Store/HexViewerConfigStore";
 import {HEX_VIEWER_SOURCE} from "./HexViewerActions";
 
-const calculateMoveDiff = (e: KeyboardEvent, rowSize: number) => {
+const calculateMoveDiff = (e: KeyboardEvent, rowSize: number, fileLength: number) => {
     switch (e.key) {
         case "ArrowDown":
             return rowSize;
@@ -17,6 +16,10 @@ const calculateMoveDiff = (e: KeyboardEvent, rowSize: number) => {
             return -rowSize * 10;
         case "PageDown":
             return rowSize * 10;
+        case "End":
+            return fileLength;
+        case "Home":
+            return -fileLength;
     }
 };
 
@@ -33,13 +36,12 @@ const calculateNewStartEnd = (start: number, end: number, pivot: number, moveDif
     }
     return [newStart, newEnd];
 };
-export const HandleCursorMoveAndSelect = (e: KeyboardEvent) => {
-    if(e.key === "Tab") {
+export const handleCursorMoveAndSelect = (e: KeyboardEvent, rowSize: number) => {
+    if (e.key === "Tab") {
         e.preventDefault();
     }
     const currentBinaryFileStore = useCurrentBinaryFileStore();
-    const hexViewerConfigStore = useHexViewerConfigStore();
-    const moveDiff = calculateMoveDiff(e, hexViewerConfigStore.rowSize);
+    const moveDiff = calculateMoveDiff(e, rowSize, currentBinaryFileStore.fileContent.byteLength);
     if (currentBinaryFileStore.selectionStart === -1 || !moveDiff) return;
 
     const fileLength = currentBinaryFileStore.fileContent.byteLength - 1;
@@ -53,8 +55,8 @@ export const HandleCursorMoveAndSelect = (e: KeyboardEvent) => {
     );
 
     if (newStart === newEnd) {
-        currentBinaryFileStore.updateSelectionPoint(newStart, HEX_VIEWER_SOURCE);
+        currentBinaryFileStore.updateSelectionPoint(newStart, HEX_VIEWER_SOURCE + "KEYBOARD");
     } else {
-        currentBinaryFileStore.updateSelectionRange(newStart, newEnd, HEX_VIEWER_SOURCE);
+        currentBinaryFileStore.updateSelectionRange(newStart, newEnd, HEX_VIEWER_SOURCE + "KEYBOARD");
     }
 };

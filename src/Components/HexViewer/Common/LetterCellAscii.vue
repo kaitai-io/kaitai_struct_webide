@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import {ProcessedLetter} from "../Types";
 import {
-  DragSelectionMoveEvent,
-  EndDragSelection,
-  SelectRangeToWhichByteBelongs,
-  SingleByteClickAction,
-  StartDragSelection
+  onMouseUpAction,
+  onSingleClickAction,
+  onMouseEnterAction,
+  onDoubleClickAction,
+  onDragStartAction
 } from "../Services/HexViewerMouseActions";
 
 const props = defineProps<{
@@ -19,11 +19,14 @@ const props = defineProps<{
 <template>
   <span
       :class="`cell ${props.letter.isSelected ? 'selected' : ''}`"
-      @click="(e) => props.interactive && SingleByteClickAction(e,  props.letter)"
-      @mousedown="(e) => props.interactive && StartDragSelection(e, props.letter)"
-      @mouseenter="(e) => props.interactive && DragSelectionMoveEvent(e, props.letter)"
-      @mouseup="(e) => props.interactive && EndDragSelection(e)"
-      @dblclick="(e) => props.interactive && SelectRangeToWhichByteBelongs(e, props.letter)"
+      :draggable="props.interactive"
+
+      @click="(e) => props.interactive && onSingleClickAction(e,  props.letter)"
+      @dblclick="(e) => props.interactive && onDoubleClickAction(e, props.letter)"
+
+      @dragstart="(e) => props.interactive && onDragStartAction(e, props.letter)"
+      @mouseenter="(e) => props.interactive && onMouseEnterAction(e, props.letter)"
+      @mouseup="(e) => props.interactive && onMouseUpAction(e)"
   >
               {{ props.letter.char[props.letter.char.length - 1] }}
       </span>
@@ -32,14 +35,15 @@ const props = defineProps<{
 
 <style scoped>
 .cell {
-  width: 8px;
+  width: 7px;
+  font-size: 12px;
   height: 100%;
   display: inline-block;
   border-radius: inherit;
 }
 
 .selected {
-  background-color: #0076e0;
-  color: white;
+  background-color: var(--hex-viewer-selected-bg-color);
+  color: var(--hex-viewer-selected-color);
 }
 </style>

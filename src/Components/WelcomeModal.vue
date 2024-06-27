@@ -3,15 +3,16 @@
 import {onMounted} from "vue";
 import {KaitaiIdeInfo} from "../KaitaiIdeInfo";
 import KaitaiStructCompiler from "kaitai-struct-compiler";
+import {LocalStorageApi} from "../v1/utils/LocalStorageApi";
 
 onMounted(() => {
-  if (localStorage.getItem("doNotShowWelcome") !== "true") {
+  if (LocalStorageApi.getDoNotShowWelcomeFlag()) {
     (<any>$("#welcomeModal")).modal();
   }
 });
 
 const dontShowAgain = () => {
-  localStorage.setItem("doNotShowWelcome", "true");
+  LocalStorageApi.storeDoNotShowWelcomeFlag(true);
 };
 
 

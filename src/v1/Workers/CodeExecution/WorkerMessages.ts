@@ -5,7 +5,7 @@ export interface IWorkerMessageInit {
     scripts: {
         kaitaiStream: string;
         zlib: string;
-    }
+    };
 }
 export interface IWorkerMessageParse {
     type: typeof PARSE_SCRIPTS;
@@ -14,8 +14,8 @@ export interface IWorkerMessageParse {
     ksyTypes: IKsyTypes;
     inputBuffer: ArrayBuffer;
 
-    eagerMode: boolean,
-    msgId: number,
+    eagerMode: boolean;
+    msgId: number;
 }
 
 export type IWorkerMessage = IWorkerMessageInit | IWorkerMessageParse

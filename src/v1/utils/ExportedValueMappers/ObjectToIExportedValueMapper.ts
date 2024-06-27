@@ -1,4 +1,4 @@
-import {IExportedValue, ObjectType} from "../../../entities";
+import {IExportedValue, IInstance, ObjectType} from "../../../entities";
 import {IKsyTypes} from "../../Workers/CodeExecution/Types";
 
 interface IDebugInfo {

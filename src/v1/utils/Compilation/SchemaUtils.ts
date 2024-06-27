@@ -1,4 +1,5 @@
 import {StringUtils} from "../Misc/StringUtils";
+import {IKsyTypes} from "../../Workers/CodeExecution/Types";
 
 export class SchemaUtils {
     static ksyNameToJsName(ksyName: string, isProp: boolean) {
@@ -26,11 +27,14 @@ export class SchemaUtils {
     }
 
     static collectKsyTypes(schema: KsySchema.IKsyFile): IKsyTypes {
+        // Function was modifying input and the reason was:
+        // we have to modify the schema (add typesByJsName for example) before sending into the compiler, so we need a copy
+        const schemaTemp = {...schema};
         var types: IKsyTypes = {};
-        SchemaUtils.collectTypes(types, schema);
+        SchemaUtils.collectTypes(types, schemaTemp);
 
-        var typeName = SchemaUtils.ksyNameToJsName(schema.meta.id, false);
-        types[typeName] = schema;
+        var typeName = SchemaUtils.ksyNameToJsName(schemaTemp.meta.id, false);
+        types[typeName] = schemaTemp;
 
         return types;
     }

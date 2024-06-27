@@ -24,8 +24,8 @@ const addressFormatted = computed(() => {
 
 <style scoped>
 .address {
-  color: red;
   width: 60px;
   display: inline-block;
+  color: var(--hex-viewer-address-color)
 }
 </style>

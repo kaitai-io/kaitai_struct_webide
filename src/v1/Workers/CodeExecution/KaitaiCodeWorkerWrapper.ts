@@ -58,11 +58,11 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
         const msg = <IWorkerResponse>ev.data;
         switch (msg.type) {
             case INIT_WORKER_SCRIPTS: {
-                this.onMessageReceiveInit(msg as IWorkerResponseInit)
+                this.onMessageReceiveInit(msg as IWorkerResponseInit);
                 return;
             }
             case PARSE_SCRIPTS: {
-                this.onMessageReceiveParse(msg as IWorkerResponseParse)
+                this.onMessageReceiveParse(msg as IWorkerResponseParse);
                 return;
             }
         }
@@ -71,13 +71,13 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
 
     private onMessageReceiveInit = (msg: IWorkerResponseInit) => {
         console.log("[KaitaiCodeWorkerWrapper][RESPONSE]", msg);
-    }
+    };
 
     private onMessageReceiveParse = (msg: IWorkerResponseParse) => {
         console.log("[KaitaiCodeWorkerWrapper][RESPONSE]", msg);
         const parseResponsePromise = this.stack.removeFunctionFromStack(msg.msgId);
         !!parseResponsePromise && parseResponsePromise(msg);
-    }
+    };
 
 
     private digestResponseFromWorker = (response: IWorkerResponseParse,

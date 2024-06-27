@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import LetterSpacer from "./LetterSpacer.vue";
 import {useHexViewerConfigStore} from "../Store/HexViewerConfigStore";
-import {computed} from "vue";
 import {OddStatus, ProcessedLetter, RangePlacementStatus} from "../Types";
 import {
-  DragSelectionMoveEvent,
-  EndDragSelection,
-  SelectRangeToWhichByteBelongs, SingleByteClickAction, StartDragSelection
+  onDoubleClickAction,
+  onDragStartAction,
+  onMouseEnterAction,
+  onMouseUpAction,
+  onSingleClickAction
 } from "../Services/HexViewerMouseActions";
 
 const store = useHexViewerConfigStore();
@@ -41,12 +42,8 @@ const rangePlacementClass = (letter: ProcessedLetter) => {
   }
 };
 
-const splitters = computed(() => {
-  return Math.floor(store.rowSize / store.columns);
-});
-
 const isGapAfter = () => {
-  if(store.columns == 0 || store.columns == 1) return false;
+  if (store.columns == 0 || store.columns == 1) return false;
   const isLastInRow = props.inRowIndex + 1 == store.rowSize;
   if (isLastInRow) return false;
   return (props.inRowIndex + 1) % store.columns === 0;
@@ -55,11 +52,14 @@ const isGapAfter = () => {
 
 <template>
   <div :class="`letter-container ${rangePlacementClass(props.letter)}`"
-       @click="(e) => props.interactive && SingleByteClickAction(e,  props.letter)"
-       @mousedown="(e) => props.interactive && StartDragSelection(e, props.letter)"
-       @mouseenter="(e) => props.interactive && DragSelectionMoveEvent(e, props.letter)"
-       @mouseup="(e) => props.interactive && EndDragSelection(e)"
-       @dblclick="(e) => props.interactive && SelectRangeToWhichByteBelongs(e, props.letter)"
+       :draggable="props.interactive"
+
+       @click="(e) => props.interactive && onSingleClickAction(e,  props.letter)"
+       @dblclick="(e) => props.interactive && onDoubleClickAction(e, props.letter)"
+
+       @dragstart="(e) => props.interactive && onDragStartAction(e, props.letter)"
+       @mouseenter="(e) => props.interactive && onMouseEnterAction(e, props.letter)"
+       @mouseup="(e) => props.interactive && onMouseUpAction(e)"
   >
   <span
       :class="`cell ${oddEvenClass(props.letter)}  ${props.letter.isSelected ? 'selected' : ''}`"
@@ -74,9 +74,8 @@ const isGapAfter = () => {
 
 <style scoped>
 .letter-container {
-  width: 24px;
+  width: 22px;
   display: inline-block;
-  color: black;
   margin: auto;
   text-align: center;
   padding-top: 1px;
@@ -91,16 +90,18 @@ const isGapAfter = () => {
 }
 
 .odd {
-  background-color: #ddddff;
+  background-color: var(--hex-viewer-odd-bg-color);
+  color: var(--hex-viewer-odd-color);
 }
 
 .even {
-  background-color: #c4c4ff;
+  background-color: var(--hex-viewer-even-bg-color);
+  color: var(--hex-viewer-even-color);
 }
 
 .selected {
-  background-color: #0076e0;
-  color: white;
+  background-color: var(--hex-viewer-selected-bg-color);
+  color: var(--hex-viewer-selected-color);
 }
 
 .l2 {

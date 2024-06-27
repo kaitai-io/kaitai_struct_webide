@@ -1,0 +1,39 @@
+:root {
+    --hex-viewer-spacer-width: 6px;
+
+    /*DARK THEME*/
+    --hex-viewer-bg-color: #222;
+    --hex-viewer-color: #ccc;
+
+    --hex-viewer-header-bg-color: #333;
+    --hex-viewer-header-color: #ccc;
+
+    --hex-viewer-odd-bg-color: #344C64;
+    --hex-viewer-odd-color: white;
+
+    --hex-viewer-even-bg-color: #577B8D;
+    --hex-viewer-even-color: white;
+
+    --hex-viewer-selected-bg-color: #57A6A1;
+    --hex-viewer-selected-color: white;
+
+    --hex-viewer-address-color: #ccc;
+
+    /*LIGHT THEME*/
+    /*--hex-viewer-bg-color: white;*/
+    /*--hex-viewer-color: #333;*/
+
+    /*--hex-viewer-header-bg-color: #eee;*/
+    /*--hex-viewer-header-color: #333;*/
+
+    /*--hex-viewer-odd-bg-color: #ddddff;*/
+    /*--hex-viewer-odd-color: #333;*/
+
+    /*--hex-viewer-even-bg-color: #c4c4ff;*/
+    /*--hex-viewer-even-color: #333;*/
+
+    /*--hex-viewer-selected-bg-color: #0076e0;*/
+    /*--hex-viewer-selected-color: white;*/
+
+    /*--hex-viewer-address-color: #ccc;*/
+}

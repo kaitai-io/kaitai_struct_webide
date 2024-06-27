@@ -3,6 +3,11 @@ import {fileSystemsManager} from "../../FileSystems/FileSystemManager";
 import {SchemaUtils} from "./SchemaUtils";
 import {YamlParser} from "./YamlParser";
 import {JsImporterError} from "./JsImporterError";
+import {IKsyTypes} from "../../Workers/CodeExecution/Types";
+
+interface IYamlImporter {
+    importYaml(name: string, mode: string): Promise<KsySchema.IKsyFile>;
+}
 
 export class JsImporter implements IYamlImporter {
     constructor(private rootFsItem: IFsItem, private ksyTypes: IKsyTypes) {
@@ -38,11 +43,9 @@ export class JsImporter implements IYamlImporter {
             const errorMessage = `failed to import spec ${fn} from ${sourceAppendix}${e.message ? ": " + e.message : ""}`;
             throw new JsImporterError(errorMessage);
         }
+
         const ksyModel = YamlParser.parseIKsyFile(<string>ksyContent, fn);
         Object.assign(this.ksyTypes, SchemaUtils.collectKsyTypes(ksyModel));
-
-        // we have to modify the schema (add typesByJsName for example) before sending into the compiler, so we need a copy
-        const compilerSchema = YamlParser.parseIKsyFile(<string>ksyContent, fn);
-        return compilerSchema;
+        return ksyModel;
     }
 }

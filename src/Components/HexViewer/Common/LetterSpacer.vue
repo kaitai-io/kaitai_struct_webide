@@ -9,7 +9,7 @@
 
 <style scoped>
 .spacer {
-  width: 10px;
+  width: var(--hex-viewer-spacer-width);
   display: inline-block;
   margin: 0;
   padding: 0;

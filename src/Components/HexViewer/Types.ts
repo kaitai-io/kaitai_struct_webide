@@ -1,3 +1,5 @@
+import {SimpleRange} from "../../v1/utils/RangeHelper";
+
 export enum OddStatus {
     NONE,
     ODD,
@@ -12,6 +14,10 @@ export enum RangePlacementStatus {
     FULL_RANGE
 }
 
+export interface IExportedValueOddRange extends SimpleRange {
+    isOdd: boolean;
+}
+
 export interface ProcessedLetter {
     isSelected: boolean;
     hex: string;
@@ -19,25 +25,17 @@ export interface ProcessedLetter {
     index: number;
     oddStatus: OddStatus;
     rangePlacement: RangePlacementStatus;
-    range?: IExportedValueRange;
-}
-
-export interface IExportedValueRange {
-    startIndex: number;
-    endIndex: number;
-    isOdd: boolean;
-    path: string;
+    range?: IExportedValueOddRange;
 }
 
 export interface IExportedValueRangesForRow {
     rowAddress: number;
-    data: IExportedValueRange[];
+    data: IExportedValueOddRange[];
 }
 
 export interface ProcessLettersConfig {
-    selectionStart: number;
-    selectionEnd: number;
+    selection: SimpleRange;
     rowIndex: number;
     emojiMode?: boolean;
-    oddEvenRanges?: IExportedValueRange[];
+    oddEvenRanges?: IExportedValueOddRange[];
 }

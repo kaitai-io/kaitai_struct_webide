@@ -49,10 +49,8 @@ body { color:#333 }
 #infoPanel { background: #222222; }
 #infoPanel { color: #eee; display:none; padding: 10px }
 #aboutWebIde { position:absolute; bottom:10px; right:10px; font-size:12px }
-#disableLazyParsingDiv, #exportToJsonDiv, #unparsedDiv, #bytesDiv, #parsedPathDiv, #selectionLengthDiv { font-size:13px; margin-top:5px }
+#exportToJsonDiv, #parsedPathDiv, #selectionLengthDiv { font-size:13px; margin-top:5px }
 #parsedPath { word-break: break-all; }
-#unparsedDiv { margin-top:0 }
-#disableLazyParsingDiv label { margin-left:2px; font-weight:normal; vertical-align:middle }
 #welcomeModalLabel { text-align:center }
 #welcomeModal .licenses { font-size:12px; margin-bottom:10px }
 /*.marker_match { background:rgba(80, 255, 80, 0.30); }*/

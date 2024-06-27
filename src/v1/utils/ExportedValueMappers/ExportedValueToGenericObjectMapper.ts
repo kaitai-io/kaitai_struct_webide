@@ -1,4 +1,5 @@
 import {AbstractExportedValueMapper} from "./AbstractExportedValueMapper";
+import {IExportedValue} from "../../../entities";
 
 export class ExportedValueToGenericObjectMapper extends AbstractExportedValueMapper<any> {
 
@@ -21,8 +22,8 @@ export class ExportedValueToGenericObjectMapper extends AbstractExportedValueMap
         super.visitObject(value);
         const newObject = {};
         Object.keys(value.object.fields || {}).forEach(key => {
-            newObject[key] = this.map(value.object.fields[key])
-        })
+            newObject[key] = this.map(value.object.fields[key]);
+        });
         return newObject;
     }
 
@@ -31,7 +32,7 @@ export class ExportedValueToGenericObjectMapper extends AbstractExportedValueMap
         return {
             name: value.enumStringValue,
             value: value.primitiveValue
-        }
+        };
     }
 
     protected visitUndefined(value: IExportedValue): any {

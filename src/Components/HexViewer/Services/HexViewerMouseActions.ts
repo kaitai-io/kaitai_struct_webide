@@ -4,52 +4,70 @@ import {useHexViewerConfigStore} from "../Store/HexViewerConfigStore";
 import {HEX_VIEWER_SOURCE} from "./HexViewerActions";
 
 const LEFT_MOUSE_BUTTON = 1;
-export const SingleByteClickAction = (e: MouseEvent, letter: ProcessedLetter) => {
+
+const handleDeselectAction = (e: MouseEvent, letter: ProcessedLetter) => {
     const store = useCurrentBinaryFileStore();
     if (letter.isSelected && store.selectionStart === store.selectionEnd) {
         store.deselect();
-        return;
+        return true;
     }
+};
+
+const handleShiftSelectAction = (e: MouseEvent, letter: ProcessedLetter) => {
+    const store = useCurrentBinaryFileStore();
     if (e.shiftKey && store.selectionPivot !== -1) {
         store.updateSelectionRange(store.selectionPivot, letter.index, HEX_VIEWER_SOURCE);
-    } else {
-        store.updateSelectionPoint(letter.index, HEX_VIEWER_SOURCE);
+        return true;
     }
 };
 
-export const StartDragSelection = (e: MouseEvent, letter: ProcessedLetter) => {
-    const store = useHexViewerConfigStore();
-
-    const uglySafeGuardForShiftClickSelectionChangingPivotPoint = e.shiftKey;
-    if (uglySafeGuardForShiftClickSelectionChangingPivotPoint) return;
-    store.updateSelectionDragStart(letter);
+const handleSingleSelectionAction = (e: MouseEvent, letter: ProcessedLetter) => {
+    const store = useCurrentBinaryFileStore();
+    store.updateSelectionPoint(letter.index, HEX_VIEWER_SOURCE);
+    return true;
 };
 
-export const DragSelectionMoveEvent = (e: MouseEvent, letter: ProcessedLetter) => {
+const handleRangeSelectionAction = (e: MouseEvent, letter: ProcessedLetter) => {
+    if (letter.range) {
+        const store = useCurrentBinaryFileStore();
+        const start = letter.range.start;
+        const end = letter.range.end;
+        store.updateSelectionRange(start, end, HEX_VIEWER_SOURCE);
+        store.updateSelectionPivot(start, HEX_VIEWER_SOURCE);
+        return true;
+    }
+};
+
+const handleDragSelectionStartAction = (e: MouseEvent, letter: ProcessedLetter) => {
+    e.preventDefault();
+    const store = useHexViewerConfigStore();
+    store.updateSelectionDragStart(letter);
+    return true;
+};
+
+const handleDragSelectionUpdate = (e: MouseEvent, letter: ProcessedLetter) => {
     const binaryFileStore = useCurrentBinaryFileStore();
     const hexViewerConfigStore = useHexViewerConfigStore();
     const isDragging = !!hexViewerConfigStore.selectionDragStart;
     const isLeftButtonDown = e.buttons === LEFT_MOUSE_BUTTON;
-
-    if (!isDragging) return;
+    if (!isDragging) return false;
     if (!isLeftButtonDown) {
         hexViewerConfigStore.updateSelectionDragStart(null);
-        return;
+        return false;
     }
 
     const start = hexViewerConfigStore.selectionDragStart.index;
     const end = letter.index;
     binaryFileStore.updateSelectionRange(start, end, HEX_VIEWER_SOURCE);
+    return true;
 };
 
-export const EndDragSelection = (e: MouseEvent) => {
+const handleSelectionDragEnd = () => {
     const hexViewerConfigStore = useHexViewerConfigStore();
     const currentBinaryFileStore = useCurrentBinaryFileStore();
 
     const isDragging = !!hexViewerConfigStore.selectionDragStart;
-    const uglySafeGuardForShiftClickSelectionChangingPivotPoint = e.shiftKey;
-    if (uglySafeGuardForShiftClickSelectionChangingPivotPoint) return;
-    if (!isDragging) return;
+    if (!isDragging) return false;
 
     const dragStartIndex = hexViewerConfigStore.selectionDragStart.index;
 
@@ -60,14 +78,29 @@ export const EndDragSelection = (e: MouseEvent) => {
 
     hexViewerConfigStore.updateSelectionDragStart(null);
     currentBinaryFileStore.updateSelectionPivot(newPivot, HEX_VIEWER_SOURCE);
+    return true;
 };
 
-export const SelectRangeToWhichByteBelongs = (e: MouseEvent, letter: ProcessedLetter) => {
-    if (!letter.range) return;
 
-    const store = useCurrentBinaryFileStore();
-    const start = letter.range.startIndex;
-    const end = letter.range.endIndex;
-    store.updateSelectionRange(start, end, HEX_VIEWER_SOURCE);
-    store.updateSelectionPivot(start, HEX_VIEWER_SOURCE);
+export const onSingleClickAction = (e: MouseEvent, letter: ProcessedLetter) => {
+    return handleDeselectAction(e, letter)
+        || handleShiftSelectAction(e, letter)
+        || handleSingleSelectionAction(e, letter);
 };
+
+export const onDoubleClickAction = (e: MouseEvent, letter: ProcessedLetter) => {
+    return handleRangeSelectionAction(e, letter);
+};
+
+export const onDragStartAction = (e: MouseEvent, letter: ProcessedLetter) => {
+    return handleDragSelectionStartAction(e, letter);
+};
+
+export const onMouseEnterAction = (e: MouseEvent, letter: ProcessedLetter) => {
+    if (handleDragSelectionUpdate(e, letter)) return;
+};
+
+export const onMouseUpAction = (e: MouseEvent) => {
+    return handleSelectionDragEnd();
+};
+

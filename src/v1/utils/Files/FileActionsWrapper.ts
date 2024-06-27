@@ -48,6 +48,8 @@ export class FileActionsWrapper {
         const start = store.selectionStart;
         const end = store.selectionEnd;
         const fileDataLength = end - start + 1;
+        const noContentToDownload =  start === -1 || end === -1;
+        if (noContentToDownload) return;
 
         const fileName = ArrayUtils.last(app.inputFsItem.fn.split("/"));
         const hexRange = `0x${start.toString(16)}-0x${end.toString(16)}`;

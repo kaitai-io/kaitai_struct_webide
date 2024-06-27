@@ -1,11 +1,11 @@
 import {IExportedValue} from "../../../entities";
 import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
+import {RangeHelper} from "../../../v1/utils/RangeHelper";
 
-export const PARSED_TREE_SOURCE = "PARSED_TREE";
+export const PARSED_TREE_SOURCE = "SOURCE_PARSED_TREE";
 
-export const TreeNodeSelected = (exported: IExportedValue) => {
-    const start = exported.ioOffset + exported.start;
-    const end = exported.ioOffset + exported.end - 1;
+export const TreeNodeSelectedAction = (exported: IExportedValue) => {
+    const range = RangeHelper.getSimpleRange(exported);
     const currentFileStore = useCurrentBinaryFileStore();
-    currentFileStore.updateSelectionRange(start, end, PARSED_TREE_SOURCE);
+    currentFileStore.updateSelectionRange(range.start, range.end, PARSED_TREE_SOURCE);
 };

@@ -27,9 +27,11 @@ const processedRow = computed<{ rowFirstByteIndex: number, letters: any, emptyLe
       : new Uint8Array([]);
 
   const letters = createLetters(data, {
+    selection: {
+      start: currentFileStore.selectionStart,
+      end: currentFileStore.selectionEnd
+    },
     rowIndex: rowAddress,
-    selectionStart: currentFileStore.selectionStart,
-    selectionEnd: currentFileStore.selectionEnd,
     oddEvenRanges: props.processedData?.find(item => item.rowAddress === rowAddress)?.data || [],
     emojiMode: hexConfig.emojiMode
   });

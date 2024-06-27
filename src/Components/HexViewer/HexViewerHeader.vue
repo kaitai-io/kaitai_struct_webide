@@ -45,7 +45,8 @@ const letters = computed(() => {
 
 .header {
   font-weight: bold;
-  background: #eee
+  background: var(--hex-viewer-header-bg-color);
+  color: var(--hex-viewer-header-color);
 }
 
 </style>

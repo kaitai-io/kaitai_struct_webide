@@ -6,8 +6,8 @@ export const PARSE_SCRIPTS = "PARSE_SCRIPTS";
 
 
 export interface IWorkerParsedResponse {
-    error?: Error,
-    resultObject: any,
+    error?: Error;
+    resultObject: any;
 }
 
 export interface IKsyTypes {
@@ -19,7 +19,7 @@ export interface IWorkerApiMethods {
 
     setInputAction(inputBuffer: ArrayBuffer): void;
 
-    reparseAction(eagerMode: boolean): Promise<IWorkerParsedResponse>,
+    reparseAction(eagerMode: boolean): Promise<IWorkerParsedResponse>;
 
-    getPropertyByPathAction(path: string): Promise<IExportedValue>
+    getPropertyByPathAction(path: string): Promise<IExportedValue>;
 }

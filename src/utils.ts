@@ -46,12 +46,6 @@ export function uuidEncode(bytes: Uint8Array, isMs: boolean) {
     return uuid;
 }
 
-export function arrayBufferToBase64(buffer: ArrayBuffer) {
-    var bytes = new Uint8Array(buffer);
-    var binary = asciiEncode(bytes);
-    return window.btoa(binary);
-}
-
 export function htmlescape(str: string) {
     return $("<div/>").text(str).html();
 }
