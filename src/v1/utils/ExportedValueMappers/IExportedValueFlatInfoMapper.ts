@@ -42,18 +42,18 @@ export class IExportedValueFlatInfoMapper extends AbstractExportedValueMapper<vo
 
 
     protected visitPrimitive(value: IExportedValue): void {
-        this.leafs.push(value);
+        this.determineLeaf(value);
         this.determineEmptyInterval(value);
     }
 
     protected visitTypedArray(value: IExportedValue): void {
-        this.leafs.push(value);
+        this.determineLeaf(value);
         this.determineEmptyInterval(value);
         this.determineByteArrayInterval(value);
     }
 
     protected visitEnum(value: IExportedValue): void {
-        this.leafs.push(value);
+        this.determineLeaf(value);
         this.determineEmptyInterval(value);
     }
 
@@ -63,6 +63,14 @@ export class IExportedValueFlatInfoMapper extends AbstractExportedValueMapper<vo
             this.emptyIntervals.push(this.intervalFromLastIndex(expectedPreviousItemEndIndex));
         }
         this.lastItemEndIndex = RangeHelper.getEndIndex(value);
+    }
+
+    private determineLeaf(value: IExportedValue): void {
+        const range = RangeHelper.getSimpleRange(value);
+        if(range.end >= range.start) {
+            this.leafs.push(value);
+
+        }
     }
 
     private determineByteArrayInterval(value: IExportedValue): void {
