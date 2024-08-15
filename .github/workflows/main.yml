@@ -5,6 +5,9 @@ on:
     branches:
       - master
       - stable
+  
+  # Allow this workflow to be triggered on the master branch by an external system (such as the kaitai_struct repo's workflow)
+  repository_dispatch:
 
 jobs:
   build:
