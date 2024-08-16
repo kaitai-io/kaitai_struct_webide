@@ -8,6 +8,7 @@ on:
   
   # Allow this workflow to be triggered on the master branch by an external system (such as the kaitai_struct repo's workflow)
   repository_dispatch:
+    types: [rebuild]
 
 jobs:
   build:
