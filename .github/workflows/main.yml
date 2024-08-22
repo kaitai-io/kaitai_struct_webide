@@ -28,7 +28,6 @@ jobs:
       - name: Use stable versions of KSC and JS runtime
         run: |
           npm install kaitai-struct-compiler@latest kaitai-struct@latest
-          node vendor_build.js
         if: github.ref == 'refs/heads/stable'
       - name: Set up environment variables for stable deployment
         run: |
