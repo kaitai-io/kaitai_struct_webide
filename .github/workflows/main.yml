@@ -5,10 +5,14 @@ on:
     branches:
       - master
       - stable
-  
-  # Allow this workflow to be triggered on the master branch by an external system (such as the kaitai_struct repo's workflow)
+
+  # Allow this workflow to be run on the `master` branch when a webhook event
+  # called `repository_dispatch` is triggered. This is used from the CI workflow
+  # in https://github.com/kaitai-io/kaitai_struct to rebuild the devel Web IDE
+  # after a new version of KSC is published to npm.
   repository_dispatch:
-    types: [rebuild]
+    types:
+      - rebuild
 
 jobs:
   build:
