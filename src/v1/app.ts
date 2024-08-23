@@ -13,10 +13,9 @@ import "bootstrap";
 import "jstree";
 
 import {addKsyFile, initFileTree, refreshFsNodes} from "./app.files";
-import {IParsedTreeNode, ParsedTreeHandler} from "./parsedToTree";
 import {codeExecutionWorkerApi} from "./Workers/WorkerApi";
 import {initFileDrop} from "./JQueryComponents/Files/FileDrop";
-import {Delayed} from "../utils";
+import {DelayAction} from "./utils/DelayAction";
 import {exportToJson} from "./utils/ExportToJson";
 import {ErrorWindowHandler} from "./app.errors";
 import {fileSystemsManager} from "./FileSystems/FileSystemManager";
@@ -32,10 +31,8 @@ import {createApp} from "vue";
 import App from "../App.vue";
 import {IAceEditorComponentOptions} from "./GoldenLayout/AceEditorComponent";
 import {createPinia} from "pinia";
-import {CurrentBinaryFile, useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
-import {PARSED_TREE_SOURCE, TreeNodeSelectedAction} from "../Components/ParsedTree/Services/ParsedTreeActions";
+import {useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
 import {useIdeSettingsStore} from "../Stores/IdeSettingsStore";
-import {RangeHelper} from "./utils/RangeHelper";
 
 const vueApp = createApp(App);
 vueApp.use(createPinia());
@@ -73,11 +70,6 @@ class AppController {
         this.vm.ui = this.ui;
         this.errors = new ErrorWindowHandler(this.ui.layoutManager.getLayoutNodeById("mainArea"));
         initFileTree();
-
-
-        useCurrentBinaryFileStore().$onAction(({name, store, args}) => {
-            this.handleSelectionUpdatedTreeEvents(name, args, store);
-        });
     }
 
     ksyFsItemName = "ksyFsItem";
@@ -120,7 +112,6 @@ class AppController {
         await this.reparse();
     }
 
-    blockFiringSelectionEvent = false;
     formatReady: Promise<any> = null;
     inputReady: Promise<any> = null;
 
@@ -137,28 +128,6 @@ class AppController {
             kaitaiIde.root = exportedRoot;
             const store = useCurrentBinaryFileStore();
             store.updateParsedFile(exportedRoot);
-            //console.log("reparse exportedRoot", exportedRoot);
-
-            this.ui.parsedDataTreeHandler = new ParsedTreeHandler(this.ui.parsedDataTreeCont.getElement(), exportedRoot, this.compilerService.ksyTypes);
-
-            this.ui.parsedDataTreeHandler.jstree.on("state_ready.jstree", () => {
-                this.ui.parsedDataTreeHandler.jstree.on("select_node.jstree", (e, selectNodeArgs) => {
-                    const node = <IParsedTreeNode>selectNodeArgs.node;
-                    const exp = this.ui.parsedDataTreeHandler.getNodeData(node).exported;
-
-                    if (!this.blockFiringSelectionEvent) {
-                        TreeNodeSelectedAction(exp);
-                    }
-
-                    if (exp) {
-                        if (exp.instanceError !== undefined) {
-                            app.errors.handle(exp.instanceError);
-                        } else if (exp.validationError !== undefined) {
-                            app.errors.handle(exp.validationError);
-                        }
-                    }
-                });
-            });
 
             this.errors.handle(parseError);
         } catch (error) {
@@ -210,22 +179,6 @@ class AppController {
                 return fsItems.length === 1 ? this.loadFsItem(fsItems[0]) : Promise.resolve(null);
             });
     }
-
-    handleSelectionUpdatedTreeEvents = async (eventName: string, args: any[], store: CurrentBinaryFile) => {
-        const isUpdateSelectionFunction = ["updateSelectionPoint"].indexOf(eventName) !== -1;
-        const sourceArgument = args.find(arg => typeof arg === "string" && arg.startsWith("SOURCE_"));
-        if (sourceArgument !== PARSED_TREE_SOURCE && isUpdateSelectionFunction && store.parsedFileFlatInfo) {
-            const newSelectionStart = args[0];
-            const node = store.parsedFileFlatInfo.leafs
-                .find(leaf => RangeHelper.exportedContainsPoint(leaf, newSelectionStart));
-            if (node && newSelectionStart !== store.selectionStart) {
-                this.blockFiringSelectionEvent = true;
-                await app.ui.parsedDataTreeHandler.activatePath(node.path);
-                this.blockFiringSelectionEvent = false;
-            }
-        }
-    };
-
 }
 
 export const app = new AppController();
@@ -263,7 +216,7 @@ $(() => {
     app.inputReady = loadCachedFsItem("inputFsItem", "kaitai", "samples/sample1.zip");
     app.formatReady = loadCachedFsItem(app.ksyFsItemName, "kaitai", "formats/archive/zip.ksy");
 
-    var editDelay = new Delayed(500);
+    const editDelay = new DelayAction(500);
     if (!("noAutoCompile" in qs))
         app.ui.ksyEditor.on("change", () => editDelay.do(() => app.recompile()));
 

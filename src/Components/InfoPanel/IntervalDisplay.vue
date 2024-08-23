@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
+import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import {computed} from "vue";
 import {SimpleRange} from "../../v1/utils/RangeHelper";
 
@@ -23,7 +23,12 @@ const next = () => {
   const nextInterval = foundInterval || fallbackToFirstInterval;
 
   if (!nextInterval) return;
-  store.updateSelectionRange(nextInterval.start, nextInterval.end, "INFO_PANEL");
+  const event: UpdateSelectionEvent = {
+    startNew: nextInterval.start,
+    endNew: nextInterval.end,
+    source: "INFO_PANEL"
+  }
+  store.updateSelectionEvent(event);
 };
 
 const prev = () => {
@@ -32,7 +37,12 @@ const prev = () => {
   const prevInterval = foundInterval || fallbackToLastInterval;
 
   if (!prevInterval) return;
-  store.updateSelectionRange(prevInterval.start, prevInterval.end, "INFO_PANEL");
+  const event: UpdateSelectionEvent = {
+    startNew: prevInterval.start,
+    endNew: prevInterval.end,
+    source: "INFO_PANEL"
+  }
+  store.updateSelectionEvent(event);
 };
 
 </script>

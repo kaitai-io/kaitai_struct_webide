@@ -7,11 +7,20 @@ import {IExportedValueFlatInfo} from "../v1/utils/ExportedValueMappers/IExported
 export interface CurrentBinaryFile {
     fileContent: ArrayBuffer;
     fileName: string;
+    range?: IExportedValue;
     parsedFile?: IExportedValue;
     parsedFileFlatInfo?: IExportedValueFlatInfo;
     selectionPivot: number;
     selectionStart: number;
     selectionEnd: number;
+}
+
+export interface UpdateSelectionEvent {
+    startNew: number;
+    endNew: number;
+    pivot?: number;
+    range?: IExportedValue;
+    source: string;
 }
 
 export const useCurrentBinaryFileStore = defineStore("SelectionStore", {
@@ -26,21 +35,18 @@ export const useCurrentBinaryFileStore = defineStore("SelectionStore", {
         };
     },
     actions: {
-        updateSelectionPoint(point: number, source: string) {
-            this.selectionStart = point;
-            this.selectionEnd = point;
-            this.selectionPivot = point;
-            LocalStorageApi.storeCurrentBinaryFileStoreState(this);
-        },
-        updateSelectionRange(startNew: number, endNew: number, source: string) {
-            const min = Math.min(startNew, endNew);
-            const max = Math.max(startNew, endNew);
+        updateSelectionEvent(event: UpdateSelectionEvent) {
+            const min = Math.min(event.startNew, event.endNew);
+            const max = Math.max(event.startNew, event.endNew);
 
             this.selectionStart = min;
             this.selectionEnd = max;
+            this.range = event.range;
+            this.selectionPivot = event.pivot;
 
             LocalStorageApi.storeCurrentBinaryFileStoreState(this);
         },
+
         updateSelectionPivot(point: number, source: string) {
             this.selectionPivot = point;
         },
@@ -57,6 +63,7 @@ export const useCurrentBinaryFileStore = defineStore("SelectionStore", {
             this.selectionStart = -1;
             this.selectionEnd = -1;
             this.selectionPivot = -1;
+            this.range = undefined;
             LocalStorageApi.storeCurrentBinaryFileStoreState(this);
         },
         updateParsedFile(parsedFile: IExportedValue) {

@@ -9,10 +9,12 @@ import FileDrop from "./Components/FileDrop.vue";
 import NewKsyModal from "./Components/NewKsyModal.vue";
 import InputContextMenu from "./Components/InputContextMenu.vue";
 import HexViewer from "./Components/HexViewer/HexViewer.vue";
+import ParsedTree from "./Components/ParsedTree/ParsedTree.vue";
 </script>
 
 <template>
   <UnsupportedBrowser/>
+  <ParsedTree/>
   <HexViewer/>
   <FileDrop/>
   <NewKsyModal/>

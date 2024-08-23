@@ -1,4 +1,5 @@
 import {SimpleRange} from "../../v1/utils/RangeHelper";
+import {IExportedValue} from "../../entities";
 
 export enum OddStatus {
     NONE,
@@ -16,6 +17,7 @@ export enum RangePlacementStatus {
 
 export interface IExportedValueOddRange extends SimpleRange {
     isOdd: boolean;
+    value: IExportedValue;
 }
 
 export interface ProcessedLetter {

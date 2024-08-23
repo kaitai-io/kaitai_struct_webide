@@ -1,5 +1,5 @@
 import {useHexViewerConfigStore} from "../Store/HexViewerConfigStore";
-import {CurrentBinaryFile} from "../../../Stores/CurrentBinaryFileStore";
+import {CurrentBinaryFile, UpdateSelectionEvent} from "../../../Stores/CurrentBinaryFileStore";
 
 export const HEX_VIEWER_SOURCE = "SOURCE_HEX_VIEWER";
 
@@ -9,13 +9,14 @@ const isInViewPort = (rowIndexToGo: number, viewportList: any) => {
     const viewPortLastRow: number = viewportList[viewportList.length - 1].data - MAGIC_NUMBER_OF_ROWS_THAT_ARE_OUTSIDE_OF_VIEWPORT;
     return rowIndexToGo < viewPortFirstRow || rowIndexToGo > viewPortLastRow;
 };
+
 export const handleSelectionUpdatedEvents = (eventName: string, args: any[], viewportList: any[], scrollTo: (index: number) => void) => {
     const hexViewerConfigStore = useHexViewerConfigStore();
-    const isSelectionEvent = ["updateSelectionRange", "updateSelectionPoint"].indexOf(eventName) !== -1;
-    const sourceArgument = args.find(arg => typeof arg === "string" && arg.startsWith("SOURCE_"));
-    if (!isSelectionEvent || sourceArgument === HEX_VIEWER_SOURCE) return false;
+    const isSelectionEvent ="updateSelectionEvent" === eventName;
+    const event = args[0] as UpdateSelectionEvent;
+    if (!isSelectionEvent || event.source === HEX_VIEWER_SOURCE) return false;
 
-    const rowIndexToGo = Math.floor(args[0] / hexViewerConfigStore.rowSize);
+    const rowIndexToGo = Math.floor(event.startNew / hexViewerConfigStore.rowSize);
     if (isInViewPort(rowIndexToGo, viewportList)) {
         scrollTo(rowIndexToGo);
         return true;

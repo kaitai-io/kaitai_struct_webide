@@ -43,7 +43,7 @@ const about = () => {
 </script>
 
 <template>
-  <div id="infoPanel">
+  <div class="info-panel" id="infoPanel">
     <SelectionPreview/>
 
 
@@ -69,5 +69,10 @@ const about = () => {
 </template>
 
 <style scoped>
-
+.info-panel {
+  background: #222222;
+  color: #eee;
+  display: none;
+  padding: 10px
+}
 </style>

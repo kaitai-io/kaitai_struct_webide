@@ -1,5 +1,5 @@
 import {NumberUtils} from "../../../v1/utils/Misc/NumberUtils";
-import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
+import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
 import {HEX_VIEWER_SOURCE} from "./HexViewerActions";
 
 const calculateMoveDiff = (e: KeyboardEvent, rowSize: number, fileLength: number) => {
@@ -36,6 +36,7 @@ const calculateNewStartEnd = (start: number, end: number, pivot: number, moveDif
     }
     return [newStart, newEnd];
 };
+
 export const handleCursorMoveAndSelect = (e: KeyboardEvent, rowSize: number) => {
     if (e.key === "Tab") {
         e.preventDefault();
@@ -54,9 +55,11 @@ export const handleCursorMoveAndSelect = (e: KeyboardEvent, rowSize: number) => 
         moveDiff, fileLength, isSelectionMove
     );
 
-    if (newStart === newEnd) {
-        currentBinaryFileStore.updateSelectionPoint(newStart, HEX_VIEWER_SOURCE + "KEYBOARD");
-    } else {
-        currentBinaryFileStore.updateSelectionRange(newStart, newEnd, HEX_VIEWER_SOURCE + "KEYBOARD");
-    }
+    const event :UpdateSelectionEvent = {
+        startNew: newStart,
+        endNew: newEnd,
+        range: undefined,
+        source: HEX_VIEWER_SOURCE + "KEYBOARD"
+    };
+    currentBinaryFileStore.updateSelectionEvent(event);
 };

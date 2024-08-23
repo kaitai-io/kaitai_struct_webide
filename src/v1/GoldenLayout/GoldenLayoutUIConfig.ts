@@ -16,7 +16,7 @@ export const GoldenLayoutUIConfig: GoldenLayout.Config = {
                                             {type: "component", componentName: "ksyEditor", title: ".ksy editor", isClosable: false},
                                             {
                                                 type: "stack", activeItemIndex: 0, content: [
-                                                    {type: "component", componentName: "parsedDataTree", title: "object tree", isClosable: false},
+                                                    {type: "component", componentName: "parsedDataTree", title: "object tree", isClosable: false}
                                                 ]
                                             },
                                         ]

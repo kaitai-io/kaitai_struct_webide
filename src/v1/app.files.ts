@@ -2,7 +2,6 @@
 import {fileSystemsManager} from "./FileSystems/FileSystemManager";
 import {initKaitaiFsTreeData} from "./FileSystems/KaitaiFileSystem";
 import {initLocalStorageFsTreeData} from "./FileSystems/LocalStorageFileSystem";
-import {IJSTreeNode} from "./parsedToTree";
 import {getSummaryIfPresent, mapToJSTreeNodes} from "./FileSystems/FileSystemHelper";
 import {FILE_SYSTEM_TYPE_LOCAL, IFsItem, IFsItemSummary, ITEM_MODE_DIRECTORY} from "./FileSystems/FileSystemsTypes";
 import dateFormat from "dateformat";
@@ -27,6 +26,14 @@ export async function addKsyFile(parent: string | Element, ksyFn: string, conten
         "last", (node: any) => app.ui.fileTree.activate_node(node, null));
     await app.loadFsItem(fsItem, true);
     return fsItem;
+}
+
+export interface IJSTreeNode<TData> {
+    id?: string;
+    text?: string;
+    icon?: string;
+    children?: IJSTreeNode<TData>[] | boolean;
+    data?: TData;
 }
 
 export function initFileTree() {

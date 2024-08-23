@@ -40,9 +40,10 @@ const groupRangesToRows = (ranges: IExportedValueOddRange[], rowSize: number = 1
 export const prepareOddEvenRangesForRows = (flatExported: IExportedValue[], rowSize: number = 16) => {
     if (!flatExported || flatExported.length === 0) return [];
     const ranges: IExportedValueOddRange[] = flatExported.map((item, index): IExportedValueOddRange => ({
-        start: item.start + item.ioOffset,
-        end: item.end + item.ioOffset - 1,
+        start: RangeHelper.getStartIndex(item),
+        end: RangeHelper.getEndIndex(item),
         isOdd: index % 2 !== 0,
+        value: item
     }));
 
     return groupRangesToRows(ranges, rowSize);
