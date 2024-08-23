@@ -1,5 +1,16 @@
 name: build
 
+# If this CI run was triggered via `repository_dispatch` from
+# https://github.com/kaitai-io/kaitai_struct, change the run name so that it's
+# not just "rebuild". Otherwise, return an empty string so that GitHub keeps the
+# default name.
+run-name: |
+  ${{ (github.event_name == 'repository_dispatch' &&
+        github.event.action == 'rebuild' &&
+        github.event.client_payload.ksc_version) &&
+      format('Build with kaitai-struct-compiler {0}', github.event.client_payload.ksc_version) ||
+      '' }}
+
 on:
   push:
     branches:
