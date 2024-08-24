@@ -35,17 +35,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm ci
 
-      - name: Use stable versions of KSC and JS runtime
+      - name: Use appropriate versions of KSC and JS runtime
+        env:
+          DIST_TAG: ${{ github.ref == 'refs/heads/master' && 'next' || 'latest' }}
+        # `--package-lock-only` means that it only updates `package-lock.json`
+        # (and `package.json`) without touching `node_modules/` at all.
         run: |
-          npm install kaitai-struct-compiler@latest kaitai-struct@latest
-          node vendor_build.js
-        if: github.ref == 'refs/heads/stable'
-      - name: Use devel versions of KSC and JS runtime
-        run: |
-          npm update kaitai-struct-compiler kaitai-struct
-        if: github.ref == 'refs/heads/master'
+          npm install --package-lock-only kaitai-struct-compiler@"$DIST_TAG" kaitai-struct@"$DIST_TAG"
+
+      # NOTE: it's important that `npm ci` is run *after* the adjustment of
+      # KSC's and JS runtime's versions so that the `install` script (`node
+      # vendor_build.js`) copies the correct versions into the `lib/_npm/`
+      # folder which will be deployed.
+      - run: npm ci
 
       - name: Set up environment variables for stable deployment
         run: |
