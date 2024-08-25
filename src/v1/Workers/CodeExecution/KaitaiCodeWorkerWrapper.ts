@@ -40,7 +40,7 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
         });
     };
 
-    getPropertyByPathAction = (path: string): Promise<IExportedValue> => {
+    getPropertyByPathAction = (path: string[]): Promise<IExportedValue> => {
         let parent = this.root;
         const parentPath = path.slice(0, -1);
         parentPath.forEach(key => parent = parent[key]);

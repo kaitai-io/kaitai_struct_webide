@@ -21,5 +21,5 @@ export interface IWorkerApiMethods {
 
     reparseAction(eagerMode: boolean): Promise<IWorkerParsedResponse>;
 
-    getPropertyByPathAction(path: string): Promise<IExportedValue>;
+    getPropertyByPathAction(path: string[]): Promise<IExportedValue>;
 }
