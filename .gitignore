@@ -255,3 +255,7 @@ lib/_npm/
 .serve_files_secret
 \.DS_Store
 playground/*.js*
+
+# Exclude JetBrains IDE files
+*.iml
+.idea

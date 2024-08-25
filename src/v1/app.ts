@@ -207,7 +207,11 @@ class AppController {
 
     onHexViewerSelectionChanged() {
         //console.log("setSelection", ui.hexViewer.selectionStart, ui.hexViewer.selectionEnd);
-        localStorage.setItem("selection", JSON.stringify({ start: this.ui.hexViewer.selectionStart, end: this.ui.hexViewer.selectionEnd }));
+        localStorage.setItem("selection", JSON.stringify({
+            start: this.ui.hexViewer.selectionStart,
+            end: this.ui.hexViewer.selectionEnd,
+            cursor: this.ui.hexViewer.selectionCursor
+        }));
 
         var start = this.ui.hexViewer.selectionStart;
         var hasSelection = start !== -1;
@@ -215,7 +219,7 @@ class AppController {
         this.refreshSelectionInput();
 
         if (this.ui.parsedDataTreeHandler && hasSelection && !this.selectedInTree) {
-            var intervals = this.ui.parsedDataTreeHandler.intervalHandler.searchRange(this.ui.hexViewer.mouseDownOffset || start);
+            var intervals = this.ui.parsedDataTreeHandler.intervalHandler.searchRange(this.ui.hexViewer.selectionCursor || start);
             if (intervals.items.length > 0) {
                 //console.log("selected node", intervals[0].id);
                 this.blockRecursive = true;
@@ -282,7 +286,11 @@ $(() => {
         const value = localStorage.getItem("selection");
         const storedSelection = value !== null ? JSON.parse(value) : null;
         if (storedSelection)
-            app.ui.hexViewer.setSelection(storedSelection.start, storedSelection.end);
+            app.ui.hexViewer.setSelection(
+                storedSelection.start,
+                storedSelection.end,
+                storedSelection.cursor
+            );
     });
 
     var editDelay = new Delayed(500);
