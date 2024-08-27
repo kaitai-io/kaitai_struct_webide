@@ -2,7 +2,6 @@ import "bootswatch/darkly/bootstrap.min.css";
 import "./../../css/contextmenu.css";
 import "golden-layout/src/css/goldenlayout-base.css";
 import "golden-layout/src/css/goldenlayout-dark-theme.css";
-import "./../../css/HexViewer.css";
 import "./../../css/app.css";
 import "jstree/dist/themes/default/style.min.css";
 import "jstree/dist/themes/default-dark/style.min.css";

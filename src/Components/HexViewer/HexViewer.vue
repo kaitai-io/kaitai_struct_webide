@@ -59,6 +59,7 @@ currentBinaryFileStore.$onAction(({name, store, args}) => {
   font-size: 12px;
   font-variant-ligatures: none;
   user-select: none;
+  text-wrap: nowrap;
 }
 
 
