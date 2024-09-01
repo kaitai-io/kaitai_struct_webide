@@ -39,7 +39,7 @@ currentBinaryFileStore.$onAction(({name, store, args}) => {
 <template>
   <div tabindex="-1" id="hex-viewer" class="hex-viewer" @keydown="(e) => handleCursorMoveAndSelect(e, hexViewerConfigStore.rowSize)">
     <HexViewerHeader/>
-    <div v-bind="containerProps" class="wrapper">
+    <div v-bind="containerProps" class="backdrop">
       <div v-bind="wrapperProps" class="wrapper-inner">
         <HexViewerRow :processed-data="oddEvenRanges" :row-index="listItem.data" v-for="listItem in list"/>
       </div>
@@ -63,7 +63,7 @@ currentBinaryFileStore.$onAction(({name, store, args}) => {
 }
 
 
-.wrapper {
+.backdrop {
   flex-grow: 1;
 }
 

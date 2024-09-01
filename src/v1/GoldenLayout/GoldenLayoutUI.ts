@@ -11,10 +11,8 @@ export class GoldenLayoutUI {
     genCodeViewer: Ace.Editor;
     genCodeDebugViewer: Ace.Editor;
     errorWindow: GoldenLayout.Container;
-    infoPanel: GoldenLayout.Container;
     fileTreeCont: JQuery;
     fileTree: JSTree;
-    converterPanel: JQuery;
 
     constructor() {
         const goldenLayout = new GoldenLayoutModule(GoldenLayoutUIConfig);
@@ -25,12 +23,12 @@ export class GoldenLayoutUI {
 
         this.layoutManager.addExistingDiv("hex-viewer");
         this.layoutManager.addExistingDiv("parsedDataTree");
+        this.layoutManager.addExistingDiv("fileTreeNew");
 
         this.layoutManager.addComponent("errorWindow", cont => {
             cont.getElement().append($("<div></div>"));
         });
 
-        this.layoutManager.addComponent("fileTreeCont", cont => cont.getElement().append($("#fileTreeCont")));
         this.layoutManager.addExistingDiv("infoPanel");
         this.layoutManager.addComponent("converterPanel", cont => cont.getElement().append($("#converter-panel")));
 

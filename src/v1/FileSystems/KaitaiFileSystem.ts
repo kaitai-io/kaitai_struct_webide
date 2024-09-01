@@ -1,5 +1,5 @@
-import {findOrCreateFsPath, mapToJSTreeNodes} from "./FileSystemHelper";
-import {FILE_SYSTEM_TYPE_KAITAI, IFileSystem, IFsItem, IJSTreeNodeHelper} from "./FileSystemsTypes";
+import {findOrCreateFsPath} from "./FileSystemHelper";
+import {FILE_SYSTEM_TYPE_KAITAI, IFileSystem, IFsItem, ITEM_MODE_DIRECTORY} from "./FileSystemsTypes";
 import {FileActionsWrapper} from "../utils/Files/FileActionsWrapper";
 import {kaitaiFsFiles} from "../../kaitaiFsFiles";
 
@@ -9,12 +9,17 @@ export class KaitaiFileSystem implements IFileSystem {
     }
 
     getRootNode() {
+        return this.files;
+    }
+
+    getRootNodeAsync() {
         return Promise.resolve(this.files);
     }
 
     setRootNode(newRoot: IFsItem): Promise<IFsItem> {
         throw "KaitaiFileSystem.setRootNode is not implemented";
     }
+
     get(fn: string): Promise<string | ArrayBuffer> {
         if (fn.toLowerCase().endsWith(".ksy"))
             return fetch(fn)
@@ -45,39 +50,8 @@ export class KaitaiFileSystem implements IFileSystem {
     }
 }
 
-export const initKaitaiFsTreeData = (kaitaiFs: KaitaiFileSystem): IJSTreeNodeHelper => {
-    const root = kaitaiFs.files;
-
-    if (!root.children.hasOwnProperty("formats") || !root.children.hasOwnProperty("samples")) {
-        console.error("'formats' node is missing from js/kaitaiFsFiles.js, are you sure 'formats' git submodule is initialized? Try run 'git submodule init; git submodule update --recursive; ./genKaitaiFsFiles.py'!");
-        root.children["formats"] = {};
-        root.children["samples"] = {};
-    }
-
-
-    return {
-        text: "kaitai.io",
-        icon: "glyphicon glyphicon-cloud",
-        state: {opened: true},
-        children: [
-            {
-                text: "formats",
-                icon: "glyphicon glyphicon-book",
-                children: mapToJSTreeNodes(root.children["formats"]),
-                state: {opened: true}
-            },
-            {
-                text: "samples",
-                icon: "glyphicon glyphicon-cd",
-                children: mapToJSTreeNodes(root.children["samples"]),
-                state: {opened: true}
-            },
-        ]
-    };
-};
-
 export const initKaitaiFs = () => {
-    const kaitaiRoot = <IFsItem>{fsType: FILE_SYSTEM_TYPE_KAITAI, children: {}};
+    const kaitaiRoot = <IFsItem>{fsType: FILE_SYSTEM_TYPE_KAITAI, children: {}, fn: "kaitai.io", type: ITEM_MODE_DIRECTORY};
     (kaitaiFsFiles || []).forEach(fn => findOrCreateFsPath(kaitaiRoot, fn));
     return new KaitaiFileSystem(kaitaiRoot);
 };

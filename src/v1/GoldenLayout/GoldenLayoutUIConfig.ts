@@ -5,7 +5,7 @@ export const GoldenLayoutUIConfig: GoldenLayout.Config = {
     content: [
         {
             type: "row", content: []
-                .concat({type: "component", componentName: "fileTreeCont", title: "files", isClosable: false, width: 12})
+                .concat({type: "component", componentName: "fileTreeNew", title: "files", isClosable: false, width: 12})
                 .concat(
                     {
                         type: "column", id: "mainArea", isClosable: false, content: [

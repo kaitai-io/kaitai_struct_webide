@@ -1,5 +1,10 @@
 import {AceEditorComponent, IAceEditorComponentOptions} from "./AceEditorComponent";
 import GoldenLayout from "golden-layout";
+import {useAceEditorStore} from "../../Stores/AceEditorStore";
+import {DelayAction} from "../utils/DelayAction";
+import {mainEditorOnChange, mainEditorRecompile} from "../../GlobalActions/MainEditorOnChange";
+import {Ace} from "ace-builds";
+import {parseAction} from "../../GlobalActions/ParseAction";
 
 export class GoldenLayoutWrapper<T> {
     dynCompId = 1;
@@ -53,7 +58,35 @@ export class GoldenLayoutWrapper<T> {
 
     addAceCodeEditorTab(name: string, options: IAceEditorComponentOptions) {
         this.addComponent(name, container => {
-            return AceEditorComponent(container, options);
+            const newEditor = AceEditorComponent(container, options);
+            switch (name) {
+                case "ksyEditor":
+                    useAceEditorStore().setKaitaiKsyEditor(newEditor);
+                    const editDelay = new DelayAction(500);
+                    newEditor.on("change", (change) => {
+                        editDelay.do(() => mainEditorOnChange(change, newEditor.getValue()));
+                    });
+                    newEditor.commands.addCommand({
+                        name: "compile", bindKey: {win: "Ctrl-Enter", mac: "Command-Enter"},
+                        exec: (editor: Ace.Editor) => {
+                            mainEditorRecompile(editor);
+                        }
+                    });
+                    break;
+                case "genCodeViewer":
+                    useAceEditorStore().setReleaseCodeEditor(newEditor);
+                    break;
+                case "genCodeDebugViewer": {
+                    useAceEditorStore().setDebugCodeEditor(newEditor);
+                    newEditor.commands.addCommand({
+                        name: "compile", bindKey: {win: "Ctrl-Enter", mac: "Command-Enter"},
+                        exec: (editor: Ace.Editor) => {
+                            parseAction();
+                        }
+                    });
+                }
+            }
+            return newEditor;
         });
     }
 

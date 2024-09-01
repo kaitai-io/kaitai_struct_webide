@@ -1,9 +1,26 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+
+import {exportToJson} from "../../GlobalActions/ExportToJson";
+import {IAceEditorComponentOptions} from "../../v1/GoldenLayout/AceEditorComponent";
+
+const exportToJsonThenPrintToConsole = (useHexForNumbers: boolean) => {
+  exportToJson(useHexForNumbers)
+      .then((json: string) => {
+        console.log(json)
+        const options: IAceEditorComponentOptions = {
+          lang: "json",
+          isReadOnly: true,
+          data: json
+        };
+        // this.ui.layoutManager.addDynamicAceCodeEditorTab("json export", options);
+      });
+}
+</script>
 
 <template>
   <div id="exportToJsonDiv">
-    <a onclick="kaitaiIde.app.vm.exportToJson(false)" href="#">export to JSON</a> (<a
-      onclick="kaitaiIde.app.vm.exportToJson(true)" href="#">hex</a>)
+    <a @click="exportToJsonThenPrintToConsole(false)" href="#">export to JSON</a>
+    (<a @click="exportToJsonThenPrintToConsole(true)" href="#">hex</a>)
     <br/>
   </div>
 </template>

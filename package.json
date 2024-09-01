@@ -81,6 +81,9 @@
       "staticOutPath": "samples"
     },
     {
+      "staticPath": "public"
+    },
+    {
       "staticPath": "LICENSE-3RD-PARTY.txt"
     },
     {

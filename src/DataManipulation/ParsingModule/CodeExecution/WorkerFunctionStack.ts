@@ -1,4 +1,3 @@
-import {IWorkerMessage} from "./WorkerMessages";
 import {IWorkerResponse, IWorkerResponseParse} from "./WorkerResponses";
 
 export class WorkerFunctionStack {

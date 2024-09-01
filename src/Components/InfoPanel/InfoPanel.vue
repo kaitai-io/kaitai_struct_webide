@@ -11,6 +11,7 @@ import ListOptionsToggle from "./ListOptionsToggle.vue";
 import ExportToJsonComponent from "./ExportToJsonComponent.vue";
 import {useIdeSettingsStore} from "../../Stores/IdeSettingsStore";
 import {RangeHelper} from "../../v1/utils/RangeHelper";
+import {useWelcomeModalStore} from "../WelcomeModal/WelcomeModalStore";
 
 const currentBinaryFileStore = useCurrentBinaryFileStore();
 const hexViewerConfigStore = useHexViewerConfigStore();
@@ -38,7 +39,7 @@ const selectionPath = computed(() => {
 });
 
 const about = () => {
-  (<any>$("#welcomeModal")).modal();
+  useWelcomeModalStore().open();
 };
 </script>
 

@@ -1,14 +1,16 @@
 import {KaitaiFileSystem} from "./KaitaiFileSystem";
-import {LocalStorageFileSystem} from "./LocalStorageFileSystem";
+import {OldLocalStorageFileSystem} from "./OldLocalStorageFileSystem";
 
 export const FILE_SYSTEM_TYPE_LOCAL = "local";
 export const FILE_SYSTEM_TYPE_KAITAI = "kaitai";
 export const ITEM_MODE_FILE = "file";
 export const ITEM_MODE_DIRECTORY = "folder";
 
+export type FsItemMode = typeof ITEM_MODE_FILE | typeof ITEM_MODE_DIRECTORY;
+export type FsItemType = typeof FILE_SYSTEM_TYPE_LOCAL | typeof FILE_SYSTEM_TYPE_KAITAI;
 export interface IFsItem {
-    fsType: typeof FILE_SYSTEM_TYPE_LOCAL | typeof FILE_SYSTEM_TYPE_KAITAI;
-    type: typeof ITEM_MODE_FILE | typeof ITEM_MODE_DIRECTORY;
+    fsType: FsItemType;
+    type: FsItemMode;
     fn?: string;
     children?: { [key: string]: IFsItem; };
 }
@@ -22,7 +24,9 @@ export interface IFsItemSummary {
 export interface IFileSystem {
     setRootNode(newRoot: IFsItem): Promise<IFsItem>;
 
-    getRootNode(): Promise<IFsItem>;
+    getRootNode(): IFsItem | undefined;
+
+    getRootNodeAsync(): Promise<IFsItem>;
 
     get(fn: string): Promise<string | ArrayBuffer>;
 
@@ -30,15 +34,6 @@ export interface IFileSystem {
 }
 
 export interface IFileSystemManager {
-    local: LocalStorageFileSystem;
+    local: OldLocalStorageFileSystem;
     kaitai: KaitaiFileSystem;
-}
-
-export interface IJSTreeNodeHelper {
-    id?: string;
-    text: string;
-    icon: string;
-    state?: { opened: boolean; };
-    children?: IJSTreeNodeHelper[];
-    data?: IFsItem;
 }

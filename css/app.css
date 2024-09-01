@@ -1,19 +1,6 @@
-/*.lm_content>div { height: 100%; width: 100% }*/
-.lm_splitter.lm_horizontal .lm_drag_handle { left:-5px; width:15px }
-.lm_splitter.lm_vertical .lm_drag_handle { top:-5px; height:15px }
 .errorWindow { background: white; font-family: Courier,monospace; font-size: 12px; white-space: pre-wrap; overflow-y: scroll; }
 .errorWindow>div { margin: 5px; }
-#fileTree { font-family:Arial; font-size:12px }
 body { line-height:normal }
-#fileTree { position:absolute; top:0; bottom:28px; width:100%; /*height:100%;*/ overflow: auto; }
-#fileTree .jstree-node { margin-left: 14px }
-#fileTree .jstree-container-ul>.jstree-node { margin-left:0 }
-#fileTree .jstree-clicked { background:initial }
-#fileTree .glyphicon { font-size:12px; margin-top:-1px; color:#eee; margin-right:3px }
-#fileTree .jstree-icon { margin-left:3px; margin-right:5px }
-#fileTree .jstree-ocl { display:none }
-#fileTreeCont .footer { position:absolute; bottom:0; width:100%; padding-left:2px }
-#fileTreeCont .footer .btn { width:33.3%; border-radius:0; font-size:13px; padding:3px 10px }
 body { color:#333 }
 .dropdown { position: absolute; display:none; z-index:9999 }
 .dropdown-menu { z-index:9999 }
@@ -22,7 +9,6 @@ body { color:#333 }
 .dropdown .glyphicon-folder-open { margin-left:-1px; margin-right:6px }
 .dropdown .dropdown-menu>li>a { padding:3px 15px }
 .btn { padding: 5px 10px; }
-.modal { color: white; }
 .control-label { margin-bottom:8px }
 .form-control { padding: 6px 12px; height:34px }
 .modal-footer, .modal-body { padding: 15px }
@@ -35,6 +21,5 @@ body { color:#333 }
 #aboutWebIde { position:absolute; bottom:10px; right:10px; font-size:12px }
 #exportToJsonDiv, #parsedPathDiv, #selectionLengthDiv { font-size:13px; margin-top:5px }
 #parsedPath { word-break: break-all; }
-#welcomeModalLabel { text-align:center }
-#welcomeModal .licenses { font-size:12px; margin-bottom:10px }
+
 /*.marker_match { background:rgba(80, 255, 80, 0.30); }*/

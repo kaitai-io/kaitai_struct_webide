@@ -17,8 +17,8 @@ const initScriptsMessage: IWorkerMessageInit = {
 workerWrapper.sendMessageToWorker(initScriptsMessage);
 
 export const codeExecutionWorkerApi: IWorkerApiMethods = {
-    initCodeAction: workerWrapper.initCodeAction,
+    setCodeAction: workerWrapper.setCodeAction,
     setInputAction: workerWrapper.setInputAction,
-    reparseAction: workerWrapper.reparseAction,
+    parseAction: workerWrapper.parseAction,
     getPropertyByPathAction: workerWrapper.getPropertyByPathAction
 };

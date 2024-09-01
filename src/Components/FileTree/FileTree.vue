@@ -1,43 +1,62 @@
 <script setup lang="ts">
 
-import FileTreeLanguagesDropdown from "./FileTreeGenerateParserDropdown.vue";
+import FileTreeBottomActions from "./FileTreeActionButtons.vue";
+import {useFileSystems} from "./Store/FileSystemsStore";
+import FileTreeNodes from "./FileTreeNodes.vue";
+import {onMounted} from "vue";
+import {FILE_SYSTEM_TYPE_LOCAL, IFsItem, ITEM_MODE_DIRECTORY} from "../../v1/FileSystems/FileSystemsTypes";
+import {LocalForageWrapper} from "../../v1/utils/LocalForageWrapper";
+import {initKaitaiFs} from "../../v1/FileSystems/KaitaiFileSystem";
+import {OldLocalStorageFileSystem} from "../../v1/FileSystems/OldLocalStorageFileSystem";
+
+const store = useFileSystems();
+
+onMounted(async () => {
+  const defaultItem: IFsItem = {
+    fsType: FILE_SYSTEM_TYPE_LOCAL,
+    type: ITEM_MODE_DIRECTORY,
+    children: {},
+    fn: "Local storage"
+  };
+  const storedItem = await LocalForageWrapper.getFsItem(`fs_files`);
+  if (storedItem) {
+    storedItem.fn = "Local storage";
+  }
+  store.addFileSystem(initKaitaiFs());
+  store.addFileSystem(new OldLocalStorageFileSystem(storedItem || defaultItem));
+});
+
 </script>
 
 <template>
-  <div id="fileTreeCont">
-    <div id="fileTree" class="fileTree">
-
+  <div id="fileTreeNew" class="file-tree-component">
+    <div class="file-tree-list-container">
+      <FileTreeNodes :fileSystem="fileSystem" v-for="fileSystem in store.fileSystems"/>
     </div>
-    <div class="footer btn-group" role="group">
-      <button id="createLocalKsyFile" type="button" class="btn btn-default"><i
-          class="glyphicon glyphicon-file"></i></button>
-      <button id="uploadFile" type="button" class="btn btn-default"><i
-          class="glyphicon glyphicon-cloud-upload"></i></button>
-      <button id="downloadFile" type="button" class="btn btn-default disabled"><i
-          class="glyphicon glyphicon-cloud-download"></i></button>
-    </div>
-  </div>
-
-  <div id="fileTreeContextMenu" class="dropdown clearfix">
-    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"
-        style="display:block;position:static;margin-bottom:5px;">
-      <li class="openItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-pencil"></i> Open</a></li>
-      <li class="createFolder"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-folder-open"></i> Create
-        folder</a></li>
-      <li class="createKsyFile"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-list-alt"></i> Create .ksy
-        file</a></li>
-      <li class="cloneKsyFile"><a tabindex="-1" href="#"><i class="glyphicon fa fa-clone"></i> Clone</a></li>
-      <li class="generateParser dropdown-submenu">
-        <a tabindex="-1" href="#"><i class="glyphicon glyphicon-flash"></i> Generate parser</a>
-        <FileTreeLanguagesDropdown/>
-      </li>
-      <li class="downloadItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-cloud-download"></i>
-        Download</a></li>
-      <li class="deleteItem"><a tabindex="-1" href="#"><i class="glyphicon glyphicon-remove"></i> Delete</a></li>
-    </ul>
+    <FileTreeBottomActions/>
   </div>
 </template>
 
+<!--font: 12px/normal "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace;-->
+
 <style scoped>
+.file-tree-component {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial;
+  font-size: 12px;
+  color: #ccc;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.file-tree-list-container {
+  overflow: scroll;
+  width: 100%;
+  flex-grow: 1;
+}
 
 </style>

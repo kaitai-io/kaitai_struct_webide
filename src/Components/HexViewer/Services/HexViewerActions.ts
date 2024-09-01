@@ -12,7 +12,7 @@ const isInViewPort = (rowIndexToGo: number, viewportList: any) => {
 
 export const handleSelectionUpdatedEvents = (eventName: string, args: any[], viewportList: any[], scrollTo: (index: number) => void) => {
     const hexViewerConfigStore = useHexViewerConfigStore();
-    const isSelectionEvent ="updateSelectionEvent" === eventName;
+    const isSelectionEvent = "updateSelectionEvent" === eventName;
     const event = args[0] as UpdateSelectionEvent;
     if (!isSelectionEvent || event.source === HEX_VIEWER_SOURCE) return false;
 

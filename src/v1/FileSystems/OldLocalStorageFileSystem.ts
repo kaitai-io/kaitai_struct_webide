@@ -1,32 +1,31 @@
 import {findOrCreateFsPath} from "./FileSystemHelper";
-import {FILE_SYSTEM_TYPE_LOCAL, IFileSystem, IFsItem, IJSTreeNodeHelper, ITEM_MODE_DIRECTORY} from "./FileSystemsTypes";
+import {IFileSystem, IFsItem} from "./FileSystemsTypes";
 import {LocalForageWrapper} from "../utils/LocalForageWrapper";
 
-export class LocalStorageFileSystem implements IFileSystem {
-    constructor(public prefix: string) {
+export class OldLocalStorageFileSystem implements IFileSystem {
+    constructor(root: IFsItem) {
+        this.root = root;
     }
 
     private root: IFsItem;
 
     private filesKey() {
-        return `${this.prefix}_files`;
+        return `fs_files`;
     }
 
     private fileKey(fn: string) {
-        return `${this.prefix}_file[${fn}]`;
+        return `fs_file[${fn}]`;
     }
 
     private save() {
         return LocalForageWrapper.saveFsItem(this.filesKey(), this.root);
     }
 
-    async getRootNode() {
-        if (!this.root) {
-            const defaultItem: IFsItem = {fsType: FILE_SYSTEM_TYPE_LOCAL, type: ITEM_MODE_DIRECTORY, children: {}};
-            const storedItem = await LocalForageWrapper.getFsItem(this.filesKey());
-            this.root = storedItem || defaultItem;
-        }
+    getRootNode() {
+        return this.root;
+    }
 
+    async getRootNodeAsync() {
         return this.root;
     }
 
@@ -46,7 +45,7 @@ export class LocalStorageFileSystem implements IFileSystem {
     }
 
     put(fn: string, data: any): Promise<IFsItem> {
-        return this.getRootNode().then(root => {
+        return this.getRootNodeAsync().then(root => {
             const node = findOrCreateFsPath(root, fn);
             const saveFileAction = LocalForageWrapper.saveFile(this.fileKey(fn), data);
             const updateFileTreeAction = this.save();
@@ -55,17 +54,3 @@ export class LocalStorageFileSystem implements IFileSystem {
         });
     }
 }
-
-export const initLocalStorageFsTreeData = (): IJSTreeNodeHelper => {
-    return {
-        text: "Local storage",
-        id: "localStorage",
-        icon: "glyphicon glyphicon-hdd",
-        state: {opened: true},
-        children: [],
-        data: {
-            fsType: FILE_SYSTEM_TYPE_LOCAL,
-            type: ITEM_MODE_DIRECTORY
-        }
-    };
-};

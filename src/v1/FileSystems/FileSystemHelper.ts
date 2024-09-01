@@ -1,4 +1,4 @@
-import {FILE_SYSTEM_TYPE_LOCAL, IFsItem, IFsItemSummary, IJSTreeNodeHelper, ITEM_MODE_DIRECTORY} from "./FileSystemsTypes";
+import {FILE_SYSTEM_TYPE_LOCAL, IFsItem, IFsItemSummary, ITEM_MODE_DIRECTORY} from "./FileSystemsTypes";
 
 
 export const findOrCreateFsPath = (root: IFsItem, filePath: string) => {
@@ -20,22 +20,6 @@ export const findOrCreateFsPath = (root: IFsItem, filePath: string) => {
         currNode = currNode.children[fnPart];
     }
     return currNode;
-};
-
-
-export const mapToJSTreeNode = (fsItem: IFsItem, fn: string): IJSTreeNodeHelper => {
-    const isFolder = fsItem.type === ITEM_MODE_DIRECTORY;
-    return {
-        text: fn,
-        icon: "glyphicon glyphicon-" + (isFolder ? "folder-open" : fn.endsWith(".ksy") ? "list-alt" : "file"),
-        children: isFolder ? mapToJSTreeNodes(fsItem) : null,
-        data: fsItem
-    };
-};
-
-export const mapToJSTreeNodes = (fsItem: IFsItem): IJSTreeNodeHelper[] => {
-    return Object.keys(fsItem.children || [])
-        .map(k => mapToJSTreeNode(fsItem.children[k], k));
 };
 
 export const getSummaryIfPresent = (fsItem?: IFsItem): IFsItemSummary => {

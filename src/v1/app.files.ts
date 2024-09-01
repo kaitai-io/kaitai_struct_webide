@@ -1,40 +1,24 @@
 ﻿import {app} from "./app";
 import {fileSystemsManager} from "./FileSystems/FileSystemManager";
-import {initKaitaiFsTreeData} from "./FileSystems/KaitaiFileSystem";
-import {initLocalStorageFsTreeData} from "./FileSystems/LocalStorageFileSystem";
-import {getSummaryIfPresent, mapToJSTreeNodes} from "./FileSystems/FileSystemHelper";
+import {getSummaryIfPresent} from "./FileSystems/FileSystemHelper";
 import {FILE_SYSTEM_TYPE_LOCAL, IFsItem, IFsItemSummary, ITEM_MODE_DIRECTORY} from "./FileSystems/FileSystemsTypes";
 import dateFormat from "dateformat";
 import {ArrayUtils} from "./utils/Misc/ArrayUtils";
 import {FileActionsWrapper} from "./utils/Files/FileActionsWrapper";
 import {openUploadFilesOperatingSystemModal} from "./JQueryComponents/Files/UploadFilesOSModal";
+import {YamlFileInfo} from "../DataManipulation/CompilationModule/JsImporter";
 
 let fileTreeCont: JQuery;
 
-export async function refreshFsNodes() {
-    var localStorageNode = app.ui.fileTree.get_node("localStorage");
-    var root = await fileSystemsManager.local.getRootNode();
-    app.ui.fileTree.delete_node(localStorageNode.children);
-    if (root)
-        mapToJSTreeNodes(root).forEach((node: any) => app.ui.fileTree.create_node(localStorageNode, node));
-}
 
 export async function addKsyFile(parent: string | Element, ksyFn: string, content: string) {
     const name = ArrayUtils.last(ksyFn.split("/"));
     let fsItem = await fileSystemsManager.local.put(name, content);
     app.ui.fileTree.create_node(app.ui.fileTree.get_node(parent), {text: name, data: fsItem, icon: "glyphicon glyphicon-list-alt"},
         "last", (node: any) => app.ui.fileTree.activate_node(node, null));
-    await app.loadFsItem(fsItem, true);
     return fsItem;
 }
 
-export interface IJSTreeNode<TData> {
-    id?: string;
-    text?: string;
-    icon?: string;
-    children?: IJSTreeNode<TData>[] | boolean;
-    data?: TData;
-}
 
 export function initFileTree() {
     fileTreeCont = app.ui.fileTreeCont.find(".fileTree");
@@ -50,13 +34,12 @@ export function initFileTree() {
             },
             themes: {name: "default-dark", dots: false, icons: true, variant: "small"},
             data: [
-                initKaitaiFsTreeData(fileSystemsManager.kaitai),
-                initLocalStorageFsTreeData()
+                // initKaitaiFsTreeData(fileSystemsManager.kaitai),
+                // initLocalStorageFsTreeData()
             ],
         },
         plugins: ["wholerow", "dnd"]
     }).jstree(true);
-    refreshFsNodes();
 
     var uiFiles = {
         fileTreeContextMenu: $("#fileTreeContextMenu"),
@@ -73,18 +56,6 @@ export function initFileTree() {
         downloadFile: $("#downloadFile"),
     };
 
-    function convertTreeNode(treeNode: any) {
-        const data = treeNode.data;
-        data.children = {};
-        treeNode.children.forEach((child: any) => data.children[child.text] = convertTreeNode(child));
-        return data;
-    }
-
-    function saveTree() {
-        const localRootNode = app.ui.fileTree.get_json()[1];
-        const convertedLocalRootNode = convertTreeNode(localRootNode);
-        fileSystemsManager.local.setRootNode(convertedLocalRootNode);
-    }
 
     var contextMenuTarget: string | Element = null;
 
@@ -180,36 +151,27 @@ export function initFileTree() {
     ctxAction(uiFiles.deleteItem, () => app.ui.fileTree.delete_node(app.ui.fileTree.get_selected()));
     ctxAction(uiFiles.openItem, () => $(contextMenuTarget).trigger("dblclick"));
 
-    ctxAction(uiFiles.generateParser, e => {
+    ctxAction(uiFiles.generateParser, async e => {
         var fsItem = getSelectedData();
         var linkData = $(e.target).data();
-        //console.log(fsItem, linkData);
+        const content = await fileSystemsManager[fsItem.fsType].get(fsItem.fn) as string;
 
-        fileSystemsManager[fsItem.fsType].get(fsItem.fn).then((content: string) => {
-            return app.compilerService.compile(fsItem, content, linkData.kslang, !!linkData.ksdebug).then((compiled: any) => {
-                Object.keys(compiled).forEach(fileName => {
-                    const options = {
-                        lang: linkData.acelang,
-                        isReadOnly: true,
-                        data: compiled[fileName]
-                    };
-                    app.ui.layoutManager.addDynamicAceCodeEditorTab(fileName, options);
-                });
-            });
+        const yamlFile: YamlFileInfo = {
+            storeId: fsItem.fsType,
+            filePath: fsItem.fn,
+            fileContent: content
+        };
+        let compiled = await app.compilerService.compileSingleTarget(yamlFile, linkData.kslang, !!linkData.ksdebug);
+        Object.keys(compiled.result).forEach(fileName => {
+            const options = {
+                lang: linkData.acelang,
+                isReadOnly: true,
+                data: compiled[fileName]
+            };
+            app.ui.layoutManager.addDynamicAceCodeEditorTab(fileName, options);
         });
     });
 
-    fileTreeCont.on("create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree", saveTree);
-    fileTreeCont.on("move_node.jstree", (e, data) => app.ui.fileTree.open_node(app.ui.fileTree.get_node(data.parent)));
-    fileTreeCont.on("select_node.jstree", (e, selectNodeArgs) => {
-        var fsItem = (<IJSTreeNode<IFsItem>>selectNodeArgs.node).data;
-        [uiFiles.downloadFile, uiFiles.downloadItem].forEach(i => i.toggleClass("disabled", !(fsItem && fsItem.type === "file")));
-    });
-
-    var lastMultiSelectReport = 0;
-    fileTreeCont.on("select_node.jstree", (e, args) => {
-        lastMultiSelectReport = e.timeStamp;
-    });
 
     var ksyParent: string | Element;
 
@@ -246,10 +208,6 @@ export function initFileTree() {
         var parentData = app.ui.fileTree.get_node(ksyParent).data;
 
         addKsyFile(ksyParent, (parentData.fn ? `${parentData.fn}/` : "") + `${ksyName}.ksy`, `meta:\n  id: ${ksyName}\n  file-extension: ${ksyName}\n`);
-    });
-
-    fileTreeCont.bind("dblclick.jstree", function (event) {
-        app.loadFsItem(<IFsItem>app.ui.fileTree.get_node(event.target).data);
     });
 
     ctxAction(uiFiles.cloneKsyFile, e => {

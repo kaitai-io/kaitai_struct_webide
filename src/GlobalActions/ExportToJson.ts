@@ -1,9 +1,9 @@
-import {codeExecutionWorkerApi} from "../Workers/WorkerApi";
-import {mapToGenericObject} from "./ExportedValueMappers";
-import {IExportedValue} from "../../entities";
-import {IWorkerParsedResponse} from "../Workers/CodeExecution/Types";
+import {codeExecutionWorkerApi} from "../DataManipulation/ParsingModule/ParseWorkerApi";
+import {mapToGenericObject} from "../v1/utils/ExportedValueMappers";
+import {IExportedValue} from "../entities";
+import {IWorkerParsedResponse} from "../DataManipulation/ParsingModule/CodeExecution/Types";
 
-export async function exportToJson(useHex: boolean = false): Promise<string> {
+export const exportToJson = async (useHexForNumbers: boolean = false): Promise<string> => {
     const overrideDefaultNumbersWithHex = (key: string, value: any) => {
         const isPropertyNumber = typeof value === "number";
         return isPropertyNumber
@@ -18,11 +18,11 @@ export async function exportToJson(useHex: boolean = false): Promise<string> {
 
     const mapResultToJson = (objectToExport: IExportedValue) => {
         const genericObject = mapToGenericObject(objectToExport);
-        const hexReplacer = useHex ? overrideDefaultNumbersWithHex : null;
+        const hexReplacer = useHexForNumbers ? overrideDefaultNumbersWithHex : null;
         return JSON.stringify(genericObject, hexReplacer, 2);
     };
 
-    let response = await codeExecutionWorkerApi.reparseAction(true);
-    let objectToExport: any = await getResultOrThrowError(response);
-    return mapResultToJson(objectToExport);
-}
+    return await codeExecutionWorkerApi.parseAction(true)
+        .then(getResultOrThrowError)
+        .then(mapResultToJson);
+};

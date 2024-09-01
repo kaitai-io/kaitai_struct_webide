@@ -32,7 +32,7 @@ const handleSingleSelectionAction = (e: MouseEvent, letter: ProcessedLetter) => 
     const event: UpdateSelectionEvent = {
         startNew: letter.index,
         endNew: letter.index,
-        range: letter.range.value,
+        range: letter.range?.value,
         source: HEX_VIEWER_SOURCE
     };
     store.updateSelectionEvent(event);

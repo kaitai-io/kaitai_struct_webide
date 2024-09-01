@@ -11,172 +11,31 @@ import "./ImportJQuery";
 import "bootstrap";
 import "jstree";
 
-import {addKsyFile, initFileTree, refreshFsNodes} from "./app.files";
-import {codeExecutionWorkerApi} from "./Workers/WorkerApi";
 import {initFileDrop} from "./JQueryComponents/Files/FileDrop";
-import {DelayAction} from "./utils/DelayAction";
-import {exportToJson} from "./utils/ExportToJson";
 import {ErrorWindowHandler} from "./app.errors";
-import {fileSystemsManager} from "./FileSystems/FileSystemManager";
-import {FILE_SYSTEM_TYPE_KAITAI, IFsItem} from "./FileSystems/FileSystemsTypes";
-import {StringUtils} from "./utils/Misc/StringUtils";
-import {CompilerService} from "./utils/Compilation/CompilerService";
-import {CompilationError} from "./utils/Compilation/CompilationError";
-import {IFileProcessItem} from "./utils/Files/Types";
-import "../extensions";
+import {CompilerService} from "../DataManipulation/CompilationModule/CompilerService";
 import {GoldenLayoutUI} from "./GoldenLayout/GoldenLayoutUI";
-import {LocalForageWrapper} from "./utils/LocalForageWrapper";
 import {createApp} from "vue";
 import App from "../App.vue";
-import {IAceEditorComponentOptions} from "./GoldenLayout/AceEditorComponent";
 import {createPinia} from "pinia";
-import {useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
-import {useIdeSettingsStore} from "../Stores/IdeSettingsStore";
+import {processUploadedFiles} from "../GlobalActions/UploadFiles";
 
 const vueApp = createApp(App);
 vueApp.use(createPinia());
 vueApp.mount("body");
 
-$.jstree.defaults.core.force_text = true;
-
 const qs = {};
 location.search.substr(1).split("&").map(x => x.split("=")).forEach(x => qs[x[0]] = x[1]);
 
 
-class AppVM {
-    ui: GoldenLayoutUI;
-
-    public exportToJson(hex: boolean) {
-        exportToJson(hex)
-            .then((json: string) => {
-                const options: IAceEditorComponentOptions = {
-                    lang: "json",
-                    isReadOnly: true,
-                    data: json
-                };
-                this.ui.layoutManager.addDynamicAceCodeEditorTab("json export", options);
-            });
-    }
-}
 
 class AppController {
     compilerService = new CompilerService();
     ui = new GoldenLayoutUI();
-    vm = new AppVM();
     errors: ErrorWindowHandler = null;
 
     init() {
-        this.vm.ui = this.ui;
         this.errors = new ErrorWindowHandler(this.ui.layoutManager.getLayoutNodeById("mainArea"));
-        initFileTree();
-    }
-
-    ksyFsItemName = "ksyFsItem";
-    lastKsyContent: string = null;
-
-    isKsyFile(fn: string) {
-        return fn.toLowerCase().endsWith(".ksy");
-    }
-
-    compile(srcYamlFsItem: IFsItem, srcYaml: string, kslang: string, debug: true | false | "both"): Promise<any> {
-        return this.compilerService.compile(srcYamlFsItem, srcYaml, kslang, debug).then(result => {
-            return result;
-        }, (error: CompilationError) => {
-            this.errors.handle(error.error);
-            return Promise.reject(error);
-        });
-    }
-
-    async recompile() {
-        let ksyFsItem = await LocalForageWrapper.getFsItem(this.ksyFsItemName);
-        const srcYaml = this.ui.ksyEditor.getValue();
-        const changed = this.lastKsyContent !== srcYaml;
-
-        if (changed && ksyFsItem.fsType === FILE_SYSTEM_TYPE_KAITAI) {
-            let fsItem = await addKsyFile("localStorage", ksyFsItem.fn.replace(".ksy", "_modified.ksy"), srcYaml);
-            await LocalForageWrapper.saveFsItem(this.ksyFsItemName, fsItem);
-        }
-
-        if (changed)
-            await fileSystemsManager[ksyFsItem.fsType].put(ksyFsItem.fn, srcYaml);
-
-        let compiled = await this.compile(ksyFsItem, srcYaml, "javascript", "both");
-        if (!compiled) return;
-
-        var fileNames = Object.keys(compiled.release);
-        let debugUserTypes = localStorage.getItem("userTypes") || "";
-        if (debugUserTypes) debugUserTypes += "\n\n";
-        this.ui.genCodeViewer.setValue(debugUserTypes + fileNames.map(x => compiled.release[x]).join(""), -1);
-        this.ui.genCodeDebugViewer.setValue(debugUserTypes + fileNames.map(x => compiled.debug[x]).join(""), -1);
-        await this.reparse();
-    }
-
-    formatReady: Promise<any> = null;
-    inputReady: Promise<any> = null;
-
-    async reparse() {
-        try {
-            await Promise.all([this.inputReady, this.formatReady]);
-
-            let debugCode = this.ui.genCodeDebugViewer.getValue();
-            let jsClassName = this.compilerService.ksySchema.meta.id.split("_").map((x: string) => StringUtils.ucFirst(x)).join("");
-            await codeExecutionWorkerApi.initCodeAction(debugCode, jsClassName, this.compilerService.ksyTypes);
-
-            const ideSettingsStore = useIdeSettingsStore();
-            const {resultObject: exportedRoot, error: parseError} = await codeExecutionWorkerApi.reparseAction(ideSettingsStore.eagerMode);
-            kaitaiIde.root = exportedRoot;
-            const store = useCurrentBinaryFileStore();
-            store.updateParsedFile(exportedRoot);
-
-            this.errors.handle(parseError);
-        } catch (error) {
-            this.errors.handle(error);
-        }
-    }
-
-    inputContent: ArrayBuffer;
-    inputFsItem: IFsItem;
-    lastKsyFsItem: IFsItem;
-
-    async loadFsItem(fsItem: IFsItem, refreshGui: boolean = true): Promise<any> {
-        if (!fsItem || fsItem.type !== "file")
-            return;
-
-        var contentRaw = await fileSystemsManager[fsItem.fsType].get(fsItem.fn);
-        if (this.isKsyFile(fsItem.fn)) {
-            let content = <string>contentRaw;
-            await LocalForageWrapper.saveFsItem(this.ksyFsItemName, fsItem);
-            this.lastKsyFsItem = fsItem;
-            this.lastKsyContent = <string>content;
-            if (this.ui.ksyEditor.getValue() !== content)
-                this.ui.ksyEditor.setValue(content, -1);
-            var ksyEditor = this.ui.layoutManager.getLayoutNodeById("ksyEditor");
-            (<any>ksyEditor).container.setTitle(fsItem.fn);
-        } else {
-            let content = <ArrayBuffer>contentRaw;
-            this.inputFsItem = fsItem;
-            this.inputContent = content;
-            const currentBinaryFileStore = useCurrentBinaryFileStore();
-            currentBinaryFileStore.newBinaryFileSelected(fsItem.fn || "", content, "SOURCE_REPARSE");
-
-            await LocalForageWrapper.saveFsItem("inputFsItem", fsItem);
-
-            this.ui.layoutManager.getLayoutNodeById("inputBinaryTab").setTitle(fsItem.fn);
-            await codeExecutionWorkerApi.setInputAction(content);
-
-            if (refreshGui) {
-                await this.reparse();
-            }
-        }
-    }
-
-    addNewFiles(files: IFileProcessItem[]) {
-        return Promise.all(files.map(file => (this.isKsyFile(file.file.name) ? <Promise<any>>file.read("text") : file.read("arrayBuffer"))
-            .then(content => fileSystemsManager.local.put(file.file.name, content))))
-            .then(fsItems => {
-                refreshFsNodes();
-                return fsItems.length === 1 ? this.loadFsItem(fsItems[0]) : Promise.resolve(null);
-            });
     }
 }
 
@@ -187,43 +46,8 @@ kaitaiIde.version = "0.1";
 kaitaiIde.commitId = "";
 kaitaiIde.commitDate = "";
 
-//localStorage.setItem("lastVersion", kaitaiIde.version);
-
 $(() => {
     app.init();
-
-    app.ui.genCodeDebugViewer.commands.addCommand({
-        name: "compile", bindKey: {win: "Ctrl-Enter", mac: "Command-Enter"},
-        exec: function (editor: any) {
-            app.reparse();
-        }
-    });
-    app.ui.ksyEditor.commands.addCommand({
-        name: "compile", bindKey: {win: "Ctrl-Enter", mac: "Command-Enter"},
-        exec: function (editor: any) {
-            app.recompile();
-        }
-    });
-
-    initFileDrop("fileDrop", (files: any) => app.addNewFiles(files));
-
-    async function loadCachedFsItem(cacheKey: string, defFsType: string, defSample: string) {
-        let fsItem = await LocalForageWrapper.getFsItem(cacheKey);
-        await app.loadFsItem(fsItem || <IFsItem>{fsType: defFsType, fn: defSample, type: "file"}, false);
-    }
-
-    app.inputReady = loadCachedFsItem("inputFsItem", "kaitai", "samples/sample1.zip");
-    app.formatReady = loadCachedFsItem(app.ksyFsItemName, "kaitai", "formats/archive/zip.ksy");
-
-    const editDelay = new DelayAction(500);
-    if (!("noAutoCompile" in qs))
-        app.ui.ksyEditor.on("change", () => editDelay.do(() => app.recompile()));
-
-    $(document).on("mousedown", e => {
-        if ($(e.target).parents(".dropdown-menu").length === 0)
-            $(".dropdown").hide();
-    });
-
-
+    initFileDrop("fileDrop", (files: any) => processUploadedFiles(files));
     kaitaiIde.app = app;
 });

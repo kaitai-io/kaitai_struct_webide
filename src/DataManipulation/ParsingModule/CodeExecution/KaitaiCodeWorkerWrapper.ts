@@ -1,4 +1,4 @@
-import {fetchInstance, IParsingOptions, mapObjectToExportedValue} from "../../utils/ExportedValueMappers/ObjectToIExportedValueMapper";
+import {fetchInstance, IParsingOptions, mapObjectToExportedValue} from "../../../v1/utils/ExportedValueMappers/ObjectToIExportedValueMapper";
 import {IExportedValue} from "../../../entities";
 import {WorkerFunctionStack} from "./WorkerFunctionStack";
 import {IWorkerMessage, IWorkerMessageParse} from "./WorkerMessages";
@@ -21,7 +21,7 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
         worker.onmessage = this.onMessageReceive;
     }
 
-    initCodeAction = (sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes): void => {
+    setCodeAction = (sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes): void => {
         this.sourceCode = sourceCode;
         this.mainClass = mainClassName;
         this.ksyTypes = {...ksyTypes};
@@ -31,7 +31,7 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
         this.inputBuffer = inputBuffer;
     };
 
-    reparseAction = (eagerMode: boolean): Promise<IWorkerParsedResponse> => {
+    parseAction = (eagerMode: boolean): Promise<IWorkerParsedResponse> => {
         return new Promise<IWorkerParsedResponse>((resolve, reject) => {
             const digestResponseFromWorkerFn = (response: IWorkerResponseParse) => this.digestResponseFromWorker(response, resolve, reject);
             const msgId = this.stack.pushFunctionToStack(digestResponseFromWorkerFn);

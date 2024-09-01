@@ -15,11 +15,11 @@ export interface IKsyTypes {
 }
 
 export interface IWorkerApiMethods {
-    initCodeAction(sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes): void;
+    setCodeAction(sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes): void;
 
     setInputAction(inputBuffer: ArrayBuffer): void;
 
-    reparseAction(eagerMode: boolean): Promise<IWorkerParsedResponse>;
+    parseAction(eagerMode: boolean): Promise<IWorkerParsedResponse>;
 
     getPropertyByPathAction(path: string[]): Promise<IExportedValue>;
 }
