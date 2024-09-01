@@ -19,7 +19,6 @@ export interface TreeNodeDisplay {
     fullPath: string;
     type: NodeType;
     fileName: string;
-    isOpen: boolean;
     storeId: typeof FILE_SYSTEM_TYPE_LOCAL | typeof FILE_SYSTEM_TYPE_KAITAI;
     depth: number;
 }
@@ -49,7 +48,7 @@ export class FileSystemVisitor {
         const newNode = this.mapToNewNode(fsItem);
         this.visibleFsItemsNew.push(newNode);
 
-        if (fsItem.type === ITEM_MODE_DIRECTORY && newNode.isOpen) {
+        if (fsItem.type === ITEM_MODE_DIRECTORY && newNode.type === OPEN_FOLDER) {
             Object.entries(fsItem.children || {})
                 .forEach(([key, child]) => {
                     child.fn = key;
@@ -68,7 +67,6 @@ export class FileSystemVisitor {
             storeId: fsItem.fsType,
             fullPath: fullPath,
             fileName: fsItem.fn,
-            isOpen: isOpen,
             depth: this.currentPath.length - 1
         };
     }
