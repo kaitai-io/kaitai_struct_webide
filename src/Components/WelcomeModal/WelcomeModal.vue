@@ -16,7 +16,12 @@ const onClickBackdrop = (e) => {
 <template>
   <div class="backdrop-welcome" tabindex="-1" v-if="store.shouldShowModal" @click="onClickBackdrop">
     <div class="modal-wrapper-background" @click="e => e.stopPropagation()">
-      <div>Hey there!</div>
+      <div class="disclaimer">
+        Disclaimer! This is the fork project rewritten in Vue3. For the official project go to this link:
+        <a href="https://ide.kaitai.io" target="_blank">https://ide.kaitai.io</a> Below is the original welcome message, with updated links to licenses.
+      </div>
+
+      <div class="title">Hey there!</div>
       <div>
         If this is the first time you are using Kaitai WebIDE then I recommend scrolling through our
         <a href="https://github.com/kaitai-io/kaitai_struct_webide/wiki/Features" target="_blank">Features
@@ -41,7 +46,7 @@ const onClickBackdrop = (e) => {
       </div>
       <div>
         Kaitai WebIDE was made possible by using
-        <a href="https://github.com/kaitai-io/kaitai_struct_webide/blob/master/docs/wiki/3rd-party-libraries.md"
+        <a href="https://github.com/lorthiz/kaitai_struct_webide/blob/master/docs/wiki/3rd-party-libraries.md"
            target="_blank">open-source libraries listed here</a>
         (<a href="LICENSE-3RD-PARTY.txt" target="_blank">licensing information</a>).
       </div>
@@ -63,20 +68,20 @@ const onClickBackdrop = (e) => {
           <span>Kaitai WebIDE version: </span>
           <span id="webIdeVersion">{{ KaitaiIdeInfo.version }}-SNAPSHOT</span>
           <a id="webideCommitId"
-             :href="'https://github.com/kaitai-io/kaitai_struct_webide/commit/' + KaitaiIdeInfo.commitId">{{
-              KaitaiIdeInfo.commitId.substr(0, 7)
+             :href="'https://github.com/lorthiz/kaitai_struct_webide/commit/' + KaitaiIdeInfo.commitId">{{
+              KaitaiIdeInfo.commitId.substring(0, 7)
             }}</a>
-          (<span id="webideCommitDate"></span>,
-          <a href="https://raw.githubusercontent.com/kaitai-io/kaitai_struct_webide/master/LICENSE"
-             target="_blank">license</a>)
+          (<span>{{KaitaiIdeInfo.commitDate}}</span>,
+          <a href="LICENSE.txt" target="_blank">license</a>)
         </div>
         <div>Kaitai compiler version: <span>
           {{ KaitaiStructCompiler.version + " (" + KaitaiStructCompiler.buildDate + ")" }}
         </span>
         </div>
       </div>
-      <button @click="store.closeWithDoNotShow()">close and do not show again</button>
-      <button @click="store.close()">Close</button>
+
+      <button class="modal-button" @click="store.closeWithDoNotShow()">close and do not show again</button>
+      <button class="modal-button" @click="store.close()">Close</button>
     </div>
   </div>
 </template>
@@ -115,6 +120,32 @@ const onClickBackdrop = (e) => {
 
   transform: translateY(-30%);
   animation: 500ms ease-out 0s 1 slideInFromTop;
+}
+
+.modal-button {
+  color: #57A6A1;
+  border-radius: 4px;
+  border: none;
+  background-color: #222222;
+  padding: 8px;
+}
+
+.modal-button:hover {
+  color: #57A6A1;
+  background-color: #344C64;
+}
+
+.title {
+  align-self: center;
+  font-size: 2rem;
+}
+
+.licenses {
+  font-size: 1rem
+}
+
+.disclaimer {
+  color: #BB5050
 }
 
 </style>
