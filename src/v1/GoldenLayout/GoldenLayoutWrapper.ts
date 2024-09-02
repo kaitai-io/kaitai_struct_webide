@@ -2,7 +2,7 @@ import {AceEditorComponent, IAceEditorComponentOptions} from "./AceEditorCompone
 import GoldenLayout from "golden-layout";
 import {useAceEditorStore} from "../../Stores/AceEditorStore";
 import {DelayAction} from "../utils/DelayAction";
-import {mainEditorOnChange, mainEditorRecompile} from "../../GlobalActions/MainEditorOnChange";
+import {mainEditorOnChange, mainEditorRecompile} from "../../GlobalActions/KsyEditorActions";
 import {Ace} from "ace-builds";
 import {parseAction} from "../../GlobalActions/ParseAction";
 
