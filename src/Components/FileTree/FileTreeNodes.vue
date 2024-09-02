@@ -11,7 +11,7 @@ const props = defineProps<{
 }>();
 
 const childrenItems = computed(() => {
-  return new FileSystemVisitor().visit(props.fileSystem, store.openPaths);
+  return new FileSystemVisitor().collectVisibleFileTreeItems(props.fileSystem, store.openPaths);
 });
 
 

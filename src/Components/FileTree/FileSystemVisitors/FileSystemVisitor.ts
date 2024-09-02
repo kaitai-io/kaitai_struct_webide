@@ -28,7 +28,7 @@ export class FileSystemVisitor {
     private currentPath: string[] = [];
     private visibleFsItemsNew: TreeNodeDisplay[] = [];
 
-    public visit(fileSystem: IFileSystem, openPaths: string[]) {
+    public collectVisibleFileTreeItems(fileSystem: IFileSystem, openPaths: string[]) {
         this.openPaths = openPaths;
         this.visitFileSystem(fileSystem);
         return this.visibleFsItemsNew;
@@ -78,8 +78,7 @@ export class FileSystemVisitor {
             }
             case ITEM_MODE_DIRECTORY: {
                 if (Object.keys(fsItem.children).length === 0) return EMPTY_FOLDER;
-                else if (isOpen) return OPEN_FOLDER;
-                else return CLOSED_FOLDER;
+                return isOpen ? OPEN_FOLDER : CLOSED_FOLDER;
             }
         }
     }
