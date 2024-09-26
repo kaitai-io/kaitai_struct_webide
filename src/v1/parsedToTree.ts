@@ -400,7 +400,22 @@ export class ParsedTreeHandler {
             if (!valueExp.parent)
                 fillParents(valueExp, nodeData && nodeData.parent);
 
-            this.jstree.set_text(node, this.childItemToNode(valueExp, true).text);
+            if (
+                valueExp.type === ObjectType.Array
+                && Object.prototype.hasOwnProperty.call(nodeData, "arrayStart")
+                && Object.prototype.hasOwnProperty.call(nodeData, "arrayEnd")
+            ) {
+                // Skip set_text() for virtual array nodes. It's better to keep it like
+                // "tags"
+                //   |- "[0 … 99]"
+                //     |- "0 [TypeName]"
+                // rather than set_text() the virtual array node to the same value as
+                // "tags"
+                //   |- "tags"
+                //     |- "0 [TypeName]"
+            } else {
+                this.jstree.set_text(node, this.childItemToNode(valueExp, true).text);
+            }
 
             var nodes = this.exportedToNodes(valueExp, nodeData, true);
             nodes.forEach(x => x.id = x.id || this.getNodeId(x));
