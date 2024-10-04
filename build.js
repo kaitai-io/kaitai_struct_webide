@@ -3,6 +3,8 @@ const { exec } = require("child_process");
 
 const { SENTRY_DSN, SENTRY_ENV } = process.env;
 
+console.log("[build.js] Running")
+
 const SENTRY_TEMPLATE = SENTRY_DSN && SENTRY_ENV ? `
     <script src="https://cdn.ravenjs.com/3.17.0/raven.min.js" crossorigin="anonymous"></script>
     <script>
@@ -69,4 +71,7 @@ async function main() {
     );
 }
 
-main().catch(err => console.error(err));
+main()
+    .then(() => console.log("[build.js] Finished"))
+    .catch(err => console.error(err));
+

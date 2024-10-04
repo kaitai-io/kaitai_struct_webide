@@ -1,6 +1,8 @@
 const { readdirSync, statSync, writeFileSync, mkdirSync } = require("fs");
 const { join } = require("path");
 
+console.log("[genKaitaiFsFiles.js] Running")
+
 function recursiveFind(dir, pattern, results = []) {
     const files = readdirSync(dir, "utf-8")
         .map(fn => join(dir, fn))
@@ -41,3 +43,5 @@ if (!module.parent) {
 }
 
 module.exports = generate;
+
+console.log("[genKaitaiFsFiles.js] Finished")

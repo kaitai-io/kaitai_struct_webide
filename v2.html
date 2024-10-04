@@ -17,9 +17,19 @@
     <script src="lib/yaml.js"></script>
     <script src="js/extensions.js"></script>
     <script src="js/kaitaiFsFiles.js"></script>
-    <script src="js/AmdLoader.js"></script>
+    <script src="js/v2/AmdLoader.js"></script>
     <script src="lib/thenBy.js"></script>
     <script>
+        
+        const prepareTemplateUrl = (componentUrl) => {
+            const componentsSharedWithV1 = ["ConverterPanel", "SelectionInput", "Stepper"]
+            const isSharedComponent = componentsSharedWithV1.some(componentName => componentUrl.indexOf(componentName) !== -1)
+            let templateUrl = componentUrl.replace(/\.js$/, ".html")
+            return isSharedComponent
+                ? templateUrl.replace(/js\/ui/, "src/ui")
+                : templateUrl.replace(/js\/v2\/ui/, "src/v2/ui")
+        }
+        
         async function init(){
             loader.paths = {
                 "big-integer": "lib/_npm/BigInteger/BigInteger",
@@ -39,14 +49,15 @@
                 // console.log('module loading: ', module.url);
                 if(/ui.(Parts|Components)/.exec(module.url)){
                     //console.log('load template for', module.url);
-                    await componentLoader.loadTemplate(module.url.replace(/\.js$/, ".html").replace(/js\/ui/, "src/ui"));
+                    let templateUrl = prepareTemplateUrl(module.url)
+                    await componentLoader.loadTemplate(templateUrl);
                 } else if (module.url.indexOf("bootstrap") !== -1)
                     window["jQuery"] = (await loader.getLoadedModule('jquery')).exports;
             };
 
-            require(["autorefresh2"]);
+            require(["v2/autorefresh2"]);
             require(["v1/app.unsupportedBrowser"]);
-            require(["v2"]);
+            require(["v2/v2"]);
         };
         init();
     </script>
