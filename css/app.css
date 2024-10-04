@@ -1,3 +1,11 @@
+a {
+    text-decoration: underline;
+}
+a:hover,
+a:focus {
+    text-decoration: none;
+}
+
 /*.lm_content>div { height: 100%; width: 100% }*/
 .lm_splitter.lm_horizontal .lm_drag_handle { left:-5px; width:15px }
 .lm_splitter.lm_vertical .lm_drag_handle { top:-5px; height:15px }
@@ -27,6 +35,9 @@ body { line-height:normal }
 #fileTreeCont .footer .btn { width:33.3%; border-radius:0; font-size:13px; padding:3px 10px }
 body { color:#333 }
 .dropdown { position: absolute; display:none; z-index:9999 }
+.dropdown a {
+    text-decoration: none;
+}
 .dropdown-menu { z-index:9999 }
 .dropdown .dropdown-menu { font-size:13px; border-color:#375a7f; border-radius:0 }
 .dropdown .glyphicon { margin-right:5px; }
