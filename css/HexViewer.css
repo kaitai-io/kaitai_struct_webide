@@ -16,7 +16,7 @@
 
 .hexViewer .hexRow { height:21px; }
 
-.hexViewer .addrPart { color: #ccc; }
+.hexViewer .addrPart { color: #b50000; }
 .hexViewer .hexPart { margin-left: 8px; }
 .hexViewer .asciiPart { margin-left: 8px; }
 .hexViewer .hexcell.cell8 { margin-left: 4px; }
