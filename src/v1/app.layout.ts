@@ -60,6 +60,7 @@ export class LayoutManager<T> {
             editor.getSession().setMode(`ace/mode/${lang}`);
             if (lang === "yaml")
                 editor.setOption("tabSize", 2);
+            editor.setOption("enableKeyboardAccessibility", true);
             editor.$blockScrolling = Infinity; // TODO: remove this line after they fix ACE not to throw warning to the console
             editor.setReadOnly(isReadOnly);
             if (callback)
