@@ -33,6 +33,14 @@ body { line-height:normal }
 #fileTree .jstree-ocl { display:none }
 #fileTreeCont .footer { position:absolute; bottom:0; width:100%; padding-left:2px }
 #fileTreeCont .footer .btn { width:33.3%; border-radius:0; font-size:13px; padding:3px 10px }
+.jstree-default-dark .jstree-anchor {
+    color: #ccc;
+}
+.jstree-default-dark .jstree-clicked,
+.jstree-default-dark .jstree-checked,
+.jstree-default-dark .jstree-hovered {
+    color: white;
+}
 body { color:#333 }
 .dropdown { position: absolute; display:none; z-index:9999 }
 .dropdown a {
