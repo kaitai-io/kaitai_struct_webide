@@ -62,7 +62,7 @@ body { color:#333 }
 #unsupportedBrowser .closeBtn { float:right; margin-top: 1px; cursor: pointer }
 .marker_solution { background:rgba(255, 80, 80, 0.3); }
 .marker_user { background:rgba(80, 255, 80, 0.30); }
-#parsedDataTree .intVal, #parsedDataTree .enumDesc { color:#bbb }
+#parsedDataTree .intVal, #parsedDataTree .enumDesc { color:#b50000 }
 #parsedDataTree .flags { color:#933; font-weight: bold }
 #parsedDataTree .propName { color: blue; }
 #parsedDataTree .className { color: green; }
