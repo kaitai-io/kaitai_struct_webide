@@ -41,6 +41,19 @@ body { line-height:normal }
 .jstree-default-dark .jstree-hovered {
     color: white;
 }
+.ace-monokai .ace_entity.ace_name.ace_tag,
+.ace-monokai .ace_keyword,
+.ace-monokai .ace_meta.ace_tag,
+.ace-monokai .ace_storage {
+    color: #fc6f09;
+}
+.ace-monokai .ace_comment {
+    color: #9db44a;
+}
+.ace-monokai .ace_gutter {
+    background: #333;
+    color: #ccc;
+}
 body { color:#333 }
 .dropdown { position: absolute; display:none; z-index:9999 }
 .dropdown a {
