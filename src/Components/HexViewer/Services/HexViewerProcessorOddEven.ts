@@ -2,38 +2,26 @@ import {IExportedValue} from "../../../entities";
 import {IExportedValueOddRange, IExportedValueRangesForRow} from "../Types";
 import {RangeHelper, SimpleRange} from "../../../v1/utils/RangeHelper";
 
-const prepareGroupForRow = (rowIndex: number, ranges: IExportedValueOddRange[], rowSize: number = 16) => {
-    const rowStartIndex = rowSize * rowIndex;
-    const rowEndIndex = rowStartIndex + rowSize - 1;
-    const rowRange: SimpleRange = {
-        start: rowSize * rowIndex,
-        end: rowStartIndex + rowSize - 1
-    };
-    const currentRow: IExportedValueRangesForRow = {
-        rowAddress: rowSize * rowIndex,
-        data: []
-    };
-
-    for (const range of ranges) {
-        const rangeStartsAfterRowEnd = rowEndIndex < range.start;
-        if (rangeStartsAfterRowEnd) break;
-
-        const rangesIntersect = RangeHelper.intervalIntersects(rowRange, range);
-        if (rangesIntersect) {
-            currentRow.data.push({...range});
-        }
-    }
-
-    return currentRow;
-};
-
 const groupRangesToRows = (ranges: IExportedValueOddRange[], rowSize: number = 16): IExportedValueRangesForRow[] => {
     const endRangeIndex = ranges[ranges.length - 1].end;
     const maxBytesByLastRange = endRangeIndex + 1;
     const expectedNumberOfGroups = Math.ceil(maxBytesByLastRange / rowSize);
 
-    return Array.from(Array(expectedNumberOfGroups).keys())
-        .map(rowIndex => prepareGroupForRow(rowIndex, ranges, rowSize));
+    const groupedRows = Array.from(Array(expectedNumberOfGroups).keys())
+        .map(rowIndex => ({
+            rowAddress: rowSize * rowIndex,
+            data: []
+        }));
+
+    for (const range of ranges) {
+        const firstAffectedRowIndex = Math.floor(range.start / rowSize);
+        const lastAffectedRowIndex = Math.floor(range.end / rowSize);
+        for (let i = firstAffectedRowIndex; i <= lastAffectedRowIndex; ++i) {
+            groupedRows[i].data.push(range);
+        }
+    }
+
+    return groupedRows;
 
 };
 
@@ -45,6 +33,5 @@ export const prepareOddEvenRangesForRows = (flatExported: IExportedValue[], rowS
         isOdd: index % 2 !== 0,
         value: item
     }));
-
     return groupRangesToRows(ranges, rowSize);
 };
