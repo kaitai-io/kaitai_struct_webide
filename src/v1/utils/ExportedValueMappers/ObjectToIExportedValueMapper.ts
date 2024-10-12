@@ -1,7 +1,7 @@
 import {IExportedValue, IInstance, ObjectType} from "../../../entities";
 import {IKsyTypes} from "../../../DataManipulation/ParsingModule/CodeExecution/Types";
 
-interface IDebugInfo {
+export interface IDebugInfo {
     start: number;
     end: number;
     ioOffset: number;
