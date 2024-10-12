@@ -3,8 +3,8 @@ import {Ace} from "ace-builds";
 import {YamlFileInfo} from "../DataManipulation/CompilationModule/JsImporter";
 import {compileGrammarAction} from "./CompileGrammar";
 import {parseAction} from "./ParseAction";
-import {fileSystemsManager} from "../v1/FileSystems/FileSystemManager";
 import {FILE_SYSTEM_TYPE_KAITAI, FILE_SYSTEM_TYPE_LOCAL} from "../v1/FileSystems/FileSystemsTypes";
+import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
 
 export const mainEditorOnChange = async (change: Ace.Delta, editorContent: string) => {
     const contentDidNotChange = change.lines.join("\n") === editorContent;
@@ -13,7 +13,7 @@ export const mainEditorOnChange = async (change: Ace.Delta, editorContent: strin
     const yamlInfo = yamlInfoWithCurrentStoreStateAndNewContent(editorContent);
     switchStoreIfChangeAppearedInKaitaiStore(yamlInfo);
 
-    await fileSystemsManager.local.put(yamlInfo.filePath, editorContent);
+    await useFileSystems().addFile(FILE_SYSTEM_TYPE_LOCAL, yamlInfo.filePath, editorContent);
     await compileGrammarAction(yamlInfo);
     await parseAction();
 };

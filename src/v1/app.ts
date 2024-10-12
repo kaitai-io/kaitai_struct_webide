@@ -10,27 +10,17 @@ import "font-awesome/css/font-awesome.min.css";
 import "./ImportJQuery";
 import "bootstrap";
 import "jstree";
-
-import {initFileDrop} from "./JQueryComponents/Files/FileDrop";
 import {ErrorWindowHandler} from "./app.errors";
-import {CompilerService} from "../DataManipulation/CompilationModule/CompilerService";
 import {GoldenLayoutUI} from "./GoldenLayout/GoldenLayoutUI";
 import {createApp} from "vue";
 import App from "../App.vue";
 import {createPinia} from "pinia";
-import {processUploadedFiles} from "../GlobalActions/UploadFiles";
 
 const vueApp = createApp(App);
 vueApp.use(createPinia());
 vueApp.mount("body");
 
-const qs = {};
-location.search.substr(1).split("&").map(x => x.split("=")).forEach(x => qs[x[0]] = x[1]);
-
-
-
 class AppController {
-    compilerService = new CompilerService();
     ui = new GoldenLayoutUI();
     errors: ErrorWindowHandler = null;
 
@@ -41,13 +31,6 @@ class AppController {
 
 export const app = new AppController();
 
-var kaitaiIde = window["kaitaiIde"] = <any>{};
-kaitaiIde.version = "0.1";
-kaitaiIde.commitId = "";
-kaitaiIde.commitDate = "";
-
 $(() => {
     app.init();
-    initFileDrop("fileDrop", (files: any) => processUploadedFiles(files));
-    kaitaiIde.app = app;
 });

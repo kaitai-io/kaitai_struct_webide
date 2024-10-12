@@ -21,7 +21,6 @@ export interface IExportedValueOddRange extends SimpleRange {
 }
 
 export interface ProcessedLetter {
-    isSelected: boolean;
     hex: string;
     char: string;
     index: number;
@@ -36,8 +35,8 @@ export interface IExportedValueRangesForRow {
 }
 
 export interface ProcessLettersConfig {
-    selection: SimpleRange;
-    rowIndex: number;
+    rowStartingIndex: number;
     emojiMode?: boolean;
     oddEvenRanges?: IExportedValueOddRange[];
+    root: IExportedValue;
 }

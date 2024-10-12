@@ -7,18 +7,26 @@ import {
   onDoubleClickAction,
   onDragStartAction
 } from "../Services/HexViewerMouseActions";
+import {computed} from "vue";
+import {RangeHelper} from "../../../v1/utils/RangeHelper";
+import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
+
+const binStore = useCurrentBinaryFileStore();
 
 const props = defineProps<{
   interactive?: boolean
   letter: ProcessedLetter
 }>();
 
+const isSelected = computed(() => {
+  return props.interactive && RangeHelper.containsPoint({start: binStore.selectionStart, end: binStore.selectionEnd}, props.letter.index);
+});
 
 </script>
 
 <template>
   <span
-      :class="`cell ${props.letter.isSelected ? 'selected' : ''}`"
+      :class="`cell ${isSelected ? 'selected' : ''}`"
       :draggable="props.interactive"
 
       @click="(e) => props.interactive && onSingleClickAction(e,  props.letter)"

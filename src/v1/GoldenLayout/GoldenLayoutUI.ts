@@ -11,8 +11,6 @@ export class GoldenLayoutUI {
     genCodeViewer: Ace.Editor;
     genCodeDebugViewer: Ace.Editor;
     errorWindow: GoldenLayout.Container;
-    fileTreeCont: JQuery;
-    fileTree: JSTree;
 
     constructor() {
         const goldenLayout = new GoldenLayoutModule(GoldenLayoutUIConfig);

@@ -1,5 +1,6 @@
 import {defineStore} from "pinia";
 import {IFileSystem} from "../../../v1/FileSystems/FileSystemsTypes";
+import {toRaw} from "vue";
 
 export interface FileSystemsStore {
     fileSystems: IFileSystem[];
@@ -41,5 +42,17 @@ export const useFileSystems = defineStore("FileSystemsStore", {
             this.selectedPath = path;
             serializeConfigToLocalStorage(this);
         },
+        async addFile(storeId: string, path: string, content: string | ArrayBuffer) {
+            const fileSystem: IFileSystem = this.fileSystems.find((fs: IFileSystem) => fs.storeId === storeId);
+            await fileSystem.put(path, content);
+            fileSystem.save(toRaw(fileSystem.getRootNode()));
+            serializeConfigToLocalStorage(this);
+        },
+        async getFile(storeId: string, filePath: string): Promise<string | ArrayBuffer> {
+            const fileSystem = this.fileSystems.find((fs: IFileSystem) => fs.storeId === storeId);
+            return !!fileSystem
+                ? await fileSystem.get(filePath)
+                : "";
+        }
     }
 });

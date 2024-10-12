@@ -33,15 +33,13 @@ const fetchLetterPlacementStatus = (letterIndex: number, matchingRange?: IExport
 };
 
 const createSingleLetter = (letter: number, index: number, options: ProcessLettersConfig) => {
-    const {selection, rowIndex, oddEvenRanges, emojiMode} = options;
+    const {rowStartingIndex, oddEvenRanges, emojiMode} = options;
 
-    const letterIndex = index + rowIndex;
-    const isSelected = RangeHelper.containsPoint(selection, letterIndex);
+    const letterIndex = index + rowStartingIndex;
     const matchingRange = (oddEvenRanges || []).find(flat => RangeHelper.containsPoint(flat, letterIndex));
 
     return {
         index: letterIndex,
-        isSelected: isSelected,
         hex: mapLetterToHexOrEmoji(letter, emojiMode),
         char: convertByteToAsciiCharacter(letter),
         range: matchingRange,
@@ -58,10 +56,9 @@ export const createEmptyLettersToFillRow = (rowLettersCount: number, rowSize: nu
     return Array.from(new Array(emptyLettersCount)).map((_, index): ProcessedLetter => {
         return {
             index: rowLettersCount + index,
-            isSelected: false,
             hex: "",
             char: "",
-            range: null,
+            range: undefined,
             oddStatus: OddStatus.NONE,
             rangePlacement: RangePlacementStatus.NONE,
         };

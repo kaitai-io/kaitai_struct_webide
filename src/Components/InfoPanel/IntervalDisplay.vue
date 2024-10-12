@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import {computed} from "vue";
-import {SimpleRange} from "../../v1/utils/RangeHelper";
+import {RangeHelper, SimpleRange} from "../../v1/utils/RangeHelper";
 
 const props = defineProps<{
   intervalName: string,
@@ -9,9 +9,9 @@ const props = defineProps<{
 }>();
 
 const store = useCurrentBinaryFileStore();
-const currentIndex = computed(() => {
+const currentlySelectedIntervalIndex = computed(() => {
   const start = store.selectionStart;
-  const foundIndex = props.intervals.findIndex(interval => interval.start <= start && start <= interval.end);
+  const foundIndex = props.intervals.findIndex(interval => RangeHelper.containsPoint(interval, start));
   return foundIndex !== -1
       ? (foundIndex + 1).toString()
       : "-"
@@ -50,7 +50,7 @@ const prev = () => {
 <template>
   <div class="local">{{ intervalName }}:
     <a href="#" class="but" @click="prev()"><<</a>
-    <span> {{ currentIndex }} / {{ intervals.length }} </span>
+    <span> {{ currentlySelectedIntervalIndex }} / {{ intervals.length }} </span>
     <a href="#" class="but" @click="next()">>></a>
   </div>
 </template>

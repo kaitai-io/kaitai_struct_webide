@@ -9,8 +9,12 @@ import {
   onMouseUpAction,
   onSingleClickAction
 } from "../Services/HexViewerMouseActions";
+import {computed} from "vue";
+import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
+import {RangeHelper} from "../../../v1/utils/RangeHelper";
 
 const store = useHexViewerConfigStore();
+const binStore = useCurrentBinaryFileStore();
 
 const props = defineProps<{
   interactive?: boolean
@@ -18,6 +22,9 @@ const props = defineProps<{
   letter: ProcessedLetter
 }>();
 
+const isSelected = computed(() => {
+  return props.interactive && RangeHelper.containsPoint({start: binStore.selectionStart, end: binStore.selectionEnd}, props.letter.index);
+});
 
 const oddEvenClass = (letter: ProcessedLetter) => {
   switch (letter.oddStatus) {
@@ -62,7 +69,7 @@ const isGapAfter = () => {
        @mouseup="(e) => props.interactive && onMouseUpAction(e)"
   >
   <span
-      :class="`cell ${oddEvenClass(props.letter)}  ${props.letter.isSelected ? 'selected' : ''}`"
+      :class="`cell ${oddEvenClass(props.letter)}  ${isSelected ? 'selected' : ''}`"
 
   >
               {{ props.letter.hex }}

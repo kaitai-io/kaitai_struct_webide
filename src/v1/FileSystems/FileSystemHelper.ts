@@ -2,11 +2,11 @@ import {FILE_SYSTEM_TYPE_LOCAL, IFsItem, IFsItemSummary, ITEM_MODE_DIRECTORY} fr
 
 
 export const findOrCreateFsPath = (root: IFsItem, filePath: string) => {
-    var currNode = root;
-    var fnParts = filePath.split("/");
-    var currPath = "";
-    for (var i = 0; i < fnParts.length; i++) {
-        var fnPart = fnParts[i];
+    const fnParts = filePath.split("/");
+    let currNode = root;
+    let currPath = "";
+    for (let i = 0; i < fnParts.length; i++) {
+        const fnPart = fnParts[i];
         currPath += (currPath ? "/" : "") + fnPart;
 
         if (!("children" in currNode)) {

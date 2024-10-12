@@ -1,22 +1,30 @@
-import {IFileProcessCallback, IFileProcessItem} from "./Types";
+import {IFileProcessItem} from "./Types";
 import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
 import {ArrayUtils} from "../Misc/ArrayUtils";
 import {useAppStore} from "../../../Stores/AppStore";
 
 export class FileActionsWrapper {
-
-    public static downloadFile(url: string) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url, true);
-        xhr.responseType = "arraybuffer";
-
-        return new Promise<ArrayBuffer>((resolve, reject) => {
-            xhr.onload = e => resolve(xhr.response);
-            xhr.onerror = reject;
-            xhr.send();
-        });
+    public static getFileFromServer(url: string) {
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    let msg;
+                    if (response.status === 404) {
+                        msg = "file not found";
+                    } else {
+                        const textAppendix = response.statusText ? ` (${response.statusText})` : "";
+                        msg = `server responded with HTTP status ${response.status}${textAppendix}`;
+                    }
+                    throw new Error(msg);
+                }
+                return response;
+            }, err => {
+                if (err instanceof TypeError) {
+                    throw new Error(`cannot reach the server (message: ${err.message}), check your internet connection`);
+                }
+                throw err;
+            });
     }
-
     public static saveFile(data: ArrayBuffer | Uint8Array | string, filename: string) {
         const a = document.createElement("a");
         document.body.appendChild(a);
@@ -28,18 +36,6 @@ export class FileActionsWrapper {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-    }
-
-    public static processFilesFromInputOnChangeEvent(event: Event, callback: IFileProcessCallback): void {
-        const target = event.target as HTMLInputElement;
-        FileActionsWrapper.processUploadedFilesWithCallback(target.files, callback);
-    }
-
-    public static processFilesFromDropEvent(event: Event, callback: IFileProcessCallback): void {
-        // @ts-ignore - Property 'originalEvent' does not exist on type 'Event'.
-        const dragEvent = event.originalEvent as DragEvent;
-        const files = dragEvent.dataTransfer.files;
-        FileActionsWrapper.processUploadedFilesWithCallback(files, callback);
     }
 
     public static downloadBinFromSelection(): void {
@@ -60,7 +56,7 @@ export class FileActionsWrapper {
         FileActionsWrapper.saveFile(new Uint8Array(store.fileContent, start, fileDataLength), downloadedFileName);
     }
 
-    private static processUploadedFiles(files: FileList): IFileProcessItem[] {
+    public static mapToProcessItems(files: FileList): IFileProcessItem[] {
         const readBlobPromise = (blob: Blob, mode: "arrayBuffer" | "text" | "dataUrl", ...args: any[]): Promise<string | ArrayBuffer> => {
             return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -76,19 +72,14 @@ export class FileActionsWrapper {
         };
 
 
-        const processSingleFile = (file: File): IFileProcessItem => ({
+        const mapSingleFileToProcessItem = (file: File): IFileProcessItem => ({
             file: file,
             read: function (mode: "arrayBuffer" | "text" | "dataUrl") {
                 return <Promise<any>>readBlobPromise(this.file, mode);
             }
         });
 
-        return Array.from(files).map(processSingleFile);
-    }
-
-    private static processUploadedFilesWithCallback(files: FileList, callback: IFileProcessCallback): void {
-        const processedFiles = FileActionsWrapper.processUploadedFiles(files);
-        callback(processedFiles);
+        return Array.from(files).map(mapSingleFileToProcessItem);
     }
 
 }

@@ -1,13 +1,17 @@
 import {findOrCreateFsPath} from "./FileSystemHelper";
-import {IFileSystem, IFsItem} from "./FileSystemsTypes";
+import {FILE_SYSTEM_TYPE_LOCAL, IFileSystem, IFsItem} from "./FileSystemsTypes";
 import {LocalForageWrapper} from "../utils/LocalForageWrapper";
 
 export class OldLocalStorageFileSystem implements IFileSystem {
+
+    public storeId: string;
+    private root: IFsItem;
+
     constructor(root: IFsItem) {
         this.root = root;
+        this.storeId = FILE_SYSTEM_TYPE_LOCAL;
     }
 
-    private root: IFsItem;
 
     private filesKey() {
         return `fs_files`;
@@ -17,24 +21,15 @@ export class OldLocalStorageFileSystem implements IFileSystem {
         return `fs_file[${fn}]`;
     }
 
-    private save() {
-        return LocalForageWrapper.saveFsItem(this.filesKey(), this.root);
+    save(root: IFsItem) {
+        return LocalForageWrapper.saveFsItem(this.filesKey(), root);
     }
 
     getRootNode() {
         return this.root;
     }
 
-    async getRootNodeAsync() {
-        return this.root;
-    }
-
-    setRootNode(newRoot: IFsItem) {
-        this.root = newRoot;
-        return this.save();
-    }
-
-    get(fn: string): Promise<string | ArrayBuffer> {
+    async get(fn: string): Promise<string | ArrayBuffer> {
         return LocalForageWrapper.getFile(this.fileKey(fn))
             .then(content => {
                 if (content === null) {
@@ -44,13 +39,10 @@ export class OldLocalStorageFileSystem implements IFileSystem {
             });
     }
 
-    put(fn: string, data: any): Promise<IFsItem> {
-        return this.getRootNodeAsync().then(root => {
-            const node = findOrCreateFsPath(root, fn);
-            const saveFileAction = LocalForageWrapper.saveFile(this.fileKey(fn), data);
-            const updateFileTreeAction = this.save();
-            return Promise.all([saveFileAction, updateFileTreeAction])
-                .then(_ => node);
-        });
+    async put(fn: string, data: string | ArrayBuffer): Promise<IFsItem> {
+        const root = this.getRootNode();
+        const node = findOrCreateFsPath(root, fn);
+        return LocalForageWrapper.saveFile(this.fileKey(fn), data)
+            .then(_ => node);
     }
 }

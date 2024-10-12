@@ -2,7 +2,7 @@ import {fetchInstance, IParsingOptions, mapObjectToExportedValue} from "../../..
 import {IExportedValue} from "../../../entities";
 import {WorkerFunctionStack} from "./WorkerFunctionStack";
 import {IWorkerMessage, IWorkerMessageParse} from "./WorkerMessages";
-import {IWorkerResponse, IWorkerResponseInit, IWorkerResponseParse} from "./WorkerResponses";
+import {IWorkerResponse, IWorkerResponseInit, IWorkerResponseParse, ParseResultType} from "./WorkerResponses";
 import {IKsyTypes, IWorkerApiMethods, PARSE_SCRIPTS, INIT_WORKER_SCRIPTS, IWorkerParsedResponse} from "./Types";
 
 export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
@@ -12,7 +12,7 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
     sourceCode: string;
     ksyTypes: IKsyTypes;
     inputBuffer: ArrayBuffer;
-    root: any;
+    root: ParseResultType;
     exported: IExportedValue;
 
     constructor(stack: WorkerFunctionStack, worker: Worker) {
@@ -25,11 +25,11 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
         this.sourceCode = sourceCode;
         this.mainClass = mainClassName;
         this.ksyTypes = {...ksyTypes};
-    };
+    }
 
     setInputAction = (inputBuffer: ArrayBuffer): void => {
         this.inputBuffer = inputBuffer;
-    };
+    }
 
     parseAction = (eagerMode: boolean): Promise<IWorkerParsedResponse> => {
         return new Promise<IWorkerParsedResponse>((resolve, reject) => {
@@ -38,7 +38,7 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
             const message = this.prepareIWorkerMessageParse(msgId, eagerMode);
             this.sendMessageToWorker(message);
         });
-    };
+    }
 
     getPropertyByPathAction = (path: string[]): Promise<IExportedValue> => {
         let parent = this.root;
@@ -47,12 +47,12 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
         const propName = path[path.length - 1];
         const property = fetchInstance(parent, propName, parentPath, false);
         return Promise.resolve(property);
-    };
+    }
 
     sendMessageToWorker = (message: IWorkerMessage): void => {
         console.log("[KaitaiCodeWorkerWrapper][REQUEST]", message);
         this.worker.postMessage(message);
-    };
+    }
 
     onMessageReceive = (ev: MessageEvent): void => {
         const msg = <IWorkerResponse>ev.data;
@@ -66,18 +66,19 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
                 return;
             }
         }
-
-    };
+    }
 
     private onMessageReceiveInit = (msg: IWorkerResponseInit) => {
         console.log("[KaitaiCodeWorkerWrapper][RESPONSE]", msg);
-    };
+    }
 
     private onMessageReceiveParse = (msg: IWorkerResponseParse) => {
         console.log("[KaitaiCodeWorkerWrapper][RESPONSE]", msg);
         const parseResponsePromise = this.stack.removeFunctionFromStack(msg.msgId);
-        !!parseResponsePromise && parseResponsePromise(msg);
-    };
+        if(!!parseResponsePromise) {
+            parseResponsePromise(msg);
+        }
+    }
 
 
     private digestResponseFromWorker = (response: IWorkerResponseParse,

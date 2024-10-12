@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import {openUploadFilesOperatingSystemModal} from "../../v1/JQueryComponents/Files/UploadFilesOSModal";
-import {processUploadedFiles} from "../../GlobalActions/UploadFiles";
+import {processUploadedFileList} from "../../GlobalActions/UploadFiles";
+import {useFileDialog} from "@vueuse/core";
+
+const {open, onChange} = useFileDialog();
+onChange(processUploadedFileList);
 
 const addKsyFile = () => {
 };
 
-const uploadFile = () => {
-  openUploadFilesOperatingSystemModal(files => {
-    processUploadedFiles(files);
-  });
-};
 
 const downloadFile = () => {
 };
@@ -22,7 +20,7 @@ const downloadFile = () => {
     <button type="button" class="action-button" @click="addKsyFile()">
       <i class="glyphicon glyphicon-file"/>
     </button>
-    <button type="button" class="action-button" @click="uploadFile()">
+    <button type="button" class="action-button" @click="open()">
       <i class="glyphicon glyphicon-cloud-upload"/>
     </button>
     <button type="button" class="action-button" @click="downloadFile()" disabled>

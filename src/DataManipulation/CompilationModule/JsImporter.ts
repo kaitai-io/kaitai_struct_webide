@@ -1,7 +1,7 @@
-import {fileSystemsManager} from "../../v1/FileSystems/FileSystemManager";
 import {YamlParser} from "./YamlParser";
 import {JsImporterError} from "./JsImporterError";
 import {FileLocationInfo} from "../../Stores/AppStore";
+import {useFileSystems} from "../../Components/FileTree/Store/FileSystemsStore";
 
 export interface IYamlImporter {
     importYaml(importFilePath: string, mode: string): Promise<KsySchema.IKsyFile>;
@@ -78,7 +78,7 @@ export class JsImporter implements IYamlImporter {
     }
 
     private async loadYamlWithFileManager({storeId, filePath}: FileLocationInfo): Promise<YamlFileInfo> {
-        const ksyContent = await fileSystemsManager[storeId].get(filePath) as string;
+        const ksyContent = await useFileSystems().getFile(storeId, filePath) as string;
         return {
             storeId: storeId,
             filePath: filePath,

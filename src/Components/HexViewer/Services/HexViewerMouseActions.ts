@@ -2,12 +2,13 @@ import {ProcessedLetter} from "../Types";
 import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
 import {useHexViewerConfigStore} from "../Store/HexViewerConfigStore";
 import {HEX_VIEWER_SOURCE} from "./HexViewerActions";
+import {RangeHelper} from "../../../v1/utils/RangeHelper";
 
 const LEFT_MOUSE_BUTTON = 1;
 
 const handleDeselectAction = (e: MouseEvent, letter: ProcessedLetter) => {
     const store = useCurrentBinaryFileStore();
-    if (letter.isSelected && store.selectionStart === store.selectionEnd) {
+    if (RangeHelper.containsPoint({start: store.selectionStart, end: store.selectionEnd}, letter.index)) {
         store.deselect();
         return true;
     }

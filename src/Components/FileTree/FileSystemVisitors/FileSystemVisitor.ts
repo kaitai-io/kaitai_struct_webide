@@ -16,6 +16,7 @@ export const KSY_FILE = "KSY_FILE";
 export type NodeType = typeof EMPTY_FOLDER | typeof OPEN_FOLDER | typeof CLOSED_FOLDER | typeof BINARY_FILE | typeof KSY_FILE;
 
 export interface TreeNodeDisplay {
+    path: string;
     fullPath: string;
     type: NodeType;
     fileName: string;
@@ -60,11 +61,15 @@ export class FileSystemVisitor {
 
 
     private mapToNewNode(fsItem: IFsItem): TreeNodeDisplay {
+        const pathWithoutCurrentItem = [...this.currentPath];
+        pathWithoutCurrentItem.pop();
+        const path = pathWithoutCurrentItem.join("/");
         const fullPath = this.currentPath.join("/");
         const isOpen = this.isDirectoryOpen(fullPath);
         return {
             type: this.getNodeType(isOpen, fsItem),
             storeId: fsItem.fsType,
+            path: path,
             fullPath: fullPath,
             fileName: fsItem.fn,
             depth: this.currentPath.length - 1

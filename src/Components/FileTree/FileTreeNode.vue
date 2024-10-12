@@ -5,8 +5,7 @@ import {
   CLOSED_FOLDER,
   EMPTY_FOLDER,
   KSY_FILE,
-  OPEN_FOLDER,
-  TreeNodeDisplay
+  OPEN_FOLDER, TreeNodeDisplay
 } from "./FileSystemVisitors/FileSystemVisitor";
 import FileStoreTreeNodeIcon from "./FileTreeNodeIcon.vue";
 import {computed} from "vue";
@@ -63,10 +62,10 @@ const isSelected = computed(() => {
 </script>
 
 <template>
-  <div class="row-wrapper" :class="{isSelected}">
-    <div class="roww" :style="{marginLeft: item.depth * 16 + 'px'}"
-         @click="() => activateRow()"
-         @dblclick="() => doubleClick()">
+  <div class="row-wrapper" draggable="true" :class="{isSelected}"
+       @click="() => activateRow()"
+       @dblclick="() => doubleClick()">
+    <div class="row-content" :style="{marginLeft: item.depth * 16 + 'px'}">
       <FileStoreTreeNodeIcon :type="item.type"/>
       <span class="row-description">{{ item.fileName }}</span>
     </div>
@@ -77,18 +76,21 @@ const isSelected = computed(() => {
 <style scoped>
 
 .row-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
   transition: background-color 200ms;
   border-radius: 2px;
-
 }
 
 .row-wrapper:hover {
   background-color: #344C64;
 }
 
-.roww {
+.row-content {
   display: flex;
   flex-direction: row;
+
   text-wrap: nowrap;
   height: 16px;
 

@@ -1,6 +1,3 @@
-import {KaitaiFileSystem} from "./KaitaiFileSystem";
-import {OldLocalStorageFileSystem} from "./OldLocalStorageFileSystem";
-
 export const FILE_SYSTEM_TYPE_LOCAL = "local";
 export const FILE_SYSTEM_TYPE_KAITAI = "kaitai";
 export const ITEM_MODE_FILE = "file";
@@ -8,6 +5,7 @@ export const ITEM_MODE_DIRECTORY = "folder";
 
 export type FsItemMode = typeof ITEM_MODE_FILE | typeof ITEM_MODE_DIRECTORY;
 export type FsItemType = typeof FILE_SYSTEM_TYPE_LOCAL | typeof FILE_SYSTEM_TYPE_KAITAI;
+
 export interface IFsItem {
     fsType: FsItemType;
     type: FsItemMode;
@@ -22,18 +20,13 @@ export interface IFsItemSummary {
 }
 
 export interface IFileSystem {
-    setRootNode(newRoot: IFsItem): Promise<IFsItem>;
+    storeId: string;
 
     getRootNode(): IFsItem | undefined;
 
-    getRootNodeAsync(): Promise<IFsItem>;
+    save(root: IFsItem): void;
 
     get(fn: string): Promise<string | ArrayBuffer>;
 
-    put(fn: string, data: any): Promise<IFsItem>;
-}
-
-export interface IFileSystemManager {
-    local: OldLocalStorageFileSystem;
-    kaitai: KaitaiFileSystem;
+    put(fn: string, data: string | ArrayBuffer): Promise<IFsItem>;
 }

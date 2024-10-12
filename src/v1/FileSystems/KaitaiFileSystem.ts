@@ -5,49 +5,32 @@ import {kaitaiFsFiles} from "../../kaitaiFsFiles";
 
 
 export class KaitaiFileSystem implements IFileSystem {
+
+    storeId: string;
+
     constructor(public files: IFsItem) {
+        this.storeId = FILE_SYSTEM_TYPE_KAITAI;
     }
 
     getRootNode() {
         return this.files;
     }
 
-    getRootNodeAsync() {
-        return Promise.resolve(this.files);
+    async get(fn: string): Promise<string | ArrayBuffer> {
+        const resp = await FileActionsWrapper.getFileFromServer(fn);
+        return fn.toLowerCase().endsWith(".ksy")
+            ? resp.text()
+            : resp.arrayBuffer();
     }
 
-    setRootNode(newRoot: IFsItem): Promise<IFsItem> {
-        throw "KaitaiFileSystem.setRootNode is not implemented";
-    }
-
-    get(fn: string): Promise<string | ArrayBuffer> {
-        if (fn.toLowerCase().endsWith(".ksy"))
-            return fetch(fn)
-                .then(response => {
-                    if (!response.ok) {
-                        let msg;
-                        if (response.status === 404) {
-                            msg = "file not found";
-                        } else {
-                            const textAppendix = response.statusText ? ` (${response.statusText})` : "";
-                            msg = `server responded with HTTP status ${response.status}${textAppendix}`;
-                        }
-                        throw new Error(msg);
-                    }
-                    return response.text();
-                }, err => {
-                    if (err instanceof TypeError) {
-                        throw new Error(`cannot reach the server (message: ${err.message}), check your internet connection`);
-                    }
-                    throw err;
-                });
-        else
-            return FileActionsWrapper.downloadFile(fn);
-    }
-
-    put(fn: string, data: any) {
+    async put(fn: string, data: any) {
         return Promise.reject("KaitaiFileSystem.put is not implemented!");
     }
+
+    save(root: IFsItem): void {
+
+    }
+
 }
 
 export const initKaitaiFs = () => {

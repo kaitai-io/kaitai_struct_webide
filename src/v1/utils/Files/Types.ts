@@ -10,7 +10,3 @@ export interface IFileProcessItem {
     file: File;
     read: IFileReader;
 }
-
-export interface IFileProcessCallback {
-    (files: IFileProcessItem[]): void;
-}

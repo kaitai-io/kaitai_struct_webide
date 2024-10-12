@@ -7,7 +7,7 @@ import {computed} from "vue";
 import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import {useHexViewerConfigStore} from "./Store/HexViewerConfigStore";
 
-import {IExportedValueRangesForRow} from "./Types";
+import {IExportedValueRangesForRow, ProcessedLetter} from "./Types";
 import LetterCellHex from "./Common/LetterCellHex.vue";
 
 const hexConfig = useHexViewerConfigStore();
@@ -18,7 +18,7 @@ const props = defineProps<{
   processedData?: IExportedValueRangesForRow[]
 }>();
 
-const processedRow = computed<{ rowFirstByteIndex: number, letters: any, emptyLetters: any }>(() => {
+const processedRow = computed<{ rowFirstByteIndex: number, letters: ProcessedLetter[], emptyLetters: ProcessedLetter[] }>(() => {
   const rowAddress = props.rowIndex * hexConfig.rowSize;
   const remainingFileBytes = currentFileStore.fileContent.byteLength - rowAddress;
 
@@ -27,13 +27,10 @@ const processedRow = computed<{ rowFirstByteIndex: number, letters: any, emptyLe
       : new Uint8Array([]);
 
   const letters = createLetters(data, {
-    selection: {
-      start: currentFileStore.selectionStart,
-      end: currentFileStore.selectionEnd
-    },
-    rowIndex: rowAddress,
-    oddEvenRanges: props.processedData?.find(item => item.rowAddress === rowAddress)?.data || [],
-    emojiMode: hexConfig.emojiMode
+    rowStartingIndex: rowAddress,
+    oddEvenRanges: (props.processedData || [])[props.rowIndex]?.data || [],
+    emojiMode: hexConfig.emojiMode,
+    root: currentFileStore.parsedFile
   });
   const emptyLetters = createEmptyLettersToFillRow(letters.length, hexConfig.rowSize);
   return {rowFirstByteIndex: rowAddress, letters, emptyLetters};
