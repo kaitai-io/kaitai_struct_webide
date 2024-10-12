@@ -8,7 +8,7 @@ export class AbstractExportedValueMapper<T> implements IExportedValueMapper<T> {
                 const isEnumValue = !!value.enumStringValue;
                 return isEnumValue
                     ? this.visitEnum(value)
-                    : this.visitPrimitive(value)
+                    : this.visitPrimitive(value);
             case ObjectType.Array:
                 return this.visitArray(value);
             case ObjectType.TypedArray:
