@@ -1,14 +1,12 @@
 <script setup lang="ts">
 
 import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
-import {FileActionsWrapper} from "../../v1/utils/Files/FileActionsWrapper";
 import {useHexViewerConfigStore} from "../HexViewer/Store/HexViewerConfigStore";
 import {computed} from "vue";
 import SelectionPreview from "./SelectionPreview.vue";
 import IntervalDisplay from "./IntervalDisplay.vue";
 import EmojiCheckbox from "./EmojiCheckbox.vue";
 import ListOptionsToggle from "./ListOptionsToggle.vue";
-import ExportToJsonComponent from "./ExportToJsonComponent.vue";
 import {useIdeSettingsStore} from "../../Stores/IdeSettingsStore";
 import {useWelcomeModalStore} from "../WelcomeModal/WelcomeModalStore";
 import {ExportedValueUtils} from "../../v1/utils/Misc/ExportedValueUtils";
@@ -49,8 +47,6 @@ const about = () => {
     <IntervalDisplay :intervals="emptyIntervals" intervalName="Unparsed parts"/>
     <IntervalDisplay :intervals="byteArrays" intervalName="Byte arrays"/>
     <div id="parsedPathDiv">Selected: <span id="parsedPath">{{ selectionPath }}</span></div>
-    <ExportToJsonComponent/>
-    <a @click="FileActionsWrapper.downloadBinFromSelection()" href="#">Download selection as BIN</a>
     <ListOptionsToggle :on-change="hexViewerConfigStore.setColumns" :values="[0,2,4,5,8]"
                        text="Split editor each n bytes"/>
     <ListOptionsToggle :on-change="hexViewerConfigStore.setRowSize" :values="[1,10,16,20,24,32]"

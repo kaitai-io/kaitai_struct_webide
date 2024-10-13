@@ -1,8 +1,8 @@
 import {FileLocationInfo} from "../Stores/AppStore";
 import {YamlFileInfo} from "../DataManipulation/CompilationModule/JsImporter";
-import {useAceEditorStore} from "../Stores/AceEditorStore";
 import {compileGrammarAction} from "./CompileGrammar";
 import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
+import {CurrentGoldenLayout} from "../v1/GoldenLayout/GoldenLayoutUI";
 
 export const loadKsyFileAction = async (ksyFileLocation: FileLocationInfo) => {
 
@@ -13,7 +13,6 @@ export const loadKsyFileAction = async (ksyFileLocation: FileLocationInfo) => {
         fileContent: content
     };
 
-    const aceEditorStore = useAceEditorStore();
-    aceEditorStore?.mainKsyEditor.setValue(yamlInfo.fileContent, -1);
+    CurrentGoldenLayout.updateKsyEditor(yamlInfo.filePath, yamlInfo.fileContent);
     await compileGrammarAction(yamlInfo);
 };

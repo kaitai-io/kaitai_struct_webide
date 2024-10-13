@@ -1,5 +1,5 @@
-﻿import {app} from "./app";
-import GoldenLayout from "golden-layout";
+﻿import GoldenLayout from "golden-layout";
+import {CurrentGoldenLayout} from "./GoldenLayout/GoldenLayoutUI";
 
 const htmlescape = (str: string) => $("<div/>").text(str).html();
 
@@ -15,7 +15,7 @@ export class ErrorWindowHandler {
         console.error.apply(window, args);
         var errMsg = args.filter(x => typeof x !== "object").join(" ");
         if (!this.errorWnd) {
-            var newPanel = app.ui.layoutManager.addPanel();
+            var newPanel = CurrentGoldenLayout.addPanel();
             this.parentContainer.addChild({type: "component", componentName: newPanel.componentName, title: "Errors"});
             this.errorWnd = await newPanel.donePromise;
             this.errorWnd.setSize(0, this.lastErrWndSize);

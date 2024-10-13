@@ -19,6 +19,7 @@ import {LocalForageWrapper} from "./v1/utils/LocalForageWrapper";
 import {initKaitaiFs} from "./v1/FileSystems/KaitaiFileSystem";
 import {OldLocalStorageFileSystem} from "./v1/FileSystems/OldLocalStorageFileSystem";
 import {useFileSystems} from "./Components/FileTree/Store/FileSystemsStore";
+import {CurrentGoldenLayout} from "./v1/GoldenLayout/GoldenLayoutUI";
 
 const store = useAppStore();
 const fileSystemsStore = useFileSystems();
@@ -61,6 +62,8 @@ const initFileParsing = async () => {
 
 
 onMounted(async () => {
+  CurrentGoldenLayout.init();
+
   await initFileSystems();
   await initFileParsing();
 });
