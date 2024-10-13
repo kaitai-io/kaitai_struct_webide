@@ -3,7 +3,7 @@ import {processUploadedFileList} from "../../GlobalActions/UploadFiles";
 import {useFileDialog} from "@vueuse/core";
 
 const {open, onChange} = useFileDialog();
-onChange(processUploadedFileList);
+onChange((files) => processUploadedFileList(files, "UploadModal"));
 
 const addKsyFile = () => {
 };

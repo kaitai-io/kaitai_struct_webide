@@ -10,7 +10,7 @@ const drop = (event: Event) => {
   // @ts-ignore - Property 'dataTransfer' does not exist on type 'Event'.
   const files = event.dataTransfer.files;
   draggingOver.value = false;
-  processUploadedFileList(files);
+  processUploadedFileList(files, "Drag&Drop");
 };
 
 const dragOver = (event: Event) => {

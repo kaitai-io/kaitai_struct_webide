@@ -28,7 +28,8 @@ const processSingleUploadedFile = (file: IFileProcessItem) => {
 };
 
 
-export const processUploadedFileList = (fileList: FileList) => {
+export const processUploadedFileList = (fileList: FileList, source: string) => {
     const files = FileActionsWrapper.mapToProcessItems(fileList);
+    console.log(`[UploadFiles][${source}] - uploading files]`)
     return Promise.all(files.map(processSingleUploadedFile));
 };
