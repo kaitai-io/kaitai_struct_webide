@@ -24,12 +24,11 @@
     "pako": "^1.0.6",
     "pinia": "^2.1.7",
     "require-from-string": "^1.2.1",
-    "requirejs": "^2.3.5",
+    "requirejs": "2.3.7",
     "smooth-scrollbar": "^7.4.1",
     "text-encoding": "^0.6.4",
     "thenby": "^1.2.3",
-    "vue": "^3.4.29",
-    "yamljs": "^0.3.0"
+    "vue": "^3.4.29"
   },
   "devDependencies": {
     "@parcel/optimizer-data-url": "^2.12.0",
