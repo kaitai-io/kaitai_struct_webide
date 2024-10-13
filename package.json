@@ -60,7 +60,7 @@
     "generate-license": "node vendor_license.js",
     "serve": "serve dist",
     "parcel-run": "parcel index.html",
-    "parcel-build": "parcel build index.html"
+    "parcel-build": "parcel build index.html --no-optimize"
   },
   "repository": {
     "type": "git",
