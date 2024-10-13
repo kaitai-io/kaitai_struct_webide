@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import {useFileSystems} from "./Store/FileSystemsStore";
-import {
-  BINARY_FILE,
-  CLOSED_FOLDER,
-  EMPTY_FOLDER,
-  KSY_FILE,
-  OPEN_FOLDER, TreeNodeDisplay
-} from "./FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplayType, TreeNodeDisplay} from "./FileSystemVisitors/FileSystemVisitor";
 import FileStoreTreeNodeIcon from "./FileTreeNodeIcon.vue";
 import {computed} from "vue";
 import {useAppStore} from "../../Stores/AppStore";
@@ -23,28 +17,28 @@ const activateRow = () => {
 
 const doubleClick = () => {
   switch (props.item.type) {
-    case KSY_FILE: {
+    case TreeNodeDisplayType.KSY_FILE: {
       appStore.updateSelectedKsyFile({
         storeId: props.item.storeId,
         filePath: prepareFilePathFromNode(props.item)
       });
       return;
     }
-    case BINARY_FILE: {
+    case TreeNodeDisplayType.BINARY_FILE: {
       appStore.updateSelectedBinaryFile({
         storeId: props.item.storeId,
         filePath: prepareFilePathFromNode(props.item)
       });
       return;
     }
-    case EMPTY_FOLDER: {
+    case TreeNodeDisplayType.EMPTY_FOLDER: {
       return;
     }
-    case OPEN_FOLDER: {
+    case TreeNodeDisplayType.OPEN_FOLDER: {
       store.closePath(props.item.fullPath);
       return;
     }
-    case CLOSED_FOLDER: {
+    case TreeNodeDisplayType.CLOSED_FOLDER: {
       store.openPath(props.item.fullPath);
       return;
     }
@@ -94,7 +88,7 @@ const isSelected = computed(() => {
   text-wrap: nowrap;
   height: 16px;
 
-  animation:  100ms ease-out 0s 1 unshrink;
+  animation: 100ms ease-out 0s 1 unshrink;
 }
 
 .row-description {

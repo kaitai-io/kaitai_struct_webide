@@ -7,64 +7,139 @@ import {
     ITEM_MODE_FILE
 } from "../../../v1/FileSystems/FileSystemsTypes";
 
-export const OPEN_FOLDER = "OPEN_FOLDER";
-export const CLOSED_FOLDER = "CLOSED_FOLDER";
-export const EMPTY_FOLDER = "EMPTY_FOLDER";
-export const BINARY_FILE = "BINARY_FILE";
-export const KSY_FILE = "KSY_FILE";
-
-export type NodeType = typeof EMPTY_FOLDER | typeof OPEN_FOLDER | typeof CLOSED_FOLDER | typeof BINARY_FILE | typeof KSY_FILE;
+export enum TreeNodeDisplayType {
+    OPEN_FOLDER,
+    CLOSED_FOLDER,
+    EMPTY_FOLDER,
+    BINARY_FILE,
+    KSY_FILE
+}
 
 export interface TreeNodeDisplay {
     path: string;
     fullPath: string;
-    type: NodeType;
+    type: TreeNodeDisplayType;
     fileName: string;
     storeId: typeof FILE_SYSTEM_TYPE_LOCAL | typeof FILE_SYSTEM_TYPE_KAITAI;
     depth: number;
 }
 
-export class FileSystemVisitor {
-    private openPaths: string[];
-    private currentPath: string[] = [];
-    private visibleFsItemsNew: TreeNodeDisplay[] = [];
+interface TempFileSystemVisitorDirectory {
+    treeNodeDisplay: TreeNodeDisplay;
+    directories: TempFileSystemVisitorDirectory[];
+    files: TreeNodeDisplay[];
+}
 
-    public collectVisibleFileTreeItems(fileSystem: IFileSystem, openPaths: string[]) {
+export class FileSystemVisitor {
+    public static collectTreeNodesFromFileSystem(fileSystem: IFileSystem, openPaths: string[]): TreeNodeDisplay[] {
+        return new FileSystemVisitor().collectVisibleFileTreeItems(fileSystem, openPaths);
+    }
+
+    private openPaths: string[];
+    private currentPathParts: string[] = [];
+    private collectedPaths: TreeNodeDisplay[] = [];
+    private currentDirectoryPathStack: TempFileSystemVisitorDirectory[] = [];
+    private currentDirectory: TempFileSystemVisitorDirectory;
+    private rootDirectory: TempFileSystemVisitorDirectory;
+
+    private constructor() {
+    }
+
+    private collectVisibleFileTreeItems(fileSystem: IFileSystem, openPaths: string[]) {
         this.openPaths = openPaths;
         this.visitFileSystem(fileSystem);
-        return this.visibleFsItemsNew;
+        return this.collectedPaths;
     }
 
     private visitFileSystem(fileSystem: IFileSystem) {
-        if (!fileSystem.getRootNode()) {
-            this.visibleFsItemsNew = [];
+        const rootNode = fileSystem.getRootNode();
+        if (!rootNode) {
             return;
         }
-        this.visitNode(fileSystem.getRootNode());
 
+        this.visitRootNode(rootNode);
+        this.collectPathsFromDirectory(this.rootDirectory);
+    }
+
+    private visitRootNode(rootNode: IFsItem) {
+        this.currentPathParts.push(rootNode.fn);
+        const rootNodeDirectory = this.mapToTempTreeNodeDisplay(rootNode);
+        this.rootDirectory = rootNodeDirectory;
+        this.currentDirectory = rootNodeDirectory;
+
+        if (rootNodeDirectory.treeNodeDisplay.type === TreeNodeDisplayType.OPEN_FOLDER) {
+            this.visitChildrenNodes(rootNode)
+        }
+
+        this.currentPathParts.pop();
+    }
+    private visitChildrenNodes(fsItem: IFsItem) {
+        Object.entries(fsItem.children || {})
+            .forEach(([key, child]) => {
+                child.fn = key;
+                this.visitNode(child);
+            });
     }
 
     private visitNode(fsItem: IFsItem) {
-        this.currentPath.push(fsItem.fn);
-        const newNode = this.mapToNewNode(fsItem);
-        this.visibleFsItemsNew.push(newNode);
+        this.currentPathParts.push(fsItem.fn);
 
-        if (fsItem.type === ITEM_MODE_DIRECTORY && newNode.type === OPEN_FOLDER) {
-            Object.entries(fsItem.children || {})
-                .forEach(([key, child]) => {
-                    child.fn = key;
-                    this.visitNode(child);
-                });
+        switch (fsItem.type) {
+            case ITEM_MODE_FILE: {
+                this.visitFileNode(fsItem);
+                break;
+            }
+            case ITEM_MODE_DIRECTORY: {
+                this.visitDirectoryNode(fsItem);
+                break;
+            }
         }
-        this.currentPath.pop();
+
+        this.currentPathParts.pop();
     }
 
+    private visitFileNode(fsItem: IFsItem) {
+        const newNode = this.mapToTreeNodeDisplay(fsItem);
+        this.currentDirectory.files.push(newNode);
+    }
 
-    private mapToNewNode(fsItem: IFsItem): TreeNodeDisplay {
-        const pathWithoutCurrentItem = [...this.currentPath];
+    private visitDirectoryNode(fsItem: IFsItem) {
+        const newDirectory = this.mapToTempTreeNodeDisplay(fsItem);
+        this.currentDirectory.directories.push(newDirectory);
+
+        if (newDirectory.treeNodeDisplay.type !== TreeNodeDisplayType.OPEN_FOLDER) {
+            return;
+        }
+
+        this.currentDirectoryPathStack.push(this.currentDirectory);
+        this.currentDirectory = newDirectory;
+        this.visitChildrenNodes(fsItem)
+
+        this.currentDirectory = this.currentDirectoryPathStack.pop();
+    }
+
+    private collectPathsFromDirectory(tempDirectory: TempFileSystemVisitorDirectory) {
+        this.collectedPaths.push(tempDirectory.treeNodeDisplay);
+        tempDirectory.directories.sort((d1, d2) => d1.treeNodeDisplay.fileName.localeCompare(d2.treeNodeDisplay.fileName));
+        tempDirectory.directories.forEach((dir) => this.collectPathsFromDirectory(dir));
+        tempDirectory.files.sort((d1, d2) => d1.fileName.localeCompare(d2.fileName));
+        this.collectedPaths.push(...tempDirectory.files);
+    }
+
+    private mapToTempTreeNodeDisplay(fsItem: IFsItem): TempFileSystemVisitorDirectory {
+        const baseInfo = this.mapToTreeNodeDisplay(fsItem);
+        return {
+            treeNodeDisplay: baseInfo,
+            directories: [],
+            files: []
+        };
+    }
+
+    private mapToTreeNodeDisplay(fsItem: IFsItem): TreeNodeDisplay {
+        const pathWithoutCurrentItem = [...this.currentPathParts];
         pathWithoutCurrentItem.pop();
         const path = pathWithoutCurrentItem.join("/");
-        const fullPath = this.currentPath.join("/");
+        const fullPath = this.currentPathParts.join("/");
         const isOpen = this.isDirectoryOpen(fullPath);
         return {
             type: this.getNodeType(isOpen, fsItem),
@@ -72,24 +147,23 @@ export class FileSystemVisitor {
             path: path,
             fullPath: fullPath,
             fileName: fsItem.fn,
-            depth: this.currentPath.length - 1
+            depth: this.currentPathParts.length - 1
         };
     }
 
-    private getNodeType(isOpen: boolean, fsItem: IFsItem): NodeType {
+    private getNodeType(isOpen: boolean, fsItem: IFsItem): TreeNodeDisplayType {
         switch (fsItem.type) {
             case ITEM_MODE_FILE: {
-                return fsItem.fn.endsWith(".ksy") ? KSY_FILE : BINARY_FILE;
+                return fsItem.fn.endsWith(".ksy") ? TreeNodeDisplayType.KSY_FILE : TreeNodeDisplayType.BINARY_FILE;
             }
             case ITEM_MODE_DIRECTORY: {
-                if (Object.keys(fsItem.children).length === 0) return EMPTY_FOLDER;
-                return isOpen ? OPEN_FOLDER : CLOSED_FOLDER;
+                if (Object.keys(fsItem.children).length === 0) return TreeNodeDisplayType.EMPTY_FOLDER;
+                return isOpen ? TreeNodeDisplayType.OPEN_FOLDER : TreeNodeDisplayType.CLOSED_FOLDER;
             }
         }
     }
 
     private isDirectoryOpen(path: string) {
-        const tempPath = this.currentPath.join("/");
-        return !!this.openPaths.find(openPath => openPath === tempPath);
+        return !!this.openPaths.find(openPath => openPath === path);
     }
 }
