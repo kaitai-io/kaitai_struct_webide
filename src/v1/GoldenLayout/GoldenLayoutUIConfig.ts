@@ -37,7 +37,7 @@ export const GoldenLayoutUIConfig: GoldenLayout.Config = {
                                                                 isClosable: false,
                                                                 width: 40
                                                             },
-                                                            {type: "component", componentName: "converterPanel", title: "converter", isClosable: false},
+                                                            {type: "component", componentName: "converter-panel", title: "converter", isClosable: false},
                                                         ]
                                                     }
                                                 ]

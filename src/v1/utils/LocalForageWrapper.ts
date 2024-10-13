@@ -1,5 +1,5 @@
 import {IFsItem} from "../FileSystems/FileSystemsTypes";
-import * as localforage from "localforage";
+import localforage from "localforage";
 
 export class LocalForageWrapper {
     public static getFsItem(ksyFsItemName: string): Promise<IFsItem> {

@@ -35,6 +35,7 @@
     "@parcel/transformer-inline-string": "^2.12.0",
     "@parcel/transformer-vue": "^2.12.0",
     "@types/dateformat": "^5.0.2",
+    "@types/js-yaml": "^4.0.9",
     "assert": "^2.1.0",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",

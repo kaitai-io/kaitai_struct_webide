@@ -1,5 +1,5 @@
 import GoldenLayout from "golden-layout";
-import * as Ace from "ace-builds";
+import Ace from "ace-builds";
 import "ace-builds/esm-resolver";
 import "ace-builds/src-noconflict/theme-monokai";
 import {LanguageProvider} from "ace-linters";

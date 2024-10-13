@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import * as bowser from "bowser";
+import bowser from "bowser";
 import {ref} from "vue";
 
 const localStorageRecord = localStorage.getItem("hideUnsupported") === "true";
