@@ -19,7 +19,7 @@ const props = defineProps<{
 }>();
 
 const isSelected = computed(() => {
-  return props.interactive && RangeHelper.containsPoint({start: binStore.selectionStart, end: binStore.selectionEnd}, props.letter.index);
+  return props.interactive && RangeHelper.containsPoint({start: binStore.selectionStart, end: binStore.selectionEnd}, props.letter.letterAddress);
 });
 
 </script>

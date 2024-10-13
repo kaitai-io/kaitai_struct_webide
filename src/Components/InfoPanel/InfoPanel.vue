@@ -10,8 +10,8 @@ import EmojiCheckbox from "./EmojiCheckbox.vue";
 import ListOptionsToggle from "./ListOptionsToggle.vue";
 import ExportToJsonComponent from "./ExportToJsonComponent.vue";
 import {useIdeSettingsStore} from "../../Stores/IdeSettingsStore";
-import {RangeHelper} from "../../v1/utils/RangeHelper";
 import {useWelcomeModalStore} from "../WelcomeModal/WelcomeModalStore";
+import {ExportedValueUtils} from "../../v1/utils/Misc/ExportedValueUtils";
 
 const currentBinaryFileStore = useCurrentBinaryFileStore();
 const hexViewerConfigStore = useHexViewerConfigStore();
@@ -29,12 +29,10 @@ const byteArrays = computed(() => {
 
 const selectionPath = computed(() => {
   if (!currentBinaryFileStore.parsedFileFlatInfo) return "";
+  const rangeIndex = ExportedValueUtils.findLeafIndexUsingBinarySearch(currentBinaryFileStore.selectionStart, currentBinaryFileStore.parsedFileFlatInfo.leafs);
 
-  const foundRange = currentBinaryFileStore.parsedFileFlatInfo.leafs
-      .find(leaf => RangeHelper.exportedContainsPoint(leaf, currentBinaryFileStore.selectionStart));
-
-  return foundRange
-      ? (foundRange.path || []).join("/")
+  return rangeIndex !== -1
+      ? (currentBinaryFileStore.parsedFileFlatInfo.leafs[rangeIndex].path || []).join("/")
       : "";
 });
 

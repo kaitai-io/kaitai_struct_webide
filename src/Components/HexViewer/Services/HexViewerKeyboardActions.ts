@@ -59,7 +59,8 @@ export const handleCursorMoveAndSelect = (e: KeyboardEvent, rowSize: number) => 
         startNew: newStart,
         endNew: newEnd,
         range: undefined,
-        source: HEX_VIEWER_SOURCE + "KEYBOARD"
+        source: HEX_VIEWER_SOURCE + "KEYBOARD",
+        pivot: currentBinaryFileStore.selectionPivot
     };
     currentBinaryFileStore.updateSelectionEvent(event);
 };

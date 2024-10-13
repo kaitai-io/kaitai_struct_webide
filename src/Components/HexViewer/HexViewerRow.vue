@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {createEmptyLettersToFillRow, createLetters} from "./Services/HexViewerProcessor";
+import {createEmptyLettersToFillRow, processContent} from "./Services/HexViewerProcessor";
 import AddressPart from "./Common/AddressPart.vue";
 import LetterCellAscii from "./Common/LetterCellAscii.vue";
 import LetterSpacer from "./Common/LetterSpacer.vue";
@@ -7,7 +7,7 @@ import {computed} from "vue";
 import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import {useHexViewerConfigStore} from "./Store/HexViewerConfigStore";
 
-import {IExportedValueRangesForRow, ProcessedLetter} from "./Types";
+import {ProcessedLetter} from "./Types";
 import LetterCellHex from "./Common/LetterCellHex.vue";
 
 const hexConfig = useHexViewerConfigStore();
@@ -15,22 +15,25 @@ const currentFileStore = useCurrentBinaryFileStore();
 
 const props = defineProps<{
   rowIndex: number,
-  processedData?: IExportedValueRangesForRow[]
 }>();
 
-const processedRow = computed<{ rowFirstByteIndex: number, letters: ProcessedLetter[], emptyLetters: ProcessedLetter[] }>(() => {
+const processedRow = computed<{
+  rowFirstByteIndex: number,
+  letters: ProcessedLetter[],
+  emptyLetters: ProcessedLetter[]
+}>(() => {
   const rowAddress = props.rowIndex * hexConfig.rowSize;
   const remainingFileBytes = currentFileStore.fileContent.byteLength - rowAddress;
 
-  const data = remainingFileBytes >= 0
+  const content = remainingFileBytes >= 0
       ? new Uint8Array(currentFileStore.fileContent, rowAddress, Math.min(hexConfig.rowSize, remainingFileBytes)).slice(0)
       : new Uint8Array([]);
 
-  const letters = createLetters(data, {
-    rowStartingIndex: rowAddress,
-    oddEvenRanges: (props.processedData || [])[props.rowIndex]?.data || [],
+  const letters = processContent(content, {
+    rowAddress: rowAddress,
     emojiMode: hexConfig.emojiMode,
-    root: currentFileStore.parsedFile
+    root: currentFileStore.parsedFile,
+    leafs: currentFileStore.parsedFileFlatInfo?.leafs || []
   });
   const emptyLetters = createEmptyLettersToFillRow(letters.length, hexConfig.rowSize);
   return {rowFirstByteIndex: rowAddress, letters, emptyLetters};
@@ -44,17 +47,12 @@ const processedRow = computed<{ rowFirstByteIndex: number, letters: ProcessedLet
 
     <LetterSpacer/>
 
-    <span>
-      <LetterCellHex :letter="letter" :inRowIndex="index" v-for="(letter, index) in processedRow.letters" interactive/>
-      <LetterCellHex :letter="emptyLetter" :inRowIndex="index"
-                     v-for="(emptyLetter, index) in processedRow.emptyLetters"/>
-    </span>
+    <LetterCellHex :letter="letter" :inRowIndex="index" v-for="(letter, index) in processedRow.letters" interactive/>
+    <LetterCellHex :letter="emptyLetter" :inRowIndex="index" v-for="(emptyLetter, index) in processedRow.emptyLetters"/>
 
     <LetterSpacer/>
 
-    <span>
-      <LetterCellAscii :letter="letter" v-for="letter in processedRow.letters" interactive/>
-    </span>
+    <LetterCellAscii :letter="letter" v-for="letter in processedRow.letters" interactive/>
   </div>
 </template>
 

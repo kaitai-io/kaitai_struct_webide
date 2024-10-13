@@ -69,7 +69,6 @@ export class IExportedValueFlatInfoMapper extends AbstractExportedValueMapper<vo
         const range = RangeHelper.getSimpleRange(value);
         if(range.end >= range.start) {
             this.leafs.push(value);
-
         }
     }
 

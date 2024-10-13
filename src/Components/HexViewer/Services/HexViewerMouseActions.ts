@@ -2,13 +2,16 @@ import {ProcessedLetter} from "../Types";
 import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
 import {useHexViewerConfigStore} from "../Store/HexViewerConfigStore";
 import {HEX_VIEWER_SOURCE} from "./HexViewerActions";
-import {RangeHelper} from "../../../v1/utils/RangeHelper";
+import {RangeHelper, SimpleRange} from "../../../v1/utils/RangeHelper";
 
 const LEFT_MOUSE_BUTTON = 1;
 
 const handleDeselectAction = (e: MouseEvent, letter: ProcessedLetter) => {
     const store = useCurrentBinaryFileStore();
-    if (RangeHelper.containsPoint({start: store.selectionStart, end: store.selectionEnd}, letter.index)) {
+
+    const selectionRange: SimpleRange = {start: store.selectionStart, end: store.selectionEnd};
+    const clickedLetterInSelectionRange = RangeHelper.containsPoint(selectionRange, letter.letterAddress);
+    if (store.selectionStart === store.selectionEnd && clickedLetterInSelectionRange) {
         store.deselect();
         return true;
     }
@@ -19,9 +22,10 @@ const handleShiftSelectAction = (e: MouseEvent, letter: ProcessedLetter) => {
     if (e.shiftKey && store.selectionPivot !== -1) {
         const event: UpdateSelectionEvent = {
             startNew: store.selectionPivot,
-            endNew: letter.index,
+            endNew: letter.letterAddress,
             source: HEX_VIEWER_SOURCE,
-            range: letter.range.value
+            range: letter.matchingRange,
+            pivot: store.selectionPivot
         };
         store.updateSelectionEvent(event);
         return true;
@@ -31,25 +35,25 @@ const handleShiftSelectAction = (e: MouseEvent, letter: ProcessedLetter) => {
 const handleSingleSelectionAction = (e: MouseEvent, letter: ProcessedLetter) => {
     const store = useCurrentBinaryFileStore();
     const event: UpdateSelectionEvent = {
-        startNew: letter.index,
-        endNew: letter.index,
-        range: letter.range?.value,
+        startNew: letter.letterAddress,
+        endNew: letter.letterAddress,
+        range: letter.matchingRange,
         source: HEX_VIEWER_SOURCE
     };
     store.updateSelectionEvent(event);
-    store.updateSelectionPivot(letter.index, HEX_VIEWER_SOURCE);
+    store.updateSelectionPivot(letter.letterAddress, HEX_VIEWER_SOURCE);
     return true;
 };
 
 const handleRangeSelectionAction = (e: MouseEvent, letter: ProcessedLetter) => {
-    if (letter.range) {
+    if (letter.matchingRange) {
         const store = useCurrentBinaryFileStore();
-        const start = letter.range.start;
-        const end = letter.range.end;
+        const simpleRange = RangeHelper.getSimpleRange(letter.matchingRange);
+        const start = letter.matchingRange.start;
         const event: UpdateSelectionEvent = {
-            startNew: start,
-            endNew: end,
-            range: letter.range.value,
+            startNew: simpleRange.start,
+            endNew: simpleRange.end,
+            range: letter.matchingRange,
             source: HEX_VIEWER_SOURCE
         };
         store.updateSelectionEvent(event);
@@ -61,7 +65,14 @@ const handleRangeSelectionAction = (e: MouseEvent, letter: ProcessedLetter) => {
 const handleDragSelectionStartAction = (e: MouseEvent, letter: ProcessedLetter) => {
     e.preventDefault();
     const store = useHexViewerConfigStore();
+    const binStore = useCurrentBinaryFileStore();
     store.updateSelectionDragStart(letter);
+    binStore.updateSelectionEvent({
+        startNew: letter.letterAddress,
+        endNew: letter.letterAddress,
+        pivot: letter.letterAddress,
+        source: HEX_VIEWER_SOURCE
+    });
     return true;
 };
 
@@ -76,8 +87,8 @@ const handleDragSelectionUpdate = (e: MouseEvent, letter: ProcessedLetter) => {
         return false;
     }
 
-    const start = hexViewerConfigStore.selectionDragStart.index;
-    const end = letter.index;
+    const start = hexViewerConfigStore.selectionDragStart.letterAddress;
+    const end = letter.letterAddress;
     const event: UpdateSelectionEvent = {
         startNew: start,
         endNew: end,
@@ -94,7 +105,7 @@ const handleSelectionDragEnd = () => {
     const isDragging = !!hexViewerConfigStore.selectionDragStart;
     if (!isDragging) return false;
 
-    const dragStartIndex = hexViewerConfigStore.selectionDragStart.index;
+    const dragStartIndex = hexViewerConfigStore.selectionDragStart.letterAddress;
 
     const newPivotIsSelectionStart = dragStartIndex !== currentBinaryFileStore.selectionStart;
     const newPivot = newPivotIsSelectionStart

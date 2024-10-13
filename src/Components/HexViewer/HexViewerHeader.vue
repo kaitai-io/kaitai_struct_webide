@@ -5,20 +5,19 @@ import LetterCellAscii from "./Common/LetterCellAscii.vue";
 import LetterSpacer from "./Common/LetterSpacer.vue";
 import {computed} from "vue";
 import {useHexViewerConfigStore} from "./Store/HexViewerConfigStore";
-import {OddStatus, RangePlacementStatus} from "./Types";
+import {ProcessedLetter} from "./Types";
+
 const store = useHexViewerConfigStore();
 
 const letters = computed(() => {
   return Array.from(Array(store.rowSize))
       .map((_, index) => index.toString(16).toUpperCase())
-      .map((letter, index) => {
+      .map((letter, index): ProcessedLetter => {
         return {
           hex: letter,
           char: letter,
-          rangePlacement: RangePlacementStatus.NONE,
-          oddStatus: OddStatus.NONE,
-          index: index,
-          isSelected: false
+          letterAddress: index,
+          matchingRangeIndex: -1,
         };
       });
 });
@@ -28,16 +27,14 @@ const letters = computed(() => {
 <template>
   <div class="header">
     <AddressPart :hidden="true" :address="0"/>
-    <LetterSpacer/>
-
-    <span>
-      <LetterCellHex v-for="(letter, index) in letters" :letter="letter" :inRowIndex="index"/>
-    </span>
 
     <LetterSpacer/>
-    <span>
-      <LetterCellAscii v-for="(letter) in letters" :letter="letter"/>
-    </span>
+
+    <LetterCellHex v-for="(letter, index) in letters" :letter="letter" :inRowIndex="index"/>
+
+    <LetterSpacer/>
+
+    <LetterCellAscii v-for="(letter) in letters" :letter="letter"/>
   </div>
 </template>
 

@@ -6,7 +6,6 @@ import {computed} from "vue";
 import {useVirtualList} from "@vueuse/core";
 import HexViewerRow from "./HexViewerRow.vue";
 import {useHexViewerConfigStore} from "./Store/HexViewerConfigStore";
-import {prepareOddEvenRangesForRows} from "./Services/HexViewerProcessorOddEven";
 import {handleOnPageReloadScrollToSelection, handleSelectionUpdatedEvents} from "./Services/HexViewerActions";
 import {handleCursorMoveAndSelect} from "./Services/HexViewerKeyboardActions";
 
@@ -19,10 +18,6 @@ const currentFileRowsCount = computed(() => {
   return [...Array(rowsCount).keys()];
 });
 
-const oddEvenRanges = computed(() => {
-  if (!currentBinaryFileStore.parsedFileFlatInfo) return [];
-  return prepareOddEvenRangesForRows(currentBinaryFileStore.parsedFileFlatInfo.leafs, hexViewerConfigStore.rowSize);
-});
 
 const {list, containerProps, wrapperProps, scrollTo} = useVirtualList(currentFileRowsCount, {
   itemHeight: 21,
@@ -41,7 +36,7 @@ currentBinaryFileStore.$onAction(({name, store, args}) => {
     <HexViewerHeader/>
     <div v-bind="containerProps" class="backdrop">
       <div v-bind="wrapperProps" class="wrapper-inner">
-        <HexViewerRow :processed-data="oddEvenRanges" :row-index="listItem.data" v-for="listItem in list"/>
+        <HexViewerRow :row-index="listItem.data" v-for="listItem in list"/>
       </div>
     </div>
   </div>

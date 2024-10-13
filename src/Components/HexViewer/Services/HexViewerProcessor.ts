@@ -1,66 +1,40 @@
 import {convertByteToAsciiCharacter, convertByteToEmoji} from "./Convert";
-import {IExportedValueOddRange, OddStatus, ProcessedLetter, ProcessLettersConfig, RangePlacementStatus} from "../Types";
-import {RangeHelper} from "../../../v1/utils/RangeHelper";
+import {ProcessedLetter, ProcessLettersConfig} from "../Types";
+import {ExportedValueUtils} from "../../../v1/utils/Misc/ExportedValueUtils";
 
-const mapLetterToHexOrEmoji = (letter: number, emojiMode: boolean): string => {
+const mapByteToHexOrEmoji = (byteValue: number, emojiMode: boolean): string => {
     return emojiMode
-        ? convertByteToEmoji(letter)
-        : letter.toString(16).padStart(2, "0");
+        ? convertByteToEmoji(byteValue)
+        : byteValue.toString(16).padStart(2, "0");
 };
 
+const processSingleByte = (byte: number, index: number, options: ProcessLettersConfig): ProcessedLetter => {
+    const {rowAddress, leafs, emojiMode} = options;
 
-const fetchLetterOddEvenStatus = (matchingRange?: IExportedValueOddRange): OddStatus => {
-    if (!matchingRange) return OddStatus.NONE;
-    return matchingRange.isOdd
-        ? OddStatus.ODD
-        : OddStatus.EVEN;
-
-};
-
-const fetchLetterPlacementStatus = (letterIndex: number, matchingRange?: IExportedValueOddRange): RangePlacementStatus => {
-    if (!matchingRange) return RangePlacementStatus.NONE;
-    const matchOnTheLeft = matchingRange.start === letterIndex;
-    const matchOnTheRight = matchingRange.end === letterIndex;
-    if (matchOnTheLeft && matchOnTheRight) {
-        return RangePlacementStatus.FULL_RANGE;
-    } else if (matchOnTheLeft) {
-        return RangePlacementStatus.START_OF_RANGE;
-    } else if (matchOnTheRight) {
-        return RangePlacementStatus.END_OF_RANGE;
-    } else {
-        return RangePlacementStatus.MIDDLE;
-    }
-};
-
-const createSingleLetter = (letter: number, index: number, options: ProcessLettersConfig) => {
-    const {rowStartingIndex, oddEvenRanges, emojiMode} = options;
-
-    const letterIndex = index + rowStartingIndex;
-    const matchingRange = (oddEvenRanges || []).find(flat => RangeHelper.containsPoint(flat, letterIndex));
+    const letterAddress = rowAddress + index;
+    const matchingRangeIndex = ExportedValueUtils.findLeafIndexUsingBinarySearch(letterAddress, leafs);
 
     return {
-        index: letterIndex,
-        hex: mapLetterToHexOrEmoji(letter, emojiMode),
-        char: convertByteToAsciiCharacter(letter),
-        range: matchingRange,
-        oddStatus: fetchLetterOddEvenStatus(matchingRange),
-        rangePlacement: fetchLetterPlacementStatus(letterIndex, matchingRange)
+        letterAddress: letterAddress,
+        hex: mapByteToHexOrEmoji(byte, emojiMode),
+        char: convertByteToAsciiCharacter(byte),
+        matchingRangeIndex: matchingRangeIndex,
+        matchingRange: leafs[matchingRangeIndex],
     };
 };
 
-export const createLetters = (content: Uint8Array, options: ProcessLettersConfig): ProcessedLetter[] => {
-    return [...content].map((letter, index) => createSingleLetter(letter, index, options));
+export const processContent = (content: Uint8Array, options: ProcessLettersConfig): ProcessedLetter[] => {
+    return [...content].map((byteValue, index) => processSingleByte(byteValue, index, options));
 };
 export const createEmptyLettersToFillRow = (rowLettersCount: number, rowSize: number = 16): ProcessedLetter[] => {
     const emptyLettersCount = rowSize - rowLettersCount;
     return Array.from(new Array(emptyLettersCount)).map((_, index): ProcessedLetter => {
         return {
-            index: rowLettersCount + index,
+            letterAddress: rowLettersCount + index,
             hex: "",
             char: "",
-            range: undefined,
-            oddStatus: OddStatus.NONE,
-            rangePlacement: RangePlacementStatus.NONE,
+            matchingRangeIndex: -1,
+            matchingRange: undefined,
         };
     });
 };

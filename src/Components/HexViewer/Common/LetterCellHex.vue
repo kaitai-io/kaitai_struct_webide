@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import LetterSpacer from "./LetterSpacer.vue";
 import {useHexViewerConfigStore} from "../Store/HexViewerConfigStore";
-import {OddStatus, ProcessedLetter, RangePlacementStatus} from "../Types";
+import {ProcessedLetter} from "../Types";
 import {
   onDoubleClickAction,
   onDragStartAction,
@@ -23,31 +23,35 @@ const props = defineProps<{
 }>();
 
 const isSelected = computed(() => {
-  return props.interactive && RangeHelper.containsPoint({start: binStore.selectionStart, end: binStore.selectionEnd}, props.letter.index);
+  return props.interactive && RangeHelper.containsPoint({
+    start: binStore.selectionStart,
+    end: binStore.selectionEnd
+  }, props.letter.letterAddress);
 });
 
-const oddEvenClass = (letter: ProcessedLetter) => {
-  switch (letter.oddStatus) {
-    case OddStatus.ODD:
-      return "odd";
-    case OddStatus.EVEN:
-      return "even";
-    default:
-      return "";
+
+const isOdd = computed(() => {
+  if (!props.interactive || props.letter.matchingRangeIndex === -1) return "";
+  return props.letter.matchingRangeIndex % 2 === 0
+      ? "odd"
+      : "even";
+});
+
+const rangePlacement = computed(() => {
+  if (!props.interactive || !props.letter.matchingRange) return "";
+  const matchingRange = RangeHelper.getSimpleRange(props.letter.matchingRange);
+  const matchOnTheLeft = matchingRange.start === props.letter.letterAddress;
+  const matchOnTheRight = matchingRange.end === props.letter.letterAddress;
+  if (matchOnTheLeft && matchOnTheRight) {
+    return "lr2";
+  } else if (matchOnTheLeft) {
+    return "l2";
+  } else if (matchOnTheRight) {
+    return "r2";
+  } else {
+    return "";
   }
-};
-const rangePlacementClass = (letter: ProcessedLetter) => {
-  switch (letter.rangePlacement) {
-    case RangePlacementStatus.FULL_RANGE:
-      return "lr2";
-    case RangePlacementStatus.END_OF_RANGE:
-      return "r2";
-    case RangePlacementStatus.START_OF_RANGE:
-      return "l2";
-    default:
-      return "";
-  }
-};
+});
 
 const isGapAfter = () => {
   if (store.columns == 0 || store.columns == 1) return false;
@@ -55,10 +59,11 @@ const isGapAfter = () => {
   if (isLastInRow) return false;
   return (props.inRowIndex + 1) % store.columns === 0;
 };
+
 </script>
 
 <template>
-  <div :class="`letter-container ${rangePlacementClass(props.letter)}`"
+  <div :class="`letter-container ${rangePlacement}`"
        :draggable="props.interactive"
 
        @click="(e) => props.interactive && onSingleClickAction(e,  props.letter)"
@@ -69,7 +74,7 @@ const isGapAfter = () => {
        @mouseup="(e) => props.interactive && onMouseUpAction(e)"
   >
   <span
-      :class="`cell ${oddEvenClass(props.letter)}  ${isSelected ? 'selected' : ''}`"
+      :class="`cell ${isOdd} ${isSelected ? 'selected' : ''}`"
 
   >
               {{ props.letter.hex }}
