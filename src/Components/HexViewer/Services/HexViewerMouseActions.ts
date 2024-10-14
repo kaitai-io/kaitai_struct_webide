@@ -38,10 +38,10 @@ const handleSingleSelectionAction = (e: MouseEvent, letter: ProcessedLetter) => 
         startNew: letter.letterAddress,
         endNew: letter.letterAddress,
         range: letter.matchingRange,
-        source: HEX_VIEWER_SOURCE
+        source: HEX_VIEWER_SOURCE,
+        pivot: letter.letterAddress
     };
     store.updateSelectionEvent(event);
-    store.updateSelectionPivot(letter.letterAddress, HEX_VIEWER_SOURCE);
     return true;
 };
 

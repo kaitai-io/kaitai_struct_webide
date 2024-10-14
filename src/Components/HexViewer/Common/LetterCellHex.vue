@@ -10,8 +10,11 @@ import {
   onSingleClickAction
 } from "../Services/HexViewerMouseActions";
 import {computed} from "vue";
-import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
+import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
 import {RangeHelper} from "../../../v1/utils/RangeHelper";
+import {prepareContextMenuOptions} from "../HexViewerContextMenu";
+import ContextMenu from "@imengyu/vue3-context-menu";
+import {HEX_VIEWER_SOURCE} from "../Services/HexViewerActions";
 
 const store = useHexViewerConfigStore();
 const binStore = useCurrentBinaryFileStore();
@@ -60,6 +63,22 @@ const isGapAfter = () => {
   return (props.inRowIndex + 1) % store.columns === 0;
 };
 
+const onContextMenu = (e: MouseEvent, letter: ProcessedLetter) => {
+  e.preventDefault();
+  if(!isSelected.value){
+    const event: UpdateSelectionEvent = {
+      startNew: letter.letterAddress,
+      endNew: letter.letterAddress,
+      range: letter.matchingRange,
+      pivot: letter.letterAddress,
+      source: HEX_VIEWER_SOURCE
+    };
+    binStore.updateSelectionEvent(event);
+  }
+  const contextMenuOptions = prepareContextMenuOptions(e);
+  ContextMenu.showContextMenu(contextMenuOptions);
+};
+
 </script>
 
 <template>
@@ -72,10 +91,10 @@ const isGapAfter = () => {
        @dragstart="(e) => props.interactive && onDragStartAction(e, props.letter)"
        @mouseenter="(e) => props.interactive && onMouseEnterAction(e, props.letter)"
        @mouseup="(e) => props.interactive && onMouseUpAction(e)"
+       @contextmenu="(e) => props.interactive && onContextMenu(e, props.letter)"
   >
   <span
       :class="`cell ${isOdd} ${isSelected ? 'selected' : ''}`"
-
   >
               {{ props.letter.hex }}
       </span>

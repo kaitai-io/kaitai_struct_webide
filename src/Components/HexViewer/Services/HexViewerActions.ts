@@ -5,6 +5,7 @@ export const HEX_VIEWER_SOURCE = "SOURCE_HEX_VIEWER";
 
 const MAGIC_NUMBER_OF_ROWS_THAT_ARE_OUTSIDE_OF_VIEWPORT = 3;
 const isInViewPort = (rowIndexToGo: number, viewportList: any) => {
+    if (!viewportList || viewportList.length === 0) return;
     const viewPortFirstRow: number = viewportList[0].data;
     const viewPortLastRow: number = viewportList[viewportList.length - 1].data - MAGIC_NUMBER_OF_ROWS_THAT_ARE_OUTSIDE_OF_VIEWPORT;
     return rowIndexToGo < viewPortFirstRow || rowIndexToGo > viewPortLastRow;
