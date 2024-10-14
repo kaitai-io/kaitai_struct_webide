@@ -13,9 +13,11 @@ export class GoldenLayoutUI {
     goldenLayout: GoldenLayout;
     ksyEditor: Ace.Editor;
     ksyEditorContainer: GoldenLayout.Container;
+
     genCodeViewer: Ace.Editor;
     genCodeDebugViewer: Ace.Editor;
     errorWindow: GoldenLayout.Container;
+    hexViewerContainer: GoldenLayout.Container;
 
     public init() {
         this.goldenLayout = new GoldenLayout(GoldenLayoutUIConfig);
@@ -24,7 +26,7 @@ export class GoldenLayoutUI {
         this.addAceCodeEditorTab("genCodeViewer", {lang: "javascript", isReadOnly: true});
         this.addAceCodeEditorTab("genCodeDebugViewer", {lang: "javascript", isReadOnly: true});
 
-        this.addExistingDiv("hex-viewer");
+        this.addHexViewer("hex-viewer");
         this.addExistingDiv("parsedDataTree");
         this.addExistingDiv("fileTreeNew");
         this.addExistingDiv("converter-panel");
@@ -63,9 +65,18 @@ export class GoldenLayoutUI {
                     if (editor && editor.resize) editor.resize();
                 });
                 container.on("open", () => {
-                     generatorCallback(container);
+                    generatorCallback(container);
                 });
             }
+        });
+    }
+
+    addHexViewer(name: string) {
+        const self = this;
+        this.goldenLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
+            self.hexViewerContainer = container;
+            const cont = $(`#${name}`).appendTo(container.getElement());
+            $(() => cont.show());
         });
     }
 
@@ -115,6 +126,11 @@ export class GoldenLayoutUI {
         this.ksyEditorContainer.setTitle(title);
         this.ksyEditor.setValue(content, -1);
     }
+
+    updateHexViewerTitle(title: string) {
+        this.getLayoutNodeById("inputBinaryTab").setTitle(title);
+    }
+
 
     updateReleaseAndDebugCodeTabs(debugCode: string, releaseCode: string) {
         this.genCodeViewer.setValue(releaseCode, -1);
