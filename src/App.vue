@@ -5,7 +5,6 @@ import InfoPanel from "./Components/InfoPanel/InfoPanel.vue";
 import UnsupportedBrowser from "./Components/UnsupportedBrowser.vue";
 import WelcomeModal from "./Components/WelcomeModal/WelcomeModal.vue";
 import NewKsyModal from "./Components/NewKsyModal.vue";
-import InputContextMenu from "./Components/InputContextMenu.vue";
 import HexViewer from "./Components/HexViewer/HexViewer.vue";
 import ParsedTree from "./Components/ParsedTree/ParsedTree.vue";
 import FileTree from "./Components/FileTree/FileTree.vue";
@@ -72,9 +71,9 @@ onMounted(async () => {
 
 <template>
   <UnsupportedBrowser/>
+
   <ParsedTree/>
   <HexViewer/>
-  <InputContextMenu/>
   <FileTree/>
   <InfoPanel/>
   <ConverterPanel/>
