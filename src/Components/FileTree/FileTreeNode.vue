@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import {useFileSystems} from "./Store/FileSystemsStore";
-import {TreeNodeDisplayType, TreeNodeDisplay} from "./FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplayType, TreeNodeDisplay, prepareFilePathFromNode} from "./FileSystemVisitors/FileSystemVisitor";
 import FileStoreTreeNodeIcon from "./FileTreeNodeIcon.vue";
-import {computed} from "vue";
+import {computed, toRaw} from "vue";
 import {useAppStore} from "../../Stores/AppStore";
+import ContextMenu from "@imengyu/vue3-context-menu";
+import {prepareContextMenuOptions} from "./ContextMenu/FileTreeNodeContextMenu";
 
 const store = useFileSystems();
 const appStore = useAppStore();
@@ -45,7 +47,12 @@ const doubleClick = () => {
   }
 };
 
-const prepareFilePathFromNode = (node: TreeNodeDisplay) => node.fullPath.split("/").slice(1).join("/");
+const contextMenu = (e: MouseEvent) => {
+  e.preventDefault();
+  store.selectPath(props.item.fullPath);
+  const contextMenuOptions = prepareContextMenuOptions(e, toRaw(props.item));
+  ContextMenu.showContextMenu(contextMenuOptions);
+};
 
 
 const isSelected = computed(() => {
@@ -57,14 +64,14 @@ const isSelected = computed(() => {
 
 <template>
   <div class="row-wrapper" draggable="true" :class="{isSelected}"
-       @click="() => activateRow()"
-       @dblclick="() => doubleClick()">
+       @click="activateRow"
+       @dblclick="doubleClick"
+       @contextmenu="contextMenu">
     <div class="row-content" :style="{marginLeft: item.depth * 16 + 'px'}">
       <FileStoreTreeNodeIcon :type="item.type"/>
       <span class="row-description">{{ item.fileName }}</span>
     </div>
   </div>
-
 </template>
 
 <style scoped>

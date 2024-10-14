@@ -33,7 +33,7 @@ export class OldLocalStorageFileSystem implements IFileSystem {
         return LocalForageWrapper.getFile(this.fileKey(fn))
             .then(content => {
                 if (content === null) {
-                    throw new Error("file not found");
+                    throw new Error(`File not found: ${fn}`);
                 }
                 return content;
             });

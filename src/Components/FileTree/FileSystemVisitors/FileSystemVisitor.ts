@@ -30,6 +30,8 @@ interface TempFileSystemVisitorDirectory {
     files: TreeNodeDisplay[];
 }
 
+export const prepareFilePathFromNode = (node: TreeNodeDisplay) => node.fullPath.split("/").slice(1).join("/");
+
 export class FileSystemVisitor {
     public static collectTreeNodesFromFileSystem(fileSystem: IFileSystem, openPaths: string[]): TreeNodeDisplay[] {
         return new FileSystemVisitor().collectVisibleFileTreeItems(fileSystem, openPaths);

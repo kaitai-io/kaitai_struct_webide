@@ -3,7 +3,7 @@ import {CompilerService} from "../DataManipulation/CompilationModule/CompilerSer
 import {codeExecutionWorkerApi} from "../DataManipulation/ParsingModule/ParseWorkerApi";
 import {CurrentGoldenLayout} from "../v1/GoldenLayout/GoldenLayoutUI";
 
-export const compileGrammarAction = async (yamlInfo: YamlFileInfo) => {
+export const compileInternalDebugAndRelease = async (yamlInfo: YamlFileInfo) => {
     const compiledGrammar = await new CompilerService().compileDebugAndReleaseTargets(yamlInfo, "javascript");
     const debugCode = Object.values(compiledGrammar.debug).join("");
     const releaseCode = Object.values(compiledGrammar.release).join("");

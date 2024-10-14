@@ -1,7 +1,7 @@
 import {useAppStore} from "../Stores/AppStore";
 import {Ace} from "ace-builds";
 import {YamlFileInfo} from "../DataManipulation/CompilationModule/JsImporter";
-import {compileGrammarAction} from "./CompileGrammar";
+import {compileInternalDebugAndRelease} from "./CompileGrammar";
 import {parseAction} from "./ParseAction";
 import {FILE_SYSTEM_TYPE_KAITAI, FILE_SYSTEM_TYPE_LOCAL} from "../v1/FileSystems/FileSystemsTypes";
 import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
@@ -14,13 +14,13 @@ export const mainEditorOnChange = async (change: Ace.Delta, editorContent: strin
     switchStoreIfChangeAppearedInKaitaiStore(yamlInfo);
 
     await useFileSystems().addFile(FILE_SYSTEM_TYPE_LOCAL, yamlInfo.filePath, editorContent);
-    await compileGrammarAction(yamlInfo);
+    await compileInternalDebugAndRelease(yamlInfo);
     await parseAction();
 };
 
 export const mainEditorRecompile = async (editor: Ace.Editor) => {
     const yamlInfo = yamlInfoWithCurrentStoreStateAndNewContent(editor.getValue());
-    await compileGrammarAction(yamlInfo);
+    await compileInternalDebugAndRelease(yamlInfo);
     await parseAction();
 };
 

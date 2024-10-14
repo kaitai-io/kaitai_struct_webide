@@ -30,7 +30,8 @@ export class LocalStorageApi {
 
     public static storeIdeSettings = (store: IdeSettings): void => {
         const state: IdeSettings = {
-            eagerMode: store.eagerMode
+            eagerMode: store.eagerMode,
+            generateOnlyMainFile: store.generateOnlyMainFile
         };
         localStorage.setItem("ideSettings", JSON.stringify(state));
     }

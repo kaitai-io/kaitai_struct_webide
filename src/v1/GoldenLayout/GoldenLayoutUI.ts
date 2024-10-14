@@ -137,6 +137,17 @@ export class GoldenLayoutUI {
         this.genCodeDebugViewer.setValue(debugCode, -1);
     }
 
+    addDynamicCodeTab(title: string, content: string, lang: string) {
+        const options: IAceEditorComponentOptions = {
+            lang: lang,
+            isReadOnly: true,
+            data: content
+        };
+        const componentName = `dynComp${this.dynCompId++}`;
+        this.addAceCodeEditorTab(componentName, options);
+        this.getLayoutNodeById("codeTab").addChild({type: "component", componentName, title});
+    }
+
     addExportedToJsonTab(title: string, json: string) {
         const options: IAceEditorComponentOptions = {
             lang: "json",
