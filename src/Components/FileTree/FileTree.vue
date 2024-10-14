@@ -15,6 +15,7 @@ const store = useFileSystems();
     <div class="file-tree-list-container">
       <div class="file-tree-list-container-inner">
         <FileTreeNodes :fileSystem="fileSystem" v-for="fileSystem in store.fileSystems"/>
+        <div class="spacer"/>
       </div>
     </div>
     <FileDrop/>
@@ -46,6 +47,10 @@ const store = useFileSystems();
 .file-tree-list-container-inner {
   min-width: 100%;
   width: max-content;
+}
+
+.spacer {
+  height: 10px;
 }
 
 </style>
