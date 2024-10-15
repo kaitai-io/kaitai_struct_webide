@@ -1,5 +1,7 @@
 import {defineStore} from "pinia";
 
+import {FILE_SYSTEM_TYPE_KAITAI} from "../v1/FileSystems/KaitaiFileSystem";
+
 export interface FileLocationInfo {
     storeId: string;
     filePath: string;
@@ -11,13 +13,13 @@ export interface AppStore {
 }
 
 const defaultKsyInfo: FileLocationInfo = {
-    storeId: "kaitai",
+    storeId: FILE_SYSTEM_TYPE_KAITAI,
     filePath: "formats/archive/zip.ksy"
 };
 
 
 const defaultBinaryInfo: FileLocationInfo = {
-    storeId: "kaitai",
+    storeId: FILE_SYSTEM_TYPE_KAITAI,
     filePath: "samples/sample1.zip"
 };
 

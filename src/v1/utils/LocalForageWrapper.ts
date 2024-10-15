@@ -18,4 +18,11 @@ export class LocalForageWrapper {
         return localforage.setItem<string | ArrayBuffer>(fileName, data);
     }
 
+    public static deleteFile(fileName: string): Promise<void> {
+        return localforage.removeItem(fileName);
+    }
+
+    public static clear(): Promise<void> {
+        return localforage.clear();
+    }
 }

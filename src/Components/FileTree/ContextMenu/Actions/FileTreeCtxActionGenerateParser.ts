@@ -1,4 +1,4 @@
-import {prepareFilePathFromNode, TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemVisitor";
 import {useFileSystems} from "../../Store/FileSystemsStore";
 import {h} from "vue";
 import {MenuChildren, MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
@@ -10,11 +10,10 @@ import {SupportedLanguage, SupportedLanguages} from "../../../../SupportedLangua
 
 export const mapFileTreeDisplayNodeToYaml = async (item: TreeNodeDisplay): Promise<YamlFileInfo> => {
     const fileSystemsStore = useFileSystems();
-    const filePath = prepareFilePathFromNode(item);
     return {
         storeId: item.storeId,
-        filePath: filePath,
-        fileContent: await fileSystemsStore.getFile(item.storeId, filePath) as string
+        filePath: item.fullPath,
+        fileContent: await fileSystemsStore.getFile(item.storeId, item.fullPath) as string
     };
 };
 

@@ -13,10 +13,8 @@ import {loadBinaryFileAction} from "./GlobalActions/LoadBinaryFile";
 import {loadKsyFileAction} from "./GlobalActions/LoadKsyFile";
 import {onMounted} from "vue";
 import {parseAction} from "./GlobalActions/ParseAction";
-import {FILE_SYSTEM_TYPE_LOCAL, IFsItem, ITEM_MODE_DIRECTORY} from "./v1/FileSystems/FileSystemsTypes";
-import {LocalForageWrapper} from "./v1/utils/LocalForageWrapper";
-import {initKaitaiFs} from "./v1/FileSystems/KaitaiFileSystem";
-import {OldLocalStorageFileSystem} from "./v1/FileSystems/OldLocalStorageFileSystem";
+import {initKaitaiFs, KaitaiFileSystem} from "./v1/FileSystems/KaitaiFileSystem";
+import {initStorageFileSystemRoot, LocalStorageFileSystem} from "./v1/FileSystems/LocalStorageFileSystem";
 import {useFileSystems} from "./Components/FileTree/Store/FileSystemsStore";
 import {CurrentGoldenLayout} from "./v1/GoldenLayout/GoldenLayoutUI";
 
@@ -39,18 +37,9 @@ store.$onAction(async ({name, store, args}) => {
 });
 
 const initFileSystems = async () => {
-  const defaultItem: IFsItem = {
-    fsType: FILE_SYSTEM_TYPE_LOCAL,
-    type: ITEM_MODE_DIRECTORY,
-    children: {},
-    fn: "Local storage"
-  };
-  const storedItem = await LocalForageWrapper.getFsItem(`fs_files`);
-  if (storedItem) {
-    storedItem.fn = "Local storage";
-  }
-  fileSystemsStore.addFileSystem(initKaitaiFs());
-  fileSystemsStore.addFileSystem(new OldLocalStorageFileSystem(storedItem || defaultItem));
+  fileSystemsStore.addFileSystem(new KaitaiFileSystem());
+  const oldStorageRoot = await initStorageFileSystemRoot();
+  fileSystemsStore.addFileSystem(new LocalStorageFileSystem(oldStorageRoot));
 };
 
 const initFileParsing = async () => {

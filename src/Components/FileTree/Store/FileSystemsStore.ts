@@ -1,6 +1,5 @@
 import {defineStore} from "pinia";
 import {IFileSystem} from "../../../v1/FileSystems/FileSystemsTypes";
-import {toRaw} from "vue";
 
 export interface FileSystemsStore {
     fileSystems: IFileSystem[];
@@ -45,14 +44,24 @@ export const useFileSystems = defineStore("FileSystemsStore", {
         async addFile(storeId: string, path: string, content: string | ArrayBuffer) {
             const fileSystem: IFileSystem = this.fileSystems.find((fs: IFileSystem) => fs.storeId === storeId);
             await fileSystem.put(path, content);
-            fileSystem.save(toRaw(fileSystem.getRootNode()));
-            serializeConfigToLocalStorage(this);
+        },
+        async createDirectory(storeId: string, path: string) {
+            const fileSystem: IFileSystem = this.fileSystems.find((fs: IFileSystem) => fs.storeId === storeId);
+            await fileSystem.createDirectory(path);
         },
         async getFile(storeId: string, filePath: string): Promise<string | ArrayBuffer> {
-            const fileSystem = this.fileSystems.find((fs: IFileSystem) => fs.storeId === storeId);
+            const fileSystem: IFileSystem = this.fileSystems.find((fs: IFileSystem) => fs.storeId === storeId);
             return !!fileSystem
                 ? await fileSystem.get(filePath)
                 : "";
+        },
+        deletePath(storeId: string, filePath: string): void {
+            const fileSystem: IFileSystem = this.fileSystems.find((fs: IFileSystem) => fs.storeId === storeId);
+            if (fileSystem) {
+                fileSystem.delete(filePath);
+            } else {
+                console.error(`[FileSystemsStore][deletePath] Could not find file system! [${storeId}]`);
+            }
         }
     }
 });

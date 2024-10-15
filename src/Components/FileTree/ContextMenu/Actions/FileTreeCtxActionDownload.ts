@@ -1,10 +1,14 @@
 import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemVisitor";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
+import {FileActionsWrapper} from "../../../../v1/utils/Files/FileActionsWrapper";
+import {useFileSystems} from "../../Store/FileSystemsStore";
 
 export const FileTreeCtxActionDownload = (item: TreeNodeDisplay): MenuItem => {
-    const action = () => {
-        alert("ACTION NOT IMPLEMENTED!");
+    const action = async () => {
+        const store = useFileSystems();
+        const fileContent = await store.getFile(item.storeId, item.fullPath);
+        FileActionsWrapper.downloadFile(fileContent, item.fileName);
     };
 
     return {

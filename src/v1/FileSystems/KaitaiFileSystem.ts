@@ -1,41 +1,45 @@
-import {findOrCreateFsPath} from "./FileSystemHelper";
-import {FILE_SYSTEM_TYPE_KAITAI, IFileSystem, IFsItem, ITEM_MODE_DIRECTORY} from "./FileSystemsTypes";
+import {IFsItemHelper} from "./IFsItemHelper";
+import {IFileSystem, IFsItem, ITEM_MODE_DIRECTORY} from "./FileSystemsTypes";
 import {FileActionsWrapper} from "../utils/Files/FileActionsWrapper";
 import {kaitaiFsFiles} from "../../kaitaiFsFiles";
 
+export const FILE_SYSTEM_TYPE_KAITAI = "kaitai";
+
+const initKaitaiFs = () => {
+    const root = <IFsItem>{fsType: FILE_SYSTEM_TYPE_KAITAI, children: {}, fn: "kaitai.io", type: ITEM_MODE_DIRECTORY};
+    (kaitaiFsFiles || []).forEach(fn => IFsItemHelper.createFileOrDirectoryFromPathInRoot(root, fn));
+    return root;
+};
+
+const kaitaiRoot = initKaitaiFs();
 
 export class KaitaiFileSystem implements IFileSystem {
 
     storeId: string;
 
-    constructor(public files: IFsItem) {
+    constructor() {
         this.storeId = FILE_SYSTEM_TYPE_KAITAI;
     }
 
     getRootNode() {
-        return this.files;
+        return kaitaiRoot;
     }
 
     async get(fn: string): Promise<string | ArrayBuffer> {
-        const resp = await FileActionsWrapper.getFileFromServer(fn);
-        return fn.toLowerCase().endsWith(".ksy")
-            ? resp.text()
-            : resp.arrayBuffer();
+        return await FileActionsWrapper.fetchFileFromServer(fn);
     }
 
     async put(fn: string, data: any) {
-        return Promise.reject("KaitaiFileSystem.put is not implemented!");
+        return Promise.reject("KaitaiFileSystem.put is not supported!");
     }
 
-    save(root: IFsItem): void {
-
+    createDirectory(filePath: string): Promise<void> {
+        return Promise.reject("KaitaiFileSystem.createDirectory is not supported!");
     }
 
+    async delete(filePath: string): Promise<void> {
+        return Promise.reject("KaitaiFileSystem.delete is not supported!");
+    }
 }
 
-export const initKaitaiFs = () => {
-    const kaitaiRoot = <IFsItem>{fsType: FILE_SYSTEM_TYPE_KAITAI, children: {}, fn: "kaitai.io", type: ITEM_MODE_DIRECTORY};
-    (kaitaiFsFiles || []).forEach(fn => findOrCreateFsPath(kaitaiRoot, fn));
-    return new KaitaiFileSystem(kaitaiRoot);
-};
 

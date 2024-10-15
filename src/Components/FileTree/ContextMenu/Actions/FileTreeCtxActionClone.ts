@@ -4,7 +4,9 @@ import {h} from "vue";
 import {mapFileTreeDisplayNodeToYaml} from "./FileTreeCtxActionGenerateParser";
 import {useAppStore} from "../../../../Stores/AppStore";
 import {useFileSystems} from "../../Store/FileSystemsStore";
-import {FILE_SYSTEM_TYPE_KAITAI, FILE_SYSTEM_TYPE_LOCAL} from "../../../../v1/FileSystems/FileSystemsTypes";
+
+import {FILE_SYSTEM_TYPE_LOCAL} from "../../../../v1/FileSystems/LocalStorageFileSystem";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../../../../v1/FileSystems/KaitaiFileSystem";
 
 export const FileTreeCtxActionClone = (item: TreeNodeDisplay): MenuItem => {
     const action = async () => {

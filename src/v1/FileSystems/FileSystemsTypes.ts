@@ -1,22 +1,13 @@
-export const FILE_SYSTEM_TYPE_LOCAL = "local";
-export const FILE_SYSTEM_TYPE_KAITAI = "kaitai";
 export const ITEM_MODE_FILE = "file";
 export const ITEM_MODE_DIRECTORY = "folder";
 
 export type FsItemMode = typeof ITEM_MODE_FILE | typeof ITEM_MODE_DIRECTORY;
-export type FsItemType = typeof FILE_SYSTEM_TYPE_LOCAL | typeof FILE_SYSTEM_TYPE_KAITAI;
 
 export interface IFsItem {
-    fsType: FsItemType;
+    fsType: string;
     type: FsItemMode;
     fn?: string;
     children?: { [key: string]: IFsItem; };
-}
-
-export interface IFsItemSummary {
-    isLocal: boolean;
-    isFolder: boolean;
-    isKsy: boolean;
 }
 
 export interface IFileSystem {
@@ -24,9 +15,11 @@ export interface IFileSystem {
 
     getRootNode(): IFsItem | undefined;
 
-    save(root: IFsItem): void;
+    get(filePath: string): Promise<string | ArrayBuffer>;
 
-    get(fn: string): Promise<string | ArrayBuffer>;
+    put(filePath: string, data: string | ArrayBuffer): Promise<void>;
 
-    put(fn: string, data: string | ArrayBuffer): Promise<IFsItem>;
+    createDirectory(filePath: string): Promise<void>;
+
+    delete(filePath: string): Promise<void>;
 }

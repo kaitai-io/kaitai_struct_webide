@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useFileSystems} from "./Store/FileSystemsStore";
-import {TreeNodeDisplayType, TreeNodeDisplay, prepareFilePathFromNode} from "./FileSystemVisitors/FileSystemVisitor";
+import {prepareFilePathFromNode, TreeNodeDisplay, TreeNodeDisplayType} from "./FileSystemVisitors/FileSystemVisitor";
 import FileStoreTreeNodeIcon from "./FileTreeNodeIcon.vue";
 import {computed, toRaw} from "vue";
 import {useAppStore} from "../../Stores/AppStore";
@@ -14,7 +14,7 @@ const props = defineProps<{
 }>();
 
 const activateRow = () => {
-  store.selectPath(props.item.fullPath);
+  store.selectPath(props.item.fullPathWithStore);
 };
 
 const doubleClick = () => {
@@ -37,11 +37,11 @@ const doubleClick = () => {
       return;
     }
     case TreeNodeDisplayType.OPEN_FOLDER: {
-      store.closePath(props.item.fullPath);
+      store.closePath(props.item.fullPathWithStore);
       return;
     }
     case TreeNodeDisplayType.CLOSED_FOLDER: {
-      store.openPath(props.item.fullPath);
+      store.openPath(props.item.fullPathWithStore);
       return;
     }
   }
@@ -49,14 +49,14 @@ const doubleClick = () => {
 
 const contextMenu = (e: MouseEvent) => {
   e.preventDefault();
-  store.selectPath(props.item.fullPath);
+  store.selectPath(props.item.fullPathWithStore);
   const contextMenuOptions = prepareContextMenuOptions(e, toRaw(props.item));
   ContextMenu.showContextMenu(contextMenuOptions);
 };
 
 
 const isSelected = computed(() => {
-  return store.selectedPath === props.item.fullPath;
+  return store.selectedPath === props.item.fullPathWithStore;
 });
 
 

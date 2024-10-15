@@ -1,13 +1,12 @@
-import {prepareFilePathFromNode, TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemVisitor";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
-import {useAppStore} from "../../../../Stores/AppStore";
 import {useFileSystems} from "../../Store/FileSystemsStore";
 
 export const FileTreeCtxActionOpenDirectory = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {
         const fileSystemsStore = useFileSystems();
-        fileSystemsStore.openPath(item.fullPath);
+        fileSystemsStore.openPath(item.fullPathWithStore);
     };
 
     return {

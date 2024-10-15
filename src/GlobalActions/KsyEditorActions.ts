@@ -3,8 +3,10 @@ import {Ace} from "ace-builds";
 import {YamlFileInfo} from "../DataManipulation/CompilationModule/JsImporter";
 import {compileInternalDebugAndRelease} from "./CompileGrammar";
 import {parseAction} from "./ParseAction";
-import {FILE_SYSTEM_TYPE_KAITAI, FILE_SYSTEM_TYPE_LOCAL} from "../v1/FileSystems/FileSystemsTypes";
 import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
+
+import {FILE_SYSTEM_TYPE_LOCAL} from "../v1/FileSystems/LocalStorageFileSystem";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../v1/FileSystems/KaitaiFileSystem";
 
 export const mainEditorOnChange = async (change: Ace.Delta, editorContent: string) => {
     const contentDidNotChange = change.lines.join("\n") === editorContent;

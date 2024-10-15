@@ -59,7 +59,7 @@
     "generate-formats": "node genKaitaiFsFiles.js",
     "generate-license": "node vendor_license.js",
     "serve": "serve dist",
-    "parcel-run": "parcel index.html",
+    "parcel-run": "parcel index.html --no-cache",
     "parcel-build": "parcel build index.html --no-optimize"
   },
   "repository": {

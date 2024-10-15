@@ -1,7 +1,5 @@
 import {MenuOptions} from "@imengyu/vue3-context-menu";
-import {TreeNodeDisplay, TreeNodeDisplayType} from "../FileSystemVisitors/FileSystemVisitor";
-import {FILE_SYSTEM_TYPE_KAITAI} from "../../../v1/FileSystems/FileSystemsTypes";
-import {h} from "vue";
+import {TreeNodeDisplay} from "../FileSystemVisitors/FileSystemVisitor";
 import {FileTreeCtxActionGenerateParser} from "./Actions/FileTreeCtxActionGenerateParser";
 import {FileTreeCtxActionClone} from "./Actions/FileTreeCtxActionClone";
 import {FileTreeCtxActionDownload} from "./Actions/FileTreeCtxActionDownload";

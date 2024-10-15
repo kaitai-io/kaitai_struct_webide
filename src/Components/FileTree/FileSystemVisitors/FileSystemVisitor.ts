@@ -1,11 +1,4 @@
-import {
-    FILE_SYSTEM_TYPE_KAITAI,
-    FILE_SYSTEM_TYPE_LOCAL,
-    IFileSystem,
-    IFsItem,
-    ITEM_MODE_DIRECTORY,
-    ITEM_MODE_FILE
-} from "../../../v1/FileSystems/FileSystemsTypes";
+import {IFileSystem, IFsItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../../../v1/FileSystems/FileSystemsTypes";
 
 export enum TreeNodeDisplayType {
     OPEN_FOLDER,
@@ -16,11 +9,11 @@ export enum TreeNodeDisplayType {
 }
 
 export interface TreeNodeDisplay {
-    path: string;
+    fullPathWithStore: string;
     fullPath: string;
-    type: TreeNodeDisplayType;
     fileName: string;
-    storeId: typeof FILE_SYSTEM_TYPE_LOCAL | typeof FILE_SYSTEM_TYPE_KAITAI;
+    type: TreeNodeDisplayType;
+    storeId: string;
     depth: number;
 }
 
@@ -30,7 +23,7 @@ interface TempFileSystemVisitorDirectory {
     files: TreeNodeDisplay[];
 }
 
-export const prepareFilePathFromNode = (node: TreeNodeDisplay) => node.fullPath.split("/").slice(1).join("/");
+export const prepareFilePathFromNode = (node: TreeNodeDisplay) => node.fullPath;
 
 export class FileSystemVisitor {
     public static collectTreeNodesFromFileSystem(fileSystem: IFileSystem, openPaths: string[]): TreeNodeDisplay[] {
@@ -64,35 +57,32 @@ export class FileSystemVisitor {
     }
 
     private visitRootNode(rootNode: IFsItem) {
-        this.currentPathParts.push(rootNode.fn);
-        const rootNodeDirectory = this.mapToTempTreeNodeDisplay(rootNode);
+        const rootNodeDirectory = this.mapToTempTreeNodeDisplay(rootNode, rootNode.fn);
         this.rootDirectory = rootNodeDirectory;
         this.currentDirectory = rootNodeDirectory;
 
         if (rootNodeDirectory.treeNodeDisplay.type === TreeNodeDisplayType.OPEN_FOLDER) {
-            this.visitChildrenNodes(rootNode)
+            this.visitChildrenNodes(rootNode);
         }
-
-        this.currentPathParts.pop();
     }
+
     private visitChildrenNodes(fsItem: IFsItem) {
         Object.entries(fsItem.children || {})
             .forEach(([key, child]) => {
-                child.fn = key;
-                this.visitNode(child);
+                this.visitNode(key, child);
             });
     }
 
-    private visitNode(fsItem: IFsItem) {
-        this.currentPathParts.push(fsItem.fn);
+    private visitNode(nodeName: string, fsItem: IFsItem) {
+        this.currentPathParts.push(nodeName);
 
         switch (fsItem.type) {
             case ITEM_MODE_FILE: {
-                this.visitFileNode(fsItem);
+                this.visitFileNode(fsItem, nodeName);
                 break;
             }
             case ITEM_MODE_DIRECTORY: {
-                this.visitDirectoryNode(fsItem);
+                this.visitDirectoryNode(fsItem, nodeName);
                 break;
             }
         }
@@ -100,13 +90,13 @@ export class FileSystemVisitor {
         this.currentPathParts.pop();
     }
 
-    private visitFileNode(fsItem: IFsItem) {
-        const newNode = this.mapToTreeNodeDisplay(fsItem);
+    private visitFileNode(fsItem: IFsItem, nodeName: string) {
+        const newNode = this.mapToTreeNodeDisplay(fsItem, nodeName);
         this.currentDirectory.files.push(newNode);
     }
 
-    private visitDirectoryNode(fsItem: IFsItem) {
-        const newDirectory = this.mapToTempTreeNodeDisplay(fsItem);
+    private visitDirectoryNode(fsItem: IFsItem, nodeName: string) {
+        const newDirectory = this.mapToTempTreeNodeDisplay(fsItem, nodeName);
         this.currentDirectory.directories.push(newDirectory);
 
         if (newDirectory.treeNodeDisplay.type !== TreeNodeDisplayType.OPEN_FOLDER) {
@@ -115,7 +105,7 @@ export class FileSystemVisitor {
 
         this.currentDirectoryPathStack.push(this.currentDirectory);
         this.currentDirectory = newDirectory;
-        this.visitChildrenNodes(fsItem)
+        this.visitChildrenNodes(fsItem);
 
         this.currentDirectory = this.currentDirectoryPathStack.pop();
     }
@@ -128,8 +118,8 @@ export class FileSystemVisitor {
         this.collectedPaths.push(...tempDirectory.files);
     }
 
-    private mapToTempTreeNodeDisplay(fsItem: IFsItem): TempFileSystemVisitorDirectory {
-        const baseInfo = this.mapToTreeNodeDisplay(fsItem);
+    private mapToTempTreeNodeDisplay(fsItem: IFsItem, nodeName: string): TempFileSystemVisitorDirectory {
+        const baseInfo = this.mapToTreeNodeDisplay(fsItem, nodeName);
         return {
             treeNodeDisplay: baseInfo,
             directories: [],
@@ -137,19 +127,17 @@ export class FileSystemVisitor {
         };
     }
 
-    private mapToTreeNodeDisplay(fsItem: IFsItem): TreeNodeDisplay {
-        const pathWithoutCurrentItem = [...this.currentPathParts];
-        pathWithoutCurrentItem.pop();
-        const path = pathWithoutCurrentItem.join("/");
+    private mapToTreeNodeDisplay(fsItem: IFsItem, name: string): TreeNodeDisplay {
         const fullPath = this.currentPathParts.join("/");
-        const isOpen = this.isDirectoryOpen(fullPath);
+        const fullPathWithStore = `${fsItem.fsType}:${fullPath}`;
+        const isOpen = this.isDirectoryOpen(fullPathWithStore);
         return {
+            fileName: name,
+            fullPath: fullPath,
+            fullPathWithStore: fullPathWithStore,
             type: this.getNodeType(isOpen, fsItem),
             storeId: fsItem.fsType,
-            path: path,
-            fullPath: fullPath,
-            fileName: fsItem.fn,
-            depth: this.currentPathParts.length - 1
+            depth: this.currentPathParts.length
         };
     }
 

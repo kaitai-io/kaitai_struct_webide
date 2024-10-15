@@ -1,7 +1,9 @@
 import {IFileProcessItem} from "../v1/utils/Files/Types";
 import {FileActionsWrapper} from "../v1/utils/Files/FileActionsWrapper";
 import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
-import {FILE_SYSTEM_TYPE_LOCAL} from "../v1/FileSystems/FileSystemsTypes";
+
+
+import {FILE_SYSTEM_TYPE_LOCAL} from "../v1/FileSystems/LocalStorageFileSystem";
 
 
 const isKsyFile = (fileName: string) => {

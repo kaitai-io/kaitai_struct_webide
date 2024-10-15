@@ -1,14 +1,13 @@
-import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplay} from "../../FileSystemVisitors/FileSystemVisitor";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
-import {mapFileTreeDisplayNodeToYaml} from "./FileTreeCtxActionGenerateParser";
-import {useAppStore} from "../../../../Stores/AppStore";
 import {useFileSystems} from "../../Store/FileSystemsStore";
-import {FILE_SYSTEM_TYPE_KAITAI, FILE_SYSTEM_TYPE_LOCAL} from "../../../../v1/FileSystems/FileSystemsTypes";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../../../../v1/FileSystems/KaitaiFileSystem";
 
 export const FileTreeCtxActionDelete = (item: TreeNodeDisplay): MenuItem => {
     const action = async () => {
-        alert("ACTION NOT IMPLEMENTED!");
+        const fileSystemStore = useFileSystems();
+        fileSystemStore.deletePath(item.storeId, item.fullPath);
     };
 
     return {

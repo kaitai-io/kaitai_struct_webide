@@ -4,8 +4,8 @@ import {ArrayUtils} from "../Misc/ArrayUtils";
 import {useAppStore} from "../../../Stores/AppStore";
 
 export class FileActionsWrapper {
-    public static getFileFromServer(url: string) {
-        return fetch(url)
+    public static async fetchFileFromServer(url: string) {
+        const resp = await fetch(url)
             .then(response => {
                 if (!response.ok) {
                     let msg;
@@ -24,8 +24,12 @@ export class FileActionsWrapper {
                 }
                 throw err;
             });
+        return url.toLowerCase().endsWith(".ksy")
+            ? resp.text()
+            : resp.arrayBuffer();
     }
-    public static saveFile(data: ArrayBuffer | Uint8Array | string, filename: string) {
+
+    public static downloadFile(data: ArrayBuffer | Uint8Array | string, filename: string) {
         const a = document.createElement("a");
         document.body.appendChild(a);
         a.style.display = "none";
@@ -53,7 +57,7 @@ export class FileActionsWrapper {
         const hexRange = `0x${start.toString(16)}-0x${end.toString(16)}`;
         const downloadedFileName = `${fileName}_${hexRange}.bin`;
 
-        FileActionsWrapper.saveFile(new Uint8Array(store.fileContent, start, fileDataLength), downloadedFileName);
+        FileActionsWrapper.downloadFile(new Uint8Array(store.fileContent, start, fileDataLength), downloadedFileName);
     }
 
     public static mapToProcessItems(files: FileList): IFileProcessItem[] {

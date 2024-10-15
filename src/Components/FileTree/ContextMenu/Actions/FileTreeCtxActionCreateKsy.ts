@@ -1,7 +1,8 @@
 import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemVisitor";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
-import {FILE_SYSTEM_TYPE_KAITAI} from "../../../../v1/FileSystems/FileSystemsTypes";
+
+import {FILE_SYSTEM_TYPE_KAITAI} from "../../../../v1/FileSystems/KaitaiFileSystem";
 
 export const FileTreeCtxActionCreateKsy = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {
