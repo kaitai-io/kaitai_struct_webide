@@ -2,8 +2,7 @@
 
 Online editor / visualizer for Kaitai Struct .ksy files
 
-[![Build Status](https://travis-ci.org/kaitai-io/kaitai_struct_webide.svg?branch=master)](https://travis-ci.org/kaitai-io/kaitai_struct_webide)
-[![Known Vulnerabilities](https://snyk.io/test/github/kaitai-io/kaitai_struct_webide/badge.svg)](https://snyk.io/test/github/kaitai-io/kaitai_struct_webide)
+![GH Pages](https://github.com/Lorthiz/kaitai_struct_webide/actions/workflows/main.yml/badge.svg)
 
 ## features
 
@@ -15,14 +14,7 @@ Online editor / visualizer for Kaitai Struct .ksy files
 
 ## demo
 
-[ide.kaitai.io](https://ide.kaitai.io/)
-
-## run locally (without compiling / modifying the source code)
-
-- Clone deploy version: `git clone https://github.com/kaitai-io/ide-kaitai-io.github.io`
-    - stable release: `/`, devel release: `/devel/`,
-- Serve on a webserver (e.g. `python3 -m http.server 8000`)
-- Go to [http://localhost:8000/](http://localhost:8000/)
+[kaitai.lorthiz.ovh](https://kaitai.lorthiz.ovh/)
 
 ## compile and run locally
 
@@ -34,7 +26,7 @@ Online editor / visualizer for Kaitai Struct .ksy files
 
 ## screenshots
 
-![Example screenshot of a .zip file](docs/zip_example.png)
-![Example screenshot of a .png file](docs/png_example.png)
+![Example screenshot of a .zip file](public/docs/zip_example.png)
+![Example screenshot of a .png file](public/docs/png_example.png)
 
 For more screenshots [visit the Features wiki page](https://github.com/kaitai-io/kaitai_struct_webide/wiki/Features)
