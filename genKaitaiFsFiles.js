@@ -23,7 +23,7 @@ function recursiveFind(dir, pattern, results = []) {
 function generate(outDir) {
     const files =
         recursiveFind("formats/", /\.ksy$/)
-        .concat(recursiveFind("samples/", /.+/))
+        .concat(recursiveFind("public/samples/", /.+/))
         .map(path => path.replace(/\\/g,'/'));
     files.sort();
     const info = `/* Generated file do not push changes to repo!
