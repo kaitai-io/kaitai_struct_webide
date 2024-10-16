@@ -1,5 +1,5 @@
-import {IExportedValue} from "../../../entities";
-import {RangeHelper, SimpleRange} from "../RangeHelper";
+import {IExportedValue} from "../DataManipulation/ExportedValueTypes";
+import {RangeHelper, SimpleRange} from "./RangeHelper";
 
 export class ExportedValueUtils {
     public static findLeafIndexUsingBinarySearch = (letterIndex: number, leafs: IExportedValue[]) => {

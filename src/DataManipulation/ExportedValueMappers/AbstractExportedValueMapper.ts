@@ -1,5 +1,5 @@
 import {IExportedValueMapper} from "./IExportedValueMapper";
-import {IExportedValue, ObjectType} from "../../../entities";
+import {IExportedValue, ObjectType} from "../ExportedValueTypes";
 
 export class AbstractExportedValueMapper<T> implements IExportedValueMapper<T> {
     public map(value: IExportedValue): T {

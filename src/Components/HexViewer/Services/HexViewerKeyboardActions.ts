@@ -1,4 +1,4 @@
-import {NumberUtils} from "../../../v1/utils/Misc/NumberUtils";
+import {NumberUtils} from "../../../Utils/NumberUtils";
 import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
 import {HEX_VIEWER_SOURCE} from "./HexViewerActions";
 

@@ -3,7 +3,7 @@ import {GoldenLayoutUIConfig} from "./GoldenLayoutUIConfig";
 import {Ace} from "ace-builds";
 import GoldenLayout from "golden-layout";
 import {AceEditorComponent, IAceEditorComponentOptions} from "./AceEditorComponent";
-import {DelayAction} from "../utils/DelayAction";
+import {DelayAction} from "../../Utils/DelayAction";
 import {mainEditorOnChange, mainEditorRecompile} from "../../GlobalActions/KsyEditorActions";
 import {parseAction} from "../../GlobalActions/ParseAction";
 

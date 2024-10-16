@@ -1,8 +1,8 @@
-import {TreeNodeDisplay} from "../../FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplay} from "../../FileSystemVisitors/FileSystemFileTreeMapper";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
 import {useFileSystems} from "../../Store/FileSystemsStore";
-import {FILE_SYSTEM_TYPE_KAITAI} from "../../../../v1/FileSystems/KaitaiFileSystem";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
 
 export const FileTreeCtxActionDelete = (item: TreeNodeDisplay): MenuItem => {
     const action = async () => {

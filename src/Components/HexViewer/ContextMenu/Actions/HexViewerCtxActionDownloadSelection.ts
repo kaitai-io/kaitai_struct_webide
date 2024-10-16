@@ -1,6 +1,6 @@
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
-import {FileActionsWrapper} from "../../../../v1/utils/Files/FileActionsWrapper";
+import {FileActionsWrapper} from "../../../../Utils/Files/FileActionsWrapper";
 import {useCurrentBinaryFileStore} from "../../../../Stores/CurrentBinaryFileStore";
 
 export const HexViewerCtxActionDownloadSelection = (): MenuItem => {

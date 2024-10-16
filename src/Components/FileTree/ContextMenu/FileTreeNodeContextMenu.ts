@@ -1,5 +1,5 @@
 import {MenuOptions} from "@imengyu/vue3-context-menu";
-import {TreeNodeDisplay} from "../FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplay} from "../FileSystemVisitors/FileSystemFileTreeMapper";
 import {FileTreeCtxActionGenerateParser} from "./Actions/FileTreeCtxActionGenerateParser";
 import {FileTreeCtxActionClone} from "./Actions/FileTreeCtxActionClone";
 import {FileTreeCtxActionDownload} from "./Actions/FileTreeCtxActionDownload";

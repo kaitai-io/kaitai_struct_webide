@@ -1,12 +1,12 @@
-import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemFileTreeMapper";
 import {useFileSystems} from "../../Store/FileSystemsStore";
 import {h} from "vue";
 import {MenuChildren, MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {CompilationTarget, CompilerService} from "../../../../DataManipulation/CompilationModule/CompilerService";
 import {YamlFileInfo} from "../../../../DataManipulation/CompilationModule/JsImporter";
-import {CurrentGoldenLayout} from "../../../../v1/GoldenLayout/GoldenLayoutUI";
+import {CurrentGoldenLayout} from "../../../GoldenLayout/GoldenLayoutUI";
 import {useIdeSettingsStore} from "../../../../Stores/IdeSettingsStore";
-import {SupportedLanguage, SupportedLanguages} from "../../../../SupportedLanguages";
+import {SupportedLanguage, KaitaiSupportedLanguages} from "../../../../DataManipulation/KaitaiSupportedLanguages";
 
 export const mapFileTreeDisplayNodeToYaml = async (item: TreeNodeDisplay): Promise<YamlFileInfo> => {
     const fileSystemsStore = useFileSystems();
@@ -41,7 +41,7 @@ export const FileTreeCtxActionGenerateParser = (item: TreeNodeDisplay): MenuItem
             : createTabsForAllGeneratedFiles(compiled, language);
     };
 
-    const generateParsersSubmenu: MenuChildren = SupportedLanguages.map(language => ({
+    const generateParsersSubmenu: MenuChildren = KaitaiSupportedLanguages.map(language => ({
         label: language.text,
         onClick: () => generateParserForLanguage(language),
         customClass: "context-menu-item",

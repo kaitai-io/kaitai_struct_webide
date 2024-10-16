@@ -78,10 +78,6 @@
       "staticOutPath": "formats"
     },
     {
-      "staticPath": "samples",
-      "staticOutPath": "samples"
-    },
-    {
       "staticPath": "public"
     },
     {

@@ -1,6 +1,6 @@
 import {AbstractExportedValueMapper} from "./AbstractExportedValueMapper";
-import {IExportedValue} from "../../../entities";
-import {SimpleRange, RangeHelper} from "../RangeHelper";
+import {IExportedValue} from "../ExportedValueTypes";
+import {SimpleRange, RangeHelper} from "../../Utils/RangeHelper";
 
 export interface IExportedValueFlatInfo {
     leafs: IExportedValue[];

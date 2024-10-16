@@ -1,4 +1,4 @@
-import {StringUtils} from "../../v1/utils/Misc/StringUtils";
+import {StringUtils} from "../../Utils/StringUtils";
 import {IKsyTypes} from "../ParsingModule/CodeExecution/Types";
 import {YamlFileInfo} from "./JsImporter";
 import {YamlParser} from "./YamlParser";

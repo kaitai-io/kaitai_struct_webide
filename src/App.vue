@@ -13,10 +13,13 @@ import {loadBinaryFileAction} from "./GlobalActions/LoadBinaryFile";
 import {loadKsyFileAction} from "./GlobalActions/LoadKsyFile";
 import {onMounted} from "vue";
 import {parseAction} from "./GlobalActions/ParseAction";
-import {initKaitaiFs, KaitaiFileSystem} from "./v1/FileSystems/KaitaiFileSystem";
-import {initStorageFileSystemRoot, LocalStorageFileSystem} from "./v1/FileSystems/LocalStorageFileSystem";
+import {KaitaiFileSystem} from "./Components/FileTree/FileSystems/KaitaiFileSystem";
+import {
+  initStorageFileSystemRoot,
+  LocalStorageFileSystem
+} from "./Components/FileTree/FileSystems/LocalStorageFileSystem";
 import {useFileSystems} from "./Components/FileTree/Store/FileSystemsStore";
-import {CurrentGoldenLayout} from "./v1/GoldenLayout/GoldenLayoutUI";
+import {CurrentGoldenLayout} from "./Components/GoldenLayout/GoldenLayoutUI";
 
 const store = useAppStore();
 const fileSystemsStore = useFileSystems();

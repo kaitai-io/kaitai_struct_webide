@@ -1,4 +1,4 @@
-import {prepareFilePathFromNode, TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemFileTreeMapper";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
 import {useAppStore} from "../../../../Stores/AppStore";
@@ -8,7 +8,7 @@ export const FileTreeCtxActionOpenKsy = (item: TreeNodeDisplay): MenuItem => {
         const appStore = useAppStore();
         appStore.updateSelectedKsyFile({
             storeId: item.storeId,
-            filePath: prepareFilePathFromNode(item)
+            filePath: item.fullPath
         });
     };
 

@@ -1,12 +1,12 @@
 import {IYamlImporter, JsImporter, YamlFileInfo} from "./JsImporter";
-import {IFsItem} from "../../v1/FileSystems/FileSystemsTypes";
-import {performanceHelper} from "../../v1/utils/PerformanceHelper";
+import {FileSystemItem} from "../../Components/FileTree/FileSystemsTypes";
+import {performanceHelper} from "../../Utils/PerformanceHelper";
 import {SchemaUtils} from "./SchemaUtils";
 import KaitaiStructCompiler from "kaitai-struct-compiler";
 import {CompilationError} from "./CompilationError";
 import {YamlParser} from "./YamlParser";
 import {IKsyTypes} from "../ParsingModule/CodeExecution/Types";
-import {StringUtils} from "../../v1/utils/Misc/StringUtils";
+import {StringUtils} from "../../Utils/StringUtils";
 import IKsyFile = KsySchema.IKsyFile;
 
 export interface KaitaiCompilationResult {
@@ -29,13 +29,13 @@ export interface ReleaseAndDebugTargets {
 }
 
 export class CompilerService {
-    async compileSingleTargetFsWrapper(srcYamlFsItem: IFsItem, yamlContent: string, targetLanguage: string, isDebug: boolean): Promise<CompilationTarget> {
+    async compileSingleTargetFsWrapper(srcYamlFsItem: FileSystemItem, yamlContent: string, targetLanguage: string, isDebug: boolean): Promise<CompilationTarget> {
         const initialYaml: YamlFileInfo = {storeId: srcYamlFsItem.fsType, fileContent: yamlContent, filePath: srcYamlFsItem.fn};
         return this.compileSingleTarget(initialYaml, targetLanguage, isDebug);
 
     }
 
-    async compileDebugAndReleaseTargetsWrapper(srcYamlFsItem: IFsItem, yamlContent: string, targetLanguage: string): Promise<ReleaseAndDebugTargets> {
+    async compileDebugAndReleaseTargetsWrapper(srcYamlFsItem: FileSystemItem, yamlContent: string, targetLanguage: string): Promise<ReleaseAndDebugTargets> {
         const initialYaml: YamlFileInfo = {storeId: srcYamlFsItem.fsType, fileContent: yamlContent, filePath: srcYamlFsItem.fn};
         return this.compileDebugAndReleaseTargets(initialYaml, targetLanguage);
     }

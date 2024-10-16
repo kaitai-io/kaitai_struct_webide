@@ -1,5 +1,5 @@
 ﻿import GoldenLayout from "golden-layout";
-import {CurrentGoldenLayout} from "./GoldenLayout/GoldenLayoutUI";
+import {CurrentGoldenLayout} from "./GoldenLayoutUI";
 
 const htmlescape = (str: string) => $("<div/>").text(str).html();
 

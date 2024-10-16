@@ -1,9 +1,9 @@
-import {IFsItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "./FileSystemsTypes";
-import {ArrayUtils} from "../utils/Misc/ArrayUtils";
-import {FsItemPathsCollector} from "../../Components/FileTree/FileSystemVisitors/FsItemPathsCollector";
+import {FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../FileSystemsTypes";
+import {ArrayUtils} from "../../../Utils/ArrayUtils";
+import {FsItemPathsCollector} from "../FileSystemVisitors/FsItemPathsCollector";
 
-export class IFsItemHelper {
-    public static createFileOrDirectoryFromPathInRoot = (root: IFsItem, filePath: string, createDirectoryMode: boolean = false) => {
+export class FsItemHelper {
+    public static createFileOrDirectoryFromPathInRoot = (root: FileSystemItem, filePath: string, createDirectoryMode: boolean = false) => {
         const pathParts = filePath.split("/");
         let currentNode = root;
         let fullPathAccumulated = "";
@@ -24,7 +24,7 @@ export class IFsItemHelper {
         }
     };
 
-    public static deletePathAndReturnFilesToDelete = (root: IFsItem, filePath: string): string[] => {
+    public static deletePathAndReturnFilesToDelete = (root: FileSystemItem, filePath: string): string[] => {
         const isDeletingFromRoot = filePath.length === 0;
 
         if (isDeletingFromRoot) {
@@ -33,12 +33,12 @@ export class IFsItemHelper {
             return filesInRoot;
         } else {
             const filePathParts = filePath.split("/");
-            let nodeToDelete = IFsItemHelper.deleteNodeFromRoot(root, filePathParts);
+            let nodeToDelete = FsItemHelper.deleteNodeFromRoot(root, filePathParts);
             return FsItemPathsCollector.collectFiles(nodeToDelete);
         }
     };
 
-    public static deleteNodeFromRoot = (root: IFsItem, filePathParts: string[]) => {
+    public static deleteNodeFromRoot = (root: FileSystemItem, filePathParts: string[]) => {
         let currNode = root;
         for (let i = 0; i < filePathParts.length - 1; i++) {
             const fnPart = filePathParts[i];

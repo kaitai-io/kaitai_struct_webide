@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {IExportedValue, ObjectType} from "../../../entities";
+import {IExportedValue, ObjectType} from "../../../DataManipulation/ExportedValueTypes";
 import IExportedObjectDescription from "./IExportedObjectDescription.vue";
 import IExportedArrayDescription from "./IExportedArrayDescription.vue";
 import IExportedGenericDescription from "./IExportedUnknownDescription.vue";

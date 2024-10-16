@@ -9,7 +9,7 @@ import EmojiCheckbox from "./EmojiCheckbox.vue";
 import ListOptionsToggle from "./ListOptionsToggle.vue";
 import {useIdeSettingsStore} from "../../Stores/IdeSettingsStore";
 import {useWelcomeModalStore} from "../WelcomeModal/WelcomeModalStore";
-import {ExportedValueUtils} from "../../v1/utils/Misc/ExportedValueUtils";
+import {ExportedValueUtils} from "../../Utils/ExportedValueUtils";
 
 const currentBinaryFileStore = useCurrentBinaryFileStore();
 const hexViewerConfigStore = useHexViewerConfigStore();

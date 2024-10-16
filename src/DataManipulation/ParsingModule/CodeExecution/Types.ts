@@ -1,4 +1,4 @@
-import {IExportedValue} from "../../../entities";
+import {IExportedValue} from "../../ExportedValueTypes";
 
 
 export const INIT_WORKER_SCRIPTS = "INIT_WORKER_SCRIPTS";

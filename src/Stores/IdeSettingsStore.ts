@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {LocalStorageApi} from "../v1/utils/LocalStorageApi";
+import {LocalStorageApi} from "../Utils/LocalStorageApi";
 
 export interface IdeSettings {
     eagerMode: boolean;

@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 
-import {FILE_SYSTEM_TYPE_KAITAI} from "../v1/FileSystems/KaitaiFileSystem";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../Components/FileTree/FileSystems/KaitaiFileSystem";
 
 export interface FileLocationInfo {
     storeId: string;

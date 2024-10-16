@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {TreeNodeDisplayType} from "./FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplayType} from "./FileSystemVisitors/FileSystemFileTreeMapper";
 
 const props = defineProps<{
   type: TreeNodeDisplayType

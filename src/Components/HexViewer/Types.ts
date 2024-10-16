@@ -1,4 +1,4 @@
-import {IExportedValue} from "../../entities";
+import {IExportedValue} from "../../DataManipulation/ExportedValueTypes";
 
 
 export interface ProcessedLetter {

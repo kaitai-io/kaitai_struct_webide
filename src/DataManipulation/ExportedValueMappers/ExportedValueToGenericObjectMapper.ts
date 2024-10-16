@@ -1,5 +1,5 @@
 import {AbstractExportedValueMapper} from "./AbstractExportedValueMapper";
-import {IExportedValue} from "../../../entities";
+import {IExportedValue} from "../ExportedValueTypes";
 
 export class ExportedValueToGenericObjectMapper extends AbstractExportedValueMapper<any> {
 

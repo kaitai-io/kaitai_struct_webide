@@ -1,5 +1,5 @@
 import {INIT_WORKER_SCRIPTS, PARSE_SCRIPTS} from "./Types";
-import {IDebugInfo} from "../../../v1/utils/ExportedValueMappers/ObjectToIExportedValueMapper";
+import {IDebugInfo} from "../../ExportedValueMappers/ObjectToIExportedValueMapper";
 
 export interface IWorkerResponseInit {
     type: typeof INIT_WORKER_SCRIPTS;

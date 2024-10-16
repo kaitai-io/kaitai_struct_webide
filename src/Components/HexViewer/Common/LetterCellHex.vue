@@ -11,7 +11,7 @@ import {
 } from "../Services/HexViewerMouseActions";
 import {computed} from "vue";
 import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
-import {RangeHelper} from "../../../v1/utils/RangeHelper";
+import {RangeHelper} from "../../../Utils/RangeHelper";
 import {prepareContextMenuOptions} from "../ContextMenu/HexViewerContextMenu";
 import ContextMenu from "@imengyu/vue3-context-menu";
 import {HEX_VIEWER_SOURCE} from "../Services/HexViewerActions";

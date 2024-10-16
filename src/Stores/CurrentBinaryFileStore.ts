@@ -1,8 +1,8 @@
 import {defineStore} from "pinia";
-import {IExportedValue} from "../entities";
-import {LocalStorageApi} from "../v1/utils/LocalStorageApi";
-import {flattenIExportedValueToFlatInfo} from "../v1/utils/ExportedValueMappers";
-import {IExportedValueFlatInfo} from "../v1/utils/ExportedValueMappers/IExportedValueFlatInfoMapper";
+import {IExportedValue} from "../DataManipulation/ExportedValueTypes";
+import {LocalStorageApi} from "../Utils/LocalStorageApi";
+import {ExportedValueMappers} from "../DataManipulation/ExportedValueMappers";
+import {IExportedValueFlatInfo} from "../DataManipulation/ExportedValueMappers/IExportedValueFlatInfoMapper";
 
 export interface CurrentBinaryFile {
     fileContent: ArrayBuffer;
@@ -68,7 +68,7 @@ export const useCurrentBinaryFileStore = defineStore("SelectionStore", {
         },
         updateParsedFile(parsedFile: IExportedValue) {
             this.parsedFile = parsedFile;
-            this.parsedFileFlatInfo = flattenIExportedValueToFlatInfo(parsedFile);
+            this.parsedFileFlatInfo = ExportedValueMappers.flatten(parsedFile);
         },
     }
 });

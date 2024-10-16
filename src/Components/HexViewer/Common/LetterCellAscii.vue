@@ -8,7 +8,7 @@ import {
   onDragStartAction
 } from "../Services/HexViewerMouseActions";
 import {computed} from "vue";
-import {RangeHelper} from "../../../v1/utils/RangeHelper";
+import {RangeHelper} from "../../../Utils/RangeHelper";
 import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
 
 const binStore = useCurrentBinaryFileStore();

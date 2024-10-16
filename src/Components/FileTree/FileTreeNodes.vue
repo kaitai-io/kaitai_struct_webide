@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import {IFileSystem} from "../../v1/FileSystems/FileSystemsTypes";
+import {FileSystem} from "./FileSystemsTypes";
 import {computed} from "vue";
 import FileStoreTreeNode from "./FileTreeNode.vue";
-import {FileSystemVisitor} from "./FileSystemVisitors/FileSystemVisitor";
+import {FileSystemFileTreeMapper} from "./FileSystemVisitors/FileSystemFileTreeMapper";
 import {useFileSystems} from "./Store/FileSystemsStore";
 
 const store = useFileSystems();
 const props = defineProps<{
-  fileSystem: IFileSystem
+  fileSystem: FileSystem
 }>();
 
 const childrenItems = computed(() => {
-  return FileSystemVisitor.collectTreeNodesFromFileSystem(props.fileSystem, store.openPaths);
+  return FileSystemFileTreeMapper.mapToFileTreeNodes(props.fileSystem, store.openPaths);
 });
 
 

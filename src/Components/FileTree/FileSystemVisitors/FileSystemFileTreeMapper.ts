@@ -1,4 +1,4 @@
-import {IFileSystem, IFsItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../../../v1/FileSystems/FileSystemsTypes";
+import {FileSystem, FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../FileSystemsTypes";
 
 export enum TreeNodeDisplayType {
     OPEN_FOLDER,
@@ -23,11 +23,9 @@ interface TempFileSystemVisitorDirectory {
     files: TreeNodeDisplay[];
 }
 
-export const prepareFilePathFromNode = (node: TreeNodeDisplay) => node.fullPath;
-
-export class FileSystemVisitor {
-    public static collectTreeNodesFromFileSystem(fileSystem: IFileSystem, openPaths: string[]): TreeNodeDisplay[] {
-        return new FileSystemVisitor().collectVisibleFileTreeItems(fileSystem, openPaths);
+export class FileSystemFileTreeMapper {
+    public static mapToFileTreeNodes(fileSystem: FileSystem, openPaths: string[]): TreeNodeDisplay[] {
+        return new FileSystemFileTreeMapper().collectVisibleFileTreeItems(fileSystem, openPaths);
     }
 
     private openPaths: string[];
@@ -40,13 +38,13 @@ export class FileSystemVisitor {
     private constructor() {
     }
 
-    private collectVisibleFileTreeItems(fileSystem: IFileSystem, openPaths: string[]) {
+    private collectVisibleFileTreeItems(fileSystem: FileSystem, openPaths: string[]) {
         this.openPaths = openPaths;
         this.visitFileSystem(fileSystem);
         return this.collectedPaths;
     }
 
-    private visitFileSystem(fileSystem: IFileSystem) {
+    private visitFileSystem(fileSystem: FileSystem) {
         const rootNode = fileSystem.getRootNode();
         if (!rootNode) {
             return;
@@ -56,7 +54,7 @@ export class FileSystemVisitor {
         this.collectPathsFromDirectory(this.rootDirectory);
     }
 
-    private visitRootNode(rootNode: IFsItem) {
+    private visitRootNode(rootNode: FileSystemItem) {
         const rootNodeDirectory = this.mapToTempTreeNodeDisplay(rootNode, rootNode.fn);
         this.rootDirectory = rootNodeDirectory;
         this.currentDirectory = rootNodeDirectory;
@@ -66,14 +64,14 @@ export class FileSystemVisitor {
         }
     }
 
-    private visitChildrenNodes(fsItem: IFsItem) {
+    private visitChildrenNodes(fsItem: FileSystemItem) {
         Object.entries(fsItem.children || {})
             .forEach(([key, child]) => {
                 this.visitNode(key, child);
             });
     }
 
-    private visitNode(nodeName: string, fsItem: IFsItem) {
+    private visitNode(nodeName: string, fsItem: FileSystemItem) {
         this.currentPathParts.push(nodeName);
 
         switch (fsItem.type) {
@@ -90,12 +88,12 @@ export class FileSystemVisitor {
         this.currentPathParts.pop();
     }
 
-    private visitFileNode(fsItem: IFsItem, nodeName: string) {
+    private visitFileNode(fsItem: FileSystemItem, nodeName: string) {
         const newNode = this.mapToTreeNodeDisplay(fsItem, nodeName);
         this.currentDirectory.files.push(newNode);
     }
 
-    private visitDirectoryNode(fsItem: IFsItem, nodeName: string) {
+    private visitDirectoryNode(fsItem: FileSystemItem, nodeName: string) {
         const newDirectory = this.mapToTempTreeNodeDisplay(fsItem, nodeName);
         this.currentDirectory.directories.push(newDirectory);
 
@@ -118,7 +116,7 @@ export class FileSystemVisitor {
         this.collectedPaths.push(...tempDirectory.files);
     }
 
-    private mapToTempTreeNodeDisplay(fsItem: IFsItem, nodeName: string): TempFileSystemVisitorDirectory {
+    private mapToTempTreeNodeDisplay(fsItem: FileSystemItem, nodeName: string): TempFileSystemVisitorDirectory {
         const baseInfo = this.mapToTreeNodeDisplay(fsItem, nodeName);
         return {
             treeNodeDisplay: baseInfo,
@@ -127,7 +125,7 @@ export class FileSystemVisitor {
         };
     }
 
-    private mapToTreeNodeDisplay(fsItem: IFsItem, name: string): TreeNodeDisplay {
+    private mapToTreeNodeDisplay(fsItem: FileSystemItem, name: string): TreeNodeDisplay {
         const fullPath = this.currentPathParts.join("/");
         const fullPathWithStore = `${fsItem.fsType}:${fullPath}`;
         const isOpen = this.isDirectoryOpen(fullPathWithStore);
@@ -141,7 +139,7 @@ export class FileSystemVisitor {
         };
     }
 
-    private getNodeType(isOpen: boolean, fsItem: IFsItem): TreeNodeDisplayType {
+    private getNodeType(isOpen: boolean, fsItem: FileSystemItem): TreeNodeDisplayType {
         switch (fsItem.type) {
             case ITEM_MODE_FILE: {
                 return fsItem.fn.endsWith(".ksy") ? TreeNodeDisplayType.KSY_FILE : TreeNodeDisplayType.BINARY_FILE;

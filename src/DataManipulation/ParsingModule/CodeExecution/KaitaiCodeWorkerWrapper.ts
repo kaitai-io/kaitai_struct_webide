@@ -1,5 +1,5 @@
-import {fetchInstance, IParsingOptions, mapObjectToExportedValue} from "../../../v1/utils/ExportedValueMappers/ObjectToIExportedValueMapper";
-import {IExportedValue} from "../../../entities";
+import {fetchInstance, IParsingOptions, mapObjectToExportedValue} from "../../ExportedValueMappers/ObjectToIExportedValueMapper";
+import {IExportedValue} from "../../ExportedValueTypes";
 import {WorkerFunctionStack} from "./WorkerFunctionStack";
 import {IWorkerMessage, IWorkerMessageParse} from "./WorkerMessages";
 import {IWorkerResponse, IWorkerResponseInit, IWorkerResponseParse, ParseResultType} from "./WorkerResponses";

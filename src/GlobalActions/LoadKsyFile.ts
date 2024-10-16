@@ -2,7 +2,7 @@ import {FileLocationInfo} from "../Stores/AppStore";
 import {YamlFileInfo} from "../DataManipulation/CompilationModule/JsImporter";
 import {compileInternalDebugAndRelease} from "./CompileGrammar";
 import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
-import {CurrentGoldenLayout} from "../v1/GoldenLayout/GoldenLayoutUI";
+import {CurrentGoldenLayout} from "../Components/GoldenLayout/GoldenLayoutUI";
 import {useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
 
 export const loadKsyFileAction = async (ksyFileLocation: FileLocationInfo) => {

@@ -1,6 +1,6 @@
-import {IExportedValue} from "../../../entities";
+import {IExportedValue} from "../../../DataManipulation/ExportedValueTypes";
 import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
-import {RangeHelper, SimpleRange} from "../../../v1/utils/RangeHelper";
+import {RangeHelper, SimpleRange} from "../../../Utils/RangeHelper";
 
 export const PARSED_TREE_SOURCE = "PARSED_TREE";
 

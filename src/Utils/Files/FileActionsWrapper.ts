@@ -1,7 +1,7 @@
 import {IFileProcessItem} from "./Types";
-import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
-import {ArrayUtils} from "../Misc/ArrayUtils";
-import {useAppStore} from "../../../Stores/AppStore";
+import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
+import {ArrayUtils} from "../ArrayUtils";
+import {useAppStore} from "../../Stores/AppStore";
 
 export class FileActionsWrapper {
     public static async fetchFileFromServer(url: string) {
@@ -70,7 +70,7 @@ export class FileActionsWrapper {
                     reader.onerror = function (e) {
                         reject(e);
                     };
-                    reader["readAs" + mode[0].toUpperCase() + mode.substr(1)](blob, ...args);
+                    reader["readAs" + mode[0].toUpperCase() + mode.substring(1)](blob, ...args);
                 }
             );
         };

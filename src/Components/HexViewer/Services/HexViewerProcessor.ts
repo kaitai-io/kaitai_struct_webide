@@ -1,6 +1,6 @@
 import {convertByteToAsciiCharacter, convertByteToEmoji} from "./Convert";
 import {ProcessedLetter, ProcessLettersConfig} from "../Types";
-import {ExportedValueUtils} from "../../../v1/utils/Misc/ExportedValueUtils";
+import {ExportedValueUtils} from "../../../Utils/ExportedValueUtils";
 
 const mapByteToHexOrEmoji = (byteValue: number, emojiMode: boolean): string => {
     return emojiMode

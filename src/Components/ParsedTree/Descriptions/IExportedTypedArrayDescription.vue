@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {IExportedValue} from "../../../entities";
+import {IExportedValue} from "../../../DataManipulation/ExportedValueTypes";
 
 const props = defineProps<{
   node: IExportedValue,

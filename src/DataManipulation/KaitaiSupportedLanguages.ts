@@ -5,7 +5,7 @@ export interface SupportedLanguage {
     text: string;
 }
 
-export const SupportedLanguages: SupportedLanguage[] = [
+export const KaitaiSupportedLanguages: SupportedLanguage[] = [
     {kaitaiLangCode: "cpp_stl", aceEditorLangCode: "c_cpp", isDebug: false, text: "CPP-STL"},
     {kaitaiLangCode: "csharp", aceEditorLangCode: "csharp", isDebug: false, text: "C#"},
     {kaitaiLangCode: "go", aceEditorLangCode: "golang", isDebug: false, text: "Go"},

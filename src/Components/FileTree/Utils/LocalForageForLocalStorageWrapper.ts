@@ -1,12 +1,12 @@
-import {IFsItem} from "../FileSystems/FileSystemsTypes";
+import {FileSystemItem} from "../FileSystemsTypes";
 import localforage from "localforage";
 
-export class LocalForageWrapper {
-    public static getFsItem(ksyFsItemName: string): Promise<IFsItem> {
-        return localforage.getItem<IFsItem>(ksyFsItemName);
+export class LocalForageForLocalStorageWrapper {
+    public static getFsItem(ksyFsItemName: string): Promise<FileSystemItem> {
+        return localforage.getItem<FileSystemItem>(ksyFsItemName);
     }
 
-    public static saveFsItem(ksyFsItemName: string, fsItem: IFsItem): Promise<IFsItem> {
+    public static saveFsItem(ksyFsItemName: string, fsItem: FileSystemItem): Promise<FileSystemItem> {
         return localforage.setItem(ksyFsItemName, fsItem);
     }
 

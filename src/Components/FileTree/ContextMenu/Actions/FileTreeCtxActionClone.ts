@@ -1,12 +1,12 @@
-import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemFileTreeMapper";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
 import {mapFileTreeDisplayNodeToYaml} from "./FileTreeCtxActionGenerateParser";
 import {useAppStore} from "../../../../Stores/AppStore";
 import {useFileSystems} from "../../Store/FileSystemsStore";
 
-import {FILE_SYSTEM_TYPE_LOCAL} from "../../../../v1/FileSystems/LocalStorageFileSystem";
-import {FILE_SYSTEM_TYPE_KAITAI} from "../../../../v1/FileSystems/KaitaiFileSystem";
+import {FILE_SYSTEM_TYPE_LOCAL} from "../../FileSystems/LocalStorageFileSystem";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
 
 export const FileTreeCtxActionClone = (item: TreeNodeDisplay): MenuItem => {
     const action = async () => {

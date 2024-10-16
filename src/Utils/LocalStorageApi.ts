@@ -1,5 +1,5 @@
-import {CurrentBinaryFile} from "../../Stores/CurrentBinaryFileStore";
-import {IdeSettings} from "../../Stores/IdeSettingsStore";
+import {CurrentBinaryFile} from "../Stores/CurrentBinaryFileStore";
+import {IdeSettings} from "../Stores/IdeSettingsStore";
 interface LocalStorageSelection {
     fileName: string;
     start: number;

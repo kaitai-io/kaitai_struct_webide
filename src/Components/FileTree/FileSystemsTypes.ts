@@ -3,17 +3,17 @@ export const ITEM_MODE_DIRECTORY = "folder";
 
 export type FsItemMode = typeof ITEM_MODE_FILE | typeof ITEM_MODE_DIRECTORY;
 
-export interface IFsItem {
+export interface FileSystemItem {
     fsType: string;
     type: FsItemMode;
     fn?: string;
-    children?: { [key: string]: IFsItem; };
+    children?: { [key: string]: FileSystemItem; };
 }
 
-export interface IFileSystem {
+export interface FileSystem {
     storeId: string;
 
-    getRootNode(): IFsItem | undefined;
+    getRootNode(): FileSystemItem | undefined;
 
     get(filePath: string): Promise<string | ArrayBuffer>;
 

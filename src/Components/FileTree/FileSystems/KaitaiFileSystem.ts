@@ -1,19 +1,19 @@
-import {IFsItemHelper} from "./IFsItemHelper";
-import {IFileSystem, IFsItem, ITEM_MODE_DIRECTORY} from "./FileSystemsTypes";
-import {FileActionsWrapper} from "../utils/Files/FileActionsWrapper";
-import {kaitaiFsFiles} from "../../kaitaiFsFiles";
+import {FsItemHelper} from "../Utils/FsItemHelper";
+import {FileSystem, FileSystemItem, ITEM_MODE_DIRECTORY} from "../FileSystemsTypes";
+import {FileActionsWrapper} from "../../../Utils/Files/FileActionsWrapper";
+import {kaitaiFsFiles} from "../../../kaitaiFsFiles";
 
 export const FILE_SYSTEM_TYPE_KAITAI = "kaitai";
 
 const initKaitaiFs = () => {
-    const root = <IFsItem>{fsType: FILE_SYSTEM_TYPE_KAITAI, children: {}, fn: "kaitai.io", type: ITEM_MODE_DIRECTORY};
-    (kaitaiFsFiles || []).forEach(fn => IFsItemHelper.createFileOrDirectoryFromPathInRoot(root, fn));
+    const root = <FileSystemItem>{fsType: FILE_SYSTEM_TYPE_KAITAI, children: {}, fn: "kaitai.io", type: ITEM_MODE_DIRECTORY};
+    (kaitaiFsFiles || []).forEach(fn => FsItemHelper.createFileOrDirectoryFromPathInRoot(root, fn));
     return root;
 };
 
 const kaitaiRoot = initKaitaiFs();
 
-export class KaitaiFileSystem implements IFileSystem {
+export class KaitaiFileSystem implements FileSystem {
 
     storeId: string;
 

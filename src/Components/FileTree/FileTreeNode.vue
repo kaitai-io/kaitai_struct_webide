@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useFileSystems} from "./Store/FileSystemsStore";
-import {prepareFilePathFromNode, TreeNodeDisplay, TreeNodeDisplayType} from "./FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "./FileSystemVisitors/FileSystemFileTreeMapper";
 import FileStoreTreeNodeIcon from "./FileTreeNodeIcon.vue";
 import {computed, toRaw} from "vue";
 import {useAppStore} from "../../Stores/AppStore";
@@ -22,14 +22,14 @@ const doubleClick = () => {
     case TreeNodeDisplayType.KSY_FILE: {
       appStore.updateSelectedKsyFile({
         storeId: props.item.storeId,
-        filePath: prepareFilePathFromNode(props.item)
+        filePath: props.item.fullPath
       });
       return;
     }
     case TreeNodeDisplayType.BINARY_FILE: {
       appStore.updateSelectedBinaryFile({
         storeId: props.item.storeId,
-        filePath: prepareFilePathFromNode(props.item)
+        filePath: props.item.fullPath
       });
       return;
     }

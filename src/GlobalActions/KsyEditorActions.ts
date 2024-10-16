@@ -5,8 +5,8 @@ import {compileInternalDebugAndRelease} from "./CompileGrammar";
 import {parseAction} from "./ParseAction";
 import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
 
-import {FILE_SYSTEM_TYPE_LOCAL} from "../v1/FileSystems/LocalStorageFileSystem";
-import {FILE_SYSTEM_TYPE_KAITAI} from "../v1/FileSystems/KaitaiFileSystem";
+import {FILE_SYSTEM_TYPE_LOCAL} from "../Components/FileTree/FileSystems/LocalStorageFileSystem";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../Components/FileTree/FileSystems/KaitaiFileSystem";
 
 export const mainEditorOnChange = async (change: Ace.Delta, editorContent: string) => {
     const contentDidNotChange = change.lines.join("\n") === editorContent;

@@ -1,8 +1,8 @@
 import {defineStore} from "pinia";
-import {IFileSystem} from "../../../v1/FileSystems/FileSystemsTypes";
+import {FileSystem} from "../FileSystemsTypes";
 
 export interface FileSystemsStore {
-    fileSystems: IFileSystem[];
+    fileSystems: FileSystem[];
     openPaths: string[];
     selectedPath: string;
 }
@@ -26,7 +26,7 @@ export const useFileSystems = defineStore("FileSystemsStore", {
         };
     },
     actions: {
-        addFileSystem(fileSystem: IFileSystem) {
+        addFileSystem(fileSystem: FileSystem) {
             this.fileSystems.push(fileSystem);
         },
         openPath(pathToAdd: string) {
@@ -42,21 +42,21 @@ export const useFileSystems = defineStore("FileSystemsStore", {
             serializeConfigToLocalStorage(this);
         },
         async addFile(storeId: string, path: string, content: string | ArrayBuffer) {
-            const fileSystem: IFileSystem = this.fileSystems.find((fs: IFileSystem) => fs.storeId === storeId);
+            const fileSystem: FileSystem = this.fileSystems.find((fs: FileSystem) => fs.storeId === storeId);
             await fileSystem.put(path, content);
         },
         async createDirectory(storeId: string, path: string) {
-            const fileSystem: IFileSystem = this.fileSystems.find((fs: IFileSystem) => fs.storeId === storeId);
+            const fileSystem: FileSystem = this.fileSystems.find((fs: FileSystem) => fs.storeId === storeId);
             await fileSystem.createDirectory(path);
         },
         async getFile(storeId: string, filePath: string): Promise<string | ArrayBuffer> {
-            const fileSystem: IFileSystem = this.fileSystems.find((fs: IFileSystem) => fs.storeId === storeId);
+            const fileSystem: FileSystem = this.fileSystems.find((fs: FileSystem) => fs.storeId === storeId);
             return !!fileSystem
                 ? await fileSystem.get(filePath)
                 : "";
         },
         deletePath(storeId: string, filePath: string): void {
-            const fileSystem: IFileSystem = this.fileSystems.find((fs: IFileSystem) => fs.storeId === storeId);
+            const fileSystem: FileSystem = this.fileSystems.find((fs: FileSystem) => fs.storeId === storeId);
             if (fileSystem) {
                 fileSystem.delete(filePath);
             } else {

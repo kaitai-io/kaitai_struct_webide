@@ -2,7 +2,7 @@ import {ProcessedLetter} from "../Types";
 import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
 import {useHexViewerConfigStore} from "../Store/HexViewerConfigStore";
 import {HEX_VIEWER_SOURCE} from "./HexViewerActions";
-import {RangeHelper, SimpleRange} from "../../../v1/utils/RangeHelper";
+import {RangeHelper, SimpleRange} from "../../../Utils/RangeHelper";
 
 const LEFT_MOUSE_BUTTON = 1;
 

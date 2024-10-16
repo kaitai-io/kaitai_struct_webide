@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import {computed} from "vue";
-import {RangeHelper, SimpleRange} from "../../v1/utils/RangeHelper";
+import {RangeHelper, SimpleRange} from "../../Utils/RangeHelper";
 
 const props = defineProps<{
   intervalName: string,

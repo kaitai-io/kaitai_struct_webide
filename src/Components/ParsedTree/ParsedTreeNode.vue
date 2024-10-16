@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
-import {IExportedValue, ObjectType} from "../../entities";
+import {IExportedValue, ObjectType} from "../../DataManipulation/ExportedValueTypes";
 import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import OpenNodeIcon from "./Icons/OpenNodeIcon.vue";
 import IExportedDescription from "./Descriptions/GenericIExportedValueDescription.vue";

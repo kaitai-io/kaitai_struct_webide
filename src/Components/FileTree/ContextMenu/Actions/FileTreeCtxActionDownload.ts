@@ -1,7 +1,7 @@
-import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemVisitor";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemFileTreeMapper";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
-import {FileActionsWrapper} from "../../../../v1/utils/Files/FileActionsWrapper";
+import {FileActionsWrapper} from "../../../../Utils/Files/FileActionsWrapper";
 import {useFileSystems} from "../../Store/FileSystemsStore";
 
 export const FileTreeCtxActionDownload = (item: TreeNodeDisplay): MenuItem => {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import {computed} from "vue";
-import {ObjectType} from "../../entities";
+import {ObjectType} from "../../DataManipulation/ExportedValueTypes";
 import ParsedTreeNode from "./ParsedTreeNode.vue";
 
 const store = useCurrentBinaryFileStore();

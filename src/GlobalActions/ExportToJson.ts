@@ -1,6 +1,6 @@
 import {codeExecutionWorkerApi} from "../DataManipulation/ParsingModule/ParseWorkerApi";
-import {mapToGenericObject} from "../v1/utils/ExportedValueMappers";
-import {IExportedValue} from "../entities";
+import {ExportedValueMappers} from "../DataManipulation/ExportedValueMappers";
+import {IExportedValue} from "../DataManipulation/ExportedValueTypes";
 import {IWorkerParsedResponse} from "../DataManipulation/ParsingModule/CodeExecution/Types";
 
 export const exportToJson = async (useHexForNumbers: boolean = false): Promise<string> => {
@@ -17,7 +17,7 @@ export const exportToJson = async (useHexForNumbers: boolean = false): Promise<s
     };
 
     const mapResultToJson = (objectToExport: IExportedValue) => {
-        const genericObject = mapToGenericObject(objectToExport);
+        const genericObject = ExportedValueMappers.toGenericObject(objectToExport);
         const hexReplacer = useHexForNumbers ? overrideDefaultNumbersWithHex : null;
         return JSON.stringify(genericObject, hexReplacer, 2);
     };
