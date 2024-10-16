@@ -2,7 +2,7 @@
 
 Online editor / visualizer for Kaitai Struct .ksy files
 
-![GH Pages](https://github.com/Lorthiz/kaitai_struct_webide/actions/workflows/main.yml/badge.svg)
+![GH Pages](https://github.com/Lorthiz/kaitai_struct_webide/actions/workflows/main.yml/badge.svg?branch=v3-refactor)
 
 ## features
 
