@@ -1,15 +1,27 @@
 <script setup lang="ts">
 import {processUploadedFileList} from "../../GlobalActions/UploadFiles";
 import {useFileDialog} from "@vueuse/core";
+import {useTextModalInputStore} from "../Modals/TextInputModal/TextInputModalStore";
+import {FILE_SYSTEM_TYPE_LOCAL} from "./FileSystems/LocalStorageFileSystem";
+import {createNewKsyAction} from "../../GlobalActions/CreateNewKsyAction";
+import {RestoreOldFileTreeAction} from "../../RestorePreviousConfig/RestoreOldFileTree";
 
 const {open, onChange} = useFileDialog();
 onChange((files) => processUploadedFileList(files, "UploadModal"));
 
 const addKsyFile = () => {
+  const store = useTextModalInputStore();
+  store.open({
+    title: "Add new KSY",
+    onAccept: (fileName) => {
+      createNewKsyAction(FILE_SYSTEM_TYPE_LOCAL, fileName);
+    },
+  });
 };
 
 
 const downloadFile = () => {
+  RestoreOldFileTreeAction();
 };
 
 
@@ -23,7 +35,7 @@ const downloadFile = () => {
     <button type="button" class="action-button" @click="open()">
       <i class="glyphicon glyphicon-cloud-upload"/>
     </button>
-    <button type="button" class="action-button" @click="downloadFile()" disabled>
+    <button type="button" class="action-button" @click="downloadFile()" >
       <i class="glyphicon glyphicon-cloud-download"/>
     </button>
   </div>

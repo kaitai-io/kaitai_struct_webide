@@ -1,7 +1,7 @@
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {useCurrentBinaryFileStore} from "../../../../Stores/CurrentBinaryFileStore";
-import {exportToJson} from "../../../../GlobalActions/ExportToJson";
 import {CurrentGoldenLayout} from "../../../GoldenLayout/GoldenLayoutUI";
+import {exportToJson} from "../../Actions/ExportToJson";
 
 export const HexViewerCtxActionExportToJson = (useHex: boolean): MenuItem => {
     const currentBinaryFileStore = useCurrentBinaryFileStore();

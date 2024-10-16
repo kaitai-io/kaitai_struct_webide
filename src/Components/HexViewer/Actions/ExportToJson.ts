@@ -1,7 +1,7 @@
-import {codeExecutionWorkerApi} from "../DataManipulation/ParsingModule/ParseWorkerApi";
-import {ExportedValueMappers} from "../DataManipulation/ExportedValueMappers";
-import {IExportedValue} from "../DataManipulation/ExportedValueTypes";
-import {IWorkerParsedResponse} from "../DataManipulation/ParsingModule/CodeExecution/Types";
+import {IWorkerParsedResponse} from "../../../DataManipulation/ParsingModule/CodeExecution/Types";
+import {IExportedValue} from "../../../DataManipulation/ExportedValueTypes";
+import {ExportedValueMappers} from "../../../DataManipulation/ExportedValueMappers";
+import {codeExecutionWorkerApi} from "../../../DataManipulation/ParsingModule/ParseWorkerApi";
 
 export const exportToJson = async (useHexForNumbers: boolean = false): Promise<string> => {
     const overrideDefaultNumbersWithHex = (key: string, value: any) => {

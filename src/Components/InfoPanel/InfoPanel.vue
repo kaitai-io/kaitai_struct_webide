@@ -8,8 +8,8 @@ import IntervalDisplay from "./IntervalDisplay.vue";
 import EmojiCheckbox from "./EmojiCheckbox.vue";
 import ListOptionsToggle from "./ListOptionsToggle.vue";
 import {useIdeSettingsStore} from "../../Stores/IdeSettingsStore";
-import {useWelcomeModalStore} from "../WelcomeModal/WelcomeModalStore";
 import {ExportedValueUtils} from "../../Utils/ExportedValueUtils";
+import {useWelcomeModalStore} from "../Modals/WelcomeModal/WelcomeModalStore";
 
 const currentBinaryFileStore = useCurrentBinaryFileStore();
 const hexViewerConfigStore = useHexViewerConfigStore();

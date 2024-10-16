@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {LocalStorageApi} from "../../Utils/LocalStorageApi";
+import {LocalStorageApi} from "../../../Utils/LocalStorageApi";
 
 export interface WelcomeModalStore {
     shouldShowModal: boolean;

@@ -1,13 +1,13 @@
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
-import {FileActionsWrapper} from "../../../../Utils/Files/FileActionsWrapper";
 import {useCurrentBinaryFileStore} from "../../../../Stores/CurrentBinaryFileStore";
+import {downloadBinaryDataFromSelection} from "../../Actions/DownloadBinaryDataFromSelection";
 
 export const HexViewerCtxActionDownloadSelection = (): MenuItem => {
     const currentBinaryFileStore = useCurrentBinaryFileStore();
 
     const action = () => {
-        FileActionsWrapper.downloadBinFromSelection();
+        downloadBinaryDataFromSelection();
     };
 
     return {

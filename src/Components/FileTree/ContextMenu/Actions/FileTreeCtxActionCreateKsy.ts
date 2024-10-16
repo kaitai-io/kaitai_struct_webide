@@ -3,10 +3,22 @@ import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
 
 import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
+import {createNewKsyAction} from "../../../../GlobalActions/CreateNewKsyAction";
+import {useTextModalInputStore} from "../../../Modals/TextInputModal/TextInputModalStore";
 
 export const FileTreeCtxActionCreateKsy = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {
-        alert("ACTION NOT IMPLEMENTED!");
+        const store = useTextModalInputStore();
+        const isRoot = item.fullPath.length === 0;
+        store.open({
+            title: "Add new KSY",
+            onAccept: (fileName) => {
+                const newPath = isRoot
+                    ? fileName
+                    : `${item.fullPath}/${fileName}`;
+                createNewKsyAction(item.storeId, newPath);
+            },
+        });
     };
 
     return {

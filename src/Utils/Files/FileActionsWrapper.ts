@@ -1,7 +1,4 @@
 import {IFileProcessItem} from "./Types";
-import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
-import {ArrayUtils} from "../ArrayUtils";
-import {useAppStore} from "../../Stores/AppStore";
 
 export class FileActionsWrapper {
     public static async fetchFileFromServer(url: string) {
@@ -40,24 +37,6 @@ export class FileActionsWrapper {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-    }
-
-    public static downloadBinFromSelection(): void {
-        const store = useCurrentBinaryFileStore();
-        const appStore = useAppStore();
-
-        const start = store.selectionStart;
-        const end = store.selectionEnd;
-        const fileDataLength = end - start + 1;
-        const noContentToDownload = start === -1 || end === -1;
-        if (noContentToDownload) return;
-
-        const filePath = appStore.selectedBinaryInfo.filePath;
-        const fileName = ArrayUtils.last(filePath.split("/"));
-        const hexRange = `0x${start.toString(16)}-0x${end.toString(16)}`;
-        const downloadedFileName = `${fileName}_${hexRange}.bin`;
-
-        FileActionsWrapper.downloadFile(new Uint8Array(store.fileContent, start, fileDataLength), downloadedFileName);
     }
 
     public static mapToProcessItems(files: FileList): IFileProcessItem[] {

@@ -2,7 +2,7 @@
 
 import KaitaiStructCompiler from "kaitai-struct-compiler";
 import {useWelcomeModalStore} from "./WelcomeModalStore";
-import {KaitaiIdeInfo} from "../../app";
+import {KaitaiIdeInfo} from "../../../app";
 
 const store = useWelcomeModalStore();
 

@@ -3,8 +3,6 @@
 import ConverterPanel from "./Components/ConverterPanel/ConverterPanel.vue";
 import InfoPanel from "./Components/InfoPanel/InfoPanel.vue";
 import UnsupportedBrowser from "./Components/UnsupportedBrowser.vue";
-import WelcomeModal from "./Components/WelcomeModal/WelcomeModal.vue";
-import NewKsyModal from "./Components/NewKsyModal.vue";
 import HexViewer from "./Components/HexViewer/HexViewer.vue";
 import ParsedTree from "./Components/ParsedTree/ParsedTree.vue";
 import FileTree from "./Components/FileTree/FileTree.vue";
@@ -20,6 +18,8 @@ import {
 } from "./Components/FileTree/FileSystems/LocalStorageFileSystem";
 import {useFileSystems} from "./Components/FileTree/Store/FileSystemsStore";
 import {CurrentGoldenLayout} from "./Components/GoldenLayout/GoldenLayoutUI";
+import WelcomeModal from "./Components/Modals/WelcomeModal/WelcomeModal.vue";
+import TextInputModal from "./Components/Modals/TextInputModal/TextInputModal.vue";
 
 const store = useAppStore();
 const fileSystemsStore = useFileSystems();
@@ -70,7 +70,7 @@ onMounted(async () => {
   <InfoPanel/>
   <ConverterPanel/>
 
-  <NewKsyModal/>
+  <TextInputModal/>
   <WelcomeModal/>
 </template>
 
