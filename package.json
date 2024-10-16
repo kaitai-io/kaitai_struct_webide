@@ -67,10 +67,6 @@
   "homepage": "https://github.com/kaitai-io/kaitai_struct_webide#readme",
   "staticFiles": [
     {
-      "staticPath": "formats",
-      "staticOutPath": "formats"
-    },
-    {
       "staticPath": "public"
     },
     {
