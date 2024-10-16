@@ -61,8 +61,8 @@ function main() {
         licResult += "=".repeat(80) + "\n\n";
     }
 
-    writeFileSync("LICENSE-3RD-PARTY.txt", licResult.trim());
-    writeFileSync("docs/wiki/3rd-party-libraries.md", wikiResult.trim());
+    writeFileSync("public/LICENSE-3RD-PARTY.txt", licResult.trim());
+    writeFileSync("public/docs/wiki/3rd-party-libraries.md", wikiResult.trim());
 }
 
 main();

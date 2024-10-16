@@ -46,7 +46,7 @@ const onClickBackdrop = (e) => {
       </div>
       <div>
         Kaitai WebIDE was made possible by using
-        <a href="https://github.com/lorthiz/kaitai_struct_webide/blob/master/docs/wiki/3rd-party-libraries.md"
+        <a href="https://github.com/lorthiz/kaitai_struct_webide/blob/master/public/docs/wiki/3rd-party-libraries.md"
            target="_blank">open-source libraries listed here</a>
         (<a href="LICENSE-3RD-PARTY.txt" target="_blank">licensing information</a>).
       </div>
