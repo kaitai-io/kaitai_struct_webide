@@ -49,8 +49,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "generate-formats": "node genKaitaiFsFiles.js",
-    "generate-license": "node vendor_license.js",
+    "generate-formats": "node build-related/genKaitaiFsFiles.js",
+    "generate-license": "node build-related/vendor_license.js",
     "serve": "serve dist",
     "parcel-run": "parcel index.html --no-cache",
     "parcel-build": "parcel build index.html --no-optimize"

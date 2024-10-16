@@ -77,11 +77,6 @@ Source: https://github.com/nodeca/pako
 
 License: MIT (https://raw.githubusercontent.com/nodeca/pako/master/LICENSE)
 
-## text-encoding
-Source: https://github.com/inexorabletash/text-encoding
-
-License: Unlicense (https://raw.githubusercontent.com/inexorabletash/text-encoding/master/LICENSE.md)
-
 ## Vue.js
 Source: https://github.com/vuejs/vue
 

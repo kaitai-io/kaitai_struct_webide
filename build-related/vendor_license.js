@@ -14,7 +14,7 @@ function findLicenses(dst) {
 }
 
 function main() {
-    const filename = "vendor.yaml";
+    const filename = "build-related/vendor.yaml";
     const vendorYaml = readFileSync(filename, "utf8");
     const vendor = jsyaml.load(vendorYaml, { schema: jsyaml.CORE_SCHEMA, filename });
     let licResult = "";

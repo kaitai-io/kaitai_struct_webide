@@ -31,10 +31,8 @@ function generate(outDir) {
  *   npm run generate-formats
  */
  `
-    const js = `export const kaitaiFsFiles: string[] = ${JSON.stringify(files, null, 4)};`;
-
-    mkdirSync(outDir + "js", { recursive: true });
-    writeFileSync(outDir + "src/kaitaiFsFiles.ts", info + js);
+    const preparedFormatsFileContent = `export const kaitaiFsFiles: string[] = ${JSON.stringify(files, null, 4)};`;
+    writeFileSync(outDir + "src/kaitaiFsFiles.ts", info + preparedFormatsFileContent);
 }
 
 function main() {
