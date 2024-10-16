@@ -80,13 +80,6 @@ libs:
     npmDir: pako
     files: [LICENSE]
 
-  text-encoding:
-    source: https://github.com/inexorabletash/text-encoding
-    licenseName: Unlicense
-    licenseUrl: https://raw.githubusercontent.com/inexorabletash/text-encoding/master/LICENSE.md
-    npmDir: text-encoding
-    files: [LICENSE.md]
-
   Vue.js:
     source: https://github.com/vuejs/vue
     licenseName: MIT

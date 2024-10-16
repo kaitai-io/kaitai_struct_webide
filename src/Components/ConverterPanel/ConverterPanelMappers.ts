@@ -46,10 +46,10 @@ export const convertToTimestamp = (data: Uint8Array): string => {
 };
 
 export const convertToString = (data: Uint8Array, encoding: STRING_ENCODINGS): string => {
-    var str = new TextDecoder(encoding).decode(data);
-    for (var i = 0; i < str.length; i++)
-        if (str[i] === "\0")
-            return str.substring(0, i);
-    return str + "...";
+    const decodedString = new TextDecoder(encoding).decode(data);
+    for (let i = 0; i < decodedString.length; i++)
+        if (decodedString[i] === "\0")
+            return decodedString.substring(0, i);
+    return decodedString + "...";
 };
 
