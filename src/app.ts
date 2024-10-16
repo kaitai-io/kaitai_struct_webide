@@ -14,14 +14,17 @@ import {createApp} from "vue";
 import App from "./App.vue";
 import {createPinia} from "pinia";
 import ContextMenu from "@imengyu/vue3-context-menu";
+import {redirectToHttps} from "./Utils/RedirectToHttps";
+
+redirectToHttps();
+export const KaitaiIdeInfo = {
+    version: "0.1",
+    commitId: "XXX",
+    commitDate: "YYY"
+};
 
 const vueApp = createApp(App);
 vueApp.use(createPinia());
 vueApp.use(ContextMenu);
 vueApp.mount("body");
 
-export const KaitaiIdeInfo = {
-    version: "0.1",
-    commitId: "XXX",
-    commitDate: "YYY"
-};
