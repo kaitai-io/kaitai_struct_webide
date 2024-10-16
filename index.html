@@ -5,13 +5,9 @@
     <title>Kaitai Web IDE</title>
     <script>
         // HTTPS redirect
-        var loc = location.toString();
-        if (loc.indexOf("http://ide.kaitai.io/") === 0)
-            location = "https" + loc.substring(4);
+        const host = "kaitai.lorthiz.ovh";
+        if (window.location.href.match(`http://${host}`)) window.location.protocol='https:'
     </script>
-
-    <!-- SCRIPT_INJECTION_POINT -->
-
 </head>
 <body>
 <noscript>
