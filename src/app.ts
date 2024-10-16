@@ -1,3 +1,5 @@
+import "./Utils/RedirectToHttps";
+
 import "bootswatch/darkly/bootstrap.min.css";
 import "golden-layout/src/css/goldenlayout-base.css";
 import "golden-layout/src/css/goldenlayout-dark-theme.css";
@@ -14,9 +16,7 @@ import {createApp} from "vue";
 import App from "./App.vue";
 import {createPinia} from "pinia";
 import ContextMenu from "@imengyu/vue3-context-menu";
-import {redirectToHttps} from "./Utils/RedirectToHttps";
 
-redirectToHttps();
 export const KaitaiIdeInfo = {
     version: "0.1",
     commitId: "XXX",
