@@ -18,7 +18,7 @@ Online editor / visualizer for Kaitai Struct .ksy files
 
 ## compile and run locally
 
-- `git clone --recursive https://github.com/kaitai-io/kaitai_struct_webide`
+- `git clone --recursive https://github.com/Lorthiz/kaitai_struct_webide`
 - `npm install`
 - `npm run generate-formats`
 - `npm run parcel-run`

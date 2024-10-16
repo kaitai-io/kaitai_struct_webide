@@ -22,7 +22,7 @@ function recursiveFind(dir, pattern, results = []) {
 
 function generate(outDir) {
     const files =
-        recursiveFind("formats/", /\.ksy$/)
+        recursiveFind("public/formats/", /\.ksy$/)
         .concat(recursiveFind("public/samples/", /.+/))
         .map(path => path.replace(/\\/g,'/'));
     files.sort();
