@@ -1,7 +1,6 @@
 const jsyaml = require("js-yaml");
 const { readdirSync, readFileSync, writeFileSync, statSync } = require("fs");
 const { join, basename } = require("path");
-const firstBy = require("thenby");
 
 function isLicenseFilename(name) {
     const fn = basename(name);
@@ -20,12 +19,11 @@ function main() {
     const vendor = jsyaml.load(vendorYaml, { schema: jsyaml.CORE_SCHEMA, filename });
     let licResult = "";
     let wikiResult = "# 3rd-party libraries\n\n";
-    const sortedLibs = Object.entries(vendor["libs"]).sort(
-        firstBy(([libName]) => libName)
-    );
-    for (const [libName, lib] of sortedLibs) {
+    const libs = Object.entries(vendor.libs);
+    libs.sort(([lib1Name], [lib2Name]) => lib1Name.localeCompare(lib2Name))
+    for (const [libName, lib] of libs) {
         console.log("Processing", libName);
-        const distDir = `./node_modules/${lib["npmDir"]}/`;
+        const distDir = `./node_modules/${lib.npmDir}/`;
         const licFns = findLicenses(distDir);
 
         if (licFns.length != 1) {

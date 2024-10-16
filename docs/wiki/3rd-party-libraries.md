@@ -26,30 +26,6 @@ Source: https://github.com/thomaspark/bootswatch
 
 License: MIT (https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE)
 
-## GoldenLayout
-Website: https://www.golden-layout.com/
-
-Source: https://github.com/deepstreamIO/golden-layout
-
-License: MIT (https://raw.githubusercontent.com/deepstreamIO/golden-layout/master/LICENSE)
-
-## Kaitai Struct Compiler
-Website: http://kaitai.io/
-
-Source: https://github.com/kaitai-io/kaitai_struct_compiler
-
-License: GPL-3.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE)
-
-## Kaitai Struct JavaScript Runtime
-Source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
-
-License: Apache-2.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE)
-
-## Vue.js
-Source: https://github.com/vuejs/vue
-
-License: MIT (https://raw.githubusercontent.com/vuejs/vue/dev/LICENSE)
-
 ## bowser
 Source: https://github.com/ded/bowser
 
@@ -59,6 +35,13 @@ License: MIT (https://raw.githubusercontent.com/ded/bowser/master/LICENSE)
 Source: https://github.com/felixge/node-dateformat
 
 License: MIT (https://raw.githubusercontent.com/felixge/node-dateformat/master/LICENSE)
+
+## GoldenLayout
+Website: https://www.golden-layout.com/
+
+Source: https://github.com/deepstreamIO/golden-layout
+
+License: MIT (https://raw.githubusercontent.com/deepstreamIO/golden-layout/master/LICENSE)
 
 ## jQuery
 Website: https://jquery.com/
@@ -72,12 +55,17 @@ Source: https://github.com/nodeca/js-yaml
 
 License: MIT (https://github.com/nodeca/js-yaml/blob/master/LICENSE)
 
-## jsTree
-Website: https://www.jstree.com/
+## Kaitai Struct Compiler
+Website: http://kaitai.io/
 
-Source: https://github.com/vakata/jstree
+Source: https://github.com/kaitai-io/kaitai_struct_compiler
 
-License: MIT (https://raw.githubusercontent.com/vakata/jstree/master/LICENSE-MIT)
+License: GPL-3.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE)
+
+## Kaitai Struct JavaScript Runtime
+Source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
+
+License: Apache-2.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE)
 
 ## localForage
 Source: https://github.com/localForage/localForage
@@ -89,22 +77,12 @@ Source: https://github.com/nodeca/pako
 
 License: MIT (https://raw.githubusercontent.com/nodeca/pako/master/LICENSE)
 
-## require-from-string
-Source: https://github.com/floatdrop/require-from-string
-
-License: MIT (https://raw.githubusercontent.com/floatdrop/require-from-string/master/LICENSE)
-
-## smooth-scrollbar
-Source: https://github.com/idiotWu/smooth-scrollbar
-
-License: MIT (https://raw.githubusercontent.com/idiotWu/smooth-scrollbar/develop/LICENSE)
-
 ## text-encoding
 Source: https://github.com/inexorabletash/text-encoding
 
 License: Unlicense (https://raw.githubusercontent.com/inexorabletash/text-encoding/master/LICENSE.md)
 
-## thenBy.js
-Source: https://github.com/Teun/thenBy.js
+## Vue.js
+Source: https://github.com/vuejs/vue
 
-License: Apache-2.0 (https://raw.githubusercontent.com/Teun/thenBy.js/master/LICENSE.TXT)
+License: MIT (https://raw.githubusercontent.com/vuejs/vue/dev/LICENSE)
