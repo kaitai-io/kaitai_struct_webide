@@ -1,12 +1,12 @@
-const { readdirSync, statSync, writeFileSync, mkdirSync } = require("fs");
-const { join } = require("path");
+const {readdirSync, statSync, writeFileSync, mkdirSync} = require("fs");
+const {join} = require("path");
 
 console.log("[genKaitaiFsFiles.js] Running")
 
 function recursiveFind(dir, pattern, results = []) {
     const files = readdirSync(dir, "utf-8")
         .map(fn => join(dir, fn))
-        .map(fn => ({ stat: statSync(fn), fn }));
+        .map(fn => ({stat: statSync(fn), fn}));
     results.push.apply(
         results,
         files
@@ -23,8 +23,9 @@ function recursiveFind(dir, pattern, results = []) {
 function generate(outDir) {
     const files =
         recursiveFind("public/formats/", /\.ksy$/)
-        .concat(recursiveFind("public/samples/", /.+/))
-        .map(path => path.replace(/\\/g,'/'));
+            .concat(recursiveFind("public/samples/", /.+/))
+            .map(path => path.replace(/\\/g, '/'))
+            .map(path => path.replace(/^public\//gm, ''))
     files.sort();
     const info = `/* Generated file do not push changes to repo!
  * To regenerate formats, run command:
