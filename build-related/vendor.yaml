@@ -5,35 +5,35 @@ libs:
     licenseName: BSD-3-Clause
     licenseUrl: https://raw.githubusercontent.com/ajaxorg/ace/master/LICENSE
     npmDir: ace-builds
-    files: [LICENSE]
+    files: [ LICENSE ]
 
   BigInteger.js:
     source: https://github.com/peterolson/BigInteger.js
     licenseName: Unlicense
     licenseUrl: https://raw.githubusercontent.com/peterolson/BigInteger.js/master/LICENSE
     npmDir: big-integer
-    files: [LICENSE]
+    files: [ LICENSE ]
 
   HeroIcons:
     source: https://github.com/tailwindlabs/heroicons
     licenseName: MIT
     licenseUrl: https://github.com/tailwindlabs/heroicons/blob/master/LICENSE
-    npmDir: @heroicons
-    files: [LICENSE]
+    npmDir: "@heroicons"
+    files: [ LICENSE ]
 
   bowser:
     source: https://github.com/ded/bowser
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/ded/bowser/master/LICENSE
     npmDir: bowser
-    files: [LICENSE]
+    files: [ LICENSE ]
 
   dateformat:
     source: https://github.com/felixge/node-dateformat
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/felixge/node-dateformat/master/LICENSE
     npmDir: dateformat
-    files: [LICENSE]
+    files: [ LICENSE ]
 
 
   GoldenLayout:
@@ -42,7 +42,7 @@ libs:
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/deepstreamIO/golden-layout/master/LICENSE
     npmDir: golden-layout
-    files: [LICENSE]
+    files: [ LICENSE ]
 
   jQuery:
     website: https://jquery.com/
@@ -50,28 +50,28 @@ libs:
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/jquery/jquery/master/LICENSE.txt
     npmDir: jquery
-    files: [LICENSE.txt]
+    files: [ LICENSE.txt ]
 
   localForage:
     source: https://github.com/localForage/localForage
     licenseName: Apache-2.0
     licenseUrl: https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
     npmDir: localforage
-    files: [LICENSE]
+    files: [ LICENSE ]
 
   pako:
     source: https://github.com/nodeca/pako
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/nodeca/pako/master/LICENSE
     npmDir: pako
-    files: [LICENSE]
+    files: [ LICENSE ]
 
   Vue.js:
     source: https://github.com/vuejs/vue
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/vuejs/vue/dev/LICENSE
     npmDir: vue
-    files: [LICENSE]
+    files: [ LICENSE ]
 
   Kaitai Struct Compiler:
     website: http://kaitai.io/
@@ -79,18 +79,18 @@ libs:
     licenseName: GPL-3.0
     licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE
     npmDir: kaitai-struct-compiler
-    files: [LICENSE]
+    files: [ LICENSE ]
 
   Kaitai Struct JavaScript Runtime:
     source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
     licenseName: Apache-2.0
     licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE
     npmDir: kaitai-struct
-    files: [LICENSE]
+    files: [ LICENSE ]
 
   js-yaml:
     source: https://github.com/nodeca/js-yaml
     licenseName: MIT
     licenseUrl: https://github.com/nodeca/js-yaml/blob/master/LICENSE
     npmDir: js-yaml
-    files: [LICENSE]
+    files: [ LICENSE ]
