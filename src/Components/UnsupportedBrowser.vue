@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import bowser from "bowser";
 import {ref} from "vue";
+import TextLink from "./UtilComponents/TextLink.vue";
 
 const localStorageRecord = localStorage.getItem("hideUnsupported") === "true";
 const browserCheck = bowser.check({
@@ -20,10 +21,9 @@ const hideUnsupported = () => {
 
 <template>
   <div v-if="!isHidden" id="unsupportedBrowser">
-    Your browser is not supported. Features may or may not working. <a href="http://outdatedbrowser.com/"
-                                                                       target="_blank">Please use the latest Chrome
-    or Firefox.</a>
-    <i @click="hideUnsupported" class="closeBtn glyphicon glyphicon-remove"></i>
+    <span>Your browser is not supported. Features may or may not working.</span>
+    <TextLink link="http://outdatedbrowser.com/" text="Please use the latest Chrome or Firefox."/>
+    <i @click="hideUnsupported"/>
   </div>
 </template>
 

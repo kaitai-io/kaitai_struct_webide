@@ -2,9 +2,10 @@ import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/Fil
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
 import {useAppStore} from "../../../../Stores/AppStore";
+import {DocumentTextIcon} from "@heroicons/vue/16/solid";
 
 export const FileTreeCtxActionOpenKsy = (item: TreeNodeDisplay): MenuItem => {
-    const action = async () => () => {
+    const action = async () => {
         const appStore = useAppStore();
         appStore.updateSelectedKsyFile({
             storeId: item.storeId,
@@ -17,6 +18,6 @@ export const FileTreeCtxActionOpenKsy = (item: TreeNodeDisplay): MenuItem => {
         onClick: action,
         hidden: item.type !== TreeNodeDisplayType.KSY_FILE,
         customClass: "context-menu-item",
-        icon: () => h("i", {class: "glyphicon  glyphicon glyphicon-pencil", style: {height: "16px"}})
+        icon: () => h(DocumentTextIcon),
     };
 };

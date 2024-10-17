@@ -10,7 +10,7 @@ export const useIdeSettingsStore = defineStore("IDESettingsStore", {
     state: (): IdeSettings => {
         const settings = LocalStorageApi.getIdeSettings();
         return settings || {
-            eagerMode: false,
+            eagerMode: true,
             generateOnlyMainFile: false
         };
     },

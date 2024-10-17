@@ -2,6 +2,7 @@
 import {UpdateSelectionEvent, useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import {computed} from "vue";
 import {RangeHelper, SimpleRange} from "../../Utils/RangeHelper";
+import TextButton from "../UtilComponents/TextButton.vue";
 
 const props = defineProps<{
   intervalName: string,
@@ -49,19 +50,15 @@ const prev = () => {
 
 <template>
   <div class="local">{{ intervalName }}:
-    <a href="#" class="but" @click="prev()"><<</a>
+    <TextButton text="<<" :click="prev"/>
     <span> {{ currentlySelectedIntervalIndex }} / {{ intervals.length }} </span>
-    <a href="#" class="but" @click="next()">>></a>
+    <TextButton text=">>" :click="next"/>
   </div>
 </template>
 
 <style scoped>
 .local {
-  font-size: 13px;
-  margin-top: 5px
-}
-
-.but {
-  display: inline-block;
+  display: flex;
+  flex-direction: row;
 }
 </style>

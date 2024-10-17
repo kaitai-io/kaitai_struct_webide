@@ -4,7 +4,6 @@ libs:
     source: https://github.com/ajaxorg/ace
     licenseName: BSD-3-Clause
     licenseUrl: https://raw.githubusercontent.com/ajaxorg/ace/master/LICENSE
-    distDir: ace
     npmDir: ace-builds
     files: [LICENSE]
 
@@ -12,27 +11,15 @@ libs:
     source: https://github.com/peterolson/BigInteger.js
     licenseName: Unlicense
     licenseUrl: https://raw.githubusercontent.com/peterolson/BigInteger.js/master/LICENSE
-    distDir: BigInteger
     npmDir: big-integer
     files: [LICENSE]
 
-  Bootstrap:
-    website: http://getbootstrap.com/
-    source: https://github.com/twbs/bootstrap
+  HeroIcons:
+    source: https://github.com/tailwindlabs/heroicons
     licenseName: MIT
-    licenseUrl: https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE
-    npmDir: bootstrap
+    licenseUrl: https://github.com/tailwindlabs/heroicons/blob/master/LICENSE
+    npmDir: @heroicons
     files: [LICENSE]
-
-  Bootswatch:
-    website: https://bootswatch.com/
-    source: https://github.com/thomaspark/bootswatch
-    licenseName: MIT
-    licenseUrl: https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE
-    npmDir: bootswatch
-    distDir: bootstrap/css/
-    files: [LICENSE]
-    priority: 10
 
   bowser:
     source: https://github.com/ded/bowser
@@ -54,7 +41,6 @@ libs:
     source: https://github.com/deepstreamIO/golden-layout
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/deepstreamIO/golden-layout/master/LICENSE
-    distDir: golden-layout
     npmDir: golden-layout
     files: [LICENSE]
 

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import TextButton from "../UtilComponents/TextButton.vue";
+
 defineProps<{
   text: string;
   state: boolean
@@ -10,17 +12,15 @@ defineProps<{
 
 <template>
   <div class="local">
-    <a @click="toggle(!state)" href="#">
-      {{ state ? checkedEmoji : unCheckedEmoji }}
-    </a>
+    <TextButton :text="state ? checkedEmoji : unCheckedEmoji" :click="() => toggle(!state)"/>
     {{ text }}
   </div>
 </template>
 
 <style scoped>
 .local {
-  display: block;
-  font-size: 13px;
-  margin-top: 5px
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 </style>

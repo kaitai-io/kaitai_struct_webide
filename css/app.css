@@ -1,25 +1,5 @@
-.errorWindow { background: white; font-family: Courier,monospace; font-size: 12px; white-space: pre-wrap; overflow-y: scroll; }
-.errorWindow>div { margin: 5px; }
-body { line-height:normal }
-body { color:#333 }
-.dropdown { position: absolute; display:none; z-index:9999 }
-.dropdown-menu { z-index:9999 }
-.dropdown .dropdown-menu { font-size:13px; border-color:#375a7f; border-radius:0 }
-.dropdown .glyphicon { margin-right:5px; }
-.dropdown .glyphicon-folder-open { margin-left:-1px; margin-right:6px }
-.dropdown .dropdown-menu>li>a { padding:3px 15px }
-.btn { padding: 5px 10px; }
-.control-label { margin-bottom:8px }
-.form-control { padding: 6px 12px; height:34px }
-.modal-footer, .modal-body { padding: 15px }
-.input-group-addon { padding: 8px 8px }
-#noscript, #unsupportedBrowser { background: #ffee00; z-index:10000; position:fixed; left:0; right:0; padding:10px; text-align:center }
-#noscript a, #unsupportedBrowser a { color: black; text-decoration: underline }
-#unsupportedBrowser .closeBtn { float:right; margin-top: 1px; cursor: pointer }
-.marker_solution { background:rgba(255, 80, 80, 0.3); }
-.marker_user { background:rgba(80, 255, 80, 0.30); }
-#aboutWebIde { position:absolute; bottom:10px; right:10px; font-size:12px }
-#exportToJsonDiv, #parsedPathDiv, #selectionLengthDiv { font-size:13px; margin-top:5px }
-#parsedPath { word-break: break-all; }
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url('./JetBrainsMono-VariableFont_wght.ttf');
+}
 
-/*.marker_match { background:rgba(80, 255, 80, 0.30); }*/

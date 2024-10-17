@@ -5,6 +5,7 @@ import {h} from "vue";
 import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
 import {createNewKsyAction} from "../../../../GlobalActions/CreateNewKsyAction";
 import {useTextModalInputStore} from "../../../Modals/TextInputModal/TextInputModalStore";
+import {BoltIcon, DocumentPlusIcon} from "@heroicons/vue/16/solid";
 
 export const FileTreeCtxActionCreateKsy = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {
@@ -27,6 +28,6 @@ export const FileTreeCtxActionCreateKsy = (item: TreeNodeDisplay): MenuItem => {
         hidden: [TreeNodeDisplayType.OPEN_FOLDER, TreeNodeDisplayType.CLOSED_FOLDER, TreeNodeDisplayType.EMPTY_FOLDER].indexOf(item.type) === -1,
         customClass: "context-menu-item",
         disabled: item.storeId === FILE_SYSTEM_TYPE_KAITAI,
-        icon: () => h("i", {class: "glyphicon glyphicon-file", style: {height: "16px"}})
+        icon: () => h(DocumentPlusIcon),
     };
 };

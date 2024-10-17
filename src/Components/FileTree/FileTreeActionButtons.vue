@@ -4,6 +4,7 @@ import {useFileDialog} from "@vueuse/core";
 import {useTextModalInputStore} from "../Modals/TextInputModal/TextInputModalStore";
 import {FILE_SYSTEM_TYPE_LOCAL} from "./FileSystems/LocalStorageFileSystem";
 import {createNewKsyAction} from "../../GlobalActions/CreateNewKsyAction";
+import { DocumentIcon, CloudArrowDownIcon, CloudArrowUpIcon } from '@heroicons/vue/16/solid'
 
 const {open, onChange} = useFileDialog();
 onChange((files) => processUploadedFileList(files, "UploadModal"));
@@ -28,14 +29,14 @@ const downloadFile = () => {
 
 <template>
   <div class="footer btn-group" role="group">
-    <button type="button" class="action-button" @click="addKsyFile()">
-      <i class="glyphicon glyphicon-file"/>
+    <button class="action-button" @click="addKsyFile()">
+      <DocumentIcon class="icon"/>
     </button>
-    <button type="button" class="action-button" @click="open()">
-      <i class="glyphicon glyphicon-cloud-upload"/>
+    <button class="action-button" @click="open()">
+      <CloudArrowUpIcon class="icon"/>
     </button>
-    <button type="button" class="action-button" @click="downloadFile()">
-      <i class="glyphicon glyphicon-cloud-download"/>
+    <button class="action-button" @click="downloadFile()">
+      <CloudArrowDownIcon class="icon"/>
     </button>
   </div>
 </template>
@@ -48,12 +49,16 @@ const downloadFile = () => {
 }
 
 .action-button {
-  font-size: 13px;
-  padding: 7px 10px;
+  font-size: 12px;
   flex-grow: 1;
-  border-radius: 0;
+  color: #cccccc;
   background-color: rgb(70, 70, 70);
-  border: none;
+  border:none;
+  padding: 5px;
+}
+
+.icon {
+  width: 20px;
 }
 
 .action-button:hover {

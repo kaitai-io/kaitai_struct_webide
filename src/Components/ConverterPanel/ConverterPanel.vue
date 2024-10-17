@@ -3,14 +3,14 @@ import {computed} from "vue";
 import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import {prepareEmptyModel, prepareModelData} from "./ConverterPanelModelFactory";
 
-const MAX_SELECTION_LENGTH_FOR_CONVERTER = 64
+const MAX_SELECTION_LENGTH_FOR_CONVERTER = 64;
 
 const model = computed(() => {
   const store = useCurrentBinaryFileStore();
 
   const content = store.fileContent;
   const offset = store.selectionStart;
-  const remainingFileContentLengthFromOffset = store.fileContent.byteLength - offset
+  const remainingFileContentLengthFromOffset = store.fileContent.byteLength - offset;
   const length = Math.min(remainingFileContentLengthFromOffset, MAX_SELECTION_LENGTH_FOR_CONVERTER);
   if (offset === -1 || remainingFileContentLengthFromOffset < 0) return prepareEmptyModel();
 
@@ -24,81 +24,28 @@ const model = computed(() => {
   <div id="converter-panel" class="converterPanel">
     <table>
       <thead>
-      <tr>
-        <th class="typeCol">Type</th>
-        <th class="typeValue">Value (unsigned)</th>
-        <th>(signed)</th>
+      <tr class="tableRow">
+        <th class="header">Type</th>
+        <th class="header">Value(unsigned)</th>
+        <th class="header">Value(signed)</th>
       </tr>
       </thead>
-      <tr>
-        <td>i8</td>
-        <td>{{ model.u8 }}</td>
-        <td>{{ model.s8 }}</td>
+
+      <tr class="tableRow" v-for="simpleType in model.simpleTypes">
+        <td class="typeCol">{{simpleType.label}}</td>
+        <td class="typeValue">{{ simpleType.unsignedValue }}</td>
+        <td class="typeValue">{{ simpleType.signedValue }}</td>
       </tr>
-      <tr>
-        <td>i16le</td>
-        <td>{{ model.u16le }}</td>
-        <td>{{ model.s16le }}</td>
+
+      <tr class="tableRow" v-for="complexType in model.complexTypes">
+        <td class="typeCol">{{complexType.label}}</td>
+        <td class="typeValue" colspan="2">{{ complexType.value }}</td>
       </tr>
-      <tr>
-        <td>i32le</td>
-        <td>{{ model.u32le }}</td>
-        <td>{{ model.s32le }}</td>
-      </tr>
-      <tr>
-        <td>i64le</td>
-        <td>{{ model.u64le }}</td>
-        <td>{{ model.s64le }}</td>
-      </tr>
-      <tr>
-        <td>i16be</td>
-        <td>{{ model.u16be }}</td>
-        <td>{{ model.s16be }}</td>
-      </tr>
-      <tr>
-        <td>i32be</td>
-        <td>{{ model.u32be }}</td>
-        <td>{{ model.s32be }}</td>
-      </tr>
-      <tr>
-        <td>i64be</td>
-        <td>{{ model.u64be }}</td>
-        <td>{{ model.s64be }}</td>
-      </tr>
-      <tr>
-        <td>float</td>
-        <td colspan="2">{{ model.float }}</td>
-      </tr>
-      <tr>
-        <td>double</td>
-        <td colspan="2">{{ model.double }}</td>
-      </tr>
-      <tr>
-        <td>unixts</td>
-        <td colspan="2">{{ model.unixts }}</td>
-      </tr>
-      <tr>
-        <td>ascii</td>
-        <td colspan="2">
-          <div class="str">{{ model.ascii }}</div>
-        </td>
-      </tr>
-      <tr>
-        <td>utf8</td>
-        <td colspan="2">
-          <div class="str">{{ model.utf8 }}</div>
-        </td>
-      </tr>
-      <tr>
-        <td>utf16le</td>
-        <td colspan="2">
-          <div class="str">{{ model.utf16le }}</div>
-        </td>
-      </tr>
-      <tr>
-        <td>utf16be</td>
-        <td colspan="2">
-          <div class="str">{{ model.utf16be }}</div>
+
+      <tr class="tableRow"  v-for="str in model.strings">
+        <td class="typeCol">{{str.label}}</td>
+        <td class="typeValue" colspan="2">
+          <div class="str">{{str.value}}</div>
         </td>
       </tr>
     </table>
@@ -109,30 +56,35 @@ const model = computed(() => {
 .converterPanel {
   color: #eee;
   overflow-y: auto;
-  height: 100%
+  height: 100%;
+  font-family: "JetBrains Mono";
+  font-size: 12px;
+  padding: 10px;
 }
 
-.converterPanel table {
-  margin: 10px;
-  font: 12px/normal "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace;
+.tableRow {
+  height: 10px;
+  line-height: 10px;
 }
 
-.converterPanel table th {
-  padding-bottom: 3px
+.header {
+  text-align: left;
+  font-weight: bold;
 }
 
-.converterPanel .typeCol {
-  min-width: 54px
+.typeValue {
+  min-width: 155px;
+  font-weight: lighter;
 }
 
-.converterPanel .typeValue {
-  min-width: 155px
+.typeCol {
+  min-width: 60px;
+  font-weight: lighter;
 }
 
-.converterPanel .str {
+.str {
+  display: block;
   overflow: hidden;
-  line-height: 16px;
-  height: 16px;
-  display: block
+  font-weight: normal;
 }
 </style>

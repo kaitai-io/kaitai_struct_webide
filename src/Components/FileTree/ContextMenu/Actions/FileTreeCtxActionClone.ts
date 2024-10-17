@@ -4,6 +4,7 @@ import {h} from "vue";
 import {mapFileTreeDisplayNodeToYaml} from "./FileTreeCtxActionGenerateParser";
 import {useAppStore} from "../../../../Stores/AppStore";
 import {useFileSystems} from "../../Store/FileSystemsStore";
+import {DocumentDuplicateIcon} from "@heroicons/vue/16/solid";
 
 import {FILE_SYSTEM_TYPE_LOCAL} from "../../FileSystems/LocalStorageFileSystem";
 import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
@@ -27,6 +28,6 @@ export const FileTreeCtxActionClone = (item: TreeNodeDisplay): MenuItem => {
         hidden: [TreeNodeDisplayType.KSY_FILE].indexOf(item.type) === -1,
         customClass: "context-menu-item",
         disabled: item.storeId === FILE_SYSTEM_TYPE_KAITAI,
-        icon: () => h("i", {class: "glyphicon glyphicon-duplicate", style: {height: "16px"}})
+        icon: () => h(DocumentDuplicateIcon),
     };
 };

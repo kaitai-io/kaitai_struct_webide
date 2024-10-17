@@ -17,15 +17,30 @@ const addressFormatted = computed(() => {
 </script>
 
 <template>
-  <div class="address">
-    <span v-if="!props.hidden">{{ addressFormatted }}</span>
+  <div class="address-wrapper">
+    <div class="address" v-if="!props.hidden">
+      <span>{{ addressFormatted }}</span>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.address {
-  width: 60px;
+.address-wrapper {
   display: inline-block;
-  color: var(--hex-viewer-address-color)
+  height: 21px;
+  vertical-align: middle;
+
+  width: 60px;
+  text-align: center;
+  color: var(--hex-viewer-address-color);
+}
+
+.address {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
 }
 </style>

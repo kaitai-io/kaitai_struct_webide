@@ -23,8 +23,6 @@ const store = useFileSystems();
   </div>
 </template>
 
-<!--font: 12px/normal "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace;-->
-
 <style scoped>
 .file-tree-component {
   width: 100%;
@@ -44,6 +42,7 @@ const store = useFileSystems();
   width: 100%;
   flex-grow: 1;
 }
+
 .file-tree-list-container-inner {
   min-width: 100%;
   width: max-content;

@@ -37,6 +37,7 @@ export const useAppStore = defineStore("AppStore", {
         },
 
         updateSelectedKsyFile(info: FileLocationInfo) {
+            console.log(info)
             this.selectedKsyInfo = info;
         },
     }

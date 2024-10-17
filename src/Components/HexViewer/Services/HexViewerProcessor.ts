@@ -1,12 +1,28 @@
-import {convertByteToAsciiCharacter, convertByteToEmoji} from "./Convert";
 import {ProcessedLetter, ProcessLettersConfig} from "../Types";
 import {ExportedValueUtils} from "../../../Utils/ExportedValueUtils";
 
-const mapByteToHexOrEmoji = (byteValue: number, emojiMode: boolean): string => {
+const mapByteToHexOrEmoji = (byte: number, emojiMode: boolean): string => {
     return emojiMode
-        ? convertByteToEmoji(byteValue)
-        : byteValue.toString(16).padStart(2, "0");
+        ? mapByteToEmoji(byte)
+        : byte.toString(16).padStart(2, "0");
 };
+
+export const mapByteToEmoji = (byte: number) => {
+    const baseEmojiCodePoint = 0x1F347;
+    const emojiCodePoint = baseEmojiCodePoint + byte;
+
+    return String.fromCodePoint(emojiCodePoint);
+};
+
+export const mapByteToAsciiCharacter = (byte: number) => {
+    if (byte === 32) {
+        return "\u00a0";
+    }
+
+    const isWhitespace = byte < 32 || (0x7f <= byte && byte <= 0xa0) || byte === 0xad;
+    return isWhitespace ? "." : String.fromCharCode(byte);
+};
+
 
 const processSingleByte = (byte: number, index: number, options: ProcessLettersConfig): ProcessedLetter => {
     const {rowAddress, leafs, emojiMode} = options;
@@ -17,7 +33,7 @@ const processSingleByte = (byte: number, index: number, options: ProcessLettersC
     return {
         letterAddress: letterAddress,
         hex: mapByteToHexOrEmoji(byte, emojiMode),
-        char: convertByteToAsciiCharacter(byte),
+        char: mapByteToAsciiCharacter(byte),
         matchingRangeIndex: matchingRangeIndex,
         matchingRange: leafs[matchingRangeIndex],
     };
@@ -28,9 +44,9 @@ export const processContent = (content: Uint8Array, options: ProcessLettersConfi
 };
 export const createEmptyLettersToFillRow = (rowLettersCount: number, rowSize: number = 16): ProcessedLetter[] => {
     const emptyLettersCount = rowSize - rowLettersCount;
-    return Array.from(new Array(emptyLettersCount)).map((_, index): ProcessedLetter => {
+    return Array.from(new Array(emptyLettersCount)).map((_): ProcessedLetter => {
         return {
-            letterAddress: rowLettersCount + index,
+            letterAddress: 0,
             hex: "",
             char: "",
             matchingRangeIndex: -1,

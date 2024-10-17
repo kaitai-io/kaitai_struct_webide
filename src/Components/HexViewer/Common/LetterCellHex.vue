@@ -46,11 +46,11 @@ const rangePlacement = computed(() => {
   const matchOnTheLeft = matchingRange.start === props.letter.letterAddress;
   const matchOnTheRight = matchingRange.end === props.letter.letterAddress;
   if (matchOnTheLeft && matchOnTheRight) {
-    return "lr2";
+    return "round-both";
   } else if (matchOnTheLeft) {
-    return "l2";
+    return "round-left";
   } else if (matchOnTheRight) {
-    return "r2";
+    return "round-right";
   } else {
     return "";
   }
@@ -65,7 +65,7 @@ const isGapAfter = () => {
 
 const onContextMenu = (e: MouseEvent, letter: ProcessedLetter) => {
   e.preventDefault();
-  if(!isSelected.value){
+  if (!isSelected.value) {
     const event: UpdateSelectionEvent = {
       startNew: letter.letterAddress,
       endNew: letter.letterAddress,
@@ -82,7 +82,7 @@ const onContextMenu = (e: MouseEvent, letter: ProcessedLetter) => {
 </script>
 
 <template>
-  <div :class="`letter-container ${rangePlacement}`"
+  <div class="cell-wrapper" :class="rangePlacement"
        :draggable="props.interactive"
 
        @click="(e) => props.interactive && onSingleClickAction(e,  props.letter)"
@@ -93,22 +93,23 @@ const onContextMenu = (e: MouseEvent, letter: ProcessedLetter) => {
        @mouseup="(e) => props.interactive && onMouseUpAction(e)"
        @contextmenu="(e) => props.interactive && onContextMenu(e, props.letter)"
   >
-  <span
-      :class="`cell ${isOdd} ${isSelected ? 'selected' : ''}`"
-  >
-              {{ props.letter.hex }}
-      </span>
+    <div class="cell"
+         :class="`${isOdd} ${isSelected ? 'selected' : ''} ${rangePlacement}`">
+      <span>{{ props.letter.hex }}</span>
+    </div>
+
   </div>
   <LetterSpacer v-if="isGapAfter()"/>
 
 </template>
 
 <style scoped>
-.letter-container {
-  width: 22px;
+.cell-wrapper {
+  height: 19px;
   display: inline-block;
-  margin: auto;
-  text-align: center;
+  vertical-align: middle;
+
+  width: 22px;
   padding-top: 1px;
   padding-bottom: 1px;
 }
@@ -116,8 +117,10 @@ const onContextMenu = (e: MouseEvent, letter: ProcessedLetter) => {
 .cell {
   width: 100%;
   height: 100%;
-  display: inline-block;
-  border-radius: inherit;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
 }
 
 .odd {
@@ -135,19 +138,34 @@ const onContextMenu = (e: MouseEvent, letter: ProcessedLetter) => {
   color: var(--hex-viewer-selected-color);
 }
 
-.l2 {
-  border-radius: 4px 0 0 4px;
+.cell-wrapper.round-left {
   padding-left: 1px;
+  width: 21px;
 }
 
 
-.r2 {
-  border-radius: 0 4px 4px 0;
+.cell-wrapper.round-right {
   padding-right: 1px;
+  width: 21px;
 }
 
-.lr2 {
-  border-radius: 4px 4px 4px 4px;
+.cell-wrapper.round-both {
   padding: 1px;
+  width: 20px;
+}
+
+.cell.round-left {
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+}
+
+
+.cell.round-right {
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.cell.round-both {
+  border-radius: 4px;
 }
 </style>

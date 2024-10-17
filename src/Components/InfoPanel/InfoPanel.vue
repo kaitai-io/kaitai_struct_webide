@@ -10,6 +10,7 @@ import ListOptionsToggle from "./ListOptionsToggle.vue";
 import {useIdeSettingsStore} from "../../Stores/IdeSettingsStore";
 import {ExportedValueUtils} from "../../Utils/ExportedValueUtils";
 import {useWelcomeModalStore} from "../Modals/WelcomeModal/WelcomeModalStore";
+import TextButton from "../UtilComponents/TextButton.vue";
 
 const currentBinaryFileStore = useCurrentBinaryFileStore();
 const hexViewerConfigStore = useHexViewerConfigStore();
@@ -46,7 +47,7 @@ const about = () => {
 
     <IntervalDisplay :intervals="emptyIntervals" intervalName="Unparsed parts"/>
     <IntervalDisplay :intervals="byteArrays" intervalName="Byte arrays"/>
-    <div id="parsedPathDiv">Selected: <span id="parsedPath">{{ selectionPath }}</span></div>
+    <div>Selected: <span id="parsedPath">{{ selectionPath }}</span></div>
     <ListOptionsToggle :on-change="hexViewerConfigStore.setColumns" :values="[0,2,4,5,8]"
                        text="Split editor each n bytes"/>
     <ListOptionsToggle :on-change="hexViewerConfigStore.setRowSize" :values="[1,10,16,20,24,32]"
@@ -59,9 +60,7 @@ const about = () => {
                    :toggle="ideSettingsStore.setEagerMode" text="Eager parsing mode"/>
     <EmojiCheckbox checked-emoji="✅" un-checked-emoji="❌" :state="ideSettingsStore.generateOnlyMainFile"
                    :toggle="ideSettingsStore.setGenerateOnlyMainFile" text="Generate only main file"/>
-    <div>
-      <a id="aboutWebIde" @click="about" href="#">about webide</a>
-    </div>
+    <TextButton :click="about" text="about webide"/>
   </div>
 </template>
 
@@ -70,6 +69,8 @@ const about = () => {
   background: #222222;
   color: #eee;
   display: none;
-  padding: 10px
+  padding: 10px;
+  font-size: 12px;
+  font-family: "JetBrains Mono";
 }
 </style>

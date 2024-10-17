@@ -53,7 +53,9 @@ currentBinaryFileStore.$onAction(({name, store, args}) => {
   height: 100%;
   background: var(--hex-viewer-bg-color);
   color: var(--hex-viewer-color);
-  font-family: Courier, monospace;
+  font-family: "JetBrains Mono";
+  font-weight: lighter;
+
   font-size: 12px;
   font-variant-ligatures: none;
   user-select: none;

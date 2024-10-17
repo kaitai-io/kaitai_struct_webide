@@ -48,7 +48,7 @@ const processedRow = computed<{
     <LetterSpacer/>
 
     <LetterCellHex :letter="letter" :inRowIndex="index" v-for="(letter, index) in processedRow.letters" interactive/>
-    <LetterCellHex :letter="emptyLetter" :inRowIndex="index" v-for="(emptyLetter, index) in processedRow.emptyLetters"/>
+    <LetterCellHex :letter="emptyLetter" :inRowIndex="index + processedRow.letters.length" v-for="(emptyLetter, index) in processedRow.emptyLetters"/>
 
     <LetterSpacer/>
 
@@ -58,7 +58,7 @@ const processedRow = computed<{
 
 <style scoped>
 .hexRow {
-  line-height: 19px;
+  display: block;
   height: 21px;
 }
 </style>

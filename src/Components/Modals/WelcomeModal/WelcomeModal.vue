@@ -3,6 +3,7 @@
 import KaitaiStructCompiler from "kaitai-struct-compiler";
 import {useWelcomeModalStore} from "./WelcomeModalStore";
 import {KaitaiIdeInfo} from "../../../app";
+import TextLink from "../../UtilComponents/TextLink.vue";
 
 const store = useWelcomeModalStore();
 
@@ -18,47 +19,53 @@ const onClickBackdrop = (e) => {
     <div class="modal-wrapper-background" @click="e => e.stopPropagation()">
       <div class="disclaimer">
         Disclaimer! This is the fork project rewritten in Vue3. For the official project go to this link:
-        <a href="https://ide.kaitai.io" target="_blank">https://ide.kaitai.io</a> Below is the original welcome message, with updated links to licenses.
+        <TextLink link="https://ide.kaitai.io" text="https://ide.kaitai.io"/>
+        Below is the original welcome message, with updated links to licenses.
       </div>
 
       <div class="title">Hey there!</div>
       <div>
         If this is the first time you are using Kaitai WebIDE then I recommend scrolling through our
-        <a href="https://github.com/kaitai-io/kaitai_struct_webide/wiki/Features" target="_blank">Features
-          page</a>.
+        <TextLink link="https://github.com/kaitai-io/kaitai_struct_webide/wiki/Features" text="Features page"/>
       </div>
       <div>
-        You can read more about Kaitai Struct on our website (<a href="http://kaitai.io"
-                                                                 target="_blank">kaitai.io</a>) and
-        learn the basics of using it by reading <a href="http://doc.kaitai.io" target="_blank">our
-        documentation</a>.
+        You can read more about Kaitai Struct on our website (
+        <TextLink link="http://kaitai.io" text="kaitai.io"/>
+        ) and
+        learn the basics of using it by reading
+        <TextLink link="http://doc.kaitai.io" text="our documentation"/>
+        .
       </div>
       <div>
         We would be pleased if you could visit us and share your thoughts about Kaitai Struct or WebIDE
         in our
-        <a href="https://gitter.im/kaitai_struct/Lobby" target="_blank">Gitter chatroom</a>.
+        <TextLink link="https://gitter.im/kaitai_struct/Lobby" text="Gitter chatroom"/>
       </div>
       <div>
         You can view the source code or create issues on Github
-        for the <a href="https://github.com/kaitai-io/kaitai_struct_webide" target="_blank">WebIDE</a>
+        for the
+        <TextLink link="https://github.com/kaitai-io/kaitai_struct_webide" text="WebIDE"/>
         or
-        <a href="https://github.com/kaitai-io/kaitai_struct" target="_blank">Kaitai Struct</a>.
+        <TextLink link="https://github.com/kaitai-io/kaitai_struct" text="Kaitai Struct"/>
       </div>
       <div>
         Kaitai WebIDE was made possible by using
-        <a href="https://github.com/lorthiz/kaitai_struct_webide/blob/master/public/docs/wiki/3rd-party-libraries.md"
-           target="_blank">open-source libraries listed here</a>
-        (<a href="LICENSE-3RD-PARTY.txt" target="_blank">licensing information</a>).
+        <TextLink
+            link="https://github.com/lorthiz/kaitai_struct_webide/blob/master/public/docs/wiki/3rd-party-libraries.md"
+            text="open-source libraries listed here"/>
+        (
+        <TextLink link="LICENSE-3RD-PARTY.txt" text="licensing information"/>
+        ).
       </div>
       <div>
         Also, follow us on Twitter!
         <ul>
           <li>
-            <a href="https://twitter.com/koczkatamas" target="_blank">@koczkatamas</a>
+            <TextLink link="https://twitter.com/koczkatamas" text="@koczkatamas"/>
             (WebIDE author)
           </li>
           <li>
-            <a href="https://twitter.com/kaitai_io" target="_blank">@kaitai_io</a>
+            <TextLink link="https://twitter.com/kaitai_io" text="@kaitai_io"/>
             (Kaitai Project)
           </li>
         </ul>
@@ -66,17 +73,15 @@ const onClickBackdrop = (e) => {
       <div class="licenses">
         <div>
           <span>Kaitai WebIDE version: </span>
-          <span id="webIdeVersion">{{ KaitaiIdeInfo.version }}-SNAPSHOT</span>
-          <a id="webideCommitId"
-             :href="'https://github.com/lorthiz/kaitai_struct_webide/commit/' + KaitaiIdeInfo.commitId">{{
-              KaitaiIdeInfo.commitId.substring(0, 7)
-            }}</a>
-          (<span>{{KaitaiIdeInfo.commitDate}}</span>,
-          <a href="LICENSE.txt" target="_blank">license</a>)
+          <span id="webIdeVersion">{{ KaitaiIdeInfo.version }}</span>
+          <TextLink :link="`https://github.com/lorthiz/kaitai_struct_webide/commit/${KaitaiIdeInfo.commitId}`"
+                    :text="KaitaiIdeInfo.commitId.substring(0, 7)"/>
+          (<span>{{ KaitaiIdeInfo.commitDate }}</span>,
+          <TextLink link="LICENSE.txt" text="license"/>
+          )
         </div>
-        <div>Kaitai compiler version: <span>
-          {{ KaitaiStructCompiler.version + " (" + KaitaiStructCompiler.buildDate + ")" }}
-        </span>
+        <div>
+          Kaitai compiler version: {{ KaitaiStructCompiler.version + " (" + KaitaiStructCompiler.buildDate + ")" }}
         </div>
       </div>
 
@@ -98,6 +103,8 @@ const onClickBackdrop = (e) => {
   align-items: center;
   justify-items: center;
   justify-content: center;
+  font-family: "JetBrains Mono";
+  font-size: 12px;
 }
 
 @keyframes slideInFromTop {
@@ -141,7 +148,7 @@ const onClickBackdrop = (e) => {
 }
 
 .licenses {
-  font-size: 1rem
+  font-size: 10px;
 }
 
 .disclaimer {

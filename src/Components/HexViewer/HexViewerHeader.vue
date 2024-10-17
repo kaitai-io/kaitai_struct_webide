@@ -41,6 +41,9 @@ const letters = computed(() => {
 <style scoped>
 
 .header {
+  display: block;
+  height: 21px;
+
   font-weight: bold;
   background: var(--hex-viewer-header-bg-color);
   color: var(--hex-viewer-header-color);

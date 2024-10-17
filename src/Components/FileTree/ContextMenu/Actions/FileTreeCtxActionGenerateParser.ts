@@ -6,7 +6,8 @@ import {CompilationTarget, CompilerService} from "../../../../DataManipulation/C
 import {YamlFileInfo} from "../../../../DataManipulation/CompilationModule/JsImporter";
 import {CurrentGoldenLayout} from "../../../GoldenLayout/GoldenLayoutUI";
 import {useIdeSettingsStore} from "../../../../Stores/IdeSettingsStore";
-import {SupportedLanguage, KaitaiSupportedLanguages} from "../../../../DataManipulation/KaitaiSupportedLanguages";
+import {KaitaiSupportedLanguages, SupportedLanguage} from "../../../../DataManipulation/KaitaiSupportedLanguages";
+import {BoltIcon} from "@heroicons/vue/16/solid";
 
 export const mapFileTreeDisplayNodeToYaml = async (item: TreeNodeDisplay): Promise<YamlFileInfo> => {
     const fileSystemsStore = useFileSystems();
@@ -52,7 +53,7 @@ export const FileTreeCtxActionGenerateParser = (item: TreeNodeDisplay): MenuItem
         hidden: [TreeNodeDisplayType.KSY_FILE].indexOf(item.type) === -1,
         customClass: "context-menu-item",
         disabled: item.type !== TreeNodeDisplayType.KSY_FILE,
-        icon: () => h("i", {class: "glyphicon glyphicon-flash", style: {height: "16px"}}),
+        icon: () => h(BoltIcon),
         children: generateParsersSubmenu
     };
 };

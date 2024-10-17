@@ -1,11 +1,8 @@
-.context-menu-item {
-}
-
 .context-menu-item .label {
     font-size: 12px !important;
 }
 
-/*Fix for intereference of .label for context menu and bootstrap-css*/
-.context-menu-item.disabled .label {
-    color: var(--mx-menu-disabled-text);
+.context-menu-item .mx-icon-placeholder {
+    max-width: 20px !important;
+    margin-right: 5px;
 }
