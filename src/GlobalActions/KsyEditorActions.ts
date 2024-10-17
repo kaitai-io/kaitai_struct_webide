@@ -1,5 +1,4 @@
 import {useAppStore} from "../Stores/AppStore";
-import {Ace} from "ace-builds";
 import {YamlFileInfo} from "../DataManipulation/CompilationModule/JsImporter";
 import {compileInternalDebugAndRelease} from "./CompileGrammar";
 import {parseAction} from "./ParseAction";
@@ -7,9 +6,10 @@ import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
 
 import {FILE_SYSTEM_TYPE_LOCAL} from "../Components/FileTree/FileSystems/LocalStorageFileSystem";
 import {FILE_SYSTEM_TYPE_KAITAI} from "../Components/FileTree/FileSystems/KaitaiFileSystem";
+import {editor} from "monaco-editor";
 
-export const mainEditorOnChange = async (change: Ace.Delta, editorContent: string) => {
-    const contentDidNotChange = change.lines.join("\n") === editorContent;
+export const mainEditorOnChange = async (change: editor.IModelContentChangedEvent, editorContent: string) => {
+    const contentDidNotChange = change.changes.join("\n") === editorContent;
     if (contentDidNotChange) return;
 
     const yamlInfo = yamlInfoWithCurrentStoreStateAndNewContent(editorContent);
@@ -20,8 +20,8 @@ export const mainEditorOnChange = async (change: Ace.Delta, editorContent: strin
     await parseAction();
 };
 
-export const mainEditorRecompile = async (editor: Ace.Editor) => {
-    const yamlInfo = yamlInfoWithCurrentStoreStateAndNewContent(editor.getValue());
+export const mainEditorRecompile = async (editorr: editor.IStandaloneCodeEditor) => {
+    const yamlInfo = yamlInfoWithCurrentStoreStateAndNewContent(editorr.getValue());
     await compileInternalDebugAndRelease(yamlInfo);
     await parseAction();
 };

@@ -1,10 +1,10 @@
 libs:
-  Ace:
-    website: https://ace.c9.io/
-    source: https://github.com/ajaxorg/ace
-    licenseName: BSD-3-Clause
-    licenseUrl: https://raw.githubusercontent.com/ajaxorg/ace/master/LICENSE
-    npmDir: ace-builds
+  Monaco Editor:
+    website: https://microsoft.github.io/monaco-editor
+    source: https://github.com/microsoft/monaco-editor
+    licenseName: MIT
+    licenseUrl: https://github.com/microsoft/monaco-editor/blob/main/LICENSE.txt
+    npmDir: monaco-editor
     files: [ LICENSE ]
 
   BigInteger.js:

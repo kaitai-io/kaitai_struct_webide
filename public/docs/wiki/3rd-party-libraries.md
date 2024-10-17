@@ -1,30 +1,9 @@
 # 3rd-party libraries
 
-## Ace
-Website: https://ace.c9.io/
-
-Source: https://github.com/ajaxorg/ace
-
-License: BSD-3-Clause (https://raw.githubusercontent.com/ajaxorg/ace/master/LICENSE)
-
 ## BigInteger.js
 Source: https://github.com/peterolson/BigInteger.js
 
 License: Unlicense (https://raw.githubusercontent.com/peterolson/BigInteger.js/master/LICENSE)
-
-## Bootstrap
-Website: http://getbootstrap.com/
-
-Source: https://github.com/twbs/bootstrap
-
-License: MIT (https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE)
-
-## Bootswatch
-Website: https://bootswatch.com/
-
-Source: https://github.com/thomaspark/bootswatch
-
-License: MIT (https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE)
 
 ## bowser
 Source: https://github.com/ded/bowser
@@ -71,6 +50,13 @@ License: Apache-2.0 (https://raw.githubusercontent.com/kaitai-io/kaitai_struct_j
 Source: https://github.com/localForage/localForage
 
 License: Apache-2.0 (https://raw.githubusercontent.com/localForage/localForage/master/LICENSE)
+
+## Monaco Editor
+Website: https://microsoft.github.io/monaco-editor
+
+Source: https://github.com/microsoft/monaco-editor
+
+License: MIT (https://github.com/microsoft/monaco-editor/blob/main/LICENSE.txt)
 
 ## pako
 Source: https://github.com/nodeca/pako

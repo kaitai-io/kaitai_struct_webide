@@ -1,30 +1,31 @@
 import {GoldenLayoutUIConfig} from "./GoldenLayoutUIConfig";
 
-import {Ace} from "ace-builds";
 import GoldenLayout from "golden-layout";
-import {AceEditorComponent, IAceEditorComponentOptions} from "./AceEditorComponent";
-import {DelayAction} from "../../Utils/DelayAction";
+import {MonacoEditorComponent, MonacoEditorOptions} from "./MonacoEditorComponent";
 import {mainEditorOnChange, mainEditorRecompile} from "../../GlobalActions/KsyEditorActions";
+import {DelayAction} from "../../Utils/DelayAction";
+import {editor, KeyCode, KeyMod} from "monaco-editor";
+import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 import {parseAction} from "../../GlobalActions/ParseAction";
 
 export class GoldenLayoutUI {
     dynCompId = 1;
 
     goldenLayout: GoldenLayout;
-    ksyEditor: Ace.Editor;
+    ksyEditor: IStandaloneCodeEditor;
     ksyEditorContainer: GoldenLayout.Container;
 
-    genCodeViewer: Ace.Editor;
-    genCodeDebugViewer: Ace.Editor;
+    genCodeViewer: IStandaloneCodeEditor;
+    genCodeDebugViewer: IStandaloneCodeEditor;
     errorWindow: GoldenLayout.Container;
     hexViewerContainer: GoldenLayout.Container;
 
     public init() {
         this.goldenLayout = new GoldenLayout(GoldenLayoutUIConfig);
 
-        this.addAceCodeEditorTab("ksyEditor", {lang: "yaml"});
-        this.addAceCodeEditorTab("genCodeViewer", {lang: "javascript", isReadOnly: true});
-        this.addAceCodeEditorTab("genCodeDebugViewer", {lang: "javascript", isReadOnly: true});
+        this.addMonacoCodeEditorTab("ksyEditor", {lang: "yaml"});
+        this.addMonacoCodeEditorTab("genCodeViewer", {lang: "javascript", isReadOnly: true});
+        this.addMonacoCodeEditorTab("genCodeDebugViewer", {lang: "javascript", isReadOnly: true});
 
         this.addHexViewer("hex-viewer");
         this.addExistingDiv("parsedDataTree");
@@ -87,21 +88,18 @@ export class GoldenLayoutUI {
         });
     }
 
-    addAceCodeEditorTab(name: string, options: IAceEditorComponentOptions) {
+    addMonacoCodeEditorTab(name: string, options: MonacoEditorOptions) {
         this.addComponent(name, container => {
-            const newEditor = AceEditorComponent(container, options);
+            const newEditor = MonacoEditorComponent(container, options);
             switch (name) {
                 case "ksyEditor":
                     const editDelay = new DelayAction(500);
-                    newEditor.on("change", (change) => {
-                        editDelay.do(() => mainEditorOnChange(change, newEditor.getValue()));
+                    newEditor.onDidChangeModelContent((event) => {
+                        editDelay.do(() => mainEditorOnChange(event, newEditor.getValue()));
                     });
-                    newEditor.commands.addCommand({
-                        name: "compile", bindKey: {win: "Ctrl-Enter", mac: "Command-Enter"},
-                        exec: (editor: Ace.Editor) => {
-                            mainEditorRecompile(editor);
-                        }
-                    });
+                    newEditor.addCommand(KeyMod.CtrlCmd | KeyCode.Enter, (args) => {
+                        mainEditorRecompile(newEditor);
+                    }, "compile");
                     this.ksyEditor = newEditor;
                     this.ksyEditorContainer = container;
                     break;
@@ -110,12 +108,9 @@ export class GoldenLayoutUI {
                     break;
                 case "genCodeDebugViewer": {
                     this.genCodeDebugViewer = newEditor;
-                    newEditor.commands.addCommand({
-                        name: "compile", bindKey: {win: "Ctrl-Enter", mac: "Command-Enter"},
-                        exec: (editor: Ace.Editor) => {
-                            parseAction();
-                        }
-                    });
+                    newEditor.addCommand(KeyMod.CtrlCmd | KeyCode.Enter, (args) => {
+                        parseAction();
+                    }, "compile");
                 }
             }
             return newEditor;
@@ -124,7 +119,7 @@ export class GoldenLayoutUI {
 
     updateKsyEditor(title: string, content: string) {
         this.ksyEditorContainer.setTitle(title);
-        this.ksyEditor.setValue(content, -1);
+        this.ksyEditor.setValue(content);
     }
 
     updateHexViewerTitle(title: string) {
@@ -133,29 +128,29 @@ export class GoldenLayoutUI {
 
 
     updateReleaseAndDebugCodeTabs(debugCode: string, releaseCode: string) {
-        this.genCodeViewer.setValue(releaseCode, -1);
-        this.genCodeDebugViewer.setValue(debugCode, -1);
+        this.genCodeViewer.setValue(releaseCode);
+        this.genCodeDebugViewer.setValue(debugCode);
     }
 
     addDynamicCodeTab(title: string, content: string, lang: string) {
-        const options: IAceEditorComponentOptions = {
+        const options: MonacoEditorOptions = {
             lang: lang,
             isReadOnly: true,
             data: content
         };
         const componentName = `dynComp${this.dynCompId++}`;
-        this.addAceCodeEditorTab(componentName, options);
+        this.addMonacoCodeEditorTab(componentName, options);
         this.getLayoutNodeById("codeTab").addChild({type: "component", componentName, title});
     }
 
     addExportedToJsonTab(title: string, json: string) {
-        const options: IAceEditorComponentOptions = {
+        const options: MonacoEditorOptions = {
             lang: "json",
             isReadOnly: true,
             data: json
         };
         const componentName = `dynComp${this.dynCompId++}`;
-        this.addAceCodeEditorTab(componentName, options);
+        this.addMonacoCodeEditorTab(componentName, options);
         this.getLayoutNodeById("codeTab").addChild({type: "component", componentName, title});
     }
 }

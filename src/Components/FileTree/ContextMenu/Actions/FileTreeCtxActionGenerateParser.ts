@@ -22,13 +22,13 @@ export const mapFileTreeDisplayNodeToYaml = async (item: TreeNodeDisplay): Promi
 export const FileTreeCtxActionGenerateParser = (item: TreeNodeDisplay): MenuItem => {
     const createOnlyMainFileTab = (compiled: CompilationTarget, language: SupportedLanguage) => {
         const [name, content] = Object.entries(compiled.result)[0];
-        CurrentGoldenLayout.addDynamicCodeTab(name, content, language.aceEditorLangCode);
+        CurrentGoldenLayout.addDynamicCodeTab(name, content, language.monacoEditorLangCode);
         return true;
     };
 
     const createTabsForAllGeneratedFiles = (compiled: CompilationTarget, language: SupportedLanguage) => {
         Object.entries(compiled.result).reverse().forEach(([name, content]) => {
-            CurrentGoldenLayout.addDynamicCodeTab(name, content, language.aceEditorLangCode);
+            CurrentGoldenLayout.addDynamicCodeTab(name, content, language.monacoEditorLangCode);
         });
         return true;
     };
