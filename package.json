@@ -43,7 +43,7 @@
     "build-workers": "sh build-related/build_language_workers.sh",
     "serve": "serve dist",
     "parcel-run": "npm run build-workers && parcel index.html --no-cache",
-    "parcel-build": "npm run build-workers && parcel build index.html --no-optimize"
+    "parcel-build": "npm run build-workers && parcel build index.html --no-optimize --no-source-maps"
   },
   "repository": {
     "type": "git",
