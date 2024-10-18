@@ -1,6 +1,5 @@
 <script setup lang="ts">
 
-import FileTreeBottomActions from "./FileTreeActionButtons.vue";
 import {useFileSystems} from "./Store/FileSystemsStore";
 import FileTreeNodes from "./FileTreeNodes.vue";
 import FileDrop from "./FileDrop.vue";
@@ -19,7 +18,6 @@ const store = useFileSystems();
       </div>
     </div>
     <FileDrop/>
-    <FileTreeBottomActions/>
   </div>
 </template>
 
