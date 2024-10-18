@@ -50,5 +50,7 @@ export const useHexViewerConfigStore = defineStore("HexViewerStore", {
             this.useHexForAddresses = addressMode;
             serializeConfigToLocalStorage(this);
         },
+        jumpToAddress(address: number) {
+        },
     }
 });

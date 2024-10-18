@@ -29,7 +29,11 @@ currentBinaryFileStore.$onAction(({name, store, args}) => {
       || handleOnPageReloadScrollToSelection(name, store, args, scrollTo);
 });
 
-
+hexViewerConfigStore.$onAction(({name, store, args}) => {
+  if(name !== "jumpToAddress") return;
+  const jumpIndex = args[0] as number;
+  scrollTo(Math.floor(jumpIndex / store.rowSize));
+})
 
 </script>
 

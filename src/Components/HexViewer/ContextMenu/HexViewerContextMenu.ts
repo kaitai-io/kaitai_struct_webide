@@ -1,6 +1,7 @@
 import {MenuOptions} from "@imengyu/vue3-context-menu";
 import {HexViewerCtxActionDownloadSelection} from "./Actions/HexViewerCtxActionDownloadSelection";
 import {HexViewerCtxActionExportToJson} from "./Actions/HexViewerCtxActionExportToJson";
+import {HexViewerCtxActionJumpToSelection} from "./Actions/HexViewerCtxActionJumpToSelection";
 
 export const prepareContextMenuOptions = (e: MouseEvent): MenuOptions => {
     return {
@@ -12,7 +13,9 @@ export const prepareContextMenuOptions = (e: MouseEvent): MenuOptions => {
         items: [
             HexViewerCtxActionDownloadSelection(),
             HexViewerCtxActionExportToJson(false),
-            HexViewerCtxActionExportToJson(true)
+            HexViewerCtxActionExportToJson(true),
+            HexViewerCtxActionJumpToSelection(),
+            HexViewerCtxActionJumpToSelection(true)
         ]
     };
 };
