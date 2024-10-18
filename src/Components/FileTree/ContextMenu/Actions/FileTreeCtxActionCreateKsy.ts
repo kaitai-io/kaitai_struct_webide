@@ -5,19 +5,15 @@ import {h} from "vue";
 import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
 import {createNewKsyAction} from "../../../../GlobalActions/CreateNewKsyAction";
 import {useTextModalInputStore} from "../../../Modals/TextInputModal/TextInputModalStore";
-import {BoltIcon, DocumentPlusIcon} from "@heroicons/vue/16/solid";
+import {DocumentPlusIcon} from "@heroicons/vue/16/solid";
 
 export const FileTreeCtxActionCreateKsy = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {
         const store = useTextModalInputStore();
-        const isRoot = item.fullPath.length === 0;
         store.open({
             title: "Add new KSY",
             onAccept: (fileName) => {
-                const newPath = isRoot
-                    ? fileName
-                    : `${item.fullPath}/${fileName}`;
-                createNewKsyAction(item.storeId, newPath);
+                createNewKsyAction(item.storeId, item.fullPath, fileName);
             },
         });
     };
