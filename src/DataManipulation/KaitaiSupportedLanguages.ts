@@ -21,4 +21,5 @@ export const KaitaiSupportedLanguages: SupportedLanguage[] = [
     {kaitaiLangCode: "python", monacoEditorLangCode: "python", isDebug: false, text: "Python"},
     {kaitaiLangCode: "ruby", monacoEditorLangCode: "ruby", isDebug: false, text: "Ruby"},
     {kaitaiLangCode: "ruby", monacoEditorLangCode: "ruby", isDebug: true, text: "Ruby (debug)"},
+    {kaitaiLangCode: "rust", monacoEditorLangCode: "rust", isDebug: false, text: "Rust"},
 ];
