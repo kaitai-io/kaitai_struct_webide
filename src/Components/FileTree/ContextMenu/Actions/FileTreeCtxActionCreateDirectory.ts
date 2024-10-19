@@ -4,6 +4,7 @@ import {h} from "vue";
 import {useFileSystems} from "../../Store/FileSystemsStore";
 import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
 import {FolderPlusIcon} from "@heroicons/vue/16/solid";
+import {FileSystemPath} from "../../FileSystemsTypes";
 
 export const FileTreeCtxActionCreateDirectory = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {
@@ -12,10 +13,9 @@ export const FileTreeCtxActionCreateDirectory = (item: TreeNodeDisplay): MenuIte
         const fullPathToNewFolder = item.fullPath
             ? `${item.fullPath}/${newFolderName}`
             : newFolderName;
-        const fullPathToNewFolderWithStore = `${item.storeId}:${fullPathToNewFolder}`;
         fileStore.createDirectory(item.storeId, fullPathToNewFolder);
-        fileStore.openPath(item.fullPathWithStore);
-        fileStore.selectPath(fullPathToNewFolderWithStore);
+        fileStore.openPath(FileSystemPath.fromFullPathWithStore(item.fullPathWithStore));
+        fileStore.selectPath(FileSystemPath.of(item.storeId, fullPathToNewFolder));
     };
 
     return {

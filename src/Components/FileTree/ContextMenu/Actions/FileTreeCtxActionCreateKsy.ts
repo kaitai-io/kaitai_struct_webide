@@ -6,6 +6,7 @@ import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
 import {createNewKsyAction} from "../../../../GlobalActions/CreateNewKsyAction";
 import {useTextModalInputStore} from "../../../Modals/TextInputModal/TextInputModalStore";
 import {DocumentPlusIcon} from "@heroicons/vue/16/solid";
+import {FileSystemPath} from "../../FileSystemsTypes";
 
 export const FileTreeCtxActionCreateKsy = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {
@@ -13,7 +14,7 @@ export const FileTreeCtxActionCreateKsy = (item: TreeNodeDisplay): MenuItem => {
         store.open({
             title: "Add new KSY",
             onAccept: (fileName) => {
-                createNewKsyAction(item.storeId, item.fullPath, fileName);
+                createNewKsyAction(FileSystemPath.fromFullPathWithStore(item.fullPathWithStore), fileName);
             },
         });
     };

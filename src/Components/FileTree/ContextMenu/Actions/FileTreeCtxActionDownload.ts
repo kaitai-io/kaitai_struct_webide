@@ -3,7 +3,7 @@ import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
 import {FileActionsWrapper} from "../../../../Utils/Files/FileActionsWrapper";
 import {useFileSystems} from "../../Store/FileSystemsStore";
-import {BoltIcon, CloudArrowDownIcon} from "@heroicons/vue/16/solid";
+import {CloudArrowDownIcon} from "@heroicons/vue/16/solid";
 
 export const FileTreeCtxActionDownload = (item: TreeNodeDisplay): MenuItem => {
     const action = async () => {

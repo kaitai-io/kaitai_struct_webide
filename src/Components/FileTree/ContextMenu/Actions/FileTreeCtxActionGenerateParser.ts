@@ -20,17 +20,32 @@ export const mapFileTreeDisplayNodeToYaml = async (item: TreeNodeDisplay): Promi
 
 
 export const FileTreeCtxActionGenerateParser = (item: TreeNodeDisplay): MenuItem => {
+
+    const toSimpleSnakeCase = (name: string) => {
+        return name.replace(/\W+/g, " ")
+            .split(/ |\B(?=[A-Z])/)
+            .map(word => word.toLowerCase())
+            .join("_");
+    };
+
     const createOnlyMainFileTab = (compiled: CompilationTarget, language: SupportedLanguage) => {
-        const [name, content] = Object.entries(compiled.result)[0];
+        const record = Object.entries(compiled.result)
+            .find(([name, content]) => {
+                const nameInSnakeCase = toSimpleSnakeCase(name);
+                return nameInSnakeCase.indexOf(compiled.mainClassId) !== -1;
+            });
+        if (!record) {
+            console.error("[GenerateOnlyMainFile] Could not find main file using schema!");
+            return;
+        }
+        const [name, content] = record;
         CurrentGoldenLayout.addDynamicCodeTab(name, content, language.monacoEditorLangCode);
-        return true;
     };
 
     const createTabsForAllGeneratedFiles = (compiled: CompilationTarget, language: SupportedLanguage) => {
-        Object.entries(compiled.result).reverse().forEach(([name, content]) => {
+        Object.entries(compiled.result).forEach(([name, content]) => {
             CurrentGoldenLayout.addDynamicCodeTab(name, content, language.monacoEditorLangCode);
         });
-        return true;
     };
 
     const generateParserForLanguage = async (language: SupportedLanguage) => {

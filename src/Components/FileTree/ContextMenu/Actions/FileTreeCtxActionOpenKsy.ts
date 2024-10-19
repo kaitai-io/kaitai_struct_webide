@@ -3,14 +3,12 @@ import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
 import {useAppStore} from "../../../../Stores/AppStore";
 import {DocumentTextIcon} from "@heroicons/vue/16/solid";
+import {FileSystemPath} from "../../FileSystemsTypes";
 
 export const FileTreeCtxActionOpenKsy = (item: TreeNodeDisplay): MenuItem => {
     const action = async () => {
         const appStore = useAppStore();
-        appStore.updateSelectedKsyFile({
-            storeId: item.storeId,
-            filePath: item.fullPath
-        });
+        appStore.updateSelectedKsyFile(FileSystemPath.fromFullPathWithStore(item.fullPathWithStore));
     };
 
     return {

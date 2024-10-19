@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {FileSystem} from "../FileSystemsTypes";
+import {FileSystem, FileSystemPath} from "../FileSystemsTypes";
 
 export interface FileSystemsStore {
     fileSystems: FileSystem[];
@@ -16,6 +16,19 @@ const serializeConfigToLocalStorage = (store: FileSystemsStore) => {
     localStorage.setItem("FileTree", config);
 };
 
+const validateMoveInputs = (oldPath: FileSystemPath, newPath: FileSystemPath) => {
+    const isTryingToMoveRoot = oldPath.path === "";
+    if (isTryingToMoveRoot) {
+        throw new Error(`[FileSystemsStore][move] Root cannot be moved!`)
+    }
+    if(!oldPath.isInTheSameStore(newPath)) {
+        throw new Error(`[FileSystemsStore][move] Changing paths between stores is not supported!`);
+    }
+
+    if(oldPath.isPartOf(newPath)){
+        throw new Error(`[FileSystemsStore][move] Trying to nest part of a path in it self! ${oldPath.path} in ${newPath.path}`);
+    }
+}
 
 export const useFileSystems = defineStore("FileSystemsStore", {
     state: (): FileSystemsStore => {
@@ -29,16 +42,17 @@ export const useFileSystems = defineStore("FileSystemsStore", {
         addFileSystem(fileSystem: FileSystem) {
             this.fileSystems.push(fileSystem);
         },
-        openPath(pathToAdd: string) {
-            this.openPaths.push(pathToAdd);
+        openPath(pathToAdd: FileSystemPath) {
+            this.openPaths.push(pathToAdd.toString());
             serializeConfigToLocalStorage(this);
         },
-        closePath(pathToRemove: string) {
-            this.openPaths = this.openPaths.filter((path: string) => path !== pathToRemove);
+        closePath(pathToRemove: FileSystemPath) {
+            const pathToRemoveStr = pathToRemove.toString();
+            this.openPaths = this.openPaths.filter((path: string) => path !== pathToRemoveStr);
             serializeConfigToLocalStorage(this);
         },
-        selectPath(path: string) {
-            this.selectedPath = path;
+        selectPath(path: FileSystemPath) {
+            this.selectedPath = path.toString();
             serializeConfigToLocalStorage(this);
         },
         async addFile(storeId: string, path: string, content: string | ArrayBuffer) {
@@ -55,12 +69,30 @@ export const useFileSystems = defineStore("FileSystemsStore", {
                 ? await fileSystem.get(filePath)
                 : "";
         },
-        deletePath(storeId: string, filePath: string): void {
-            const fileSystem: FileSystem = this.fileSystems.find((fs: FileSystem) => fs.storeId === storeId);
+
+        deletePath(path: FileSystemPath): void {
+            const fileSystem: FileSystem = this.fileSystems.find((fs: FileSystem) => fs.storeId === path.storeId);
             if (fileSystem) {
-                fileSystem.delete(filePath);
+                fileSystem.delete(path.path);
             } else {
-                console.error(`[FileSystemsStore][deletePath] Could not find file system! [${storeId}]`);
+                console.error(`[FileSystemsStore][deletePath] Could not find file system! [${path.storeId}]`);
+            }
+        },
+
+        async move(oldPath: FileSystemPath, newPath: FileSystemPath): Promise<void> {
+            validateMoveInputs(oldPath, newPath);
+            const fileSystem: FileSystem = this.fileSystems.find((fs: FileSystem) => fs.storeId === oldPath.storeId);
+            if (fileSystem) {
+                await fileSystem.move(oldPath.path, newPath.path);
+                this.openPaths = this.openPaths.map((path: string) => {
+                    const openPath = FileSystemPath.fromFullPathWithStore(path)
+                    if (openPath.isPartOf(oldPath)) {
+                        return openPath.replacePathPart(oldPath, newPath).toString();
+                    }
+                    return path;
+                });
+            } else {
+                console.error(`[FileSystemsStore][deletePath] Could not find file system! [${oldPath.storeId}]`);
             }
         }
     }

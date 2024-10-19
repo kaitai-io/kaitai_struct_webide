@@ -3,11 +3,12 @@ import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
 import {useFileSystems} from "../../Store/FileSystemsStore";
 import {FolderIcon} from "@heroicons/vue/16/solid";
+import {FileSystemPath} from "../../FileSystemsTypes";
 
 export const FileTreeCtxActionOpenDirectory = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {
         const fileSystemsStore = useFileSystems();
-        fileSystemsStore.openPath(item.fullPathWithStore);
+        fileSystemsStore.openPath(FileSystemPath.fromFullPathWithStore(item.fullPathWithStore));
     };
 
     return {

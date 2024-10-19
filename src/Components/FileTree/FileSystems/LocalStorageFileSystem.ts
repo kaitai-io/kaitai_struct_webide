@@ -1,5 +1,5 @@
 import {FsItemHelper} from "../Utils/FsItemHelper";
-import {FileSystem, FileSystemItem, ITEM_MODE_DIRECTORY} from "../FileSystemsTypes";
+import {FileSystem, FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../FileSystemsTypes";
 import {LocalForageForLocalStorageWrapper} from "../Utils/LocalForageForLocalStorageWrapper";
 import {toRaw} from "vue";
 
@@ -77,4 +77,22 @@ export class LocalStorageFileSystem implements FileSystem {
             LocalForageForLocalStorageWrapper.deleteFile(LocalStorageFileSystem.fileLocalForageKey(fileName));
         });
     }
+
+    async move(oldPath: string, newPath: string): Promise<void> {
+        const oldPathInfo = FsItemHelper.getInfoAboutPath(this.root, oldPath);
+        FsItemHelper.createFileOrDirectoryFromPathInRoot(this.root, newPath, oldPathInfo.node.type === ITEM_MODE_DIRECTORY);
+        const newPathInfo = FsItemHelper.getInfoAboutPath(this.root, newPath);
+        delete oldPathInfo.parentNode.children[oldPathInfo.nodeName];
+        newPathInfo.parentNode.children[newPathInfo.nodeName] = oldPathInfo.node;
+        if(oldPathInfo.node.type === ITEM_MODE_FILE) {
+            const oldFileForageKey = LocalStorageFileSystem.fileLocalForageKey(oldPathInfo.nodeName)
+            const newFileForageKey = LocalStorageFileSystem.fileLocalForageKey(newPathInfo.nodeName)
+            const content = await LocalForageForLocalStorageWrapper.getFile(oldFileForageKey)
+            await LocalForageForLocalStorageWrapper.saveFile(newFileForageKey, content)
+        }
+        await this.updateTreeInDatabase();
+        return Promise.resolve(undefined);
+    }
+
+
 }

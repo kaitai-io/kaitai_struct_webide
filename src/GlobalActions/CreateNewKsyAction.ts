@@ -1,6 +1,7 @@
 import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
 import {useAppStore} from "../Stores/AppStore";
 import {FileActionsWrapper} from "../Utils/Files/FileActionsWrapper";
+import {FileSystemPath} from "../Components/FileTree/FileSystemsTypes";
 
 const sanitizePath = (path: string) => {
     const pathIsRoot = path.length === 0;
@@ -15,21 +16,20 @@ const prepareTemplate = async (fileNameWithoutExtension: string): Promise<string
 };
 
 
-export const createNewKsyAction = async (storeId: string, path: string, fileName: string) => {
-    const store = useFileSystems();
+export const createNewKsyAction = async ({storeId, path}: FileSystemPath, fileName: string) => {
     const pathParts = sanitizePath(path);
     const fileNameWithoutExtension = fileName.replace(/\..*$/mi, "");
     pathParts.push(`${fileNameWithoutExtension}.ksy`);
     const newFilePath = pathParts.join("/");
-    const template= await prepareTemplate(fileNameWithoutExtension);
-    await store.addFile(storeId, newFilePath, template);
-    store.selectPath(`${storeId}:${newFilePath}`);
-    store.openPath(`${storeId}:${path}`);
+    const template = await prepareTemplate(fileNameWithoutExtension);
+    const fileSystemsStore = useFileSystems();
+    await fileSystemsStore.addFile(storeId, newFilePath, template);
+    fileSystemsStore.openPath(FileSystemPath.of(storeId, path));
 
     const appStore = useAppStore();
-    appStore.updateSelectedKsyFile({
-        storeId: storeId,
-        filePath: newFilePath
-    });
+    const newFileSystemPath = FileSystemPath.of(storeId, newFilePath);
+    fileSystemsStore.selectPath(newFileSystemPath);
+    appStore.updateSelectedKsyFile(newFileSystemPath);
+
 
 };

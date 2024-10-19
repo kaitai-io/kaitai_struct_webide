@@ -4,11 +4,12 @@ import {h} from "vue";
 import {useFileSystems} from "../../Store/FileSystemsStore";
 import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
 import {TrashIcon} from "@heroicons/vue/16/solid";
+import {FileSystemPath} from "../../FileSystemsTypes";
 
 export const FileTreeCtxActionDelete = (item: TreeNodeDisplay): MenuItem => {
     const action = async () => {
         const fileSystemStore = useFileSystems();
-        fileSystemStore.deletePath(item.storeId, item.fullPath);
+        fileSystemStore.deletePath(FileSystemPath.fromFullPathWithStore(item.fullPathWithStore));
     };
 
     return {

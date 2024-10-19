@@ -2,6 +2,14 @@ import {FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../FileSystem
 import {ArrayUtils} from "../../../Utils/ArrayUtils";
 import {FsItemPathsCollector} from "../FileSystemVisitors/FsItemPathsCollector";
 
+export interface FileSystemItemPathInfo {
+    isRoot: boolean;
+    nodeName: string;
+    node: FileSystemItem;
+    parentNode?: FileSystemItem;
+    path: string;
+}
+
 export class FsItemHelper {
     public static createFileOrDirectoryFromPathInRoot = (root: FileSystemItem, filePath: string, createDirectoryMode: boolean = false) => {
         const pathParts = filePath.split("/");
@@ -25,9 +33,9 @@ export class FsItemHelper {
     };
 
     public static deletePathAndReturnFilesToDelete = (root: FileSystemItem, filePath: string): string[] => {
-        const isDeletingFromRoot = filePath.length === 0;
+        const isDeletingRoot = filePath.length === 0;
 
-        if (isDeletingFromRoot) {
+        if (isDeletingRoot) {
             const filesInRoot = FsItemPathsCollector.collectFiles(root);
             Object.keys(root.children || {}).forEach(key => delete root.children[key]);
             return filesInRoot;
@@ -49,5 +57,35 @@ export class FsItemHelper {
         delete currNode.children[lastPart];
         return nodeToDelete;
     };
+
+    public static findNodeInRoot = (root: FileSystemItem, filePathParts: string[]) => {
+        let currNode = root;
+        for (let i = 0; i < filePathParts.length; i++) {
+            const fnPart = filePathParts[i];
+            currNode = currNode.children[fnPart];
+        }
+        return currNode;
+    };
+
+    public static getInfoAboutPath(root: FileSystemItem, path: string): FileSystemItemPathInfo {
+        if (path === "") return {
+            nodeName: "",
+            isRoot: true,
+            node: root,
+            path: path
+        };
+        const pathParts = path.split("/");
+        const nodeName = pathParts[pathParts.length - 1];
+        const parentFolder = [...pathParts];
+        parentFolder.pop();
+        const parentNode = FsItemHelper.findNodeInRoot(root, parentFolder);
+        return {
+            isRoot: false,
+            nodeName: nodeName,
+            node: parentNode.children[nodeName],
+            parentNode: parentNode,
+            path: path
+        };
+    }
 
 }

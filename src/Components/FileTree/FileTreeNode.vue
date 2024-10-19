@@ -6,6 +6,7 @@ import {computed, toRaw} from "vue";
 import {useAppStore} from "../../Stores/AppStore";
 import ContextMenu from "@imengyu/vue3-context-menu";
 import {prepareContextMenuOptions} from "./ContextMenu/FileTreeNodeContextMenu";
+import {FileSystemPath} from "./FileSystemsTypes";
 
 const store = useFileSystems();
 const appStore = useAppStore();
@@ -14,34 +15,28 @@ const props = defineProps<{
 }>();
 
 const activateRow = () => {
-  store.selectPath(props.item.fullPathWithStore);
+  store.selectPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
 };
 
 const doubleClick = () => {
   switch (props.item.type) {
     case TreeNodeDisplayType.KSY_FILE: {
-      appStore.updateSelectedKsyFile({
-        storeId: props.item.storeId,
-        filePath: props.item.fullPath
-      });
+      appStore.updateSelectedKsyFile(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
       return;
     }
     case TreeNodeDisplayType.BINARY_FILE: {
-      appStore.updateSelectedBinaryFile({
-        storeId: props.item.storeId,
-        filePath: props.item.fullPath
-      });
+      appStore.updateSelectedBinaryFile(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
       return;
     }
     case TreeNodeDisplayType.EMPTY_FOLDER: {
       return;
     }
     case TreeNodeDisplayType.OPEN_FOLDER: {
-      store.closePath(props.item.fullPathWithStore);
+      store.closePath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
       return;
     }
     case TreeNodeDisplayType.CLOSED_FOLDER: {
-      store.openPath(props.item.fullPathWithStore);
+      store.openPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
       return;
     }
   }
@@ -49,7 +44,7 @@ const doubleClick = () => {
 
 const contextMenu = (e: MouseEvent) => {
   e.preventDefault();
-  store.selectPath(props.item.fullPathWithStore);
+  store.selectPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
   const contextMenuOptions = prepareContextMenuOptions(e, toRaw(props.item));
   ContextMenu.showContextMenu(contextMenuOptions);
 };

@@ -10,9 +10,9 @@ import {FileTreeCtxActionOpenDirectory} from "./Actions/FileTreeCtxActionOpenDir
 import {FileTreeCtxActionCloseDirectory} from "./Actions/FileTreeCtxActionCloseDirectory";
 import {FileTreeCtxActionCreateDirectory} from "./Actions/FileTreeCtxActionCreateDirectory";
 import {FileTreeCtxActionCreateKsy} from "./Actions/FileTreeCtxActionCreateKsy";
+import {FileTreeCtxActionRename} from "./Actions/FileTreeCtxActionRename";
 
 export const prepareContextMenuOptions = (e: MouseEvent, item: TreeNodeDisplay): MenuOptions => {
-
     return {
         x: e.x,
         y: e.y,
@@ -20,12 +20,19 @@ export const prepareContextMenuOptions = (e: MouseEvent, item: TreeNodeDisplay):
         theme: "flat dark",
         clickCloseOnOutside: true,
         items: [
+            // {
+            //     label: "Restore old files",
+            //     onClick: () => RestoreOldFileTreeAction(),
+            //     customClass: "context-menu-item",
+            //     hidden: item.storeId === FILE_SYSTEM_TYPE_KAITAI || item.fullPath !== ""
+            // },
             FileTreeCtxActionOpenKsy(item),
             FileTreeCtxActionOpenBinFile(item),
             FileTreeCtxActionOpenDirectory(item),
             FileTreeCtxActionCloseDirectory(item),
             FileTreeCtxActionCreateDirectory(item),
             FileTreeCtxActionCreateKsy(item),
+            FileTreeCtxActionRename(item),
             FileTreeCtxActionClone(item),
             FileTreeCtxActionGenerateParser(item),
             FileTreeCtxActionDownload(item),

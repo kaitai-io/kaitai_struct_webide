@@ -1,15 +1,15 @@
-import {FileLocationInfo} from "../Stores/AppStore";
 import {YamlFileInfo} from "../DataManipulation/CompilationModule/JsImporter";
 import {compileInternalDebugAndRelease} from "./CompileGrammar";
 import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
 import {CurrentGoldenLayout} from "../Components/GoldenLayout/GoldenLayoutUI";
 import {useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
+import {FileSystemPath} from "../Components/FileTree/FileSystemsTypes";
 
-export const loadKsyFileAction = async (ksyFileLocation: FileLocationInfo) => {
-    const content = await useFileSystems().getFile(ksyFileLocation.storeId, ksyFileLocation.filePath) as string;
+export const loadKsyFileAction = async (ksyFileLocation: FileSystemPath) => {
+    const content = await useFileSystems().getFile(ksyFileLocation.storeId, ksyFileLocation.path) as string;
     const yamlInfo: YamlFileInfo = {
         storeId: ksyFileLocation.storeId,
-        filePath: ksyFileLocation.filePath,
+        filePath: ksyFileLocation.path,
         fileContent: content
     };
 

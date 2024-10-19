@@ -8,8 +8,8 @@ import {FILE_SYSTEM_TYPE_LOCAL} from "../Components/FileTree/FileSystems/LocalSt
 import {FILE_SYSTEM_TYPE_KAITAI} from "../Components/FileTree/FileSystems/KaitaiFileSystem";
 import {editor} from "monaco-editor";
 
-export const mainEditorOnChange = async (change: editor.IModelContentChangedEvent, editorContent: string) => {
-    const contentDidNotChange = change.changes.join("\n") === editorContent;
+export const mainEditorOnChange = async (changedEvent: editor.IModelContentChangedEvent, editorContent: string) => {
+    const contentDidNotChange = changedEvent.changes.map(change => change.text).join("\n") === editorContent;
     if (contentDidNotChange) return;
 
     const yamlInfo = yamlInfoWithCurrentStoreStateAndNewContent(editorContent);
@@ -36,7 +36,7 @@ const yamlInfoWithCurrentStoreStateAndNewContent = (content: string): YamlFileIn
 
     return {
         storeId: appStore.selectedKsyInfo.storeId,
-        filePath: appStore.selectedKsyInfo.filePath,
+        filePath: appStore.selectedKsyInfo.path,
         fileContent: content
     };
 };

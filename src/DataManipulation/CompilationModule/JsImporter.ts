@@ -1,7 +1,8 @@
 import {YamlParser} from "./YamlParser";
 import {JsImporterError} from "./JsImporterError";
-import {FileLocationInfo} from "../../Stores/AppStore";
 import {useFileSystems} from "../../Components/FileTree/Store/FileSystemsStore";
+import {FileSystemPath} from "../../Components/FileTree/FileSystemsTypes";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../../Components/FileTree/FileSystems/KaitaiFileSystem";
 
 export interface IYamlImporter {
     importYaml(importFilePath: string, mode: string): Promise<KsySchema.IKsyFile>;
@@ -36,7 +37,7 @@ export class JsImporter implements IYamlImporter {
             return YamlParser.parseIKsyFile(yamlFile);
         } catch (e) {
             const sourceAppendix = mode === "abs" ? "kaitai.io" : "local storage";
-            const errorMessage = `failed to import spec ${fileLocation.filePath} from ${sourceAppendix}${e.message ? ": " + e.message : ""}`;
+            const errorMessage = `failed to import spec ${fileLocation.path} from ${sourceAppendix}${e.message ? ": " + e.message : ""}`;
             throw new JsImporterError(errorMessage);
         }
     }
@@ -45,30 +46,27 @@ export class JsImporter implements IYamlImporter {
         return Object.values(this.importedFilesCache);
     }
 
-    private deductFileLocation(importFilePath: string, mode: string): FileLocationInfo {
-        let loadFn;
+    private deductFileLocation(importFilePath: string, mode: string): FileSystemPath {
+        let fileName;
         let storeId = this.initialYaml.storeId;
         if (mode === "abs") {
-            loadFn = "formats/" + importFilePath;
-            storeId = "kaitai";
+            fileName = "formats/" + importFilePath;
+            storeId = FILE_SYSTEM_TYPE_KAITAI;
         } else {
-            var fnParts = this.initialYaml.filePath.split("/");
+            const fnParts = this.initialYaml.filePath.split("/");
             fnParts.pop();
-            loadFn = fnParts.join("/") + "/" + importFilePath;
+            fileName = fnParts.join("/") + "/" + importFilePath;
 
-            if (loadFn.startsWith("/")) {
-                loadFn = loadFn.substring(1);
+            if (fileName.startsWith("/")) {
+                fileName = fileName.substring(1);
             }
         }
 
-        return {
-            storeId: storeId,
-            filePath: `${loadFn}.ksy`
-        };
+        return FileSystemPath.of(storeId, `${fileName}.ksy`)
     }
 
-    private async getFileByLocationWithCache(fileLocation: FileLocationInfo): Promise<YamlFileInfo> {
-        const uniqueKey = `${fileLocation.storeId}:${fileLocation.filePath}`;
+    private async getFileByLocationWithCache(fileLocation: FileSystemPath): Promise<YamlFileInfo> {
+        const uniqueKey = `${fileLocation.storeId}:${fileLocation.path}`;
         if (this.importedFilesCache.hasOwnProperty(uniqueKey)) return this.importedFilesCache[uniqueKey];
 
         const newYamlFile = await this.loadYamlWithFileManager(fileLocation);
@@ -77,11 +75,11 @@ export class JsImporter implements IYamlImporter {
 
     }
 
-    private async loadYamlWithFileManager({storeId, filePath}: FileLocationInfo): Promise<YamlFileInfo> {
-        const ksyContent = await useFileSystems().getFile(storeId, filePath) as string;
+    private async loadYamlWithFileManager({storeId, path}: FileSystemPath): Promise<YamlFileInfo> {
+        const ksyContent = await useFileSystems().getFile(storeId, path) as string;
         return {
             storeId: storeId,
-            filePath: filePath,
+            filePath: path,
             fileContent: ksyContent
         };
     }

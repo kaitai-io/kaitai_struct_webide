@@ -1,27 +1,15 @@
 import {defineStore} from "pinia";
 
 import {FILE_SYSTEM_TYPE_KAITAI} from "../Components/FileTree/FileSystems/KaitaiFileSystem";
-
-export interface FileLocationInfo {
-    storeId: string;
-    filePath: string;
-}
+import {FileSystemPath} from "../Components/FileTree/FileSystemsTypes";
 
 export interface AppStore {
-    selectedKsyInfo: FileLocationInfo;
-    selectedBinaryInfo: FileLocationInfo;
+    selectedKsyInfo: FileSystemPath;
+    selectedBinaryInfo: FileSystemPath;
 }
 
-const defaultKsyInfo: FileLocationInfo = {
-    storeId: FILE_SYSTEM_TYPE_KAITAI,
-    filePath: "formats/archive/zip.ksy"
-};
-
-
-const defaultBinaryInfo: FileLocationInfo = {
-    storeId: FILE_SYSTEM_TYPE_KAITAI,
-    filePath: "samples/sample1.zip"
-};
+const defaultKsyInfo: FileSystemPath = FileSystemPath.of(FILE_SYSTEM_TYPE_KAITAI, "formats/archive/zip.ksy");
+const defaultBinaryInfo: FileSystemPath = FileSystemPath.of(FILE_SYSTEM_TYPE_KAITAI, "samples/sample1.zip");
 
 export const useAppStore = defineStore("AppStore", {
 
@@ -32,11 +20,11 @@ export const useAppStore = defineStore("AppStore", {
         };
     },
     actions: {
-        updateSelectedBinaryFile(info: FileLocationInfo) {
+        updateSelectedBinaryFile(info: FileSystemPath) {
             this.selectedBinaryInfo = info;
         },
 
-        updateSelectedKsyFile(info: FileLocationInfo) {
+        updateSelectedKsyFile(info: FileSystemPath) {
             this.selectedKsyInfo = info;
         },
     }

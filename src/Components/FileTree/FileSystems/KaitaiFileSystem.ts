@@ -7,7 +7,7 @@ export const FILE_SYSTEM_TYPE_KAITAI = "kaitai";
 
 const initKaitaiFs = () => {
     const root = <FileSystemItem>{fsType: FILE_SYSTEM_TYPE_KAITAI, children: {}, fn: "kaitai.io", type: ITEM_MODE_DIRECTORY};
-    (kaitaiFsFiles || []).forEach(fn => FsItemHelper.createFileOrDirectoryFromPathInRoot(root, fn));
+    (kaitaiFsFiles || []).forEach(path => FsItemHelper.createFileOrDirectoryFromPathInRoot(root, path));
     return root;
 };
 
@@ -39,6 +39,11 @@ export class KaitaiFileSystem implements FileSystem {
 
     async delete(filePath: string): Promise<void> {
         return Promise.reject("KaitaiFileSystem.delete is not supported!");
+    }
+
+    move(oldPath: string, newPath: string): Promise<void> {
+        return Promise.reject("KaitaiFileSystem.move is not supported!");
+
     }
 }
 

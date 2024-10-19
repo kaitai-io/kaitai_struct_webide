@@ -15,6 +15,7 @@ export interface KaitaiCompilationResult {
 
 export interface CompilationTarget {
     result: KaitaiCompilationResult;
+    mainClassId: string;
     jsMainClassName: string;
     ksySchema: KsySchema.IKsyFile;
     ksyTypes: IKsyTypes;
@@ -55,6 +56,7 @@ export class CompilerService {
             return {
                 result: compilationTarget,
                 ksySchema: schema,
+                mainClassId: this.getMainClassId(schema),
                 jsMainClassName: this.getJsMainClassNameFromSchema(schema),
                 ksyTypes: types
             };
@@ -126,6 +128,7 @@ export class CompilerService {
 
         return Promise.resolve({
             result: {},
+            mainClassId: this.getMainClassId(schema),
             jsMainClassName: this.getJsMainClassNameFromSchema(schema),
             ksySchema: schema,
             ksyTypes: types
@@ -137,6 +140,7 @@ export class CompilerService {
         return Promise.resolve({
             debug: {},
             release: {},
+            mainClassId: this.getMainClassId(schema),
             jsMainClassName: this.getJsMainClassNameFromSchema(schema),
             ksySchema: schema,
             ksyTypes: types
@@ -145,6 +149,10 @@ export class CompilerService {
 
     private getJsMainClassNameFromSchema(schema: IKsyFile) {
         return schema.meta.id.split("_").map((x: string) => StringUtils.ucFirst(x)).join("");
+    }
+
+    private getMainClassId(schema: IKsyFile) {
+        return schema.meta.id;
     }
 
 }
