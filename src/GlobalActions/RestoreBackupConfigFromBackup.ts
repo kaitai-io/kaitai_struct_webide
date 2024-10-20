@@ -4,10 +4,19 @@ import {FileSystemItem} from "../Components/FileTree/FileSystemsTypes";
 import {FileSystemFilesCollector} from "../Components/FileTree/FileSystemVisitors/FileSystemFilesCollector";
 
 /**
- * This is debug Action, you can add your config(value of `fs_files` key from localForage) in `public/Backup/backup.json` folder;
+ * THIS ACTION CLEANS AND REPLACES THE WHOLE LOCAL STORE!
+ *
+ * This is debug Action, you can add your config(value of `fs_files` key from localForage) in `public/Backup/_backup.json` folder;
  * Then put all the files also in that location: `public/Backup/{FILE_NAME}`
+ * It needs to be a FLAT structure - exactly how LocalStorage is working now!
  * Then just press the `Restore old config` button on Info Panel view to start a restore.
- * THIS ACTION CLEARS THE WHOLE LOCAL STORE!
+ *
+ * Your `public/Backup` folder might look like this:
+ * > _backup.json
+ * > some_grammar_file.ksy
+ * > some_other_grammar.ksy
+ * > someBinaryFile.png
+ * > ...
  */
 export const RestoreBackupConfigFromBackup = async () => {
     console.log("[RestoreBackupConfigFromBackup]: Restore action started.");
