@@ -5,11 +5,13 @@ import {FileSystemFilesCollector} from "../Components/FileTree/FileSystemVisitor
 
 /**
  * THIS ACTION CLEANS AND REPLACES THE WHOLE LOCAL STORE!
+ * To create a backup check instructions in `src/Utils/GetBackupFromOfficialKaitaiIDE.js`
  *
  * This is debug Action, you can add your config(value of `fs_files` key from localForage) in `public/Backup/_backup.json` folder;
  * Then put all the files also in that location: `public/Backup/{FILE_NAME}`
  * It needs to be a FLAT structure - exactly how LocalStorage is working now!
  * Then just press the `Restore old config` button on Info Panel view to start a restore.
+ * Once it's done just refresh the page to see the changes.
  *
  * Your `public/Backup` folder might look like this:
  * > _backup.json
