@@ -11,6 +11,7 @@ import {useIdeSettingsStore} from "../../Stores/IdeSettingsStore";
 import {ExportedValueUtils} from "../../Utils/ExportedValueUtils";
 import {useWelcomeModalStore} from "../Modals/WelcomeModal/WelcomeModalStore";
 import TextButton from "../UtilComponents/TextButton.vue";
+import {RestoreBackupConfigFromBackup} from "../../GlobalActions/RestoreBackupConfigFromBackup";
 
 const currentBinaryFileStore = useCurrentBinaryFileStore();
 const hexViewerConfigStore = useHexViewerConfigStore();
@@ -34,6 +35,7 @@ const selectionPath = computed(() => {
       ? (currentBinaryFileStore.parsedFileFlatInfo.leafs[rangeIndex].path || []).join("/")
       : "";
 });
+const isLocalEnv = process.env.NODE_ENV === 'development';
 
 const about = () => {
   useWelcomeModalStore().open();
@@ -61,6 +63,7 @@ const about = () => {
     <EmojiCheckbox checked-emoji="✅" un-checked-emoji="❌" :state="ideSettingsStore.generateOnlyMainFile"
                    :toggle="ideSettingsStore.setGenerateOnlyMainFile" text="Generate only main file"/>
     <TextButton :click="about" text="about webide"/>
+    <TextButton :click="RestoreBackupConfigFromBackup" text="Restore old config" v-if="isLocalEnv"/>
   </div>
 </template>
 

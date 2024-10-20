@@ -1,6 +1,6 @@
 import {FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../FileSystemsTypes";
 import {ArrayUtils} from "../../../Utils/ArrayUtils";
-import {FsItemPathsCollector} from "../FileSystemVisitors/FsItemPathsCollector";
+import {FileSystemFilesCollector} from "../FileSystemVisitors/FileSystemFilesCollector";
 
 export interface FileSystemItemPathInfo {
     isRoot: boolean;
@@ -36,13 +36,13 @@ export class FsItemHelper {
         const isDeletingRoot = filePath.length === 0;
 
         if (isDeletingRoot) {
-            const filesInRoot = FsItemPathsCollector.collectFiles(root);
+            const filesInRoot = FileSystemFilesCollector.collectFileNames(root);
             Object.keys(root.children || {}).forEach(key => delete root.children[key]);
             return filesInRoot;
         } else {
             const filePathParts = filePath.split("/");
             let nodeToDelete = FsItemHelper.deleteNodeFromRoot(root, filePathParts);
-            return FsItemPathsCollector.collectFiles(nodeToDelete);
+            return FileSystemFilesCollector.collectFileNames(nodeToDelete);
         }
     };
 

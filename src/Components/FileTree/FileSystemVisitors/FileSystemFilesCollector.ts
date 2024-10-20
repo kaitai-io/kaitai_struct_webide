@@ -1,8 +1,8 @@
 import {FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../FileSystemsTypes";
 
-export class FsItemPathsCollector {
-    public static collectFiles(fsItem: FileSystemItem): string[] {
-        return new FsItemPathsCollector().collectFiles(fsItem);
+export class FileSystemFilesCollector {
+    public static collectFileNames(fsItem: FileSystemItem): string[] {
+        return new FileSystemFilesCollector().collectFiles(fsItem);
     }
 
     private readonly collectedPaths: string[];

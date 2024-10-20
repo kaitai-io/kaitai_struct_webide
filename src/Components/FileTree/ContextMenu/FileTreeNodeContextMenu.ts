@@ -20,12 +20,6 @@ export const prepareContextMenuOptions = (e: MouseEvent, item: TreeNodeDisplay):
         theme: "flat dark",
         clickCloseOnOutside: true,
         items: [
-            // {
-            //     label: "Restore old files",
-            //     onClick: () => RestoreOldFileTreeAction(),
-            //     customClass: "context-menu-item",
-            //     hidden: item.storeId === FILE_SYSTEM_TYPE_KAITAI || item.fullPath !== ""
-            // },
             FileTreeCtxActionOpenKsy(item),
             FileTreeCtxActionOpenBinFile(item),
             FileTreeCtxActionOpenDirectory(item),
