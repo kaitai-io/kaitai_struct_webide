@@ -37,7 +37,7 @@ export const RestoreBackupConfigFromBackup = async () => {
     console.log("[RestoreBackupConfigFromBackup]: Backup file tree saved under fs_files");
 
     for (const fileName of filesToRestore) {
-        const fileContent = await FileActionsWrapper.fetchFileFromServer(`OldFiles/${fileName}`);
+        const fileContent = await FileActionsWrapper.fetchFileFromServer(`Backup/${fileName}`);
         await LocalForageForLocalStorageWrapper.saveFile(`fs_file[${fileName}]`, fileContent);
         console.log(`[RestoreBackupConfigFromBackup]: File restored and saved: ${fileName}`);
     }
