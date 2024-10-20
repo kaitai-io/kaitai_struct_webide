@@ -54,6 +54,10 @@ const isSelected = computed(() => {
   return store.selectedPath === props.item.fullPathWithStore;
 });
 
+const nodeFileIsLoadedInEditor = computed(() => {
+  return appStore.selectedBinaryInfo.toString() === props.item.fullPathWithStore
+  || appStore.selectedKsyInfo.toString() === props.item.fullPathWithStore
+})
 
 </script>
 
@@ -62,7 +66,7 @@ const isSelected = computed(() => {
        @click="activateRow"
        @dblclick="doubleClick"
        @contextmenu="contextMenu">
-    <div class="row-content" :style="{marginLeft: item.depth * 16 + 'px'}">
+    <div class="row-content" :class="{isLoaded:nodeFileIsLoadedInEditor}" :style="{marginLeft: item.depth * 16 + 'px'}">
       <FileStoreTreeNodeIcon :type="item.type"/>
       <span class="row-description">{{ item.fileName }}</span>
     </div>
@@ -99,6 +103,11 @@ const isSelected = computed(() => {
 
 .isSelected {
   background-color: #57A6A1 !important;
+  color: white;
+}
+
+.isLoaded {
+  font-weight: bold;
   color: white;
 }
 
