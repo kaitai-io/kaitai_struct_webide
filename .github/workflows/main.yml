@@ -37,11 +37,22 @@ jobs:
         uses: actions/configure-pages@v3
 
       - run: npm ci
-      - name: Use stable versions of KSC and JS runtime
+      - name: Generate license, formats and build project
         run: |
           npm run generate-license
           npm run generate-formats
           npm run parcel-build
+
+      - name: Remove not needed files from build
+        run: |
+          rm -rf ./dist/formats/github
+          rm -rf ./dist/formats/_build
+          rm -rf ./dist/formats/.editorconfig
+          rm -rf ./dist/formats/.git
+          rm -rf ./dist/formats/.gitattributes
+          rm -rf ./dist/formats/.gitmodules
+          rm -rf ./dist/formats/CONTRIBUTING.md
+          rm -rf ./dist/formats/README.md
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
