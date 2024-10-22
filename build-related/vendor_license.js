@@ -1,6 +1,6 @@
-const jsyaml = require("js-yaml");
-const { readdirSync, readFileSync, writeFileSync, statSync } = require("fs");
-const { join, basename } = require("path");
+import jsyaml from "js-yaml";
+import { readdirSync, readFileSync, writeFileSync, statSync } from "fs";
+import { join, basename } from "path";
 
 function isLicenseFilename(name) {
     const fn = basename(name);

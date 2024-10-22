@@ -1,5 +1,5 @@
-const {readdirSync, statSync, writeFileSync, mkdirSync} = require("fs");
-const {join} = require("path");
+import {readdirSync, statSync, writeFileSync, mkdirSync} from "fs";
+import {join} from "path";
 
 console.log("[genKaitaiFsFiles.js] Running")
 
