@@ -1,4 +1,4 @@
-import {readdirSync, statSync, writeFileSync, mkdirSync} from "fs";
+import {readdirSync, statSync, writeFileSync} from "fs";
 import {join} from "path";
 
 console.log("[genKaitaiFsFiles.js] Running")
@@ -41,10 +41,6 @@ function main() {
     generate(outDir);
 }
 
-if (!module.parent) {
-    main();
-}
-
-module.exports = generate;
+main();
 
 console.log("[genKaitaiFsFiles.js] Finished")
