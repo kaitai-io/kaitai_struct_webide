@@ -2,7 +2,7 @@ import {FileSystemPath} from "../FileSystemsTypes";
 import {useFileSystems} from "../Store/FileSystemsStore";
 import {useAppStore} from "../../../Stores/AppStore";
 
-const updateCurrentlyLoadedFilesIfNeeded = (currentPath: FileSystemPath, newPath: FileSystemPath) => {
+export const updateCurrentlyLoadedFilesIfNeeded = (currentPath: FileSystemPath, newPath: FileSystemPath) => {
     const fileSystemAppStore = useAppStore();
     if (fileSystemAppStore.selectedKsyInfo.isPartOf(currentPath)) {
         const newCurrentlyLoadedFilePath = fileSystemAppStore.selectedKsyInfo.replacePathPart(currentPath, newPath);
@@ -15,9 +15,9 @@ const updateCurrentlyLoadedFilesIfNeeded = (currentPath: FileSystemPath, newPath
     }
 };
 
-export const FileTreeMoveAction = async (oldPath: FileSystemPath, newPath: FileSystemPath) => {
+export const FileTreeRenameAction = async (oldPath: FileSystemPath, newPath: FileSystemPath) => {
     const fileSystemsStore = useFileSystems();
     await fileSystemsStore.move(oldPath, newPath);
     updateCurrentlyLoadedFilesIfNeeded(oldPath, newPath);
-    fileSystemsStore.selectPath(newPath)
-}
+    fileSystemsStore.selectPath(newPath);
+};

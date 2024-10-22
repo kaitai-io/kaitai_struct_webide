@@ -25,7 +25,11 @@ export class FileSystemPath {
     }
 
     public isInTheSameStore(other: FileSystemPath) {
-        return this.storeId === other.storeId
+        return this.storeId === other.storeId;
+    }
+
+    public clone() {
+        return FileSystemPath.of(this.storeId, this.path);
     }
 
     public isTheSame(other: FileSystemPath) {
@@ -38,10 +42,41 @@ export class FileSystemPath {
             this.path.startsWith(other.path);
     }
 
+    public isNestedIn(other: FileSystemPath) {
+        if (this.storeId !== other.storeId) {
+            return false;
+        }
+        const pathABCParts = this.path.split("/");
+        const pathABCDEParts = other.path.split("/");
+        if(pathABCDEParts.length < pathABCParts.length) {
+            return false;
+        }
+        for (let i = 0; i < pathABCParts.length; ++i) {
+            if(pathABCParts[i] !== pathABCDEParts[i]) return false;
+        }
+        return true;
+    }
+
+    public getLastPathElement() {
+        const pathParts = this.path.split("/");
+        return pathParts[pathParts.length - 1];
+    }
+
+    public append(pathPart: string) {
+        if (!pathPart || pathPart.length === 0) return;
+        if (this.path.length === 0) {
+            this.path += pathPart;
+        } else {
+            console.log(this.path, pathPart);
+            this.path += `/${pathPart}`;
+        }
+    }
+
     public replacePathPart(oldFragment: FileSystemPath, newFragment: FileSystemPath): FileSystemPath {
         const newPath = this.path.replace(oldFragment.path, newFragment.path);
         return FileSystemPath.of(this.storeId, newPath);
     }
+
     public toString() {
         return `${this.storeId}:${this.path}`;
     }
@@ -59,6 +94,8 @@ export interface FileSystem {
     createDirectory(filePath: string): Promise<void>;
 
     delete(filePath: string): Promise<void>;
+
+    listAllFilesInPath(path: string): Promise<string[]>;
 
     move(oldPath: string, newPath: string): Promise<void>;
 }

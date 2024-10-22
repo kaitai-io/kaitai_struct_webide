@@ -2,6 +2,7 @@ import {FsItemHelper} from "../Utils/FsItemHelper";
 import {FileSystem, FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../FileSystemsTypes";
 import {LocalForageForLocalStorageWrapper} from "../Utils/LocalForageForLocalStorageWrapper";
 import {toRaw} from "vue";
+import {FileSystemPathCollector} from "../FileSystemVisitors/FileSystemPathCollector";
 
 export const FILE_SYSTEM_TYPE_LOCAL = "local";
 
@@ -84,15 +85,21 @@ export class LocalStorageFileSystem implements FileSystem {
         const newPathInfo = FsItemHelper.getInfoAboutPath(this.root, newPath);
         delete oldPathInfo.parentNode.children[oldPathInfo.nodeName];
         newPathInfo.parentNode.children[newPathInfo.nodeName] = oldPathInfo.node;
-        if(oldPathInfo.node.type === ITEM_MODE_FILE) {
-            const oldFileForageKey = LocalStorageFileSystem.fileLocalForageKey(oldPathInfo.nodeName)
-            const newFileForageKey = LocalStorageFileSystem.fileLocalForageKey(newPathInfo.nodeName)
-            const content = await LocalForageForLocalStorageWrapper.getFile(oldFileForageKey)
-            await LocalForageForLocalStorageWrapper.saveFile(newFileForageKey, content)
+        if (oldPathInfo.node.type === ITEM_MODE_FILE) {
+            const oldFileForageKey = LocalStorageFileSystem.fileLocalForageKey(oldPathInfo.nodeName);
+            const newFileForageKey = LocalStorageFileSystem.fileLocalForageKey(newPathInfo.nodeName);
+            const content = await LocalForageForLocalStorageWrapper.getFile(oldFileForageKey);
+            await LocalForageForLocalStorageWrapper.saveFile(newFileForageKey, content);
         }
         await this.updateTreeInDatabase();
         return Promise.resolve(undefined);
     }
 
-
+    listAllFilesInPath(path: string): Promise<string[]> {
+        if (path === "") {
+            return Promise.resolve(FileSystemPathCollector.collectPaths(this.root));
+        }
+        const foundFolder = FsItemHelper.findNodeInRoot(this.root, path.split("/"));
+        return Promise.resolve(FileSystemPathCollector.collectPaths(foundFolder));
+    }
 }

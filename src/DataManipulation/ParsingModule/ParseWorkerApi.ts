@@ -10,8 +10,8 @@ const workerWrapper = new KaitaiCodeWorkerWrapper(workerFunctionStack, codeExecu
 const initScriptsMessage: IWorkerMessageInit = {
     type: INIT_WORKER_SCRIPTS,
     scripts: {
-        kaitaiStream: process.env.WORKER_LIB_KAITAI_STREAM_URL,
-        zlib: process.env.WORKER_LIB_ZLIB_URL
+        kaitaiStream: `${location.protocol}//${location.host}/KaitaiStream.js`,
+        zlib: `${location.protocol}//${location.host}/pako_inflate.js`
     }
 };
 workerWrapper.sendMessageToWorker(initScriptsMessage);

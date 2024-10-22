@@ -18,7 +18,6 @@ function main() {
     const vendorYaml = readFileSync(filename, "utf8");
     const vendor = jsyaml.load(vendorYaml, { schema: jsyaml.CORE_SCHEMA, filename });
     let licResult = "";
-    let wikiResult = "# 3rd-party libraries\n\n";
     const libs = Object.entries(vendor.libs);
     libs.sort(([lib1Name], [lib2Name]) => lib1Name.localeCompare(lib2Name))
     for (const [libName, lib] of libs) {
@@ -39,19 +38,14 @@ function main() {
         licResult += `  License applies to files used for generating minified sources.\n`;
         licResult += "\n";
 
-        wikiResult += `## ${libName}\n`;
-
         if (lib["website"]) {
             licResult += `Website: ${lib["website"]}\n`;
-            wikiResult += `Website: ${lib["website"]}\n\n`;
         }
 
         if (lib["source"]) {
             licResult += `Source: ${lib["source"]}\n`;
-            wikiResult += `Source: ${lib["source"]}\n\n`;
         }
 
-        wikiResult += `License: ${lib["licenseName"]} (${lib["licenseUrl"]})\n\n`;
 
         licResult += "=".repeat(80) + "\n";
         licResult +=
@@ -62,7 +56,6 @@ function main() {
     }
 
     writeFileSync("public/LICENSE-3RD-PARTY.txt", licResult.trim());
-    writeFileSync("public/docs/wiki/3rd-party-libraries.md", wikiResult.trim());
 }
 
 main();

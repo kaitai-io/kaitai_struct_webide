@@ -41,9 +41,12 @@ export class KaitaiFileSystem implements FileSystem {
         return Promise.reject("KaitaiFileSystem.delete is not supported!");
     }
 
+    listAllFilesInPath(path: string): Promise<string[]> {
+        return Promise.reject("KaitaiFileSystem.move is not supported!");
+    }
+
     move(oldPath: string, newPath: string): Promise<void> {
         return Promise.reject("KaitaiFileSystem.move is not supported!");
-
     }
 }
 

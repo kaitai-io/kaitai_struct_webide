@@ -6,7 +6,7 @@ import {useTextModalInputStore} from "../../../Modals/TextInputModal/TextInputMo
 import {useAppStore} from "../../../../Stores/AppStore";
 import {FileSystemPath} from "../../FileSystemsTypes";
 import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
-import {FileTreeMoveAction} from "../../Actions/FileTreeMoveAction";
+import {FileTreeRenameAction} from "../../Actions/FileTreeRenameAction";
 
 export const FileTreeCtxActionRename = (item: TreeNodeDisplay): MenuItem => {
 
@@ -21,7 +21,7 @@ export const FileTreeCtxActionRename = (item: TreeNodeDisplay): MenuItem => {
                 const oldPath = FileSystemPath.fromFullPathWithStore(item.fullPathWithStore);
                 const newPath = FileSystemPath.of(item.storeId, newFullPathString);
 
-                FileTreeMoveAction(oldPath, newPath);
+                FileTreeRenameAction(oldPath, newPath);
             },
         });
     };

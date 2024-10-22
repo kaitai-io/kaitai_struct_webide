@@ -19,16 +19,18 @@ const serializeConfigToLocalStorage = (store: FileSystemsStore) => {
 const validateMoveInputs = (oldPath: FileSystemPath, newPath: FileSystemPath) => {
     const isTryingToMoveRoot = oldPath.path === "";
     if (isTryingToMoveRoot) {
-        throw new Error(`[FileSystemsStore][move] Root cannot be moved!`)
+        throw new Error(`[FileSystemsStore][move] Root cannot be moved!`);
     }
-    if(!oldPath.isInTheSameStore(newPath)) {
+    if (oldPath.isTheSame(newPath)) {
+        throw new Error(`[FileSystemsStore][move] Moving the same directory!`);
+    }
+    if (!oldPath.isInTheSameStore(newPath)) {
         throw new Error(`[FileSystemsStore][move] Changing paths between stores is not supported!`);
     }
-
-    if(oldPath.isPartOf(newPath)){
-        throw new Error(`[FileSystemsStore][move] Trying to nest part of a path in it self! ${oldPath.path} in ${newPath.path}`);
+    if (oldPath.isNestedIn(newPath)) {
+        throw new Error(`[FileSystemsStore][move] Trying to nest part of a path in it self! ${newPath.path} in ${oldPath.path}`);
     }
-}
+};
 
 export const useFileSystems = defineStore("FileSystemsStore", {
     state: (): FileSystemsStore => {
@@ -37,6 +39,16 @@ export const useFileSystems = defineStore("FileSystemsStore", {
             openPaths: [],
             selectedPath: ""
         };
+    },
+    getters: {
+        listAllItemsInPath: (state) => {
+            return async (path: FileSystemPath): Promise<string[]> => {
+                const fileSystem: FileSystem = state.fileSystems.find((fs: FileSystem) => fs.storeId === path.storeId);
+                return !!fileSystem
+                    ? fileSystem.listAllFilesInPath(path.path)
+                    : [];
+            };
+        }
     },
     actions: {
         addFileSystem(fileSystem: FileSystem) {
@@ -85,7 +97,7 @@ export const useFileSystems = defineStore("FileSystemsStore", {
             if (fileSystem) {
                 await fileSystem.move(oldPath.path, newPath.path);
                 this.openPaths = this.openPaths.map((path: string) => {
-                    const openPath = FileSystemPath.fromFullPathWithStore(path)
+                    const openPath = FileSystemPath.fromFullPathWithStore(path);
                     if (openPath.isPartOf(oldPath)) {
                         return openPath.replacePathPart(oldPath, newPath).toString();
                     }

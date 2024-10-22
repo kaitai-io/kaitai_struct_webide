@@ -2,6 +2,7 @@ import {FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../FileSystem
 
 export class FileSystemFilesCollector {
     public static collectFileNames(fsItem: FileSystemItem): string[] {
+        if (!fsItem) return [];
         return new FileSystemFilesCollector().collectFiles(fsItem);
     }
 
