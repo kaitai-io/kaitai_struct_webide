@@ -5,8 +5,9 @@ import {MonacoEditorComponent, MonacoEditorOptions} from "./MonacoEditorComponen
 import {mainEditorOnChange, mainEditorRecompile} from "../../GlobalActions/KsyEditorActions";
 import {DelayAction} from "../../Utils/DelayAction";
 import {editor, KeyCode, KeyMod} from "monaco-editor";
-import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 import {parseAction} from "../../GlobalActions/ParseAction";
+import {KaitaiCodeWorkerApi} from "../../DataManipulation/ParsingModule/KaitaiCodeWorkerApi";
+import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 
 export class GoldenLayoutUI {
     dynCompId = 1;
@@ -25,7 +26,7 @@ export class GoldenLayoutUI {
 
         this.addMonacoCodeEditorTab("ksyEditor", {lang: "yaml"});
         this.addMonacoCodeEditorTab("genCodeViewer", {lang: "javascript", isReadOnly: true});
-        this.addMonacoCodeEditorTab("genCodeDebugViewer", {lang: "javascript", isReadOnly: true});
+        this.addMonacoCodeEditorTab("genCodeDebugViewer", {lang: "javascript"});
 
         this.addHexViewer("hex-viewer");
         this.addExistingDiv("parsedDataTree");
@@ -108,9 +109,10 @@ export class GoldenLayoutUI {
                     break;
                 case "genCodeDebugViewer": {
                     this.genCodeDebugViewer = newEditor;
-                    newEditor.addCommand(KeyMod.CtrlCmd | KeyCode.Enter, (args) => {
-                        parseAction();
-                    }, "compile");
+                    newEditor.addCommand(KeyMod.CtrlCmd | KeyCode.KeyK, async (args) => {
+                        KaitaiCodeWorkerApi.setOnlyCodeAction(this.genCodeDebugViewer.getValue());
+                        await parseAction();
+                    });
                 }
             }
             return newEditor;

@@ -2,8 +2,8 @@ import {fetchInstance, IParsingOptions, mapObjectToExportedValue} from "../../Ex
 import {IExportedValue} from "../../ExportedValueTypes";
 import {WorkerFunctionStack} from "./WorkerFunctionStack";
 import {IWorkerMessage, IWorkerMessageParse} from "./WorkerMessages";
-import {IWorkerResponse, IWorkerResponseInit, IWorkerResponseParse, ParseResultType} from "./WorkerResponses";
-import {IKsyTypes, IWorkerApiMethods, PARSE_SCRIPTS, INIT_WORKER_SCRIPTS, IWorkerParsedResponse} from "./Types";
+import {IWorkerResponse, IWorkerResponseParse, ParseResultObject, ParseResultType} from "./WorkerResponses";
+import {IKsyTypes, IWorkerApiMethods, IWorkerParsedResponse, PARSE_SCRIPTS} from "./Types";
 
 export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
     stack: WorkerFunctionStack;
@@ -18,7 +18,11 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
     constructor(stack: WorkerFunctionStack, worker: Worker) {
         this.stack = stack;
         this.worker = worker;
-        worker.onmessage = this.onMessageReceive;
+        worker.onmessage = this.onMessageReceive.bind(this);
+    }
+
+    setOnlyCodeAction = (sourceCode: string): void => {
+        this.sourceCode = sourceCode;
     }
 
     setCodeAction = (sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes): void => {
@@ -41,9 +45,9 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
     }
 
     getPropertyByPathAction = (path: string[]): Promise<IExportedValue> => {
-        let parent = this.root;
+        let parent = this.root as ParseResultObject;
         const parentPath = path.slice(0, -1);
-        parentPath.forEach(key => parent = parent[key]);
+        parentPath.forEach(key => parent = parent[key] as ParseResultObject);
         const propName = path[path.length - 1];
         const property = fetchInstance(parent, propName, parentPath, false);
         return Promise.resolve(property);
@@ -57,10 +61,6 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
     onMessageReceive = (ev: MessageEvent): void => {
         const msg = <IWorkerResponse>ev.data;
         switch (msg.type) {
-            case INIT_WORKER_SCRIPTS: {
-                this.onMessageReceiveInit(msg as IWorkerResponseInit);
-                return;
-            }
             case PARSE_SCRIPTS: {
                 this.onMessageReceiveParse(msg as IWorkerResponseParse);
                 return;
@@ -68,37 +68,34 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
         }
     }
 
-    private onMessageReceiveInit = (msg: IWorkerResponseInit) => {
-        console.log("[KaitaiCodeWorkerWrapper][RESPONSE]", msg);
-    }
-
     private onMessageReceiveParse = (msg: IWorkerResponseParse) => {
         console.log("[KaitaiCodeWorkerWrapper][RESPONSE]", msg);
         const parseResponsePromise = this.stack.removeFunctionFromStack(msg.msgId);
-        if(!!parseResponsePromise) {
+        if (!!parseResponsePromise) {
             parseResponsePromise(msg);
         }
     }
 
 
     private digestResponseFromWorker = (response: IWorkerResponseParse,
-                                        resolve: (value?: (PromiseLike<IWorkerParsedResponse> | IWorkerParsedResponse)) => void,
-                                        reject: (reason?: any) => void) => {
+                                     resolve: (value?: (PromiseLike<IWorkerParsedResponse> | IWorkerParsedResponse)) => void,
+                                     reject: (reason?: any) => void) => {
         let {error, resultObject, eagerMode, enums} = response;
 
         const parsingOptions = this.prepareParsingOptions(eagerMode, enums, error);
-        this.root = {...resultObject};
+        this.root = {...resultObject as ParseResultObject};
         this.exported = mapObjectToExportedValue(resultObject, parsingOptions);
 
-        error && console.log("[KaitaiCodeWorkerWrapper] Error: ", error);
+        if (error) {
+            console.log("[KaitaiCodeWorkerWrapper] Error: ", error);
+        }
 
         if (error && (this.exported === undefined || this.exported === null)) {
             reject(error);
         } else {
-            const response: IWorkerParsedResponse = {resultObject: this.exported, error};
-            resolve(response);
+            resolve({resultObject: this.exported, error});
         }
-    };
+    }
 
     prepareIWorkerMessageParse = (msgId: number, eagerMode: boolean): IWorkerMessageParse => {
         return {
@@ -110,7 +107,7 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
             ksyTypes: this.ksyTypes,
             inputBuffer: this.inputBuffer,
         };
-    };
+    }
 
     prepareParsingOptions = (eagerMode: boolean, enums: any, error: Error): IParsingOptions => {
         return {
@@ -120,5 +117,6 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
             incomplete: !!error,
             streamLength: this.inputBuffer.byteLength,
         };
-    };
+    }
+
 }

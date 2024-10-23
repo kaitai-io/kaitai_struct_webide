@@ -1,4 +1,4 @@
-import {codeExecutionWorkerApi} from "../DataManipulation/ParsingModule/ParseWorkerApi";
+import {KaitaiCodeWorkerApi} from "../DataManipulation/ParsingModule/KaitaiCodeWorkerApi";
 import {useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
 import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
 import {CurrentGoldenLayout} from "../Components/GoldenLayout/GoldenLayoutUI";
@@ -9,5 +9,5 @@ export const loadBinaryFileAction = async (binaryFileLocation: FileSystemPath) =
     const fileContent = await useFileSystems().getFile(binaryFileLocation.storeId, binaryFileLocation.path) as ArrayBuffer;
     CurrentGoldenLayout.updateHexViewerTitle(binaryFileLocation.path);
     store.newBinaryFileSelected(binaryFileLocation.path, fileContent, "SOURCE_REPARSE");
-    codeExecutionWorkerApi.setInputAction(fileContent);
+    KaitaiCodeWorkerApi.setInputAction(fileContent);
 };

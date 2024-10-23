@@ -1,7 +1,7 @@
-import {IExportedValue} from "../../ExportedValueTypes";
+import {IExportedObject, IExportedValue} from "../../ExportedValueTypes";
+import KaitaiStream from "kaitai-struct/KaitaiStream";
 
 
-export const INIT_WORKER_SCRIPTS = "INIT_WORKER_SCRIPTS";
 export const PARSE_SCRIPTS = "PARSE_SCRIPTS";
 
 
@@ -14,7 +14,21 @@ export interface IKsyTypes {
     [name: string]: KsySchema.IType;
 }
 
+export class EvaluatedClass {
+
+    constructor(public kaitaiStream: KaitaiStream) {
+    }
+
+    _read(): IExportedObject {
+        return {};
+    }
+
+    name: string;
+}
+
 export interface IWorkerApiMethods {
+    setOnlyCodeAction(sourceCode: string): void;
+
     setCodeAction(sourceCode: string, mainClassName: string, ksyTypes: IKsyTypes): void;
 
     setInputAction(inputBuffer: ArrayBuffer): void;

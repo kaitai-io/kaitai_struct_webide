@@ -1,15 +1,10 @@
-import {IKsyTypes, INIT_WORKER_SCRIPTS, PARSE_SCRIPTS} from "./Types";
+import {IKsyTypes} from "./Types";
 
-export interface IWorkerMessageInit {
-    type: typeof INIT_WORKER_SCRIPTS;
-    scripts: {
-        kaitaiStream: string;
-        zlib: string;
-    };
-}
+const PARSE_SCRIPTS = "PARSE_SCRIPTS";
+
 export interface IWorkerMessageParse {
     type: typeof PARSE_SCRIPTS;
-    sourceCode: string;
+    sourceCode: any;
     mainClass: string;
     ksyTypes: IKsyTypes;
     inputBuffer: ArrayBuffer;
@@ -18,4 +13,4 @@ export interface IWorkerMessageParse {
     msgId: number;
 }
 
-export type IWorkerMessage = IWorkerMessageInit | IWorkerMessageParse
+export type IWorkerMessage = IWorkerMessageParse;

@@ -1,7 +1,7 @@
 import {IWorkerParsedResponse} from "../../../DataManipulation/ParsingModule/CodeExecution/Types";
 import {IExportedValue} from "../../../DataManipulation/ExportedValueTypes";
 import {ExportedValueMappers} from "../../../DataManipulation/ExportedValueMappers";
-import {codeExecutionWorkerApi} from "../../../DataManipulation/ParsingModule/ParseWorkerApi";
+import {KaitaiCodeWorkerApi} from "../../../DataManipulation/ParsingModule/KaitaiCodeWorkerApi";
 
 export const exportToJson = async (useHexForNumbers: boolean = false): Promise<string> => {
     const overrideDefaultNumbersWithHex = (key: string, value: any) => {
@@ -22,7 +22,7 @@ export const exportToJson = async (useHexForNumbers: boolean = false): Promise<s
         return JSON.stringify(genericObject, hexReplacer, 2);
     };
 
-    return await codeExecutionWorkerApi.parseAction(true)
+    return await KaitaiCodeWorkerApi.parseAction(true)
         .then(getResultOrThrowError)
         .then(mapResultToJson);
 };

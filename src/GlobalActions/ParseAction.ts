@@ -1,10 +1,10 @@
 import {useCurrentBinaryFileStore} from "../Stores/CurrentBinaryFileStore";
 import {useIdeSettingsStore} from "../Stores/IdeSettingsStore";
-import {codeExecutionWorkerApi} from "../DataManipulation/ParsingModule/ParseWorkerApi";
+import {KaitaiCodeWorkerApi} from "../DataManipulation/ParsingModule/KaitaiCodeWorkerApi";
 
 export const parseAction = async () => {
     const store = useCurrentBinaryFileStore();
     const ideSettingsStore = useIdeSettingsStore();
-    const {resultObject: exportedRoot, error: parseError} = await codeExecutionWorkerApi.parseAction(ideSettingsStore.eagerMode);
+    const {resultObject: exportedRoot, error: parseError} = await KaitaiCodeWorkerApi.parseAction(ideSettingsStore.eagerMode);
     store.updateParsedFile(exportedRoot);
 };

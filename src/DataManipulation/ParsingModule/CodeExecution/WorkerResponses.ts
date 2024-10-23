@@ -1,16 +1,6 @@
-import {INIT_WORKER_SCRIPTS, PARSE_SCRIPTS} from "./Types";
+import {PARSE_SCRIPTS} from "./Types";
 import {IDebugInfo} from "../../ExportedValueMappers/ObjectToIExportedValueMapper";
 
-export interface IWorkerResponseInit {
-    type: typeof INIT_WORKER_SCRIPTS;
-
-    resultObject: any;
-    enums: any;
-    error: Error;
-
-    eagerMode: boolean;
-    msgId: number;
-}
 
 export interface DebugMap {
     [key: string]: IDebugInfo;
@@ -21,6 +11,7 @@ export interface ParseResultObject {
     _root: ParseResultObject;
     _parent?: ParseResultObject;
     _io: any;
+
     [name: string]: ParseResultType;
 }
 
@@ -37,4 +28,4 @@ export interface IWorkerResponseParse {
     msgId: number;
 }
 
-export type IWorkerResponse = IWorkerResponseInit | IWorkerResponseParse;
+export type IWorkerResponse = IWorkerResponseParse;

@@ -1,15 +1,21 @@
-declare function importScripts(...urls: string[]): void;
+import {IWorkerMessage, IWorkerMessageParse} from "./WorkerMessages";
+import {IWorkerResponse, ParseResultType} from "./WorkerResponses";
+import KaitaiStream from "kaitai-struct/KaitaiStream";
+import {EvaluatedClass, PARSE_SCRIPTS} from "./Types";
 
-const myself = <Worker><any>self;
+// @ts-ignore - It's required for evaluating module code, without this line, eval throws error:
+// TypeError: KaitaiStream is undefined
+self.KaitaiStream = KaitaiStream;
 
-const evaluateCodeToCreateMainClass = (sourceCode: string, mainClassName: string) => {
-    let evaluatedMainClass = undefined;
+
+const evaluateCodeToCreateMainClass = (sourceCode: any, mainClassName: string): typeof EvaluatedClass => {
+    let evaluatedMainClass: typeof EvaluatedClass = undefined;
     eval(`${sourceCode}
     evaluatedMainClass = ${mainClassName}.${mainClassName};`);
     return evaluatedMainClass;
 };
 
-const extractEnumsFromMainClass = (MainClass): any => {
+const extractEnumsFromMainClass = (MainClass: typeof EvaluatedClass): any => {
     const enums = JSON.stringify({...MainClass});
     const mainClassName = MainClass.name;
     return {
@@ -17,14 +23,14 @@ const extractEnumsFromMainClass = (MainClass): any => {
     };
 };
 
-const parseObjectUsingMainClass = (MainClass, inputBuffer) => {
+const parseObjectUsingMainClass = (MainClass: typeof EvaluatedClass, inputBuffer: ArrayBuffer) => {
     const ioInput = new KaitaiStream(inputBuffer, 0);
     let parseResult = new MainClass(ioInput);
 
     try {
         parseResult._read();
         return {root: parseResult};
-    } catch (error: Error) {
+    } catch (error) {
         return {
             root: parseResult,
             error: error
@@ -32,24 +38,6 @@ const parseObjectUsingMainClass = (MainClass, inputBuffer) => {
     }
 };
 
-const INIT_WORKER_SCRIPTS = "INIT_WORKER_SCRIPTS";
-const PARSE_SCRIPTS = "PARSE_SCRIPTS";
-
-
-let scriptsInitialized = false;
-const initWorkerScripts = ({scripts}: IWorkerMessageInit) => {
-    if (scriptsInitialized) return;
-    console.log("Initializing scripts for worker", scripts);
-
-    importScripts(scripts.kaitaiStream);
-    (KaitaiStream as any).depUrls = (KaitaiStream as any).depUrls || {};
-    (KaitaiStream as any).depUrls.zlib = scripts.zlib;
-    scriptsInitialized = true;
-
-    myself.postMessage({
-        type: INIT_WORKER_SCRIPTS
-    });
-};
 
 const parseScripts = (msg: IWorkerMessageParse) => {
     const MainClass = evaluateCodeToCreateMainClass(msg.sourceCode, msg.mainClass);
@@ -59,22 +47,18 @@ const parseScripts = (msg: IWorkerMessageParse) => {
     const response: IWorkerResponse = {
         type: PARSE_SCRIPTS,
         error: error,
-        resultObject: root,
+        resultObject: root as unknown as ParseResultType,
         msgId: msg.msgId,
         eagerMode: msg.eagerMode,
         enums: enums
     };
 
-    myself.postMessage(response);
+    self.postMessage(response);
 };
 
-myself.onmessage = (ev: MessageEvent) => {
+self.onmessage = (ev: MessageEvent) => {
     const msg = <IWorkerMessage>ev.data;
     switch (msg.type) {
-        case INIT_WORKER_SCRIPTS: {
-            initWorkerScripts(msg as IWorkerMessageInit);
-            return;
-        }
         case PARSE_SCRIPTS: {
             parseScripts(msg as IWorkerMessageParse);
             return;
