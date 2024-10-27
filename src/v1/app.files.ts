@@ -405,8 +405,9 @@ export function initFileTree() {
         addKsyFile(ksyParent, (parentData.fn ? `${parentData.fn}/` : "") + `${ksyName}.ksy`, `meta:\n  id: ${ksyName}\n  file-extension: ${ksyName}\n`);
     });
 
-    fileTreeCont.bind("dblclick.jstree", function (event) {
-        app.loadFsItem(<IFsItem>app.ui.fileTree.get_node(event.target).data);
+    fileTreeCont.on("select_node.jstree", function (event, selectNodeArgs) {
+        const fsItem = (<IJSTreeNode<IFsItem>>selectNodeArgs.node).data;
+        app.loadFsItem(fsItem);
     });
 
     ctxAction(uiFiles.cloneKsyFile, e => {
