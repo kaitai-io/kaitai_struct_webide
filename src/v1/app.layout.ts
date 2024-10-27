@@ -49,7 +49,6 @@ export class LayoutManager<T> {
         this.layout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
             self.ui[name + "Cont"] = container;
             self.ui[name] = $(`#${name}`).appendTo(container.getElement());
-            $(() => self.ui[name].show());
         });
     }
 
