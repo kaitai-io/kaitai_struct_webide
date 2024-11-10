@@ -55,6 +55,13 @@ Source: https://github.com/vuejs/vue
 
 License: MIT (https://raw.githubusercontent.com/vuejs/vue/dev/LICENSE)
 
+## a11y-dialog
+Website: https://a11y-dialog.netlify.app/
+
+Source: https://github.com/KittyGiraudel/a11y-dialog
+
+License: MIT (https://github.com/KittyGiraudel/a11y-dialog/blob/main/LICENSE)
+
 ## bowser
 Source: https://github.com/ded/bowser
 

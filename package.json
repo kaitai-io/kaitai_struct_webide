@@ -5,6 +5,7 @@
     "doc": "docs"
   },
   "dependencies": {
+    "a11y-dialog": "^8.1.1",
     "ace-builds": "^1.17.0",
     "big-integer": "^1.6.25",
     "bootstrap": "^3.4.1",

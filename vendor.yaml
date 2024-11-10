@@ -1,4 +1,12 @@
 libs:
+  a11y-dialog:
+    website: https://a11y-dialog.netlify.app/
+    source: https://github.com/KittyGiraudel/a11y-dialog
+    licenseName: MIT
+    licenseUrl: https://github.com/KittyGiraudel/a11y-dialog/blob/main/LICENSE
+    npmDir: a11y-dialog
+    files: [LICENSE, dist/a11y-dialog.js]
+
   Ace:
     website: https://ace.c9.io/
     source: https://github.com/ajaxorg/ace
