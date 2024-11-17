@@ -1,10 +1,10 @@
-import {IWorkerResponse, IWorkerResponseParse} from "./WorkerResponses";
+import {IWorkerResponse} from "./WorkerResponses";
 
 export class WorkerFunctionStack {
     msgHandlers: { [msgId: number]: (msg: IWorkerResponse) => void } = {};
     lastMsgId = 0;
 
-    pushFunctionToStack(parseResponseFromWorker: (response: IWorkerResponseParse) => void): number {
+    pushFunctionToStack(parseResponseFromWorker: (response: IWorkerResponse) => void): number {
         const msgId = ++this.lastMsgId;
         this.msgHandlers[msgId] = parseResponseFromWorker;
         return msgId;

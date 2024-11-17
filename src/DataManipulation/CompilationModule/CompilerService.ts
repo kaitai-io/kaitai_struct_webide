@@ -7,6 +7,7 @@ import {CompilationError} from "./CompilationError";
 import {YamlParser} from "./YamlParser";
 import {IKsyTypes} from "../ParsingModule/CodeExecution/Types";
 import {StringUtils} from "../../Utils/StringUtils";
+import {KsySchema} from "../KsySchemaTypes";
 import IKsyFile = KsySchema.IKsyFile;
 
 export interface KaitaiCompilationResult {
@@ -30,18 +31,18 @@ export interface ReleaseAndDebugTargets {
 }
 
 export class CompilerService {
-    async compileSingleTargetFsWrapper(srcYamlFsItem: FileSystemItem, yamlContent: string, targetLanguage: string, isDebug: boolean): Promise<CompilationTarget> {
+    static async compileSingleTargetFsWrapper(srcYamlFsItem: FileSystemItem, yamlContent: string, targetLanguage: string, isDebug: boolean): Promise<CompilationTarget> {
         const initialYaml: YamlFileInfo = {storeId: srcYamlFsItem.fsType, fileContent: yamlContent, filePath: srcYamlFsItem.fn};
         return this.compileSingleTarget(initialYaml, targetLanguage, isDebug);
 
     }
 
-    async compileDebugAndReleaseTargetsWrapper(srcYamlFsItem: FileSystemItem, yamlContent: string, targetLanguage: string): Promise<ReleaseAndDebugTargets> {
+    static async compileDebugAndReleaseTargetsWrapper(srcYamlFsItem: FileSystemItem, yamlContent: string, targetLanguage: string): Promise<ReleaseAndDebugTargets> {
         const initialYaml: YamlFileInfo = {storeId: srcYamlFsItem.fsType, fileContent: yamlContent, filePath: srcYamlFsItem.fn};
         return this.compileDebugAndReleaseTargets(initialYaml, targetLanguage);
     }
 
-    async compileSingleTarget(initialYaml: YamlFileInfo, targetLanguage: string, isDebug: boolean): Promise<CompilationTarget> {
+    static async compileSingleTarget(initialYaml: YamlFileInfo, targetLanguage: string, isDebug: boolean): Promise<CompilationTarget> {
         try {
             if (targetLanguage === "json") {
                 return this.getJsonCompilationTargetResponse(initialYaml);
@@ -65,7 +66,7 @@ export class CompilerService {
         }
     }
 
-    async compileDebugAndReleaseTargets(initialYaml: YamlFileInfo, targetLanguage: string): Promise<ReleaseAndDebugTargets> {
+    static async compileDebugAndReleaseTargets(initialYaml: YamlFileInfo, targetLanguage: string): Promise<ReleaseAndDebugTargets> {
         try {
             if (targetLanguage === "json") {
                 return this.getJsonReleaseAndDebugTargets(initialYaml);
@@ -88,7 +89,7 @@ export class CompilerService {
     }
 
 
-    prepareMainFileSchema(yamlInfo: YamlFileInfo) {
+    static prepareMainFileSchema(yamlInfo: YamlFileInfo) {
         try {
             const perfYamlParse = performanceHelper.measureAction("[YAML_PARSE]");
             let compilerSchema = YamlParser.parseIKsyFile(yamlInfo);
@@ -99,7 +100,7 @@ export class CompilerService {
         }
     }
 
-    private async _compileDebugAndRelease(targetLanguage: string, compilerSchema: IKsyFile, jsImporter: IYamlImporter): Promise<KaitaiCompilationResult[]> {
+    private static async _compileDebugAndRelease(targetLanguage: string, compilerSchema: IKsyFile, jsImporter: IYamlImporter): Promise<KaitaiCompilationResult[]> {
         try {
             const perfCompile = performanceHelper.measureAction("[KSY_COMPILE][RELEASE+DEBUG]");
             const debug = KaitaiStructCompiler.compile(targetLanguage, compilerSchema, jsImporter, true);
@@ -110,7 +111,7 @@ export class CompilerService {
         }
     }
 
-    private async _compileDebugOrRelease(
+    private static async _compileDebugOrRelease(
         targetLanguage: string, compilerSchema: IKsyFile, jsImporter: IYamlImporter, isDebug: boolean
     ): Promise<KaitaiCompilationResult> {
         try {
@@ -123,7 +124,7 @@ export class CompilerService {
         }
     }
 
-    private getJsonCompilationTargetResponse(initialYaml: YamlFileInfo): Promise<CompilationTarget> {
+    private static getJsonCompilationTargetResponse(initialYaml: YamlFileInfo): Promise<CompilationTarget> {
         const {schema, types} = SchemaUtils.getTypesAndSchemaFromSingleFile(initialYaml);
 
         return Promise.resolve({
@@ -135,7 +136,7 @@ export class CompilerService {
         });
     }
 
-    private getJsonReleaseAndDebugTargets(initialYaml: YamlFileInfo): Promise<ReleaseAndDebugTargets> {
+    private static getJsonReleaseAndDebugTargets(initialYaml: YamlFileInfo): Promise<ReleaseAndDebugTargets> {
         const {schema, types} = SchemaUtils.getTypesAndSchemaFromSingleFile(initialYaml);
         return Promise.resolve({
             debug: {},
@@ -147,11 +148,11 @@ export class CompilerService {
         });
     }
 
-    private getJsMainClassNameFromSchema(schema: IKsyFile) {
+    private static getJsMainClassNameFromSchema(schema: IKsyFile) {
         return schema.meta.id.split("_").map((x: string) => StringUtils.ucFirst(x)).join("");
     }
 
-    private getMainClassId(schema: IKsyFile) {
+    private static getMainClassId(schema: IKsyFile) {
         return schema.meta.id;
     }
 

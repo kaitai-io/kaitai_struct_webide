@@ -1,21 +1,18 @@
+import {KsySchema} from "./KsySchemaTypes";
+
 export class ObjectType {
     public static Primitive = "Primitive";
     public static Array = "Array";
     public static TypedArray = "TypedArray";
     public static Object = "Object";
     public static Undefined = "Undefined";
-}
-
-export interface IInstance {
-    path: string[];
-    offset: number;
+    public static LazyInstance = "LazyInstance";
 }
 
 export interface IExportedObject {
     class?: string;
     ksyType?: KsySchema.IType;
     fields?: { [name: string]: IExportedValue; };
-    instances?: { [name: string]: IInstance; };
 }
 
 export interface IExportedValue {
@@ -35,7 +32,6 @@ export interface IExportedValue {
 
     enumName?: string;
     enumStringValue?: string;
-    //isInstance?: boolean;
 
     parent?: IExportedValue;
 }

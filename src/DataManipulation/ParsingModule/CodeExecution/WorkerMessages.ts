@@ -1,16 +1,21 @@
-import {IKsyTypes} from "./Types";
-
-const PARSE_SCRIPTS = "PARSE_SCRIPTS";
+import {CompilationTarget} from "../../CompilationModule/CompilerService";
+import {GET_INSTANCE, PARSE_SCRIPTS} from "./Types";
 
 export interface IWorkerMessageParse {
     type: typeof PARSE_SCRIPTS;
-    sourceCode: any;
-    mainClass: string;
-    ksyTypes: IKsyTypes;
-    inputBuffer: ArrayBuffer;
-
-    eagerMode: boolean;
     msgId: number;
+
+    compilationTarget: CompilationTarget;
+    inputBuffer: ArrayBuffer;
+    eagerMode: boolean;
 }
 
-export type IWorkerMessage = IWorkerMessageParse;
+
+export interface IWorkerMessageGetInstance {
+    type: typeof GET_INSTANCE;
+    msgId: number;
+
+    path: string[];
+}
+
+export type IWorkerMessage = IWorkerMessageParse | IWorkerMessageGetInstance;

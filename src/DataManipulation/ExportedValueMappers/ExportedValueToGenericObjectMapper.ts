@@ -10,12 +10,12 @@ export class ExportedValueToGenericObjectMapper extends AbstractExportedValueMap
 
     protected visitArray(value: IExportedValue) {
         super.visitArray(value);
-        return ([...value.arrayItems] || []).map((item) => this.map(item));
+        return [...value.arrayItems].map((item) => this.map(item));
     }
 
     protected visitTypedArray(value: IExportedValue) {
         super.visitTypedArray(value);
-        return [...value.bytes] || [];
+        return [...value.bytes];
     }
 
     protected visitObject(value: IExportedValue) {

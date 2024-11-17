@@ -3,6 +3,7 @@ import {JsImporterError} from "./JsImporterError";
 import {useFileSystems} from "../../Components/FileTree/Store/FileSystemsStore";
 import {FileSystemPath} from "../../Components/FileTree/FileSystemsTypes";
 import {FILE_SYSTEM_TYPE_KAITAI} from "../../Components/FileTree/FileSystems/KaitaiFileSystem";
+import {KsySchema} from "../KsySchemaTypes";
 
 export interface IYamlImporter {
     importYaml(importFilePath: string, mode: string): Promise<KsySchema.IKsyFile>;
@@ -47,7 +48,7 @@ export class JsImporter implements IYamlImporter {
     }
 
     private deductFileLocation(importFilePath: string, mode: string): FileSystemPath {
-        let fileName;
+        let fileName: string;
         let storeId = this.initialYaml.storeId;
         if (mode === "abs") {
             fileName = "formats/" + importFilePath;

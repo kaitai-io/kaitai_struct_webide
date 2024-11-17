@@ -50,7 +50,7 @@ export const FileTreeCtxActionGenerateParser = (item: TreeNodeDisplay): MenuItem
 
     const generateParserForLanguage = async (language: SupportedLanguage) => {
         const yamlInfo = await mapFileTreeDisplayNodeToYaml(item);
-        const compiled = await new CompilerService().compileSingleTarget(yamlInfo, language.kaitaiLangCode, language.isDebug);
+        const compiled = await CompilerService.compileSingleTarget(yamlInfo, language.kaitaiLangCode, language.isDebug);
         const ideSettings = useIdeSettingsStore();
         ideSettings.generateOnlyMainFile
             ? createOnlyMainFileTab(compiled, language)

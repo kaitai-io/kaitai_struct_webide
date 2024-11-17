@@ -37,7 +37,7 @@ export class IExportedValueFlatInfoMapper extends AbstractExportedValueMapper<vo
     }
 
     protected visitArray(value: IExportedValue): void {
-        ([...value.arrayItems] || []).forEach((item) => super.map(item));
+        [...value.arrayItems].forEach((item) => super.map(item));
     }
 
 
@@ -58,6 +58,8 @@ export class IExportedValueFlatInfoMapper extends AbstractExportedValueMapper<vo
     }
 
     private determineEmptyInterval(value: IExportedValue): void {
+        if(this.isRangeInstanceOrIsPastCurrentIndex(value)) return;
+
         const expectedPreviousItemEndIndex = RangeHelper.getStartIndex(value) - 1;
         if (expectedPreviousItemEndIndex !== this.lastItemEndIndex) {
             this.emptyIntervals.push(this.intervalFromLastIndex(expectedPreviousItemEndIndex));
@@ -66,6 +68,8 @@ export class IExportedValueFlatInfoMapper extends AbstractExportedValueMapper<vo
     }
 
     private determineLeaf(value: IExportedValue): void {
+        if(this.isRangeInstanceOrIsPastCurrentIndex(value)) return;
+
         const range = RangeHelper.getSimpleRange(value);
         if(range.end >= range.start) {
             this.leafs.push(value);
@@ -73,9 +77,11 @@ export class IExportedValueFlatInfoMapper extends AbstractExportedValueMapper<vo
     }
 
     private determineByteArrayInterval(value: IExportedValue): void {
+        if(this.isRangeInstanceOrIsPastCurrentIndex(value)) return;
         if (value.bytes.length <= 64) return;
 
         this.arrayIntervals.push(RangeHelper.getSimpleRange(value));
+
     }
 
     private intervalFromLastIndex(expectedPreviousItemEndIndex: number): SimpleRange {
@@ -83,6 +89,10 @@ export class IExportedValueFlatInfoMapper extends AbstractExportedValueMapper<vo
             start: this.lastItemEndIndex + 1,
             end: expectedPreviousItemEndIndex,
         };
+    }
+
+    private isRangeInstanceOrIsPastCurrentIndex(value: IExportedValue) {
+        return RangeHelper.isInstance(value) || RangeHelper.getStartIndex(value) < this.lastItemEndIndex
     }
 
 }

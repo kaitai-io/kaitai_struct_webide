@@ -6,18 +6,28 @@ const props = defineProps<{
   isSelected: boolean
 }>();
 
+
 </script>
 
 <template>
-  <span>{{ node.path[node.path.length - 1] }}</span>
-  <span> [</span>
-  <span class="variable-name" :class="{isSelected}">{{ node.object.class }}</span>
+  <span class="variable-name" :class="{isSelected}">{{ node.path[node.path.length - 1] }}</span>
+  <span>[</span>
+  <span class="main-value" :class="{isSelected}">UNLOADED INSTANCE</span>
   <span>]</span>
 </template>
 
 <style scoped>
 .variable-name {
+  color: #57A6A1;
+}
+
+.main-value {
   color: #577B8D;
+  font-weight: bold;
+}
+
+.secondary-value {
+  opacity: 80%;
 }
 
 .isSelected {

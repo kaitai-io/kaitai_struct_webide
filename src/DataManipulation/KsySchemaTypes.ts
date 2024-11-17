@@ -1,4 +1,4 @@
-﻿namespace KsySchema {
+﻿export namespace KsySchema {
     interface IMeta {
         id: string;
         endian?: "le" | "be";

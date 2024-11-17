@@ -1,5 +1,6 @@
-import {IExportedValue, IInstance, ObjectType} from "../ExportedValueTypes";
-import {IKsyTypes} from "../ParsingModule/CodeExecution/Types";
+import {IExportedValue, ObjectType} from "../ExportedValueTypes";
+import {EvaluatedClass} from "../ParsingModule/CodeExecution/Types";
+import {EvaluatedCodeScope} from "../ParsingModule/CodeExecution/EvaluatedCodeScope";
 
 export interface IDebugInfo {
     start: number;
@@ -12,10 +13,9 @@ export interface IDebugInfo {
 }
 
 export interface IParsingOptions {
+    scope: EvaluatedCodeScope;
     eagerMode: boolean;
     incomplete: boolean;
-    ksyTypes: IKsyTypes;
-    enums: any;
     streamLength: number;
 }
 
@@ -34,7 +34,7 @@ function isUndef(obj: any) {
     return typeof obj === "undefined";
 }
 
-export const fetchInstance = (obj: any, propName: string, objPath: string[], noLazy: boolean): IExportedValue => {
+export const fetchInstance = (obj: any, propName: string, objPath: string[], noLazy: boolean, scope: EvaluatedCodeScope): IExportedValue => {
     let value;
     let instanceError: Error;
     try {
@@ -52,7 +52,7 @@ export const fetchInstance = (obj: any, propName: string, objPath: string[], noL
 
     const instHasRawAttr = Object.prototype.hasOwnProperty.call(obj, `_raw__m_${propName}`);
     const debugInfo = <IDebugInfo>obj._debug[`_m_${propName}`];
-    const exported = exportValue(value, debugInfo, instHasRawAttr, objPath.concat(propName), noLazy);
+    const exported = exportValue(value, debugInfo, instHasRawAttr, objPath.concat(propName), noLazy, scope);
     if (instanceError !== undefined) {
         exported.instanceError = instanceError;
     }
@@ -69,7 +69,7 @@ function inferDebugEnd(debugs: IDebugInfo[]): number {
     return inferredEnd;
 }
 
-const exportValue = (obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: string[], noLazy: boolean, ksyTypes: IKsyTypes, enums: any): IExportedValue => {
+const exportValue = (obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: string[], noLazy: boolean, scope: EvaluatedCodeScope): IExportedValue => {
     adjustDebug(debug);
     const result: IExportedValue = {
         start: debug && debug.start,
@@ -87,33 +87,17 @@ const exportValue = (obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
         result.primitiveValue = obj;
         if (debug && debug.enumName) {
             result.enumName = debug.enumName;
-            let enumObj = {...enums};
-            const enumPath = debug.enumName.split(".");
-            enumPath.forEach(pathPart => enumObj = enumObj[pathPart]);
-
-            let flagCheck = 0, flagSuccess = true;
-            const flagStr = Object.keys(enumObj).filter(x => isNaN(<any>x)).filter(x => {
-                if (flagCheck & enumObj[x]) {
-                    flagSuccess = false;
-                    return false;
-                }
-
-                flagCheck |= enumObj[x];
-                return obj & enumObj[x];
-            }).join("|");
-
-            //console.log(debug.enumName, enumObj, enumObj[obj], flagSuccess, flagStr);
-            result.enumStringValue = enumObj[obj] || (flagSuccess && flagStr);
+            result.enumStringValue = scope.getMatchingEnumStringValuesByPath(obj, debug.enumName).join("|");
         }
     } else if (result.type === ObjectType.Array) {
         if (debug && debug.arr) {
-            result.arrayItems = debug.arr.map((itemDebug, i) => exportValue(obj[i], itemDebug, hasRawAttr, path.concat(i.toString()), noLazy, ksyTypes, enums));
+            result.arrayItems = debug.arr.map((itemDebug, i) => exportValue(obj[i], itemDebug, hasRawAttr, path.concat(i.toString()), noLazy, scope));
             if (result.incomplete) {
                 debug.end = inferDebugEnd(debug.arr);
                 result.end = debug.end;
             }
         } else {
-            result.arrayItems = (<any[]>obj).map((item, i) => exportValue(item, undefined, hasRawAttr, path.concat(i.toString()), noLazy, ksyTypes, enums));
+            result.arrayItems = (<any[]>obj).map((item, i) => exportValue(item, undefined, hasRawAttr, path.concat(i.toString()), noLazy, scope));
         }
     } else if (result.type === ObjectType.Object) {
         const hasSubstream = hasRawAttr && obj._io;
@@ -121,8 +105,8 @@ const exportValue = (obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
             debug.end = debug.start + obj._io.size;
             result.end = debug.end;
         }
-        result.object = {class: obj.constructor.name, instances: {}, fields: {}};
-        const ksyType = ksyTypes[result.object.class];
+        result.object = {class: obj.constructor.name, fields: {}};
+        const ksyType = scope.getKsyTypeByClass(result.object.class);
 
         const fieldNames = new Set<string>(Object.keys(obj));
         if (obj._debug) {
@@ -130,28 +114,37 @@ const exportValue = (obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
         }
         const fieldNamesArr = Array.from(fieldNames).filter(x => x[0] !== "_");
         fieldNamesArr
-            .forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], fieldNames.has(`_raw_${key}`), path.concat(key), noLazy, ksyTypes, enums));
+            .forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], fieldNames.has(`_raw_${key}`), path.concat(key), noLazy, scope));
 
         if (result.incomplete && !hasSubstream && obj._debug) {
             debug.end = inferDebugEnd(fieldNamesArr.map(key => <IDebugInfo>obj._debug[key]));
             result.end = debug.end;
         }
 
-        const propNames = obj.constructor !== Object ?
-            Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor") : [];
+        const instanceNames = obj.constructor !== Object
+            ? Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor")
+            : [];
 
-        for (const propName of propNames) {
-            const ksyInstanceData = ksyType && ksyType.instancesByJsName[propName] || {};
+        for (const instanceName of instanceNames) {
+            const ksyInstanceData = ksyType && ksyType.instancesByJsName[instanceName] || {};
             const parseMode = ksyInstanceData["-webide-parse-mode"];
             const eagerLoad = parseMode === "eager" || (parseMode !== "lazy" && ksyInstanceData.value);
 
-            if (Object.prototype.hasOwnProperty.call(obj, `_m_${propName}`) || eagerLoad || noLazy)
-                result.object.fields[propName] = fetchInstance(obj, propName, path, noLazy);
-            else
-                result.object.instances[propName] = <IInstance>{path: path.concat(propName), offset: 0};
+            if (Object.prototype.hasOwnProperty.call(obj, `_m_${instanceName}`) || eagerLoad || noLazy) {
+                result.object.fields[instanceName] = fetchInstance(obj, instanceName, path, noLazy, scope);
+            } else
+                result.object.fields[instanceName] = {
+                    start: undefined,
+                    end: undefined,
+                    ioOffset: undefined,
+                    incomplete: false,
+                    type: ObjectType.LazyInstance,
+                    path: path.concat(instanceName)
+                };
         }
-    } else
+    } else {
         console.log(`Unknown object type: ${result.type}`);
+    }
 
     return result;
 };
@@ -163,13 +156,13 @@ function adjustDebug(debug: IDebugInfo): void {
     debug.incomplete = (debug.start != null && debug.end == null);
 }
 
-export const mapObjectToExportedValue = (obj: any, options: IParsingOptions): IExportedValue => {
-    const {eagerMode, ksyTypes, enums, streamLength, incomplete} = options;
+export const mapObjectToExportedValue = (obj: EvaluatedClass, options: IParsingOptions): IExportedValue => {
+    const {eagerMode, streamLength, incomplete, scope} = options;
     const debug = {
         start: 0,
         end: streamLength,
         ioOffset: 0,
         incomplete: incomplete
     };
-    return exportValue(obj, debug, false, [], eagerMode, ksyTypes, enums);
+    return exportValue(obj, debug, false, [], eagerMode, scope);
 };

@@ -48,11 +48,11 @@ export class FileSystemPath {
         }
         const pathABCParts = this.path.split("/");
         const pathABCDEParts = other.path.split("/");
-        if(pathABCDEParts.length < pathABCParts.length) {
+        if (pathABCDEParts.length < pathABCParts.length) {
             return false;
         }
         for (let i = 0; i < pathABCParts.length; ++i) {
-            if(pathABCParts[i] !== pathABCDEParts[i]) return false;
+            if (pathABCParts[i] !== pathABCDEParts[i]) return false;
         }
         return true;
     }
@@ -67,7 +67,6 @@ export class FileSystemPath {
         if (this.path.length === 0) {
             this.path += pathPart;
         } else {
-            console.log(this.path, pathPart);
             this.path += `/${pathPart}`;
         }
     }

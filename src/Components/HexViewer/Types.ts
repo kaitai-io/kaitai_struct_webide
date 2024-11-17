@@ -14,5 +14,4 @@ export interface ProcessLettersConfig {
     rowAddress: number;
     emojiMode?: boolean;
     leafs: IExportedValue[];
-    root: IExportedValue;
 }

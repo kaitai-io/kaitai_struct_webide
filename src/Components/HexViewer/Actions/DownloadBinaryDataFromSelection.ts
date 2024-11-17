@@ -13,7 +13,7 @@ export const downloadBinaryDataFromSelection = () => {
     const noContentToDownload = start === -1 || end === -1;
     if (noContentToDownload) return;
 
-    const filePath = appStore.selectedBinaryInfo.filePath;
+    const filePath = appStore.selectedBinaryInfo.path;
     const fileName = ArrayUtils.last(filePath.split("/"));
     const hexRange = `0x${start.toString(16)}-0x${end.toString(16)}`;
     const downloadedFileName = `${fileName}_${hexRange}.bin`;

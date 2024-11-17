@@ -5,8 +5,6 @@ import {MonacoEditorComponent, MonacoEditorOptions} from "./MonacoEditorComponen
 import {mainEditorOnChange, mainEditorRecompile} from "../../GlobalActions/KsyEditorActions";
 import {DelayAction} from "../../Utils/DelayAction";
 import {editor, KeyCode, KeyMod} from "monaco-editor";
-import {parseAction} from "../../GlobalActions/ParseAction";
-import {KaitaiCodeWorkerApi} from "../../DataManipulation/ParsingModule/KaitaiCodeWorkerApi";
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 
 export class GoldenLayoutUI {
@@ -59,7 +57,7 @@ export class GoldenLayoutUI {
     }
 
     addComponent(name: string, generatorCallback?: (container: GoldenLayout.Container) => any) {
-        var editor: any;
+        let editor: any;
         this.goldenLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
             container.getElement().attr("id", name);
             if (generatorCallback) {
@@ -109,10 +107,6 @@ export class GoldenLayoutUI {
                     break;
                 case "genCodeDebugViewer": {
                     this.genCodeDebugViewer = newEditor;
-                    newEditor.addCommand(KeyMod.CtrlCmd | KeyCode.KeyK, async (args) => {
-                        KaitaiCodeWorkerApi.setOnlyCodeAction(this.genCodeDebugViewer.getValue());
-                        await parseAction();
-                    });
                 }
             }
             return newEditor;

@@ -1,7 +1,6 @@
 import {defineStore} from "pinia";
 import {IExportedValue} from "../DataManipulation/ExportedValueTypes";
 import {LocalStorageApi} from "../Utils/LocalStorageApi";
-import {ExportedValueMappers} from "../DataManipulation/ExportedValueMappers";
 import {IExportedValueFlatInfo} from "../DataManipulation/ExportedValueMappers/IExportedValueFlatInfoMapper";
 
 export interface CurrentBinaryFile {
@@ -46,7 +45,6 @@ export const useCurrentBinaryFileStore = defineStore("SelectionStore", {
 
             LocalStorageApi.storeCurrentBinaryFileStoreState(this);
         },
-
         updateSelectionPivot(point: number, source: string) {
             this.selectionPivot = point;
         },
@@ -66,9 +64,9 @@ export const useCurrentBinaryFileStore = defineStore("SelectionStore", {
             this.range = undefined;
             LocalStorageApi.storeCurrentBinaryFileStoreState(this);
         },
-        updateParsedFile(parsedFile: IExportedValue) {
+        updateParsedFile(parsedFile: IExportedValue, flatInfo: IExportedValueFlatInfo) {
             this.parsedFile = parsedFile;
-            this.parsedFileFlatInfo = ExportedValueMappers.flatten(parsedFile);
+            this.parsedFileFlatInfo = flatInfo;
         },
     }
 });

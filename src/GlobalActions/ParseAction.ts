@@ -5,6 +5,6 @@ import {KaitaiCodeWorkerApi} from "../DataManipulation/ParsingModule/KaitaiCodeW
 export const parseAction = async () => {
     const store = useCurrentBinaryFileStore();
     const ideSettingsStore = useIdeSettingsStore();
-    const {resultObject: exportedRoot, error: parseError} = await KaitaiCodeWorkerApi.parseAction(ideSettingsStore.eagerMode);
-    store.updateParsedFile(exportedRoot);
+    const {resultObject, flatExported, error: parseError} = await KaitaiCodeWorkerApi.parseAction(ideSettingsStore.eagerMode);
+    store.updateParsedFile(resultObject, flatExported);
 };

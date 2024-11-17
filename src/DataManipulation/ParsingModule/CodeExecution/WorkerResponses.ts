@@ -1,31 +1,21 @@
-import {PARSE_SCRIPTS} from "./Types";
-import {IDebugInfo} from "../../ExportedValueMappers/ObjectToIExportedValueMapper";
-
-
-export interface DebugMap {
-    [key: string]: IDebugInfo;
-}
-
-export interface ParseResultObject {
-    _debug: DebugMap;
-    _root: ParseResultObject;
-    _parent?: ParseResultObject;
-    _io: any;
-
-    [name: string]: ParseResultType;
-}
-
-export type ParseResultType = ParseResultObject | ParseResultObject[] | Uint8Array | number | string | DebugMap;
+import {GET_INSTANCE, PARSE_SCRIPTS} from "./Types";
+import {IExportedValue} from "../../ExportedValueTypes";
+import {IExportedValueFlatInfo} from "../../ExportedValueMappers/IExportedValueFlatInfoMapper";
 
 export interface IWorkerResponseParse {
     type: typeof PARSE_SCRIPTS;
-
-    resultObject: ParseResultType;
-    enums: any;
-    error: Error;
-
-    eagerMode: boolean;
     msgId: number;
+
+    resultObject: IExportedValue;
+    flatExported: IExportedValueFlatInfo;
+    error: Error;
 }
 
-export type IWorkerResponse = IWorkerResponseParse;
+export interface IWorkerResponseGetInstance {
+    type: typeof GET_INSTANCE;
+    msgId: number;
+    instance: IExportedValue;
+}
+
+
+export type IWorkerResponse = IWorkerResponseParse | IWorkerResponseGetInstance;

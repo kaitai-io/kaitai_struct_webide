@@ -1,56 +1,49 @@
-import {IWorkerMessage, IWorkerMessageParse} from "./WorkerMessages";
-import {IWorkerResponse, ParseResultType} from "./WorkerResponses";
-import KaitaiStream from "kaitai-struct/KaitaiStream";
-import {EvaluatedClass, PARSE_SCRIPTS} from "./Types";
+import {IWorkerMessage, IWorkerMessageGetInstance, IWorkerMessageParse} from "./WorkerMessages";
+import {IWorkerResponse, IWorkerResponseGetInstance} from "./WorkerResponses";
+import {EvaluatedClass, GET_INSTANCE, PARSE_SCRIPTS} from "./Types";
+import {EvaluatedCodeScope} from "./EvaluatedCodeScope";
+import {fetchInstance, mapObjectToExportedValue} from "../../ExportedValueMappers/ObjectToIExportedValueMapper";
+import {ExportedValueMappers} from "../../ExportedValueMappers";
 
-// @ts-ignore - It's required for evaluating module code, without this line, eval throws error:
-// TypeError: KaitaiStream is undefined
-self.KaitaiStream = KaitaiStream;
+let evaluatedScope: EvaluatedCodeScope = undefined;
+let root: EvaluatedClass = undefined;
 
+const getInstanceByPath = (msg: IWorkerMessageGetInstance) => {
+    let parent = root;
+    const path = [...msg.path];
+    const instanceName= path.pop()
+    path.forEach(pathPart => parent = parent[pathPart]);
 
-const evaluateCodeToCreateMainClass = (sourceCode: any, mainClassName: string): typeof EvaluatedClass => {
-    let evaluatedMainClass: typeof EvaluatedClass = undefined;
-    eval(`${sourceCode}
-    evaluatedMainClass = ${mainClassName}.${mainClassName};`);
-    return evaluatedMainClass;
-};
-
-const extractEnumsFromMainClass = (MainClass: typeof EvaluatedClass): any => {
-    const enums = JSON.stringify({...MainClass});
-    const mainClassName = MainClass.name;
-    return {
-        [mainClassName]: JSON.parse(enums)
+    const response: IWorkerResponseGetInstance = {
+        type: GET_INSTANCE,
+        msgId: msg.msgId,
+        instance: fetchInstance(parent, instanceName, path, false, evaluatedScope)
     };
-};
 
-const parseObjectUsingMainClass = (MainClass: typeof EvaluatedClass, inputBuffer: ArrayBuffer) => {
-    const ioInput = new KaitaiStream(inputBuffer, 0);
-    let parseResult = new MainClass(ioInput);
-
-    try {
-        parseResult._read();
-        return {root: parseResult};
-    } catch (error) {
-        return {
-            root: parseResult,
-            error: error
-        };
-    }
-};
-
-
+    self.postMessage(response);
+}
 const parseScripts = (msg: IWorkerMessageParse) => {
-    const MainClass = evaluateCodeToCreateMainClass(msg.sourceCode, msg.mainClass);
-    const enums = extractEnumsFromMainClass(MainClass);
-    const {root, error} = parseObjectUsingMainClass(MainClass, msg.inputBuffer);
+    evaluatedScope = new EvaluatedCodeScope();
+    const {error: evaluationError} = evaluatedScope.evaluateCode(msg.compilationTarget);
+    const {parsed, error: parsingError} = evaluatedScope.parseBuffer(msg.inputBuffer);
+    root = parsed;
+
+    const exported = mapObjectToExportedValue(parsed, {
+        scope: evaluatedScope,
+        incomplete: !!parsingError,
+        streamLength: msg.inputBuffer.byteLength,
+        eagerMode: msg.eagerMode,
+    });
+
+    const flattenedExported = ExportedValueMappers.flatten(exported);
+
 
     const response: IWorkerResponse = {
         type: PARSE_SCRIPTS,
-        error: error,
-        resultObject: root as unknown as ParseResultType,
+        error: evaluationError || parsingError,
+        resultObject: exported,
+        flatExported: flattenedExported,
         msgId: msg.msgId,
-        eagerMode: msg.eagerMode,
-        enums: enums
     };
 
     self.postMessage(response);
@@ -59,6 +52,10 @@ const parseScripts = (msg: IWorkerMessageParse) => {
 self.onmessage = (ev: MessageEvent) => {
     const msg = <IWorkerMessage>ev.data;
     switch (msg.type) {
+        case GET_INSTANCE: {
+            getInstanceByPath(msg as IWorkerMessageGetInstance);
+            return;
+        }
         case PARSE_SCRIPTS: {
             parseScripts(msg as IWorkerMessageParse);
             return;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from "vue";
+import {computed, ref, toRaw} from "vue";
 import {IExportedValue, ObjectType} from "../../DataManipulation/ExportedValueTypes";
 import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import OpenNodeIcon from "./Icons/OpenNodeIcon.vue";
@@ -7,6 +7,7 @@ import IExportedDescription from "./Descriptions/GenericIExportedValueDescriptio
 import ParsingErrorIcon from "./Icons/ParsingErrorIcon.vue";
 import ParsingWarrningIcon from "./Icons/ParsingWarrningIcon.vue";
 import {TreeNodeSelectedAction} from "./Services/ParsedTreeActions";
+import {KaitaiCodeWorkerApi} from "../../DataManipulation/ParsingModule/KaitaiCodeWorkerApi";
 
 const store = useCurrentBinaryFileStore();
 
@@ -38,10 +39,16 @@ const isSelected = computed(() => {
 
 const isOpen = ref(false);
 
+const onClick = async () => {
+  if (props.node.type !== ObjectType.LazyInstance) return;
+  const result = await KaitaiCodeWorkerApi.getPropertyByPathAction(toRaw(props.node.path));
+  console.log("LOADED INSTANCE!", result)
+};
+
 </script>
 
 <template>
-  <div class="row" :style="styleObject">
+  <div class="row" :style="styleObject" @click="onClick">
     <OpenNodeIcon :isOpen="isOpen" :isParentEmpty="children.length == 0" :onClick="() => isOpen = !isOpen"/>
 
     <div @click="() => TreeNodeSelectedAction(node)" class="row-description" :class="{isSelected}">
@@ -73,6 +80,10 @@ const isOpen = ref(false);
   cursor: pointer;
   padding: 0 4px;
   border-radius: 2px;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  flex-grow: 1;
 }
 
 .row-description:hover {

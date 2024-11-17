@@ -32,7 +32,6 @@ const processedRow = computed<{
   const letters = processContent(content, {
     rowAddress: rowAddress,
     emojiMode: hexConfig.emojiMode,
-    root: currentFileStore.parsedFile,
     leafs: currentFileStore.parsedFileFlatInfo?.leafs || []
   });
   const emptyLetters = createEmptyLettersToFillRow(letters.length, hexConfig.rowSize);

@@ -2,10 +2,11 @@ import {StringUtils} from "../../Utils/StringUtils";
 import {IKsyTypes} from "../ParsingModule/CodeExecution/Types";
 import {YamlFileInfo} from "./JsImporter";
 import {YamlParser} from "./YamlParser";
+import {KsySchema} from "../KsySchemaTypes";
 
 export class SchemaUtils {
-    static prepareSchemaAndCombinedKsyTypes(intialYamlInfo: YamlFileInfo, yamls: YamlFileInfo[]) {
-        const {schema, types} = SchemaUtils.getTypesAndSchemaFromSingleFile(intialYamlInfo);
+    static prepareSchemaAndCombinedKsyTypes(initialYamlInfo: YamlFileInfo, yamls: YamlFileInfo[]) {
+        const {schema, types} = SchemaUtils.getTypesAndSchemaFromSingleFile(initialYamlInfo);
 
         const allTypesCombined = yamls.reduce((combinedTypes, currentYaml) => {
             const typesAndSchema = SchemaUtils.getTypesAndSchemaFromSingleFile(currentYaml);

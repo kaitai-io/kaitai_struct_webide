@@ -4,7 +4,6 @@ import {LocalStorageApi} from "../Utils/LocalStorageApi";
 export interface IdeSettings {
     eagerMode: boolean;
     generateOnlyMainFile: boolean;
-    removeCommonJsHeader: boolean;
 }
 
 export const useIdeSettingsStore = defineStore("IDESettingsStore", {
@@ -12,8 +11,7 @@ export const useIdeSettingsStore = defineStore("IDESettingsStore", {
         const settings = LocalStorageApi.getIdeSettings();
         return settings || {
             eagerMode: true,
-            generateOnlyMainFile: false,
-            removeCommonJsHeader: true
+            generateOnlyMainFile: false
         };
     },
     actions: {
@@ -25,9 +23,5 @@ export const useIdeSettingsStore = defineStore("IDESettingsStore", {
             this.generateOnlyMainFile = generateOnlyMainFile;
             LocalStorageApi.storeIdeSettings(this);
         },
-        setRemoveCommonJsHeader(removeCommonJsHeader: boolean) {
-            this.removeCommonJsHeader = removeCommonJsHeader;
-            LocalStorageApi.storeIdeSettings(this);
-        }
     }
 });
