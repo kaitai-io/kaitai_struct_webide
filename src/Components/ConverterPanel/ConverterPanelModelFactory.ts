@@ -84,9 +84,9 @@ export const prepareModelData = (data: Uint8Array): ConverterPanelModel => {
             simpleTypeOf(data, "i16le", TWO_BYTES, LITTLE_ENDIAN),
             simpleTypeOf(data, "i32le", FOUR_BYTES, LITTLE_ENDIAN),
             simpleTypeOf(data, "i64le", EIGHT_BYTES, LITTLE_ENDIAN),
-            simpleTypeOf(data, "i16le", TWO_BYTES, BIG_ENDIAN),
-            simpleTypeOf(data, "i32le", FOUR_BYTES, BIG_ENDIAN),
-            simpleTypeOf(data, "i64le", EIGHT_BYTES, BIG_ENDIAN),
+            simpleTypeOf(data, "i16be", TWO_BYTES, BIG_ENDIAN),
+            simpleTypeOf(data, "i32be", FOUR_BYTES, BIG_ENDIAN),
+            simpleTypeOf(data, "i64be", EIGHT_BYTES, BIG_ENDIAN),
         ],
         complexTypes: [
             complexTypeOf("float", convertToFloat(data)),
