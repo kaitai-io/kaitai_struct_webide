@@ -2,36 +2,48 @@
 
 import {ref} from "vue";
 import {processUploadedFileList} from "../../GlobalActions/UploadFiles";
+import {useFileDialog} from "@vueuse/core";
 
 const draggingOver = ref(false);
-const drop = (event: Event) => {
+const canDrop = ref(false);
+
+const {open, onChange} = useFileDialog();
+onChange((files) => processUploadedFileList(files, "UploadModal"));
+
+
+const drop = (event: DragEvent) => {
   event.preventDefault();
   event.stopPropagation();
-  // @ts-ignore - Property 'dataTransfer' does not exist on type 'Event'.
-  const files = event.dataTransfer.files;
+  if (canDrop) {
+    const files = event.dataTransfer.files;
+    processUploadedFileList(files, "Drag&Drop");
+  }
   draggingOver.value = false;
-  processUploadedFileList(files, "Drag&Drop");
+  canDrop.value = false;
 };
 
-const dragOver = (event: Event) => {
+const dragOver = (event: DragEvent) => {
   event.preventDefault();
   event.stopPropagation();
   draggingOver.value = true;
+  canDrop.value = !!event.dataTransfer && !event.dataTransfer.getData("draggedFileTreeItem");
 };
 
-const dragLeave = (event: Event) => {
+const dragLeave = (event: DragEvent) => {
   event.preventDefault();
   event.stopPropagation();
   draggingOver.value = false;
+  canDrop.value = false;
 };
-
 
 </script>
 
 <template>
-  <div class="file-drop-inner" :class="{'dragging-over': draggingOver}" @drop="drop" @dragover="dragOver"
+  <div class="file-drop-inner" :class="{'dragging-over': draggingOver && canDrop, 'active': !draggingOver}" @drop="drop"
+       @dragover="dragOver"
+       @click="open()"
        @dragleave="dragLeave">
-    <span>Drag &amp; drop a file here to upload</span>
+    <span>Drop a file here to upload or click to browse</span>
   </div>
 </template>
 
@@ -44,6 +56,12 @@ const dragLeave = (event: Event) => {
   padding: 10px 5px;
   margin: 5px;
   text-align: center;
+}
+
+.active:hover {
+  color: white;
+  border-color: white;
+  cursor: pointer;
 }
 
 .dragging-over {
