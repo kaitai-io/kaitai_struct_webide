@@ -1,25 +1,7 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
     "module": "ESNext",
-    "noImplicitAny": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "noEmitOnError": false,
-    "removeComments": false,
-    "preserveConstEnums": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "alwaysStrict": true,
-//    "strictNullChecks": true,
-    "sourceMap": false,
+    "moduleResolution": "Bundler",
     "target": "es2021",
-    "outDir": "js/",
-    "lib": ["es2021", "dom"],
-    "moduleResolution": "Node"
-  },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-  ]
+  }
 }
