@@ -53,7 +53,6 @@ export class CompilerService {
             const compilationTarget = await this._compileDebugOrRelease(targetLanguage, compilerSchema, jsImporter, isDebug);
             const {schema, types} = SchemaUtils.prepareSchemaAndCombinedKsyTypes(initialYaml, jsImporter.getFilesLoadedUsingImporter());
 
-
             return {
                 result: compilationTarget,
                 ksySchema: schema,

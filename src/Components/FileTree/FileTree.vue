@@ -3,6 +3,7 @@
 import {useFileSystems} from "./Store/FileSystemsStore";
 import FileTreeNodes from "./FileTreeNodes.vue";
 import FileDrop from "./FileDrop.vue";
+import {GL_FILE_TREE_ID} from "../GoldenLayout/GoldenLayoutUIConfig";
 
 const store = useFileSystems();
 
@@ -10,7 +11,7 @@ const store = useFileSystems();
 </script>
 
 <template>
-  <div id="fileTreeNew" class="file-tree-component">
+  <div :id="GL_FILE_TREE_ID" class="file-tree-component">
     <div class="file-tree-list-container">
       <div class="file-tree-list-container-inner">
         <FileTreeNodes :fileSystem="fileSystem" v-for="fileSystem in store.fileSystems"/>

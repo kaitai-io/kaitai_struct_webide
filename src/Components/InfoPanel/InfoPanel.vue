@@ -12,6 +12,8 @@ import {ExportedValueUtils} from "../../Utils/ExportedValueUtils";
 import {useWelcomeModalStore} from "../Modals/WelcomeModal/WelcomeModalStore";
 import TextButton from "../UtilComponents/TextButton.vue";
 import {RestoreBackupConfigFromBackup} from "../../GlobalActions/RestoreBackupConfigFromBackup";
+import {useErrorStore} from "../../Stores/ErrorStore";
+import {GL_INFO_PANEL_ID} from "../GoldenLayout/GoldenLayoutUIConfig";
 
 const currentBinaryFileStore = useCurrentBinaryFileStore();
 const hexViewerConfigStore = useHexViewerConfigStore();
@@ -35,7 +37,7 @@ const selectionPath = computed(() => {
       ? (currentBinaryFileStore.parsedFileFlatInfo.leafs[rangeIndex].path || []).join("/")
       : "";
 });
-const isLocalEnv = process.env.NODE_ENV === 'development';
+const isLocalEnv = process.env.NODE_ENV === "development";
 
 const about = () => {
   useWelcomeModalStore().open();
@@ -43,7 +45,7 @@ const about = () => {
 </script>
 
 <template>
-  <div class="info-panel" id="infoPanel">
+  <div :id="GL_INFO_PANEL_ID" class="info-panel">
     <SelectionPreview/>
 
 

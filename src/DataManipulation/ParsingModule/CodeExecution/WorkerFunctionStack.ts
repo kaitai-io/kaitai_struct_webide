@@ -18,4 +18,8 @@ export class WorkerFunctionStack {
         delete this.msgHandlers[msgId];
         return parseResponseMethod;
     }
+
+    getNewMessageId() {
+        return ++this.lastMsgId;
+    }
 }

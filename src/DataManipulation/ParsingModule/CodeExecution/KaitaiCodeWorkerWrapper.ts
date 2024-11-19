@@ -2,8 +2,10 @@ import {IExportedValue} from "../../ExportedValueTypes";
 import {WorkerFunctionStack} from "./WorkerFunctionStack";
 import {IWorkerMessage, IWorkerMessageGetInstance, IWorkerMessageParse} from "./WorkerMessages";
 import {IWorkerResponse, IWorkerResponseGetInstance, IWorkerResponseParse} from "./WorkerResponses";
-import {GET_INSTANCE, IWorkerApiMethods, IWorkerParsedResponse, PARSE_SCRIPTS} from "./Types";
+import {GET_INSTANCE, IWorkerApiMethods, PARSE_SCRIPTS} from "./Types";
 import {CompilationTarget} from "../../CompilationModule/CompilerService";
+import {useErrorStore} from "../../../Stores/ErrorStore";
+import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
 
 export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
     stack: WorkerFunctionStack;
@@ -26,13 +28,9 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
         this.inputBuffer = inputBuffer;
     };
 
-    parseAction = (eagerMode: boolean): Promise<IWorkerParsedResponse> => {
-        return new Promise<IWorkerParsedResponse>((resolve, reject) => {
-            const digestResponseFromWorkerFn = (response: IWorkerResponseParse) => this.digestParseResponseFromWorker(response, resolve, reject);
-            const msgId = this.stack.pushFunctionToStack(digestResponseFromWorkerFn);
-            const message = this.prepareIWorkerMessageParse(msgId, eagerMode);
-            this.sendMessageToWorker(message);
-        });
+    parseAction = (eagerMode: boolean): void => {
+        const message = this.prepareIWorkerMessageParse(this.stack.getNewMessageId(), eagerMode);
+        this.sendMessageToWorker(message);
     };
 
     getPropertyByPathAction = (path: string[]): Promise<IExportedValue> => {
@@ -49,44 +47,46 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
     };
 
     sendMessageToWorker = (message: IWorkerMessage): void => {
-        console.log("[KaitaiCodeWorkerWrapper][REQUEST]", message);
+        console.log(`[KaitaiCodeWorkerWrapper][REQUEST][${message.type}]`, message);
         this.worker.postMessage(message);
     };
 
     onMessageReceive = (ev: MessageEvent): void => {
-        const msg = <IWorkerResponse>ev.data;
-        switch (msg.type) {
+        const message = <IWorkerResponse>ev.data;
+        console.log(`[KaitaiCodeWorkerWrapper][RESPONSE][${message.type}]`, message);
+        switch (message.type) {
             case GET_INSTANCE: {
-                this.onMessageReceiveParse(msg)
+                this.onMessageReceiveGetInstance(message);
                 return;
             }
             case PARSE_SCRIPTS: {
-                this.onMessageReceiveParse(msg as IWorkerResponseParse);
+                this.onMessageReceiveParse(message);
                 return;
             }
         }
     };
 
-    private onMessageReceiveParse = (msg: IWorkerResponse) => {
-        console.log("[KaitaiCodeWorkerWrapper][RESPONSE]", msg);
-        const parseResponsePromise = this.stack.removeFunctionFromStack(msg.msgId);
-        if (!!parseResponsePromise) {
-            parseResponsePromise(msg);
+    private onMessageReceiveGetInstance = (msg: IWorkerResponseGetInstance) => {
+        const getInstanceDigestFn = this.stack.removeFunctionFromStack(msg.msgId);
+        if (!!getInstanceDigestFn) {
+            getInstanceDigestFn(msg);
         }
     };
-
-
-    private digestParseResponseFromWorker = (response: IWorkerResponseParse,
-                                        resolve: (value?: (PromiseLike<IWorkerParsedResponse> | IWorkerParsedResponse)) => void,
-                                        reject: (reason?: any) => void) => {
-        let {error, resultObject, flatExported} = response;
-        resolve({resultObject, flatExported, error});
+    private onMessageReceiveParse = (msg: IWorkerResponseParse) => {
+        const store = useCurrentBinaryFileStore();
+        let {error, resultObject, flatExported} = msg;
+        if (error) {
+            useErrorStore().setError(error);
+        } else {
+            useErrorStore().clearErrors();
+        }
+        store.updateParsedFile(resultObject, flatExported);
     };
 
 
     private digestGetInstanceResponseFromWorker = (response: IWorkerResponseGetInstance,
-                                             resolve: (value?: (PromiseLike<IExportedValue> | IExportedValue)) => void,
-                                             reject: (reason?: any) => void) => {
+                                                   resolve: (value?: (PromiseLike<IExportedValue> | IExportedValue)) => void,
+                                                   reject: (reason?: any) => void) => {
         const {instance} = response;
         resolve(instance);
     };

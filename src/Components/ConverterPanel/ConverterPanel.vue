@@ -2,6 +2,7 @@
 import {computed} from "vue";
 import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import {prepareEmptyModel, prepareModelData} from "./ConverterPanelModelFactory";
+import {GL_CONVERTER_PANEL_ID} from "../GoldenLayout/GoldenLayoutUIConfig";
 
 const MAX_SELECTION_LENGTH_FOR_CONVERTER = 64;
 
@@ -21,7 +22,7 @@ const model = computed(() => {
 </script>
 
 <template>
-  <div id="converter-panel" class="converterPanel">
+  <div :id="GL_CONVERTER_PANEL_ID" class="converterPanel">
     <table>
       <thead>
       <tr class="tableRow">

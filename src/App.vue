@@ -20,6 +20,7 @@ import {useFileSystems} from "./Components/FileTree/Store/FileSystemsStore";
 import {CurrentGoldenLayout} from "./Components/GoldenLayout/GoldenLayoutUI";
 import WelcomeModal from "./Components/Modals/WelcomeModal/WelcomeModal.vue";
 import TextInputModal from "./Components/Modals/TextInputModal/TextInputModal.vue";
+import ErrorPanel from "./Components/GoldenLayout/ErrorPanel.vue";
 
 const store = useAppStore();
 const fileSystemsStore = useFileSystems();
@@ -28,12 +29,12 @@ store.$onAction(async ({name, store, args}) => {
   switch (name) {
     case "updateSelectedBinaryFile": {
       await loadBinaryFileAction(args[0]);
-      await parseAction();
+      parseAction();
       return;
     }
     case "updateSelectedKsyFile": {
       await loadKsyFileAction(args[0]);
-      await parseAction();
+      parseAction();
       return;
     }
   }
@@ -48,7 +49,7 @@ const initFileSystems = async () => {
 const initFileParsing = async () => {
   await loadKsyFileAction(store.selectedKsyInfo);
   await loadBinaryFileAction(store.selectedBinaryInfo);
-  await parseAction();
+  parseAction();
 };
 
 
@@ -69,6 +70,7 @@ onMounted(async () => {
   <FileTree/>
   <InfoPanel/>
   <ConverterPanel/>
+  <ErrorPanel/>
 
   <TextInputModal/>
   <WelcomeModal/>

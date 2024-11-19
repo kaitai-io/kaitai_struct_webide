@@ -1,12 +1,11 @@
-import {useAppStore} from "../Stores/AppStore";
-import {YamlFileInfo} from "../DataManipulation/CompilationModule/JsImporter";
-import {compileInternalDebugAndRelease} from "./CompileGrammar";
-import {parseAction} from "./ParseAction";
-import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
-
-import {FILE_SYSTEM_TYPE_LOCAL} from "../Components/FileTree/FileSystems/LocalStorageFileSystem";
-import {FILE_SYSTEM_TYPE_KAITAI} from "../Components/FileTree/FileSystems/KaitaiFileSystem";
 import {editor} from "monaco-editor";
+import {useFileSystems} from "../FileTree/Store/FileSystemsStore";
+import {FILE_SYSTEM_TYPE_LOCAL} from "../FileTree/FileSystems/LocalStorageFileSystem";
+import {parseAction} from "../../GlobalActions/ParseAction";
+import {compileInternalDebugAndRelease} from "../../GlobalActions/CompileGrammar";
+import {YamlFileInfo} from "../../DataManipulation/CompilationModule/JsImporter";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../FileTree/FileSystems/KaitaiFileSystem";
+import {useAppStore} from "../../Stores/AppStore";
 
 export const mainEditorOnChange = async (changedEvent: editor.IModelContentChangedEvent, editorContent: string) => {
     const contentDidNotChange = changedEvent.changes.map(change => change.text).join("\n") === editorContent;
@@ -17,13 +16,13 @@ export const mainEditorOnChange = async (changedEvent: editor.IModelContentChang
 
     await useFileSystems().addFile(FILE_SYSTEM_TYPE_LOCAL, yamlInfo.filePath, editorContent);
     await compileInternalDebugAndRelease(yamlInfo);
-    await parseAction();
+    parseAction();
 };
 
 export const mainEditorRecompile = async (editorr: editor.IStandaloneCodeEditor) => {
     const yamlInfo = yamlInfoWithCurrentStoreStateAndNewContent(editorr.getValue());
     await compileInternalDebugAndRelease(yamlInfo);
-    await parseAction();
+    parseAction();
 };
 
 const switchStoreIfChangeAppearedInKaitaiStore = (yamlInfo: YamlFileInfo) => {

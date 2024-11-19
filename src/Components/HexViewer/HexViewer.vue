@@ -8,6 +8,7 @@ import HexViewerRow from "./HexViewerRow.vue";
 import {useHexViewerConfigStore} from "./Store/HexViewerConfigStore";
 import {handleOnPageReloadScrollToSelection, handleSelectionUpdatedEvents} from "./Services/HexViewerActions";
 import {handleCursorMoveAndSelect} from "./Services/HexViewerKeyboardActions";
+import {GL_HEX_VIEWER_ID} from "../GoldenLayout/GoldenLayoutUIConfig";
 
 const currentBinaryFileStore = useCurrentBinaryFileStore();
 const hexViewerConfigStore = useHexViewerConfigStore();
@@ -30,15 +31,15 @@ currentBinaryFileStore.$onAction(({name, store, args}) => {
 });
 
 hexViewerConfigStore.$onAction(({name, store, args}) => {
-  if(name !== "jumpToAddress") return;
+  if (name !== "jumpToAddress") return;
   const jumpIndex = args[0] as number;
   scrollTo(Math.floor(jumpIndex / store.rowSize));
-})
+});
 
 </script>
 
 <template>
-  <div tabindex="-1" id="hex-viewer" class="hex-viewer"
+  <div :id="GL_HEX_VIEWER_ID" tabindex="-1" class="hex-viewer"
        @keydown="(e) => handleCursorMoveAndSelect(e, hexViewerConfigStore.rowSize)">
     <HexViewerHeader/>
     <div v-bind="containerProps" class="backdrop">

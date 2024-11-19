@@ -3,6 +3,7 @@ import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import {computed} from "vue";
 import {ObjectType} from "../../DataManipulation/ExportedValueTypes";
 import ParsedTreeNode from "./ParsedTreeNode.vue";
+import {GL_PARSED_DATA_TREE_ID} from "../GoldenLayout/GoldenLayoutUIConfig";
 
 const store = useCurrentBinaryFileStore();
 const parsedFile = computed(() => {
@@ -26,7 +27,7 @@ const children = computed(() => {
 </script>
 
 <template>
-  <div class="local" id="parsedDataTree">
+  <div :id="GL_PARSED_DATA_TREE_ID" class="local">
     <div class="overflow-wrapper">
       <ParsedTreeNode :node="node" v-if="parsedFile" v-for="node in children" :depth="0"/>
     </div>

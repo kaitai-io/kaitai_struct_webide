@@ -10,7 +10,8 @@ export const HexViewerCtxActionExportToJson = (useHex: boolean): MenuItem => {
 
     const action = async () => {
         const json = await exportToJson(useHex);
-        CurrentGoldenLayout.addExportedToJsonTab("json export", json);
+        const title = useHex ? "json export(hex)" : "json export"
+        CurrentGoldenLayout.addDynamicCodeTab(title, json, "json");
     };
     const label = useHex ? "Export to JSON(HEX)" : "Export to JSON";
 

@@ -37,7 +37,7 @@ export interface IWorkerApiMethods {
 
     setInputAction(inputBuffer: ArrayBuffer): void;
 
-    parseAction(eagerMode: boolean): Promise<IWorkerParsedResponse>;
+    parseAction(eagerMode: boolean): void;
 
     getPropertyByPathAction(path: string[]): Promise<IExportedValue>;
 }

@@ -1,11 +1,22 @@
-import {GoldenLayoutUIConfig} from "./GoldenLayoutUIConfig";
+import {
+    GL_BINARY_FILE_TAB_ID,
+    GL_CODE_STACK_ID,
+    GL_CONVERTER_PANEL_ID,
+    GL_FILE_TREE_ID,
+    GL_GEN_CODE_VIEWER_DEBUG_ID,
+    GL_GEN_CODE_VIEWER_ID,
+    GL_HEX_VIEWER_ID,
+    GL_INFO_PANEL_ID,
+    GL_KSY_EDITOR_ID,
+    GL_PARSED_DATA_TREE_ID,
+    GoldenLayoutUIConfig
+} from "./GoldenLayoutUIConfig";
 
 import GoldenLayout from "golden-layout";
 import {MonacoEditorComponent, MonacoEditorOptions} from "./MonacoEditorComponent";
-import {mainEditorOnChange, mainEditorRecompile} from "../../GlobalActions/KsyEditorActions";
-import {DelayAction} from "../../Utils/DelayAction";
-import {editor, KeyCode, KeyMod} from "monaco-editor";
+import {editor} from "monaco-editor";
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
+import {MonacoEditorComponentKsyEditor} from "../KsyEditor/MonacoEditorComponentKsyEditor";
 
 export class GoldenLayoutUI {
     dynCompId = 1;
@@ -16,26 +27,20 @@ export class GoldenLayoutUI {
 
     genCodeViewer: IStandaloneCodeEditor;
     genCodeDebugViewer: IStandaloneCodeEditor;
-    errorWindow: GoldenLayout.Container;
-    hexViewerContainer: GoldenLayout.Container;
+    errorPanel: GoldenLayout.Container;
 
     public init() {
         this.goldenLayout = new GoldenLayout(GoldenLayoutUIConfig);
 
-        this.addMonacoCodeEditorTab("ksyEditor", {lang: "yaml"});
-        this.addMonacoCodeEditorTab("genCodeViewer", {lang: "javascript", isReadOnly: true});
-        this.addMonacoCodeEditorTab("genCodeDebugViewer", {lang: "javascript"});
+        this.addMonacoCodeEditorTab(GL_KSY_EDITOR_ID, {lang: "yaml"});
+        this.addMonacoCodeEditorTab(GL_GEN_CODE_VIEWER_ID, {lang: "javascript", isReadOnly: true});
+        this.addMonacoCodeEditorTab(GL_GEN_CODE_VIEWER_DEBUG_ID, {lang: "javascript"});
 
-        this.addHexViewer("hex-viewer");
-        this.addExistingDiv("parsedDataTree");
-        this.addExistingDiv("fileTreeNew");
-        this.addExistingDiv("converter-panel");
-
-        this.addComponent("errorWindow", cont => {
-            cont.getElement().append($("<div></div>"));
-        });
-
-        this.addExistingDiv("infoPanel");
+        this.addExistingDiv(GL_HEX_VIEWER_ID);
+        this.addExistingDiv(GL_PARSED_DATA_TREE_ID);
+        this.addExistingDiv(GL_FILE_TREE_ID);
+        this.addExistingDiv(GL_CONVERTER_PANEL_ID);
+        this.addExistingDiv(GL_INFO_PANEL_ID);
 
         this.goldenLayout.init();
     }
@@ -56,30 +61,6 @@ export class GoldenLayoutUI {
         };
     }
 
-    addComponent(name: string, generatorCallback?: (container: GoldenLayout.Container) => any) {
-        let editor: any;
-        this.goldenLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
-            container.getElement().attr("id", name);
-            if (generatorCallback) {
-                container.on("resize", () => {
-                    if (editor && editor.resize) editor.resize();
-                });
-                container.on("open", () => {
-                    generatorCallback(container);
-                });
-            }
-        });
-    }
-
-    addHexViewer(name: string) {
-        const self = this;
-        this.goldenLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
-            self.hexViewerContainer = container;
-            const cont = $(`#${name}`).appendTo(container.getElement());
-            $(() => cont.show());
-        });
-    }
-
     addExistingDiv(name: string) {
         this.goldenLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
             const cont = $(`#${name}`).appendTo(container.getElement());
@@ -88,28 +69,21 @@ export class GoldenLayoutUI {
     }
 
     addMonacoCodeEditorTab(name: string, options: MonacoEditorOptions) {
-        this.addComponent(name, container => {
-            const newEditor = MonacoEditorComponent(container, options);
+        const self = this;
+        this.goldenLayout.registerComponent(name, function (container: GoldenLayout.Container, componentState: any) {
+            container.getElement().attr("id", name);
             switch (name) {
-                case "ksyEditor":
-                    const editDelay = new DelayAction(500);
-                    newEditor.onDidChangeModelContent((event) => {
-                        editDelay.do(() => mainEditorOnChange(event, newEditor.getValue()));
-                    });
-                    newEditor.addCommand(KeyMod.CtrlCmd | KeyCode.Enter, (args) => {
-                        mainEditorRecompile(newEditor);
-                    }, "compile");
-                    this.ksyEditor = newEditor;
-                    this.ksyEditorContainer = container;
+                case GL_KSY_EDITOR_ID:
+                    self.ksyEditor = MonacoEditorComponentKsyEditor(container, options);
+                    self.ksyEditorContainer = container;
                     break;
-                case "genCodeViewer":
-                    this.genCodeViewer = newEditor;
+                case GL_GEN_CODE_VIEWER_ID:
+                    self.genCodeViewer = MonacoEditorComponent(container, options);
                     break;
-                case "genCodeDebugViewer": {
-                    this.genCodeDebugViewer = newEditor;
+                case GL_GEN_CODE_VIEWER_DEBUG_ID: {
+                    self.genCodeDebugViewer = MonacoEditorComponent(container, options);
                 }
             }
-            return newEditor;
         });
     }
 
@@ -119,7 +93,7 @@ export class GoldenLayoutUI {
     }
 
     updateHexViewerTitle(title: string) {
-        this.getLayoutNodeById("inputBinaryTab").setTitle(title);
+        this.getLayoutNodeById(GL_BINARY_FILE_TAB_ID).setTitle(title);
     }
 
 
@@ -136,18 +110,7 @@ export class GoldenLayoutUI {
         };
         const componentName = `dynComp${this.dynCompId++}`;
         this.addMonacoCodeEditorTab(componentName, options);
-        this.getLayoutNodeById("codeTab").addChild({type: "component", componentName, title});
-    }
-
-    addExportedToJsonTab(title: string, json: string) {
-        const options: MonacoEditorOptions = {
-            lang: "json",
-            isReadOnly: true,
-            data: json
-        };
-        const componentName = `dynComp${this.dynCompId++}`;
-        this.addMonacoCodeEditorTab(componentName, options);
-        this.getLayoutNodeById("codeTab").addChild({type: "component", componentName, title});
+        this.getLayoutNodeById(GL_CODE_STACK_ID).addChild({type: "component", componentName, title});
     }
 }
 
