@@ -10,14 +10,14 @@ import {ObjectType} from "../../../../src/DataManipulation/ExportedValueTypes.js
 const SimpleObjectBinary = fs.readFileSync("test/DataManipulation/ParsingModule/SimpleObjectInstance/simple_object.bin");
 const SimpleObjectKsy = fs.readFileSync("test/DataManipulation/ParsingModule/SimpleObjectInstance/simple_object_instance.ksy").toString();
 const prepareSimpleObjectScope = async () => {
-    const compilerTarget = await CompilerService.compileSingleTarget({
+    const compilationResult = await CompilerService.compileSingleTarget({
         filePath: "",
         storeId: "",
         fileContent: SimpleObjectKsy
     }, "javascript", true)
 
     const scope = new EvaluatedCodeScope();
-    scope.evaluateCode(compilerTarget)
+    scope.evaluateCode(compilationResult.result)
     return scope;
 }
 const prepareParsedObject = async (eagerMode) => {

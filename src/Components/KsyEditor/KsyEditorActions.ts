@@ -15,13 +15,15 @@ export const mainEditorOnChange = async (changedEvent: editor.IModelContentChang
     switchStoreIfChangeAppearedInKaitaiStore(yamlInfo);
 
     await useFileSystems().addFile(FILE_SYSTEM_TYPE_LOCAL, yamlInfo.filePath, editorContent);
-    await compileInternalDebugAndRelease(yamlInfo);
+    const compilationSuccess = await compileInternalDebugAndRelease(yamlInfo);
+    if (!compilationSuccess) return;
     parseAction();
 };
 
 export const mainEditorRecompile = async (editorr: editor.IStandaloneCodeEditor) => {
     const yamlInfo = yamlInfoWithCurrentStoreStateAndNewContent(editorr.getValue());
-    await compileInternalDebugAndRelease(yamlInfo);
+    const compilationSuccess = await compileInternalDebugAndRelease(yamlInfo);
+    if (!compilationSuccess) return;
     parseAction();
 };
 

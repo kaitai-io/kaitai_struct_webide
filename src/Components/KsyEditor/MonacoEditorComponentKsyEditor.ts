@@ -16,7 +16,7 @@ export const MonacoEditorComponentKsyEditor = (container: GoldenLayout.Container
 
     newEditor.addCommand(KeyMod.CtrlCmd | KeyCode.Enter, (args) => {
         mainEditorRecompile(newEditor);
-    }, "compile");
+    });
 
     return newEditor;
 };

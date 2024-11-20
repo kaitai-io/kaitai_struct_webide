@@ -20,7 +20,7 @@ import {useFileSystems} from "./Components/FileTree/Store/FileSystemsStore";
 import {CurrentGoldenLayout} from "./Components/GoldenLayout/GoldenLayoutUI";
 import WelcomeModal from "./Components/Modals/WelcomeModal/WelcomeModal.vue";
 import TextInputModal from "./Components/Modals/TextInputModal/TextInputModal.vue";
-import ErrorPanel from "./Components/GoldenLayout/ErrorPanel.vue";
+import ErrorPanel from "./Components/ErrorPanel/ErrorPanel.vue";
 
 const store = useAppStore();
 const fileSystemsStore = useFileSystems();

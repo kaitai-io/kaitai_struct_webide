@@ -15,8 +15,9 @@ import {
 import GoldenLayout from "golden-layout";
 import {MonacoEditorComponent, MonacoEditorOptions} from "./MonacoEditorComponent";
 import {editor} from "monaco-editor";
-import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 import {MonacoEditorComponentKsyEditor} from "../KsyEditor/MonacoEditorComponentKsyEditor";
+import {ErrorPanelManager} from "./ErrorPanelManager";
+import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 
 export class GoldenLayoutUI {
     dynCompId = 1;
@@ -27,7 +28,7 @@ export class GoldenLayoutUI {
 
     genCodeViewer: IStandaloneCodeEditor;
     genCodeDebugViewer: IStandaloneCodeEditor;
-    errorPanel: GoldenLayout.Container;
+    errorPanelManager: ErrorPanelManager;
 
     public init() {
         this.goldenLayout = new GoldenLayout(GoldenLayoutUIConfig);
@@ -41,24 +42,13 @@ export class GoldenLayoutUI {
         this.addExistingDiv(GL_FILE_TREE_ID);
         this.addExistingDiv(GL_CONVERTER_PANEL_ID);
         this.addExistingDiv(GL_INFO_PANEL_ID);
+        this.errorPanelManager = new ErrorPanelManager(this);
 
         this.goldenLayout.init();
     }
 
     getLayoutNodeById(id: string): GoldenLayout.ContentItem {
         return (<any>this.goldenLayout)._getAllContentItems().filter((x: any) => x.config.id === id || x.componentName === id)[0];
-    }
-
-    addPanel() {
-        let componentName = `dynComp${this.dynCompId++}`;
-        return {
-            componentName,
-            donePromise: <Promise<GoldenLayout.Container>>new Promise((resolve, reject) => {
-                this.goldenLayout.registerComponent(componentName, function (container: GoldenLayout.Container, componentState: any) {
-                    resolve(container);
-                });
-            })
-        };
     }
 
     addExistingDiv(name: string) {
@@ -100,6 +90,14 @@ export class GoldenLayoutUI {
     updateReleaseAndDebugCodeTabs(debugCode: string, releaseCode: string) {
         this.genCodeViewer.setValue(releaseCode);
         this.genCodeDebugViewer.setValue(debugCode);
+    }
+
+    handleErrorMessage(errorMessage?: string) {
+        if (!errorMessage) {
+            this.errorPanelManager.close();
+            return;
+        }
+        this.errorPanelManager.setMessage(errorMessage);
     }
 
     addDynamicCodeTab(title: string, content: string, lang: string) {

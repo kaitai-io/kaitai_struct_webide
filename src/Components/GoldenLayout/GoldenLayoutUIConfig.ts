@@ -11,6 +11,7 @@ export const GL_HEX_VIEWER_ID = "hex-viewer";
 export const GL_FILE_TREE_ID = "file-tree";
 export const GL_INFO_PANEL_ID = "info-panel";
 export const GL_CONVERTER_PANEL_ID = "converter-panel";
+export const GL_ERRORS_TAB_ID = "errors-tab";
 
 
 export const GoldenLayoutUIConfig: GoldenLayout.Config = {

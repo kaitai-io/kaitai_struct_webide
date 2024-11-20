@@ -4,8 +4,8 @@ import {IWorkerMessage, IWorkerMessageGetInstance, IWorkerMessageParse} from "./
 import {IWorkerResponse, IWorkerResponseGetInstance, IWorkerResponseParse} from "./WorkerResponses";
 import {GET_INSTANCE, IWorkerApiMethods, PARSE_SCRIPTS} from "./Types";
 import {CompilationTarget} from "../../CompilationModule/CompilerService";
-import {useErrorStore} from "../../../Stores/ErrorStore";
 import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
+import {useErrorStore} from "../../../Components/ErrorPanel/Store/ErrorStore";
 
 export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
     stack: WorkerFunctionStack;

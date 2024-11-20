@@ -1,5 +1,4 @@
 import {IYamlImporter, JsImporter, YamlFileInfo} from "./JsImporter";
-import {FileSystemItem} from "../../Components/FileTree/FileSystemsTypes";
 import {performanceHelper} from "../../Utils/PerformanceHelper";
 import {SchemaUtils} from "./SchemaUtils";
 import KaitaiStructCompiler from "kaitai-struct-compiler";
@@ -30,19 +29,21 @@ export interface ReleaseAndDebugTargets {
     ksyTypes: IKsyTypes;
 }
 
+export interface CompilationResultSuccess {
+    status: "SUCCESS";
+    result: ReleaseAndDebugTargets | CompilationTarget
+}
+
+
+export interface CompilationResultFailure {
+    status: "FAILURE";
+    error: any;
+}
+
+export type CompilationResult = CompilationResultSuccess | CompilationResultFailure;
+
 export class CompilerService {
-    static async compileSingleTargetFsWrapper(srcYamlFsItem: FileSystemItem, yamlContent: string, targetLanguage: string, isDebug: boolean): Promise<CompilationTarget> {
-        const initialYaml: YamlFileInfo = {storeId: srcYamlFsItem.fsType, fileContent: yamlContent, filePath: srcYamlFsItem.fn};
-        return this.compileSingleTarget(initialYaml, targetLanguage, isDebug);
-
-    }
-
-    static async compileDebugAndReleaseTargetsWrapper(srcYamlFsItem: FileSystemItem, yamlContent: string, targetLanguage: string): Promise<ReleaseAndDebugTargets> {
-        const initialYaml: YamlFileInfo = {storeId: srcYamlFsItem.fsType, fileContent: yamlContent, filePath: srcYamlFsItem.fn};
-        return this.compileDebugAndReleaseTargets(initialYaml, targetLanguage);
-    }
-
-    static async compileSingleTarget(initialYaml: YamlFileInfo, targetLanguage: string, isDebug: boolean): Promise<CompilationTarget> {
+    static async compileSingleTarget(initialYaml: YamlFileInfo, targetLanguage: string, isDebug: boolean): Promise<CompilationResult> {
         try {
             if (targetLanguage === "json") {
                 return this.getJsonCompilationTargetResponse(initialYaml);
@@ -54,18 +55,24 @@ export class CompilerService {
             const {schema, types} = SchemaUtils.prepareSchemaAndCombinedKsyTypes(initialYaml, jsImporter.getFilesLoadedUsingImporter());
 
             return {
-                result: compilationTarget,
-                ksySchema: schema,
-                mainClassId: this.getMainClassId(schema),
-                jsMainClassName: this.getJsMainClassNameFromSchema(schema),
-                ksyTypes: types
+                status: "SUCCESS",
+                result: {
+                    result: compilationTarget,
+                    ksySchema: schema,
+                    mainClassId: this.getMainClassId(schema),
+                    jsMainClassName: this.getJsMainClassNameFromSchema(schema),
+                    ksyTypes: types,
+                }
             };
         } catch (ex) {
-            return Promise.reject(ex);
+            return {
+                status: "FAILURE",
+                error: ex
+            }
         }
     }
 
-    static async compileDebugAndReleaseTargets(initialYaml: YamlFileInfo, targetLanguage: string): Promise<ReleaseAndDebugTargets> {
+    static async compileDebugAndReleaseTargets(initialYaml: YamlFileInfo, targetLanguage: string): Promise<CompilationResult> {
         try {
             if (targetLanguage === "json") {
                 return this.getJsonReleaseAndDebugTargets(initialYaml);
@@ -76,14 +83,20 @@ export class CompilerService {
             const {schema, types} = SchemaUtils.prepareSchemaAndCombinedKsyTypes(initialYaml, jsImporter.getFilesLoadedUsingImporter());
 
             return {
-                debug: debugTarget,
-                release: releaseTarget,
-                jsMainClassName: this.getJsMainClassNameFromSchema(schema),
-                ksySchema: schema,
-                ksyTypes: types
+                status: "SUCCESS",
+                result: {
+                    debug: debugTarget,
+                    release: releaseTarget,
+                    jsMainClassName: this.getJsMainClassNameFromSchema(schema),
+                    ksySchema: schema,
+                    ksyTypes: types,
+                }
             };
         } catch (ex) {
-            return Promise.reject(ex);
+            return {
+                status: "FAILURE",
+                error: ex,
+            };
         }
     }
 
@@ -123,27 +136,32 @@ export class CompilerService {
         }
     }
 
-    private static getJsonCompilationTargetResponse(initialYaml: YamlFileInfo): Promise<CompilationTarget> {
+    private static getJsonCompilationTargetResponse(initialYaml: YamlFileInfo): Promise<CompilationResult> {
         const {schema, types} = SchemaUtils.getTypesAndSchemaFromSingleFile(initialYaml);
-
         return Promise.resolve({
-            result: {},
-            mainClassId: this.getMainClassId(schema),
-            jsMainClassName: this.getJsMainClassNameFromSchema(schema),
-            ksySchema: schema,
-            ksyTypes: types
+            status: "SUCCESS",
+            result: {
+                result: {},
+                mainClassId: this.getMainClassId(schema),
+                jsMainClassName: this.getJsMainClassNameFromSchema(schema),
+                ksySchema: schema,
+                ksyTypes: types
+            }
         });
     }
 
-    private static getJsonReleaseAndDebugTargets(initialYaml: YamlFileInfo): Promise<ReleaseAndDebugTargets> {
+    private static getJsonReleaseAndDebugTargets(initialYaml: YamlFileInfo): Promise<CompilationResult> {
         const {schema, types} = SchemaUtils.getTypesAndSchemaFromSingleFile(initialYaml);
         return Promise.resolve({
-            debug: {},
-            release: {},
-            mainClassId: this.getMainClassId(schema),
-            jsMainClassName: this.getJsMainClassNameFromSchema(schema),
-            ksySchema: schema,
-            ksyTypes: types
+            status: "SUCCESS",
+            result: {
+                debug: {},
+                release: {},
+                mainClassId: this.getMainClassId(schema),
+                jsMainClassName: this.getJsMainClassNameFromSchema(schema),
+                ksySchema: schema,
+                ksyTypes: types
+            }
         });
     }
 

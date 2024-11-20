@@ -1,24 +1,30 @@
 import {YamlFileInfo} from "../DataManipulation/CompilationModule/JsImporter";
-import {CompilerService} from "../DataManipulation/CompilationModule/CompilerService";
+import {CompilerService, ReleaseAndDebugTargets} from "../DataManipulation/CompilationModule/CompilerService";
 import {CurrentGoldenLayout} from "../Components/GoldenLayout/GoldenLayoutUI";
 import {KaitaiCodeWorkerApi} from "../DataManipulation/ParsingModule/KaitaiCodeWorkerApi";
-import {useErrorStore} from "../Stores/ErrorStore";
+import {useErrorStore} from "../Components/ErrorPanel/Store/ErrorStore";
 
 export const compileInternalDebugAndRelease = async (yamlInfo: YamlFileInfo) => {
-    try {
-        useErrorStore().clearErrors();
-        const compiledGrammar = await CompilerService.compileDebugAndReleaseTargets(yamlInfo, "javascript");
-        const debugCode = Object.values(compiledGrammar.debug).join("");
-        const releaseCode = Object.values(compiledGrammar.release).join("");
-        CurrentGoldenLayout.updateReleaseAndDebugCodeTabs(debugCode, releaseCode);
-        KaitaiCodeWorkerApi.setCompilationTarget({
-            result: compiledGrammar.debug,
-            ksyTypes: compiledGrammar.ksyTypes,
-            ksySchema: compiledGrammar.ksySchema,
-            jsMainClassName: compiledGrammar.jsMainClassName,
-            mainClassId: compiledGrammar.jsMainClassName
-        });
-    } catch (ex) {
-        useErrorStore().setError(ex);
+    const compilationResult = await CompilerService.compileDebugAndReleaseTargets(yamlInfo, "javascript");
+    switch (compilationResult.status) {
+        case "FAILURE": {
+            useErrorStore().setError(compilationResult.error);
+            return false;
+        }
+        case "SUCCESS": {
+            const compiledGrammar = compilationResult.result as ReleaseAndDebugTargets;
+            useErrorStore().clearErrors();
+            const debugCode = Object.values(compiledGrammar.debug).join("");
+            const releaseCode = Object.values(compiledGrammar.release).join("");
+            CurrentGoldenLayout.updateReleaseAndDebugCodeTabs(debugCode, releaseCode);
+            KaitaiCodeWorkerApi.setCompilationTarget({
+                result: compiledGrammar.debug,
+                ksyTypes: compiledGrammar.ksyTypes,
+                ksySchema: compiledGrammar.ksySchema,
+                jsMainClassName: compiledGrammar.jsMainClassName,
+                mainClassId: compiledGrammar.jsMainClassName,
+            });
+            return true;
+        }
     }
 };
