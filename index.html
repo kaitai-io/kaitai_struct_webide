@@ -14,6 +14,7 @@
 
     <link rel="stylesheet" type="text/css" href="lib/_npm/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="css/contextmenu.css" />
+    <link rel="stylesheet" type="text/css" href="css/dialog.css" />
     <link rel="stylesheet" type="text/css" href="lib/_npm/goldenlayout/goldenlayout-base.css" />
     <link rel="stylesheet" type="text/css" href="lib/_npm/goldenlayout/goldenlayout-dark-theme.css" />
     <link rel="stylesheet" type="text/css" href="css/HexViewer.css" />
@@ -33,7 +34,7 @@
     <script src="js/kaitaiFsFiles.js"></script>
     <script>
         var paths = {};
-        ["bowser", "jstree", "localforage", "goldenlayout", "vue", "kaitai-struct-compiler", "dateformat"].forEach(
+        ["bowser", "jstree", "localforage", "goldenlayout", "vue", "kaitai-struct-compiler", "dateformat", "a11y-dialog"].forEach(
             name => paths[name] = `../../lib/_npm/${name}/${name}`);
         paths["big-integer"] = "../../lib/_npm/BigInteger/BigInteger";
         paths["js-yaml"] = "../../lib/_npm/js-yaml/js-yaml.min";
@@ -138,82 +139,80 @@
     </ul>
 </div>
 
-<div class="modal fade" id="newKsyModal" tabindex="-1" role="dialog" aria-labelledby="newKsyModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="newKsyModalLabel">Create new .ksy format file</h4>
-            </div>
-            <form>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="newKsyName" class="control-label">Name:</label>
-                        <input type="text" class="form-control" id="newKsyName">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create</button>
-                </div>
-            </form>
+<div class="dialog-container" id="newKsyModal" aria-labelledby="newKsyModalLabel" aria-hidden="true">
+    <div class="dialog-content" role="document">
+        <div class="modal-header">
+            <button type="button" class="close" data-a11y-dialog-hide aria-label="Close dialog"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="newKsyModalLabel">Create new .ksy format file</h4>
         </div>
-    </div>
-</div>
-
-<div class="modal fade" id="welcomeModal" tabindex="-1" role="dialog" aria-labelledby="welcomeModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
+        <form>
             <div class="modal-body">
                 <div class="form-group">
-                    <h4 class="modal-title" id="welcomeModalLabel">Hey there!</h4>
+                    <label for="newKsyName" class="control-label">Name:</label>
+                    <input type="text" class="form-control" id="newKsyName" autofocus>
                 </div>
-                <div class="form-group">
-                    If this is the first time you are using Kaitai WebIDE then I recommend scrolling through our
-                    <a href="https://github.com/kaitai-io/kaitai_struct_webide/wiki/Features" target="_blank">Features page</a>.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-a11y-dialog-hide>Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="dialog-overlay hidden" id="newKsyModalOverlay"></div>
+
+<div class="dialog-container" id="welcomeModal" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+    <div class="dialog-content" role="document">
+        <div class="modal-body">
+            <div class="form-group">
+                <h4 class="modal-title" id="welcomeModalLabel">Hey there!</h4>
+            </div>
+            <div class="form-group">
+                If this is the first time you are using Kaitai WebIDE then I recommend scrolling through our
+                <a href="https://github.com/kaitai-io/kaitai_struct_webide/wiki/Features" target="_blank">Features page</a>.
+            </div>
+            <div class="form-group">
+                You can read more about Kaitai Struct on our website (<a href="http://kaitai.io" target="_blank">kaitai.io</a>) and
+                learn the basics of using it by reading <a href="http://doc.kaitai.io" target="_blank">our documentation</a>.
+            </div>
+            <div class="form-group">
+                We would be pleased if you could visit us and share your thoughts about Kaitai Struct or WebIDE in our
+                <a href="https://gitter.im/kaitai_struct/Lobby" target="_blank">Gitter chatroom</a>.
+            </div>
+            <div class="form-group">
+                You can view the source code or create issues on Github
+                for the <a href="https://github.com/kaitai-io/kaitai_struct_webide" target="_blank">WebIDE</a> or
+                <a href="https://github.com/kaitai-io/kaitai_struct" target="_blank">Kaitai Struct</a>.
+            </div>
+            <div class="form-group">
+                Kaitai WebIDE was made possible by using
+                <a href="https://github.com/kaitai-io/kaitai_struct_webide/blob/master/docs/wiki/3rd-party-libraries.md" target="_blank">open-source libraries listed here</a>
+                (<a href="LICENSE-3RD-PARTY.txt" target="_blank">licensing information</a>).
+            </div>
+            <div class="form-group">
+                Also, follow us on Twitter!
+                <ul>
+                    <li style="margin-top:5px"><a href="https://twitter.com/koczkatamas" target="_blank">@koczkatamas</a> (WebIDE author)</li>
+                    <li style="margin-top:5px"><a href="https://twitter.com/kaitai_io" target="_blank">@kaitai_io</a> (Kaitai Project)</li>
+                </ul>
+            </div>
+            <div class="welcome-modal-licenses">
+                <div>
+                    Kaitai WebIDE version: <span id="webIdeVersion"></span>-SNAPSHOT-<a id="webideCommitId" href=""></a>
+                    (<span id="webideCommitDate"></span>,
+                        <a href="https://raw.githubusercontent.com/kaitai-io/kaitai_struct_webide/master/LICENSE" target="_blank">license</a>)
                 </div>
-                <div class="form-group">
-                    You can read more about Kaitai Struct on our website (<a href="http://kaitai.io" target="_blank">kaitai.io</a>) and
-                    learn the basics of using it by reading <a href="http://doc.kaitai.io" target="_blank">our documentation</a>.
-                </div>
-                <div class="form-group">
-                    We would be pleased if you could visit us and share your thoughts about Kaitai Struct or WebIDE in our
-                    <a href="https://gitter.im/kaitai_struct/Lobby" target="_blank">Gitter chatroom</a>.
-                </div>
-                <div class="form-group">
-                    You can view the source code or create issues on Github
-                    for the <a href="https://github.com/kaitai-io/kaitai_struct_webide" target="_blank">WebIDE</a> or
-                    <a href="https://github.com/kaitai-io/kaitai_struct" target="_blank">Kaitai Struct</a>.
-                </div>
-                <div class="form-group">
-                    Kaitai WebIDE was made possible by using
-                    <a href="https://github.com/kaitai-io/kaitai_struct_webide/blob/master/docs/wiki/3rd-party-libraries.md" target="_blank">open-source libraries listed here</a>
-                    (<a href="LICENSE-3RD-PARTY.txt" target="_blank">licensing information</a>).
-                </div>
-                <div class="form-group">
-                    Also, follow us on Twitter!
-                    <ul>
-                        <li style="margin-top:5px"><a href="https://twitter.com/koczkatamas" target="_blank">@koczkatamas</a> (WebIDE author)</li>
-                        <li style="margin-top:5px"><a href="https://twitter.com/kaitai_io" target="_blank">@kaitai_io</a> (Kaitai Project)</li>
-                    </ul>
-                </div>
-                <div class="licenses">
-                    <div>
-                        Kaitai WebIDE version: <span id="webIdeVersion"></span>-SNAPSHOT-<a id="webideCommitId" href=""></a>
-                        (<span id="webideCommitDate"></span>,
-                            <a href="https://raw.githubusercontent.com/kaitai-io/kaitai_struct_webide/master/LICENSE" target="_blank">license</a>)
-                    </div>
-                    <div>Kaitai compiler version: <span id="compilerVersion"></span></div>
-                </div>
-                <div style="text-align:center; font-size:12px; margin-bottom:10px">
-                    <a id="welcomeDoNotShowAgain" href="#" data-dismiss="modal">close and do not show again</a>
-                </div>
-                <div style="text-align:center">
-                    <button type="submit" class="btn btn-primary" data-dismiss="modal">Close</button>
-                </div>
+                <div>Kaitai compiler version: <span id="compilerVersion"></span></div>
+            </div>
+            <div style="text-align:center; font-size:12px; margin-bottom:10px">
+                <a id="welcomeDoNotShowAgain" href="#" data-a11y-dialog-hide>close and do not show again</a>
+            </div>
+            <div style="text-align:center">
+                <button type="button" class="btn btn-primary" data-a11y-dialog-hide>Close</button>
             </div>
         </div>
     </div>
 </div>
+<div class="dialog-overlay hidden" id="welcomeModalOverlay"></div>
 </body>
 </html>

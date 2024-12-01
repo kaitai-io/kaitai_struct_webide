@@ -4,6 +4,7 @@ import dateFormat = require("dateformat");
 import { app } from "./app";
 import { IJSTreeNode } from "./parsedToTree";
 import { downloadFile, saveFile, openFilesWithDialog } from "../utils";
+import * as A11yDialog from "a11y-dialog";
 
 declare var kaitaiFsFiles: string[];
 
@@ -373,10 +374,22 @@ export function initFileTree() {
     });
 
     var ksyParent: string|Element;
+    let newKsyDialog: typeof A11yDialog;
     function showKsyModal(parent: string | Element) {
         ksyParent = parent;
+        if (!newKsyDialog) {
+            // FIXME: eliminate duplication with "#welcomeModal"
+            const modal = $("#newKsyModal")[0];
+            newKsyDialog = new A11yDialog(modal);
+            modal.addEventListener('click', () => newKsyDialog.hide());
+            modal.querySelector('.dialog-content').addEventListener('click', e => e.stopPropagation());
+            const overlay = document.querySelector("#newKsyModalOverlay");
+            newKsyDialog
+                .on('show', () => overlay.classList.remove("hidden"))
+                .on('hide', () => overlay.classList.add("hidden"));
+        }
         $("#newKsyName").val("");
-        (<any>$("#newKsyModal")).modal();
+        newKsyDialog.show();
     }
 
     ctxAction(uiFiles.createKsyFile, () => showKsyModal(contextMenuTarget));
@@ -394,10 +407,9 @@ export function initFileTree() {
 
     uiFiles.uploadFile.on("click", () => openFilesWithDialog(files => app.addNewFiles(files)));
 
-    $("#newKsyModal").on("shown.bs.modal", () => { $("#newKsyModal input").focus(); });
     $("#newKsyModal form").submit(function (event) {
         event.preventDefault();
-        (<any>$("#newKsyModal")).modal("hide");
+        newKsyDialog.hide();
 
         var ksyName = $("#newKsyName").val();
         var parentData = app.ui.fileTree.get_node(ksyParent).data;

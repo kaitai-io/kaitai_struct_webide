@@ -1,0 +1,75 @@
+.dialog-container,
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.dialog-container {
+    z-index: 1050;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/**
+ * 1. Make sure the dialog container and all its descendants are not
+ *    visible and not focusable when it is hidden.
+ */
+.dialog-container[aria-hidden='true'] {
+    display: none; /* 1 */
+}
+
+.dialog-overlay {
+    z-index: 1040;
+    background-color: #000;
+    opacity: 0.7;
+    animation: fade-in .3s both;
+}
+
+.dialog-content {
+    z-index: 2;
+    position: relative;
+
+    background-color: #303030;
+    color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #999;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+    width: auto;
+    margin: 10px;
+    animation: fade-in .3s .2s both, slide-down .3s .2s both;
+}
+
+@media (min-width: 768px) {
+    .dialog-content {
+        width: 600px;
+        margin: 30px auto;
+        -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+}
+
+/* https://a11y-dialog.netlify.app/advanced/animations */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes slide-down {
+    from {
+        transform: translateY(-25%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dialog-overlay,
+    .dialog-content {
+        animation: none;
+    }
+}
