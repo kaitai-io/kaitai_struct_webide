@@ -16,5 +16,5 @@ export const loadKsyFileAction = async (ksyFileLocation: FileSystemPath) => {
     CurrentGoldenLayout.updateKsyEditor(yamlInfo.filePath, yamlInfo.fileContent);
     const store = useCurrentBinaryFileStore();
     store.updateParsedFile(undefined, undefined);
-    await compileInternalDebugAndRelease(yamlInfo);
+    return await compileInternalDebugAndRelease(yamlInfo);
 };

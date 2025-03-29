@@ -8,14 +8,14 @@ import {FileSystemPath} from "../../FileSystemsTypes";
 
 export const FileTreeCtxActionCreateDirectory = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {
-        const fileStore = useFileSystems();
+        const fileSystemStore = useFileSystems();
         const newFolderName = "New folder";
         const fullPathToNewFolder = item.fullPath
             ? `${item.fullPath}/${newFolderName}`
             : newFolderName;
-        fileStore.createDirectory(item.storeId, fullPathToNewFolder);
-        fileStore.openPath(FileSystemPath.fromFullPathWithStore(item.fullPathWithStore));
-        fileStore.selectPath(FileSystemPath.of(item.storeId, fullPathToNewFolder));
+        fileSystemStore.createDirectory(item.storeId, fullPathToNewFolder);
+        fileSystemStore.openPath(FileSystemPath.fromFullPathWithStore(item.fullPathWithStore));
+        fileSystemStore.selectPath(FileSystemPath.of(item.storeId, fullPathToNewFolder));
     };
 
     return {

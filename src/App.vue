@@ -33,8 +33,10 @@ store.$onAction(async ({name, store, args}) => {
       return;
     }
     case "updateSelectedKsyFile": {
-      await loadKsyFileAction(args[0]);
-      parseAction();
+      const parsingSuccess = await loadKsyFileAction(args[0]);
+      if(parsingSuccess){
+        parseAction();
+      }
       return;
     }
   }

@@ -5,7 +5,7 @@ import {IExportedValueFlatInfo} from "../DataManipulation/ExportedValueMappers/I
 
 export interface CurrentBinaryFile {
     fileContent: ArrayBuffer;
-    fileName: string;
+    filePath: string;
     range?: IExportedValue;
     parsedFile?: IExportedValue;
     parsedFileFlatInfo?: IExportedValueFlatInfo;
@@ -27,7 +27,7 @@ export const useCurrentBinaryFileStore = defineStore("SelectionStore", {
         const value = LocalStorageApi.getCurrentBinaryFileStoreState();
         return {
             fileContent: new ArrayBuffer(0),
-            fileName: value?.fileName || "",
+            filePath: value?.filePath || "",
             selectionStart: value?.start || -1,
             selectionEnd: value?.end || -1,
             selectionPivot: value?.pivot || -1,
@@ -45,16 +45,13 @@ export const useCurrentBinaryFileStore = defineStore("SelectionStore", {
 
             LocalStorageApi.storeCurrentBinaryFileStoreState(this);
         },
-        updateSelectionPivot(point: number, source: string) {
-            this.selectionPivot = point;
-        },
         newBinaryFileSelected(filePath: string, fileContent: ArrayBuffer, source: string) {
             this.fileContent = fileContent;
-            if (filePath === this.fileName) return;
+            if (filePath === this.filePath) return;
             this.selectionStart = -1;
             this.selectionEnd = -1;
             this.selectionPivot = -1;
-            this.fileName = filePath;
+            this.filePath = filePath;
             LocalStorageApi.storeCurrentBinaryFileStoreState(this);
         },
         deselect() {

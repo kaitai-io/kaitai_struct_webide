@@ -1,7 +1,7 @@
 import {CurrentBinaryFile} from "../Stores/CurrentBinaryFileStore";
 import {IdeSettings} from "../Stores/IdeSettingsStore";
 interface LocalStorageSelection {
-    fileName: string;
+    filePath: string;
     start: number;
     end: number;
     pivot: number;
@@ -15,7 +15,7 @@ export class LocalStorageApi {
 
     public static storeCurrentBinaryFileStoreState = (store: CurrentBinaryFile): void => {
         const state: LocalStorageSelection = {
-            fileName: store.fileName,
+            filePath: store.filePath,
             start: store.selectionStart,
             end: store.selectionEnd,
             pivot: store.selectionPivot,

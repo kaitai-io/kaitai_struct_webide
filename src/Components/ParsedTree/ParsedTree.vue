@@ -1,47 +1,53 @@
 <script setup lang="ts">
-import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
-import {computed} from "vue";
-import {ObjectType} from "../../DataManipulation/ExportedValueTypes";
-import ParsedTreeNode from "./ParsedTreeNode.vue";
 import {GL_PARSED_DATA_TREE_ID} from "../GoldenLayout/GoldenLayoutUIConfig";
+import {computed} from "vue";
+import {ExportedValueMappers} from "../../DataManipulation/ExportedValueMappers";
+import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
+import ParsedTreeRow from "./ParsedTreeRow.vue";
+import {useParsedTreeStore} from "./Store/ParsedTreeStore";
+import {useVirtualList} from "@vueuse/core";
+import {handleSelectionUpdatedEvents} from "./Services/ParsedTreeActions";
 
-const store = useCurrentBinaryFileStore();
-const parsedFile = computed(() => {
-  return store.parsedFile;
+const binaryStore = useCurrentBinaryFileStore();
+const parsedTreeStore = useParsedTreeStore();
+
+const parsedTreeLeafs = computed(() => {
+  return ExportedValueMappers.collectParsedTreeLeafs(binaryStore.parsedFile, parsedTreeStore.openPaths);
 });
 
-const children = computed(() => {
-  if (!parsedFile) return [];
-  switch (parsedFile.value.type) {
-    case ObjectType.Object: {
-      return Object.values(parsedFile.value.object.fields);
-    }
-    case ObjectType.Array: {
-      return parsedFile.value.arrayItems;
-    }
-    default:
-      return [];
-  }
+const {list, containerProps, wrapperProps, scrollTo} = useVirtualList(parsedTreeLeafs, {
+  itemHeight: 16,
+  overscan: 1
+});
+
+binaryStore.$onAction(({name, args}) => {
+  return handleSelectionUpdatedEvents(name, args, scrollTo);
 });
 
 </script>
 
 <template>
-  <div :id="GL_PARSED_DATA_TREE_ID" class="local">
-    <div class="overflow-wrapper">
-      <ParsedTreeNode :node="node" v-if="parsedFile" v-for="node in children" :depth="0"/>
+  <div :id="GL_PARSED_DATA_TREE_ID" class="parsed-tree">
+    <div v-bind="containerProps" class="backdrop">
+      <div v-bind="wrapperProps" class="wrapper-inner">
+        <ParsedTreeRow :node="listItem.data" v-for="listItem in list"/>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.local {
-  color: white;
-  overflow-y: scroll;
+.parsed-tree {
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
 
-.overflow-wrapper {
-  height: 100%;
+.backdrop {
+  flex-grow: 1;
+}
+
+.wrapper-inner {
+
 }
 </style>

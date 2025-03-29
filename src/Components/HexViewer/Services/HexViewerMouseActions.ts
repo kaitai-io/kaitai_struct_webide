@@ -54,10 +54,10 @@ const handleRangeSelectionAction = (e: MouseEvent, letter: ProcessedLetter) => {
             startNew: simpleRange.start,
             endNew: simpleRange.end,
             range: letter.matchingRange,
+            pivot: start,
             source: HEX_VIEWER_SOURCE
         };
         store.updateSelectionEvent(event);
-        store.updateSelectionPivot(start, HEX_VIEWER_SOURCE);
         return true;
     }
 };
@@ -92,6 +92,7 @@ const handleDragSelectionUpdate = (e: MouseEvent, letter: ProcessedLetter) => {
     const event: UpdateSelectionEvent = {
         startNew: start,
         endNew: end,
+        pivot: binaryFileStore.selectionPivot,
         source: HEX_VIEWER_SOURCE
     };
     binaryFileStore.updateSelectionEvent(event);
@@ -100,20 +101,10 @@ const handleDragSelectionUpdate = (e: MouseEvent, letter: ProcessedLetter) => {
 
 const handleSelectionDragEnd = () => {
     const hexViewerConfigStore = useHexViewerConfigStore();
-    const currentBinaryFileStore = useCurrentBinaryFileStore();
 
     const isDragging = !!hexViewerConfigStore.selectionDragStart;
     if (!isDragging) return false;
-
-    const dragStartIndex = hexViewerConfigStore.selectionDragStart.letterAddress;
-
-    const newPivotIsSelectionStart = dragStartIndex !== currentBinaryFileStore.selectionStart;
-    const newPivot = newPivotIsSelectionStart
-        ? currentBinaryFileStore.selectionStart
-        : currentBinaryFileStore.selectionEnd;
-
     hexViewerConfigStore.updateSelectionDragStart(null);
-    currentBinaryFileStore.updateSelectionPivot(newPivot, HEX_VIEWER_SOURCE);
     return true;
 };
 

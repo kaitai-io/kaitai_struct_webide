@@ -29,7 +29,7 @@ self.MonacoEnvironment = {
     }
 };
 
-export const MonacoEditorComponent = (container: GoldenLayout.Container, {isReadOnly, lang, data}: MonacoEditorOptions): IStandaloneCodeEditor => {
+export const CreateMonacoEditorComponent = (container: GoldenLayout.Container, {isReadOnly, lang, data}: MonacoEditorOptions): IStandaloneCodeEditor => {
     return editor.create(container.getElement().get(0), {
         value: data,
         theme: "vs-dark",

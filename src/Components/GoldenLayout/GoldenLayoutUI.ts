@@ -13,9 +13,9 @@ import {
 } from "./GoldenLayoutUIConfig";
 
 import GoldenLayout from "golden-layout";
-import {MonacoEditorComponent, MonacoEditorOptions} from "./MonacoEditorComponent";
+import {CreateMonacoEditorComponent, MonacoEditorOptions} from "./CreateMonacoEditorComponent";
 import {editor} from "monaco-editor";
-import {MonacoEditorComponentKsyEditor} from "../KsyEditor/MonacoEditorComponentKsyEditor";
+import {CreateMonacoEditorComponentKsyEditor} from "../KsyEditor/CreateMonacoEditorComponentKsyEditor";
 import {ErrorPanelManager} from "./ErrorPanelManager";
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 
@@ -64,15 +64,18 @@ export class GoldenLayoutUI {
             container.getElement().attr("id", name);
             switch (name) {
                 case GL_KSY_EDITOR_ID:
-                    self.ksyEditor = MonacoEditorComponentKsyEditor(container, options);
+                    self.ksyEditor = CreateMonacoEditorComponentKsyEditor(container, options);
                     self.ksyEditorContainer = container;
                     break;
                 case GL_GEN_CODE_VIEWER_ID:
-                    self.genCodeViewer = MonacoEditorComponent(container, options);
+                    self.genCodeViewer = CreateMonacoEditorComponent(container, options);
                     break;
                 case GL_GEN_CODE_VIEWER_DEBUG_ID: {
-                    self.genCodeDebugViewer = MonacoEditorComponent(container, options);
+                    self.genCodeDebugViewer = CreateMonacoEditorComponent(container, options);
+                    break;
                 }
+                default:
+                    CreateMonacoEditorComponent(container, options);
             }
         });
     }

@@ -10,7 +10,7 @@ import {FileSystemPath} from "./FileSystemsTypes";
 import {FILE_SYSTEM_TYPE_KAITAI} from "./FileSystems/KaitaiFileSystem";
 import {FileTreeDragMoveAction, FileTreeDragMoveActionHelper,} from "./Actions/FileTreeDragMoveAction";
 
-const store = useFileSystems();
+const fileSystemStore = useFileSystems();
 const appStore = useAppStore();
 const props = defineProps<{
   item: TreeNodeDisplay
@@ -19,7 +19,7 @@ const props = defineProps<{
 const draggingOver = ref(false);
 
 const activateRow = () => {
-  store.selectPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
+  fileSystemStore.selectPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
 };
 
 const doubleClick = () => {
@@ -36,11 +36,11 @@ const doubleClick = () => {
       return;
     }
     case TreeNodeDisplayType.OPEN_FOLDER: {
-      store.closePath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
+      fileSystemStore.closePath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
       return;
     }
     case TreeNodeDisplayType.CLOSED_FOLDER: {
-      store.openPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
+      fileSystemStore.openPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
       return;
     }
   }
@@ -48,14 +48,14 @@ const doubleClick = () => {
 
 const contextMenu = (e: MouseEvent) => {
   e.preventDefault();
-  store.selectPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
+  fileSystemStore.selectPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
   const contextMenuOptions = prepareContextMenuOptions(e, toRaw(props.item));
   ContextMenu.showContextMenu(contextMenuOptions);
 };
 
 
 const isSelected = computed(() => {
-  return store.selectedPath === props.item.fullPathWithStore;
+  return fileSystemStore.selectedPath === props.item.fullPathWithStore;
 });
 
 const nodeFileIsLoadedInEditor = computed(() => {
@@ -75,7 +75,7 @@ const drop = async (event: DragEvent) => {
 
 const dragStart = (event: DragEvent) => {
   event.dataTransfer.setData("draggedFileTreeItem", props.item.fullPathWithStore);
-  store.selectPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
+  fileSystemStore.selectPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
 };
 
 const dragOver = (event: DragEvent) => {

@@ -28,9 +28,9 @@ const calculateNewStartEnd = (start: number, end: number, pivot: number, moveDif
     let newEnd = end;
     if (isSelectionMove) {
         const isStartPivot = start === pivot;
-        let modifiedEnd = isStartPivot ? end : start;
-        modifiedEnd = NumberUtils.clamp(modifiedEnd + moveDiff, 0, fileLength);
-        return [pivot, modifiedEnd];
+        let newEnd = isStartPivot ? end : start;
+        newEnd = NumberUtils.clamp(newEnd + moveDiff, 0, fileLength);
+        return [pivot, newEnd];
     } else {
         newStart = newEnd = NumberUtils.clamp(newStart + moveDiff, 0, fileLength);
     }
@@ -60,7 +60,7 @@ export const handleCursorMoveAndSelect = (e: KeyboardEvent, rowSize: number) => 
         endNew: newEnd,
         range: undefined,
         source: HEX_VIEWER_SOURCE + "KEYBOARD",
-        pivot: currentBinaryFileStore.selectionPivot
+        pivot: isSelectionMove ? currentBinaryFileStore.selectionPivot : newStart
     };
     currentBinaryFileStore.updateSelectionEvent(event);
 };
