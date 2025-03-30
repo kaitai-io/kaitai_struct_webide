@@ -9,7 +9,6 @@
     "@heroicons/vue": "^2.1.5",
     "@imengyu/vue3-context-menu": "^1.4.3",
     "@vueuse/core": "^10.11.0",
-    "big-integer": "^1.6.25",
     "bowser": "^1.7.3",
     "dateformat": "^5.0.3",
     "golden-layout": "^1.5.9",

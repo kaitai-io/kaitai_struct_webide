@@ -7,13 +7,6 @@ libs:
     npmDir: monaco-editor
     files: [ LICENSE ]
 
-  BigInteger.js:
-    source: https://github.com/peterolson/BigInteger.js
-    licenseName: Unlicense
-    licenseUrl: https://raw.githubusercontent.com/peterolson/BigInteger.js/master/LICENSE
-    npmDir: big-integer
-    files: [ LICENSE ]
-
   HeroIcons:
     source: https://github.com/tailwindlabs/heroicons
     licenseName: MIT

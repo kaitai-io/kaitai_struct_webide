@@ -1,4 +1,4 @@
-import {convertToDouble, convertToFloat, convertToInteger, convertToString, convertToTimestamp} from "./ConverterPanelMappers";
+import {AllowedLengths, convertToDouble, convertToFloat, convertToInteger, convertToString, convertToTimestamp} from "./ConverterPanelMappers";
 
 const LITTLE_ENDIAN = false;
 const BIG_ENDIAN = true;
@@ -37,7 +37,7 @@ const emptySimpleTypeOf = (label: string): SimpleType => {
     };
 };
 
-const simpleTypeOf = (data: Uint8Array, label: string, lengthInBytes: number, bigEndian: boolean): SimpleType => {
+const simpleTypeOf = (data: Uint8Array, label: string, lengthInBytes: AllowedLengths, bigEndian: boolean): SimpleType => {
     return {
         label: label,
         unsignedValue: convertToInteger(data, lengthInBytes, UNSIGNED, bigEndian),

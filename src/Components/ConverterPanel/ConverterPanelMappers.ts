@@ -1,9 +1,20 @@
-import bigInt from "big-integer";
 import dateFormat from "dateformat";
 
 type STRING_ENCODINGS = "ascii" | "utf-8" | "utf-16le" | "utf-16be";
+const BIG_INT_256 = BigInt(256);
+const BIG_INT_2 = BigInt(2);
+const BIG_INT_MINUS_1 = BigInt(-1);
 
-export const convertToInteger = (data: Uint8Array, lengthInBytes: number, isSigned: boolean, isBigEndian: boolean): string => {
+const MAX_VALUES = {
+    1: BIG_INT_256 ** BigInt(1),
+    2: BIG_INT_256 ** BigInt(2),
+    4: BIG_INT_256 ** BigInt(4),
+    8: BIG_INT_256 ** BigInt(8),
+};
+
+export type AllowedLengths = 1 | 2 | 4 | 8
+
+export const convertToInteger = (data: Uint8Array, lengthInBytes: AllowedLengths, isSigned: boolean, isBigEndian: boolean): string => {
     if (lengthInBytes > data.length) return "";
 
     let arr = data.slice(0, lengthInBytes);
@@ -11,14 +22,14 @@ export const convertToInteger = (data: Uint8Array, lengthInBytes: number, isSign
     if (!isBigEndian)
         arr = arr.reverse();
 
-    let num = bigInt(0);
+    let num = BigInt(0);
     for (let i = 0; i < arr.length; i++)
-        num = num.multiply(256).add(arr[i]);
+        num = num * BIG_INT_256 + BigInt(arr[i]);
 
     if (isSigned) {
-        const maxVal = bigInt(256).pow(lengthInBytes);
-        if (num.greaterOrEquals(maxVal.divide(2)))
-            num = maxVal.minus(num).negate();
+        const maxVal = MAX_VALUES[lengthInBytes];
+        if (num >= (maxVal / BIG_INT_2))
+            num = (maxVal - num) * BIG_INT_MINUS_1;
     }
 
     return num.toString();
