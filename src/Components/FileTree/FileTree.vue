@@ -3,7 +3,7 @@
 import {useFileSystems} from "./Store/FileSystemsStore";
 import FileTreeNodes from "./FileTreeNodes.vue";
 import FileDrop from "./FileDrop.vue";
-import {GL_FILE_TREE_ID} from "../GoldenLayout/GoldenLayoutUIConfig";
+import {GL_FILE_TREE_ID} from "../Dockview/DockviewerConfig";
 
 const store = useFileSystems();
 

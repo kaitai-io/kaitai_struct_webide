@@ -3,14 +3,18 @@ import {WorkerFunctionStack} from "./WorkerFunctionStack";
 import {IWorkerMessage, IWorkerMessageGetInstance, IWorkerMessageParse} from "./WorkerMessages";
 import {IWorkerResponse, IWorkerResponseGetInstance, IWorkerResponseParse} from "./WorkerResponses";
 import {GET_INSTANCE, IWorkerApiMethods, PARSE_SCRIPTS} from "./Types";
-import {CompilationTarget} from "../../CompilationModule/CompilerService";
+import {CompilationTarget, CompilerService} from "../../CompilationModule/CompilerService";
 import {useCurrentBinaryFileStore} from "../../../Stores/CurrentBinaryFileStore";
 import {useErrorStore} from "../../../Components/ErrorPanel/Store/ErrorStore";
+import {YamlFileInfo} from "../../CompilationModule/JsImporter";
+import {useIdeSettingsStore} from "../../../Stores/IdeSettingsStore";
+import {KaitaiCodeWorkerApi} from "../KaitaiCodeWorkerApi";
 
 export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
     stack: WorkerFunctionStack;
     worker: Worker;
 
+    ksyYamlInfo: YamlFileInfo;
     inputBuffer: ArrayBuffer;
     compilationTarget: CompilationTarget;
 
@@ -26,10 +30,27 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
 
     setInputAction = (inputBuffer: ArrayBuffer): void => {
         this.inputBuffer = inputBuffer;
+        this.parseAction();
     };
 
-    parseAction = (eagerMode: boolean): void => {
-        const message = this.prepareIWorkerMessageParse(this.stack.getNewMessageId(), eagerMode);
+    setKsyYamlInfo = (yamlInfo: YamlFileInfo): void => {
+        this.ksyYamlInfo = yamlInfo;
+        this.parseAction();
+    };
+
+    parseAction = async (): Promise<void> => {
+        if (!this.ksyYamlInfo || !this.inputBuffer) return;
+        const errorStore = useErrorStore();
+        errorStore.clearErrors();
+        const compilationResult = await CompilerService.compileSingleTarget(this.ksyYamlInfo, "javascript", true);
+        if (compilationResult.status === "FAILURE") {
+            useErrorStore().setError(compilationResult.error);
+            return;
+        }
+        const compiledGrammar = compilationResult.result as CompilationTarget;
+        KaitaiCodeWorkerApi.setCompilationTarget(compiledGrammar);
+        const store = useIdeSettingsStore();
+        const message = this.prepareIWorkerMessageParse(this.stack.getNewMessageId(), store.eagerMode);
         this.sendMessageToWorker(message);
     };
 
@@ -77,8 +98,6 @@ export class KaitaiCodeWorkerWrapper implements IWorkerApiMethods {
         let {error, resultObject, flatExported} = msg;
         if (error) {
             useErrorStore().setError(error);
-        } else {
-            useErrorStore().clearErrors();
         }
         store.updateParsedFile(resultObject, flatExported);
     };

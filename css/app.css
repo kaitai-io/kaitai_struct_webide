@@ -1,5 +1,21 @@
+@import './../node_modules/dockview-core/dist/styles/dockview.css';
+@import './../node_modules/@imengyu/vue3-context-menu/lib/vue3-context-menu.css';
+
 @font-face {
     font-family: "JetBrains Mono";
     src: url('./JetBrainsMono-VariableFont_wght.ttf');
 }
 
+html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}

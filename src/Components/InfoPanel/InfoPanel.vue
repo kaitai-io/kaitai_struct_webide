@@ -12,8 +12,7 @@ import {ExportedValueUtils} from "../../Utils/ExportedValueUtils";
 import {useWelcomeModalStore} from "../Modals/WelcomeModal/WelcomeModalStore";
 import TextButton from "../UtilComponents/TextButton.vue";
 import {RestoreBackupConfigFromBackup} from "../../GlobalActions/RestoreBackupConfigFromBackup";
-import {useErrorStore} from "../../Stores/ErrorStore";
-import {GL_INFO_PANEL_ID} from "../GoldenLayout/GoldenLayoutUIConfig";
+import {GL_INFO_PANEL_ID} from "../Dockview/DockviewerConfig";
 
 const currentBinaryFileStore = useCurrentBinaryFileStore();
 const hexViewerConfigStore = useHexViewerConfigStore();
@@ -73,7 +72,6 @@ const about = () => {
 .info-panel {
   background: #222222;
   color: #eee;
-  display: none;
   padding: 10px;
   font-size: 12px;
   font-family: "JetBrains Mono";

@@ -34,6 +34,7 @@ const togglePath = () => {
 <style scoped>
 .icon {
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .icon:hover {

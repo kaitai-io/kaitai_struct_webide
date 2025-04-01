@@ -2,10 +2,15 @@
 
 import KaitaiStructCompiler from "kaitai-struct-compiler";
 import {useWelcomeModalStore} from "./WelcomeModalStore";
-import {KaitaiIdeInfo} from "../../../app";
 import TextLink from "../../UtilComponents/TextLink.vue";
 
 const store = useWelcomeModalStore();
+
+const KaitaiIdeInfo = {
+  version: "0.3-SNAPSHOT",
+  commitId: process.env.GIT_COMMIT,
+  buildDate: process.env.BUILD_DATE
+};
 
 const onClickBackdrop = (e) => {
   e.stopPropagation();
@@ -69,10 +74,10 @@ const onClickBackdrop = (e) => {
       <div class="licenses">
         <div>
           <span>Kaitai WebIDE version: </span>
-          <span id="webIdeVersion">{{ KaitaiIdeInfo.version }}</span>
+          <span id="webIdeVersion">{{ KaitaiIdeInfo.version }}-</span>
           <TextLink :link="`https://github.com/lorthiz/kaitai_struct_webide/commit/${KaitaiIdeInfo.commitId}`"
                     :text="KaitaiIdeInfo.commitId.substring(0, 7)"/>
-          (<span>{{ KaitaiIdeInfo.commitDate }}</span>,
+          (<span>{{ KaitaiIdeInfo.buildDate }}</span>,
           <TextLink link="LICENSE.txt" text="license"/>
           )
         </div>

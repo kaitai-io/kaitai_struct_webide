@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import "./ErrorPanelStyle.css";
 import {useErrorStore} from "./Store/ErrorStore";
-import {CurrentGoldenLayout} from "../GoldenLayout/GoldenLayoutUI";
+import {computed} from "vue";
 
 const errorStore = useErrorStore();
 
@@ -18,25 +17,27 @@ const formatErrorMessage = (error: any) => {
   return "Parse error" + (error.name ? ` (${error.name})` : "") + `${error.message ? ": " + error.message : ""}\nCall stack: ${error.stack}`;
 };
 
-errorStore.$onAction(async ({name, store, args}) => {
-  switch (name) {
-    case "setError": {
-      const errMsg = formatErrorMessage(args[0]);
-      CurrentGoldenLayout.handleErrorMessage(errMsg);
-      break;
-    }
-    case "clearErrors": {
-      CurrentGoldenLayout.handleErrorMessage();
-      break;
-    }
+const error = computed(() => {
+  if (errorStore.error) {
+    return formatErrorMessage(errorStore.error);
   }
 });
 
 </script>
 
 <template>
+  <div v-if="error" class="error-panel">{{ error }}</div>
 </template>
 
 <style scoped>
-
+.error-panel {
+  background: #222222;
+  color: #dc6f6f;
+  padding: 10px;
+  font-size: 14px;
+  font-family: "JetBrains Mono";
+  white-space: pre;
+  text-wrap: auto;
+  overflow-y: scroll;
+}
 </style>

@@ -21,5 +21,6 @@ const indentElementWidth = computed(() => ({
   border-right: 1px dotted white;
   display: block;
   height: 100%;
+  flex-shrink: 0;
 }
 </style>

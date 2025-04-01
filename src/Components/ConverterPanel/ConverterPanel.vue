@@ -2,7 +2,7 @@
 import {computed} from "vue";
 import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import {prepareEmptyModel, prepareModelData} from "./ConverterPanelModelFactory";
-import {GL_CONVERTER_PANEL_ID} from "../GoldenLayout/GoldenLayoutUIConfig";
+import {GL_CONVERTER_PANEL_ID} from "../Dockview/DockviewerConfig";
 
 const MAX_SELECTION_LENGTH_FOR_CONVERTER = 64;
 

@@ -1,81 +1,51 @@
 <script setup lang="ts">
-
-import ConverterPanel from "./Components/ConverterPanel/ConverterPanel.vue";
-import InfoPanel from "./Components/InfoPanel/InfoPanel.vue";
-import UnsupportedBrowser from "./Components/UnsupportedBrowser.vue";
-import HexViewer from "./Components/HexViewer/HexViewer.vue";
-import ParsedTree from "./Components/ParsedTree/ParsedTree.vue";
-import FileTree from "./Components/FileTree/FileTree.vue";
 import {useAppStore} from "./Stores/AppStore";
+import {useFileSystems} from "./Components/FileTree/Store/FileSystemsStore";
 import {loadBinaryFileAction} from "./GlobalActions/LoadBinaryFile";
 import {loadKsyFileAction} from "./GlobalActions/LoadKsyFile";
-import {onMounted} from "vue";
-import {parseAction} from "./GlobalActions/ParseAction";
 import {KaitaiFileSystem} from "./Components/FileTree/FileSystems/KaitaiFileSystem";
 import {
   initStorageFileSystemRoot,
   LocalStorageFileSystem
 } from "./Components/FileTree/FileSystems/LocalStorageFileSystem";
-import {useFileSystems} from "./Components/FileTree/Store/FileSystemsStore";
-import {CurrentGoldenLayout} from "./Components/GoldenLayout/GoldenLayoutUI";
+import {onBeforeMount} from "vue";
 import WelcomeModal from "./Components/Modals/WelcomeModal/WelcomeModal.vue";
 import TextInputModal from "./Components/Modals/TextInputModal/TextInputModal.vue";
-import ErrorPanel from "./Components/ErrorPanel/ErrorPanel.vue";
+import DockviewApp from "./Components/Dockview/DockviewApp.vue";
+
 
 const store = useAppStore();
 const fileSystemsStore = useFileSystems();
 
-store.$onAction(async ({name, store, args}) => {
+store.$onAction(async ({name, args}) => {
   switch (name) {
     case "updateSelectedBinaryFile": {
       await loadBinaryFileAction(args[0]);
-      parseAction();
       return;
     }
     case "updateSelectedKsyFile": {
-      const parsingSuccess = await loadKsyFileAction(args[0]);
-      if(parsingSuccess){
-        parseAction();
-      }
+      await loadKsyFileAction(args[0]);
       return;
     }
   }
 });
 
-const initFileSystems = async () => {
+
+onBeforeMount(async () => {
   fileSystemsStore.addFileSystem(new KaitaiFileSystem());
   const oldStorageRoot = await initStorageFileSystemRoot();
   fileSystemsStore.addFileSystem(new LocalStorageFileSystem(oldStorageRoot));
-};
-
-const initFileParsing = async () => {
-  await loadKsyFileAction(store.selectedKsyInfo);
-  await loadBinaryFileAction(store.selectedBinaryInfo);
-  parseAction();
-};
-
-
-onMounted(async () => {
-  CurrentGoldenLayout.init();
-
-  await initFileSystems();
-  await initFileParsing();
 });
+
 
 </script>
 
 <template>
-  <UnsupportedBrowser/>
-
-  <ParsedTree/>
-  <HexViewer/>
-  <FileTree/>
-  <InfoPanel/>
-  <ConverterPanel/>
-  <ErrorPanel/>
-
   <TextInputModal/>
   <WelcomeModal/>
+
+  <DockviewApp/>
+
 </template>
 
 <style scoped>

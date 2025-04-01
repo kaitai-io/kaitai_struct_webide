@@ -21,17 +21,9 @@ export interface CompilationTarget {
     ksyTypes: IKsyTypes;
 }
 
-export interface ReleaseAndDebugTargets {
-    debug: KaitaiCompilationResult;
-    release: KaitaiCompilationResult;
-    jsMainClassName: string;
-    ksySchema: KsySchema.IKsyFile;
-    ksyTypes: IKsyTypes;
-}
-
 export interface CompilationResultSuccess {
     status: "SUCCESS";
-    result: ReleaseAndDebugTargets | CompilationTarget
+    result: CompilationTarget;
 }
 
 
@@ -68,34 +60,6 @@ export class CompilerService {
             return {
                 status: "FAILURE",
                 error: ex
-            }
-        }
-    }
-
-    static async compileDebugAndReleaseTargets(initialYaml: YamlFileInfo, targetLanguage: string): Promise<CompilationResult> {
-        try {
-            if (targetLanguage === "json") {
-                return this.getJsonReleaseAndDebugTargets(initialYaml);
-            }
-            const compilerSchema = this.prepareMainFileSchema(initialYaml);
-            const jsImporter = new JsImporter(initialYaml);
-            const [releaseTarget, debugTarget] = await this._compileDebugAndRelease(targetLanguage, compilerSchema, jsImporter);
-            const {schema, types} = SchemaUtils.prepareSchemaAndCombinedKsyTypes(initialYaml, jsImporter.getFilesLoadedUsingImporter());
-
-            return {
-                status: "SUCCESS",
-                result: {
-                    debug: debugTarget,
-                    release: releaseTarget,
-                    jsMainClassName: this.getJsMainClassNameFromSchema(schema),
-                    ksySchema: schema,
-                    ksyTypes: types,
-                }
-            };
-        } catch (ex) {
-            return {
-                status: "FAILURE",
-                error: ex,
             };
         }
     }
@@ -109,17 +73,6 @@ export class CompilerService {
             return compilerSchema;
         } catch (ex) {
             throw new CompilationError("yaml", ex);
-        }
-    }
-
-    private static async _compileDebugAndRelease(targetLanguage: string, compilerSchema: IKsyFile, jsImporter: IYamlImporter): Promise<KaitaiCompilationResult[]> {
-        try {
-            const perfCompile = performanceHelper.measureAction("[KSY_COMPILE][RELEASE+DEBUG]");
-            const debug = KaitaiStructCompiler.compile(targetLanguage, compilerSchema, jsImporter, true);
-            const release = KaitaiStructCompiler.compile(targetLanguage, compilerSchema, jsImporter, false);
-            return perfCompile.done(Promise.all([release, debug]));
-        } catch (ex) {
-            throw new CompilationError("kaitai", ex);
         }
     }
 
@@ -142,21 +95,6 @@ export class CompilerService {
             status: "SUCCESS",
             result: {
                 result: {},
-                mainClassId: this.getMainClassId(schema),
-                jsMainClassName: this.getJsMainClassNameFromSchema(schema),
-                ksySchema: schema,
-                ksyTypes: types
-            }
-        });
-    }
-
-    private static getJsonReleaseAndDebugTargets(initialYaml: YamlFileInfo): Promise<CompilationResult> {
-        const {schema, types} = SchemaUtils.getTypesAndSchemaFromSingleFile(initialYaml);
-        return Promise.resolve({
-            status: "SUCCESS",
-            result: {
-                debug: {},
-                release: {},
                 mainClassId: this.getMainClassId(schema),
                 jsMainClassName: this.getJsMainClassNameFromSchema(schema),
                 ksySchema: schema,

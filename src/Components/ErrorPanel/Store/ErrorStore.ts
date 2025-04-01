@@ -14,13 +14,9 @@ export const useErrorStore = defineStore("ErrorStore", {
         };
     },
     actions: {
-        setErrorTabSize(newSize: number) {
-            this.size = newSize;
-        },
         setError(error: any) {
             this.error = error;
         },
-
         clearErrors() {
             this.error = undefined;
         },

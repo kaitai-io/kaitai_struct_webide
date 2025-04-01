@@ -1,5 +1,6 @@
 import {defineStore} from "pinia";
 import {LocalStorageApi} from "../Utils/LocalStorageApi";
+import {KaitaiCodeWorkerApi} from "../DataManipulation/ParsingModule/KaitaiCodeWorkerApi";
 
 export interface IdeSettings {
     eagerMode: boolean;

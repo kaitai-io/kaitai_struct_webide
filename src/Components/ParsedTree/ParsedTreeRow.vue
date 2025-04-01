@@ -5,7 +5,6 @@ import {ParsedTreeLeaf} from "../../DataManipulation/ExportedValueMappers/IExpor
 import RowIndent from "./Common/RowIndent.vue";
 import OpenNodeIcon from "./Common/OpenNodeIcon.vue";
 import RowMargin from "./Common/RowMargin.vue";
-import {useParsedTreeStore} from "./Store/ParsedTreeStore";
 import {TreeNodeSelectedAction} from "./Services/ParsedTreeActions";
 import ParsingErrorIcon from "./Common/ParsingErrorIcon.vue";
 import IExportedDescription from "./Descriptions/GenericIExportedValueDescription.vue";
@@ -56,6 +55,11 @@ const path = computed(() => {
   height: 16px;
   font: 12px/normal "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace;
   color: white;
+
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 
 .isSelected {
@@ -73,7 +77,7 @@ const path = computed(() => {
   display: flex;
   flex-direction: row;
   white-space: preserve;
-
+  flex-shrink: 0;
 }
 
 .row-description:hover {

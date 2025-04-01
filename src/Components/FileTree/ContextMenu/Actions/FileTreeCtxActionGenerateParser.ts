@@ -4,10 +4,10 @@ import {h} from "vue";
 import {MenuChildren, MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {CompilationTarget, CompilerService} from "../../../../DataManipulation/CompilationModule/CompilerService";
 import {YamlFileInfo} from "../../../../DataManipulation/CompilationModule/JsImporter";
-import {CurrentGoldenLayout} from "../../../GoldenLayout/GoldenLayoutUI";
 import {useIdeSettingsStore} from "../../../../Stores/IdeSettingsStore";
 import {KaitaiSupportedLanguages, SupportedLanguage} from "../../../../DataManipulation/KaitaiSupportedLanguages";
 import {BoltIcon} from "@heroicons/vue/16/solid";
+import {useDockviewStore} from "../../../Dockview/Store/DockviewStore";
 
 export const mapFileTreeDisplayNodeToYaml = async (item: TreeNodeDisplay): Promise<YamlFileInfo> => {
     const fileSystemsStore = useFileSystems();
@@ -39,19 +39,27 @@ export const FileTreeCtxActionGenerateParser = (item: TreeNodeDisplay): MenuItem
             return;
         }
         const [name, content] = record;
-        CurrentGoldenLayout.addDynamicCodeTab(name, content, language.monacoEditorLangCode);
+        useDockviewStore().addTab({
+            title: name,
+            content: content,
+            language: language.monacoEditorLangCode
+        })
     };
 
     const createTabsForAllGeneratedFiles = (compiled: CompilationTarget, language: SupportedLanguage) => {
         Object.entries(compiled.result).forEach(([name, content]) => {
-            CurrentGoldenLayout.addDynamicCodeTab(name, content, language.monacoEditorLangCode);
+            useDockviewStore().addTab({
+                title: name,
+                content: content,
+                language: language.monacoEditorLangCode
+            })
         });
     };
 
     const generateParserForLanguage = async (language: SupportedLanguage) => {
         const yamlInfo = await mapFileTreeDisplayNodeToYaml(item);
         const compiled = await CompilerService.compileSingleTarget(yamlInfo, language.kaitaiLangCode, language.isDebug);
-        if(compiled.status === "FAILURE") return;
+        if (compiled.status === "FAILURE") return;
         const ideSettings = useIdeSettingsStore();
         ideSettings.generateOnlyMainFile
             ? createOnlyMainFileTab(compiled.result as CompilationTarget, language)

@@ -2,13 +2,15 @@
 import "./HexViewerColorSheet.css";
 import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";
 import HexViewerHeader from "./HexViewerHeader.vue";
-import {computed} from "vue";
+import {computed, onMounted} from "vue";
 import {useVirtualList} from "@vueuse/core";
 import HexViewerRow from "./HexViewerRow.vue";
 import {useHexViewerConfigStore} from "./Store/HexViewerConfigStore";
 import {handleOnPageReloadScrollToSelection, handleSelectionUpdatedEvents} from "./Services/HexViewerActions";
 import {handleCursorMoveAndSelect} from "./Services/HexViewerKeyboardActions";
-import {GL_HEX_VIEWER_ID} from "../GoldenLayout/GoldenLayoutUIConfig";
+import {GL_HEX_VIEWER_ID} from "../Dockview/DockviewerConfig";
+import {loadBinaryFileAction} from "../../GlobalActions/LoadBinaryFile";
+import {useAppStore} from "../../Stores/AppStore";
 
 const currentBinaryFileStore = useCurrentBinaryFileStore();
 const hexViewerConfigStore = useHexViewerConfigStore();
@@ -34,6 +36,11 @@ hexViewerConfigStore.$onAction(({name, store, args}) => {
   if (name !== "jumpToAddress") return;
   const jumpIndex = args[0] as number;
   scrollTo(Math.floor(jumpIndex / store.rowSize));
+});
+
+onMounted(async () => {
+  const fileSystemsStore = useAppStore();
+  await loadBinaryFileAction(fileSystemsStore.selectedBinaryInfo);
 });
 
 </script>

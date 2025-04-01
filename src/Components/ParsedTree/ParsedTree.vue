@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {GL_PARSED_DATA_TREE_ID} from "../GoldenLayout/GoldenLayoutUIConfig";
+import {GL_PARSED_DATA_TREE_ID} from "../Dockview/DockviewerConfig";
 import {computed} from "vue";
 import {ExportedValueMappers} from "../../DataManipulation/ExportedValueMappers";
 import {useCurrentBinaryFileStore} from "../../Stores/CurrentBinaryFileStore";

@@ -28,22 +28,13 @@ libs:
     npmDir: dateformat
     files: [ LICENSE ]
 
-
-  GoldenLayout:
-    website: https://www.golden-layout.com/
-    source: https://github.com/deepstreamIO/golden-layout
+  Dockview:
+    source: https://github.com/mathuo/dockview
     licenseName: MIT
-    licenseUrl: https://raw.githubusercontent.com/deepstreamIO/golden-layout/master/LICENSE
-    npmDir: golden-layout
+    licenseUrl: https://github.com/mathuo/dockview/blob/master/LICENSE
+    npmDir: dockview-core
     files: [ LICENSE ]
 
-  jQuery:
-    website: https://jquery.com/
-    source: https://github.com/jquery/jquery
-    licenseName: MIT
-    licenseUrl: https://raw.githubusercontent.com/jquery/jquery/master/LICENSE.txt
-    npmDir: jquery
-    files: [ LICENSE.txt ]
 
   localForage:
     source: https://github.com/localForage/localForage

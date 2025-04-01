@@ -16,12 +16,12 @@ const serializeConfigToLocalStorage = (store: HexViewerConfigStore) => {
         emojiMode: store.emojiMode,
         useHexForAddresses: store.useHexForAddresses
     });
-    localStorage.setItem("HexViewerStore", config);
+    localStorage.setItem("HexViewerStoreConfig", config);
 };
 
-export const useHexViewerConfigStore = defineStore("HexViewerStore", {
+export const useHexViewerConfigStore = defineStore("HexViewerStoreConfig", {
     state: (): HexViewerConfigStore => {
-        return JSON.parse(localStorage.getItem("HexViewerStore")) || {
+        return JSON.parse(localStorage.getItem("HexViewerStoreConfig")) || {
             selectionDragStart: null,
             rowSize: 16,
             columns: 8,

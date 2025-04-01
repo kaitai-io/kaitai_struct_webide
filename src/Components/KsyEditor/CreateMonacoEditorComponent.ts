@@ -1,4 +1,3 @@
-import GoldenLayout from "golden-layout";
 import {editor} from "monaco-editor";
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 
@@ -29,8 +28,8 @@ self.MonacoEnvironment = {
     }
 };
 
-export const CreateMonacoEditorComponent = (container: GoldenLayout.Container, {isReadOnly, lang, data}: MonacoEditorOptions): IStandaloneCodeEditor => {
-    return editor.create(container.getElement().get(0), {
+export const CreateMonacoEditorComponent = (element: HTMLElement, {isReadOnly, lang, data}: MonacoEditorOptions): IStandaloneCodeEditor => {
+    return editor.create(element, {
         value: data,
         theme: "vs-dark",
         language: lang,
