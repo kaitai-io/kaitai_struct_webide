@@ -39,7 +39,7 @@ jobs:
       - run: npm ci
       - name: Generate license, formats and build project
         env:
-          GIT_COMMIT: ${{ env.GITHUB_SHA }}
+          GIT_COMMIT: ${GITHUB_SHA}
           BUILD_DATE: ${{ github.event.repository.updated_at}}
         run: |
           npm run generate-license
