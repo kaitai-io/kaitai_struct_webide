@@ -39,8 +39,10 @@ hexViewerConfigStore.$onAction(({name, store, args}) => {
 });
 
 onMounted(async () => {
-  const fileSystemsStore = useAppStore();
-  await loadBinaryFileAction(fileSystemsStore.selectedBinaryInfo);
+  setTimeout(() => {
+    const fileSystemsStore = useAppStore();
+    loadBinaryFileAction(fileSystemsStore.selectedBinaryInfo);
+  }, 20)
 });
 
 </script>

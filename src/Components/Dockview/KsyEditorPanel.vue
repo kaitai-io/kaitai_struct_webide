@@ -34,8 +34,11 @@ onMounted(async () => {
     KaitaiCodeWorkerApi.parseAction();
   });
 
-  const appStore = useAppStore();
-  await loadKsyFileAction(appStore.selectedKsyInfo);
+
+  setTimeout(() => {
+    const appStore = useAppStore();
+    loadKsyFileAction(appStore.selectedKsyInfo);
+  }, 20)
 });
 
 store.$onAction(async ({name, store, args}) => {
