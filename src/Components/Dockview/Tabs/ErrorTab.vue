@@ -31,7 +31,6 @@ const error = computed(() => {
   flex-wrap: nowrap;
   align-content: center;
   align-items: center;
-  overflow: scroll;
 }
 
 .icon {

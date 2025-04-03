@@ -14,7 +14,10 @@ const formatErrorMessage = (error: any) => {
     return error.toString();
   }
 
-  return "Parse error" + (error.name ? ` (${error.name})` : "") + `${error.message ? ": " + error.message : ""}\nCall stack: ${error.stack}`;
+  const formattedStack = error.stack.split("\n")
+      .map((item: string, index: number) => index > 0 ? item.replace(/^\s*/gi, "\t") : item)
+      .join("\n");
+  return "Parse error" + (error.name ? ` (${error.name})` : "") + `${error.message ? ": " + error.message : ""}\n\nCall stack: ${formattedStack}`;
 };
 
 const error = computed(() => {
@@ -26,18 +29,29 @@ const error = computed(() => {
 </script>
 
 <template>
-  <div v-if="error" class="error-panel">{{ error }}</div>
+  <div class="error-panel">
+    <div v-if="error" class="error-panel-inner">{{ error }}</div>
+  </div>
 </template>
 
 <style scoped>
 .error-panel {
+  display: flex;
+  flex-direction: row;
   background: #222222;
   color: #dc6f6f;
-  padding: 10px;
+
   font-size: 14px;
   font-family: "JetBrains Mono";
   white-space: pre;
   text-wrap: auto;
-  overflow-y: scroll;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+}
+
+.error-panel-inner {
+  padding: 10px;
+  display: flex;
 }
 </style>
