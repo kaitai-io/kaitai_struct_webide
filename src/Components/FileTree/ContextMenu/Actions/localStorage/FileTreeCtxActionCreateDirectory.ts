@@ -1,10 +1,10 @@
-import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemFileTreeMapper";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "../../../FileSystemVisitors/FileSystemFileTreeMapper";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
-import {useFileSystems} from "../../Store/FileSystemsStore";
-import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
+import {useFileSystems} from "../../../Store/FileSystemsStore";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../../../FileSystems/KaitaiFileSystem";
 import {FolderPlusIcon} from "@heroicons/vue/16/solid";
-import {FileSystemPath} from "../../FileSystemsTypes";
+import {FileSystemPath} from "../../../FileSystemsTypes";
 
 export const FileTreeCtxActionCreateDirectory = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {

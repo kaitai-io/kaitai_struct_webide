@@ -1,12 +1,12 @@
-import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemFileTreeMapper";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "../../../FileSystemVisitors/FileSystemFileTreeMapper";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
 
-import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
-import {createNewKsyAction} from "../../../../GlobalActions/CreateNewKsyAction";
-import {useTextModalInputStore} from "../../../Modals/TextInputModal/TextInputModalStore";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../../../FileSystems/KaitaiFileSystem";
+import {createNewKsyAction} from "../../../../../GlobalActions/CreateNewKsyAction";
+import {useTextModalInputStore} from "../../../../Modals/TextInputModal/TextInputModalStore";
 import {DocumentPlusIcon} from "@heroicons/vue/16/solid";
-import {FileSystemPath} from "../../FileSystemsTypes";
+import {FileSystemPath} from "../../../FileSystemsTypes";
 
 export const FileTreeCtxActionCreateKsy = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {

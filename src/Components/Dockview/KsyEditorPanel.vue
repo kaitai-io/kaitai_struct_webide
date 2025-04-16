@@ -35,10 +35,8 @@ onMounted(async () => {
   });
 
 
-  setTimeout(() => {
-    const appStore = useAppStore();
-    loadKsyFileAction(appStore.selectedKsyInfo);
-  }, 20)
+  const appStore = useAppStore();
+  loadKsyFileAction(appStore.selectedKsyInfo);
 });
 
 store.$onAction(async ({name, store, args}) => {
@@ -49,7 +47,7 @@ store.$onAction(async ({name, store, args}) => {
 });
 
 onUnmounted(() => {
-  ksyEditor?.dispose()
+  ksyEditor?.dispose();
 });
 </script>
 

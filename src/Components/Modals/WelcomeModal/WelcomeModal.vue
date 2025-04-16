@@ -104,7 +104,7 @@ const onClickBackdrop = (e) => {
   align-items: center;
   justify-items: center;
   justify-content: center;
-  font-family: "JetBrains Mono";
+  font-family: "JetBrains Mono", monospace;
   font-size: 12px;
 }
 

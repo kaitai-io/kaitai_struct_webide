@@ -33,20 +33,20 @@ const model = computed(() => {
       </thead>
 
       <tr class="tableRow" v-for="simpleType in model.simpleTypes">
-        <td class="typeCol">{{simpleType.label}}</td>
+        <td class="typeCol">{{ simpleType.label }}</td>
         <td class="typeValue">{{ simpleType.unsignedValue }}</td>
         <td class="typeValue">{{ simpleType.signedValue }}</td>
       </tr>
 
       <tr class="tableRow" v-for="complexType in model.complexTypes">
-        <td class="typeCol">{{complexType.label}}</td>
+        <td class="typeCol">{{ complexType.label }}</td>
         <td class="typeValue" colspan="2">{{ complexType.value }}</td>
       </tr>
 
-      <tr class="tableRow"  v-for="str in model.strings">
-        <td class="typeCol">{{str.label}}</td>
+      <tr class="tableRow" v-for="str in model.strings">
+        <td class="typeCol">{{ str.label }}</td>
         <td class="typeValue" colspan="2">
-          <div class="str">{{str.value}}</div>
+          <div class="str">{{ str.value }}</div>
         </td>
       </tr>
     </table>
@@ -58,7 +58,7 @@ const model = computed(() => {
   color: #eee;
   overflow-y: auto;
   height: 100%;
-  font-family: "JetBrains Mono";
+  font-family: "JetBrains Mono", monospace;
   font-size: 12px;
   padding: 10px;
 }

@@ -1,9 +1,9 @@
-import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemFileTreeMapper";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "../../../FileSystemVisitors/FileSystemFileTreeMapper";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
-import {useFileSystems} from "../../Store/FileSystemsStore";
+import {useFileSystems} from "../../../Store/FileSystemsStore";
 import {FolderIcon} from "@heroicons/vue/16/solid";
-import {FileSystemPath} from "../../FileSystemsTypes";
+import {FileSystemPath} from "../../../FileSystemsTypes";
 
 export const FileTreeCtxActionCloseDirectory = (item: TreeNodeDisplay): MenuItem => {
     const action = () => {

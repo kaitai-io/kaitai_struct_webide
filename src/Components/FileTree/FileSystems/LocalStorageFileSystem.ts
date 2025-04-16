@@ -5,44 +5,23 @@ import {toRaw} from "vue";
 import {FileSystemPathCollector} from "../FileSystemVisitors/FileSystemPathCollector";
 
 export const FILE_SYSTEM_TYPE_LOCAL = "local";
+export const FILE_SYSTEM_TYPE_DIST = "dist";
 
-const defaultItem: FileSystemItem = {
-    fsType: FILE_SYSTEM_TYPE_LOCAL,
-    type: ITEM_MODE_DIRECTORY,
-    children: {},
-    fn: "Local storage"
-};
-
-export const initStorageFileSystemRoot = async () => {
-    const storedItem = await LocalForageForLocalStorageWrapper.getFsItem(LocalStorageFileSystem.fileTreeLocalForageKey());
-    if (storedItem) {
-        storedItem.fn = "Local storage";
-    }
-    return storedItem || defaultItem;
-};
 
 export class LocalStorageFileSystem implements FileSystem {
-    public static fileTreeLocalForageKey() {
-        return `fs_files`;
-    }
 
-    public static fileLocalForageKey(fileName: string) {
-        return `fs_file[${fileName}]`;
-    }
 
     private static getOnlyFileName(filePath: string) {
         const filePathParts = filePath.split("/");
         return filePathParts[filePathParts.length - 1];
     }
 
-    public storeId: string;
-
-    constructor(private root: FileSystemItem) {
-        this.storeId = FILE_SYSTEM_TYPE_LOCAL;
+    constructor(private root: FileSystemItem, public storeId: string, private rootKey: string, private fileKey: string) {
     }
 
     updateTreeInDatabase() {
-        return LocalForageForLocalStorageWrapper.saveFsItem(LocalStorageFileSystem.fileTreeLocalForageKey(), toRaw(this.root));
+        const localForageRootKey = this.fileTreeLocalForageKey();
+        return LocalForageForLocalStorageWrapper.saveFsItem(localForageRootKey, toRaw(this.root));
     }
 
     getRootNode() {
@@ -51,7 +30,8 @@ export class LocalStorageFileSystem implements FileSystem {
 
     async get(filePath: string): Promise<string | ArrayBuffer> {
         const fileName = LocalStorageFileSystem.getOnlyFileName(filePath);
-        const fileContent = await LocalForageForLocalStorageWrapper.getFile(LocalStorageFileSystem.fileLocalForageKey(fileName));
+        const localForageFileKey = this.fileLocalForageKey(fileName);
+        const fileContent = await LocalForageForLocalStorageWrapper.getFile(localForageFileKey);
         if (!fileContent) {
             throw new Error(`File not found: ${filePath}`);
         }
@@ -61,7 +41,8 @@ export class LocalStorageFileSystem implements FileSystem {
     async put(filePath: string, data: string | ArrayBuffer): Promise<void> {
         FsItemHelper.createFileOrDirectoryFromPathInRoot(this.root, filePath);
         const fileName = LocalStorageFileSystem.getOnlyFileName(filePath);
-        await LocalForageForLocalStorageWrapper.saveFile(LocalStorageFileSystem.fileLocalForageKey(fileName), data);
+        const localForageFileKey = this.fileLocalForageKey(fileName);
+        await LocalForageForLocalStorageWrapper.saveFile(localForageFileKey, data);
         await this.updateTreeInDatabase();
     }
 
@@ -75,7 +56,8 @@ export class LocalStorageFileSystem implements FileSystem {
         await this.updateTreeInDatabase();
         filesToDelete.forEach(fileToDelete => {
             const fileName = LocalStorageFileSystem.getOnlyFileName(fileToDelete);
-            LocalForageForLocalStorageWrapper.deleteFile(LocalStorageFileSystem.fileLocalForageKey(fileName));
+            const localForageFileKey = this.fileLocalForageKey(fileName);
+            LocalForageForLocalStorageWrapper.deleteFile(localForageFileKey);
         });
     }
 
@@ -86,8 +68,8 @@ export class LocalStorageFileSystem implements FileSystem {
         delete oldPathInfo.parentNode.children[oldPathInfo.nodeName];
         newPathInfo.parentNode.children[newPathInfo.nodeName] = oldPathInfo.node;
         if (oldPathInfo.node.type === ITEM_MODE_FILE) {
-            const oldFileForageKey = LocalStorageFileSystem.fileLocalForageKey(oldPathInfo.nodeName);
-            const newFileForageKey = LocalStorageFileSystem.fileLocalForageKey(newPathInfo.nodeName);
+            const oldFileForageKey = this.fileLocalForageKey(oldPathInfo.nodeName);
+            const newFileForageKey = this.fileLocalForageKey(newPathInfo.nodeName);
             const content = await LocalForageForLocalStorageWrapper.getFile(oldFileForageKey);
             await LocalForageForLocalStorageWrapper.saveFile(newFileForageKey, content);
         }
@@ -101,5 +83,13 @@ export class LocalStorageFileSystem implements FileSystem {
         }
         const foundFolder = FsItemHelper.findNodeInRoot(this.root, path.split("/"));
         return Promise.resolve(FileSystemPathCollector.collectPaths(foundFolder));
+    }
+
+    private fileTreeLocalForageKey() {
+        return this.rootKey;
+    }
+
+    private fileLocalForageKey(fileName: string) {
+        return `${this.fileKey}[${fileName}]`;
     }
 }

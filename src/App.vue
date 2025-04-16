@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import {useAppStore} from "./Stores/AppStore";
-import {useFileSystems} from "./Components/FileTree/Store/FileSystemsStore";
 import {loadBinaryFileAction} from "./GlobalActions/LoadBinaryFile";
 import {loadKsyFileAction} from "./GlobalActions/LoadKsyFile";
-import {KaitaiFileSystem} from "./Components/FileTree/FileSystems/KaitaiFileSystem";
-import {
-  initStorageFileSystemRoot,
-  LocalStorageFileSystem
-} from "./Components/FileTree/FileSystems/LocalStorageFileSystem";
-import {onBeforeMount} from "vue";
 import WelcomeModal from "./Components/Modals/WelcomeModal/WelcomeModal.vue";
 import TextInputModal from "./Components/Modals/TextInputModal/TextInputModal.vue";
 import DockviewApp from "./Components/Dockview/DockviewApp.vue";
+import InitializeIDE from "./Components/InitializeIDE/InitializeIDE.vue";
+import {useInitializeIDEStore} from "./Components/InitializeIDE/Store/InitializeIDEStore";
+import UnsupportedBrowser from "./Components/UnsupportedBrowser.vue";
 
 
 const store = useAppStore();
-const fileSystemsStore = useFileSystems();
+const initializedStore = useInitializeIDEStore();
 
 store.$onAction(async ({name, args}) => {
   switch (name) {
@@ -30,21 +26,16 @@ store.$onAction(async ({name, args}) => {
   }
 });
 
-
-onBeforeMount(async () => {
-  fileSystemsStore.addFileSystem(new KaitaiFileSystem());
-  const oldStorageRoot = await initStorageFileSystemRoot();
-  fileSystemsStore.addFileSystem(new LocalStorageFileSystem(oldStorageRoot));
-});
-
-
 </script>
 
 <template>
-  <TextInputModal/>
-  <WelcomeModal/>
-
-  <DockviewApp/>
+  <UnsupportedBrowser/>
+  <InitializeIDE v-if="!initializedStore.isInitialized"/>
+  <slot v-if="initializedStore.isInitialized">
+    <TextInputModal/>
+    <WelcomeModal/>
+    <DockviewApp/>
+  </slot>
 
 </template>
 

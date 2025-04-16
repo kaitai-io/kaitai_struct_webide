@@ -3,7 +3,7 @@
 import {DockviewReadyEvent, DockviewVue, themeVisualStudio} from "dockview-vue";
 import {AddTabEvent, useDockviewStore} from "./Store/DockviewStore";
 import {DockviewApi} from "dockview-core";
-import {defaultLayout, GL_HEX_VIEWER_ID} from "./DockviewerConfig";
+import {defaultLayout, GL_KSY_EDITOR_ID} from "./DockviewerConfig";
 
 const dockviewStore = useDockviewStore();
 let id = 0;
@@ -18,11 +18,13 @@ dockviewStore.$onAction(({name, args}) => {
   if (name !== "addTab") return;
   const event = args[0] as AddTabEvent;
 
+  const panelAlreadyExists = api.panels.findIndex(panel => panel.title === event.title) !== -1;
+  if (panelAlreadyExists) return;
   api.addPanel({
     id: `dyn-${id++}`,
     component: "DynamicCodePanel",
     title: event.title,
-    position: {referencePanel: GL_HEX_VIEWER_ID, direction: "within"},
+    position: {referencePanel: GL_KSY_EDITOR_ID, direction: "within"},
     params: {
       content: event.content,
       language: event.language

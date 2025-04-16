@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useFileSystems} from "./Store/FileSystemsStore";
-import {TreeNodeDisplay, TreeNodeDisplayType} from "./FileSystemVisitors/FileSystemFileTreeMapper";
+import {TreeNodeDisplay} from "./FileSystemVisitors/FileSystemFileTreeMapper";
 import FileStoreTreeNodeIcon from "./FileTreeNodeIcon.vue";
 import {computed, ref, toRaw} from "vue";
 import {useAppStore} from "../../Stores/AppStore";
@@ -9,6 +9,7 @@ import {prepareContextMenuOptions} from "./ContextMenu/FileTreeNodeContextMenu";
 import {FileSystemPath} from "./FileSystemsTypes";
 import {FILE_SYSTEM_TYPE_KAITAI} from "./FileSystems/KaitaiFileSystem";
 import {FileTreeDragMoveAction, FileTreeDragMoveActionHelper,} from "./Actions/FileTreeDragMoveAction";
+import {DoubleClickActions} from "./Actions/DoubleClickActions";
 
 const fileSystemStore = useFileSystems();
 const appStore = useAppStore();
@@ -23,27 +24,7 @@ const activateRow = () => {
 };
 
 const doubleClick = () => {
-  switch (props.item.type) {
-    case TreeNodeDisplayType.KSY_FILE: {
-      appStore.updateSelectedKsyFile(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
-      return;
-    }
-    case TreeNodeDisplayType.BINARY_FILE: {
-      appStore.updateSelectedBinaryFile(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
-      return;
-    }
-    case TreeNodeDisplayType.EMPTY_FOLDER: {
-      return;
-    }
-    case TreeNodeDisplayType.OPEN_FOLDER: {
-      fileSystemStore.closePath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
-      return;
-    }
-    case TreeNodeDisplayType.CLOSED_FOLDER: {
-      fileSystemStore.openPath(FileSystemPath.fromFullPathWithStore(props.item.fullPathWithStore));
-      return;
-    }
-  }
+  DoubleClickActions(props.item);
 };
 
 const contextMenu = (e: MouseEvent) => {
@@ -103,7 +84,7 @@ const dragLeave = (event: DragEvent) => {
        @dragleave="dragLeave"
   >
     <div class="row-content" :class="{isLoaded:nodeFileIsLoadedInEditor}" :style="{marginLeft: item.depth * 16 + 'px'}">
-      <FileStoreTreeNodeIcon :type="item.type"/>
+      <FileStoreTreeNodeIcon :type="item.type" :storeId="item.storeId"/>
       <span class="row-description">{{ item.fileName }}</span>
     </div>
   </div>

@@ -39,10 +39,8 @@ hexViewerConfigStore.$onAction(({name, store, args}) => {
 });
 
 onMounted(async () => {
-  setTimeout(() => {
-    const fileSystemsStore = useAppStore();
-    loadBinaryFileAction(fileSystemsStore.selectedBinaryInfo);
-  }, 20)
+  const fileSystemsStore = useAppStore();
+  loadBinaryFileAction(fileSystemsStore.selectedBinaryInfo);
 });
 
 </script>
@@ -67,7 +65,7 @@ onMounted(async () => {
   height: 100%;
   background: var(--hex-viewer-bg-color);
   color: var(--hex-viewer-color);
-  font-family: "JetBrains Mono";
+  font-family: "JetBrains Mono", monospace;
   font-weight: lighter;
 
   font-size: 12px;

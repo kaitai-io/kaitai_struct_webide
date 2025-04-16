@@ -1,12 +1,11 @@
-import {TreeNodeDisplay} from "../../FileSystemVisitors/FileSystemFileTreeMapper";
+import {TreeNodeDisplay} from "../../../FileSystemVisitors/FileSystemFileTreeMapper";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
 import {PencilIcon} from "@heroicons/vue/16/solid";
-import {useTextModalInputStore} from "../../../Modals/TextInputModal/TextInputModalStore";
-import {useAppStore} from "../../../../Stores/AppStore";
-import {FileSystemPath} from "../../FileSystemsTypes";
-import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
-import {FileTreeRenameAction} from "../../Actions/FileTreeRenameAction";
+import {useTextModalInputStore} from "../../../../Modals/TextInputModal/TextInputModalStore";
+import {FileSystemPath} from "../../../FileSystemsTypes";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../../../FileSystems/KaitaiFileSystem";
+import {FileTreeRenameAction} from "../../../Actions/FileTreeRenameAction";
 
 export const FileTreeCtxActionRename = (item: TreeNodeDisplay): MenuItem => {
 

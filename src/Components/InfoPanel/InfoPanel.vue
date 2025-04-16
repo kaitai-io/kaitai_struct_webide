@@ -74,6 +74,6 @@ const about = () => {
   color: #eee;
   padding: 10px;
   font-size: 12px;
-  font-family: "JetBrains Mono";
+  font-family: "JetBrains Mono", monospace;
 }
 </style>

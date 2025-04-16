@@ -1,12 +1,12 @@
-import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemFileTreeMapper";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "../../../FileSystemVisitors/FileSystemFileTreeMapper";
 import {MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
 import {h} from "vue";
-import {FileActionsWrapper} from "../../../../Utils/Files/FileActionsWrapper";
-import {useFileSystems} from "../../Store/FileSystemsStore";
+import {FileActionsWrapper} from "../../../../../Utils/Files/FileActionsWrapper";
+import {useFileSystems} from "../../../Store/FileSystemsStore";
 import {CloudArrowDownIcon} from "@heroicons/vue/16/solid";
-import {FILE_SYSTEM_TYPE_KAITAI} from "../../FileSystems/KaitaiFileSystem";
-import {FileSystemPath} from "../../FileSystemsTypes";
-import {FileToPack, ZipUtil} from "../../../../Utils/Files/ZipUtil";
+import {FILE_SYSTEM_TYPE_KAITAI} from "../../../FileSystems/KaitaiFileSystem";
+import {FileSystemPath} from "../../../FileSystemsTypes";
+import {FileToPack, ZipUtil} from "../../../../../Utils/Files/ZipUtil";
 
 const mapFilesForPacking = async (getFile: (filePath: string) => Promise<string | ArrayBuffer>, rootPath: string, filePathsInNode: string[]): Promise<FileToPack[]> => {
     const itemPathParts = rootPath.split("/");

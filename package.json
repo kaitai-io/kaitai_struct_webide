@@ -9,7 +9,7 @@
     "@heroicons/vue": "^2.1.5",
     "@imengyu/vue3-context-menu": "^1.4.3",
     "@vueuse/core": "^10.11.0",
-    "bowser": "^1.7.3",
+    "bowser": "^2.11.0",
     "dateformat": "^5.0.3",
     "dockview-core": "^4.2.1",
     "dockview-vue": "^4.2.1",

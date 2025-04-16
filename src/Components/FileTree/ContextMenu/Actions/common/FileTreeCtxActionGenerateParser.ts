@@ -1,13 +1,13 @@
-import {TreeNodeDisplay, TreeNodeDisplayType} from "../../FileSystemVisitors/FileSystemFileTreeMapper";
-import {useFileSystems} from "../../Store/FileSystemsStore";
+import {TreeNodeDisplay, TreeNodeDisplayType} from "../../../FileSystemVisitors/FileSystemFileTreeMapper";
+import {useFileSystems} from "../../../Store/FileSystemsStore";
 import {h} from "vue";
 import {MenuChildren, MenuItem} from "@imengyu/vue3-context-menu/lib/ContextMenuDefine";
-import {CompilationTarget, CompilerService} from "../../../../DataManipulation/CompilationModule/CompilerService";
-import {YamlFileInfo} from "../../../../DataManipulation/CompilationModule/JsImporter";
-import {useIdeSettingsStore} from "../../../../Stores/IdeSettingsStore";
-import {KaitaiSupportedLanguages, SupportedLanguage} from "../../../../DataManipulation/KaitaiSupportedLanguages";
+import {CompilationTarget, CompilerService} from "../../../../../DataManipulation/CompilationModule/CompilerService";
+import {YamlFileInfo} from "../../../../../DataManipulation/CompilationModule/JsImporter";
+import {useIdeSettingsStore} from "../../../../../Stores/IdeSettingsStore";
+import {KaitaiSupportedLanguages, SupportedLanguage} from "../../../../../DataManipulation/KaitaiSupportedLanguages";
 import {BoltIcon} from "@heroicons/vue/16/solid";
-import {useDockviewStore} from "../../../Dockview/Store/DockviewStore";
+import {FILE_SYSTEM_TYPE_DIST} from "../../../FileSystems/LocalStorageFileSystem";
 
 export const mapFileTreeDisplayNodeToYaml = async (item: TreeNodeDisplay): Promise<YamlFileInfo> => {
     const fileSystemsStore = useFileSystems();
@@ -39,21 +39,14 @@ export const FileTreeCtxActionGenerateParser = (item: TreeNodeDisplay): MenuItem
             return;
         }
         const [name, content] = record;
-        useDockviewStore().addTab({
-            title: name,
-            content: content,
-            language: language.monacoEditorLangCode
-        })
+        useFileSystems().addFile(FILE_SYSTEM_TYPE_DIST, `${language.monacoEditorLangCode}/${name}`, content);
+
     };
 
-    const createTabsForAllGeneratedFiles = (compiled: CompilationTarget, language: SupportedLanguage) => {
-        Object.entries(compiled.result).forEach(([name, content]) => {
-            useDockviewStore().addTab({
-                title: name,
-                content: content,
-                language: language.monacoEditorLangCode
-            })
-        });
+    const createTabsForAllGeneratedFiles = async (compiled: CompilationTarget, language: SupportedLanguage) => {
+        for (const [name, content] of Object.entries(compiled.result)) {
+            await useFileSystems().addFile(FILE_SYSTEM_TYPE_DIST, `${language.monacoEditorLangCode}/${name}`, content);
+        }
     };
 
     const generateParserForLanguage = async (language: SupportedLanguage) => {

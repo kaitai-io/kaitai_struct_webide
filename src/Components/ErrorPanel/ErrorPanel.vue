@@ -42,7 +42,7 @@ const error = computed(() => {
   color: #dc6f6f;
 
   font-size: 14px;
-  font-family: "JetBrains Mono";
+  font-family: "JetBrains Mono", monospace;
   white-space: pre;
   text-wrap: auto;
   width: 100%;
