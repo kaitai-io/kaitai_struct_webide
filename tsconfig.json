@@ -1,26 +1,7 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
-    "module": "amd",
-    "noImplicitAny": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "noEmitOnError": false,
-    "removeComments": false,
-    "preserveConstEnums": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "alwaysStrict": true,
-//    "strictNullChecks": true,
-    "sourceMap": false,
-    "target": "es2017",
-    "outDir": "js/",
-    "lib": ["es2017", "dom"]
-  },
-  "include": [
-    "src/**/*",
-    "lib/ts-types/"
-  ],
-  "exclude": [
-    "src/worker/ImportLoader.ts"
-  ]
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "es2021",
+  }
 }

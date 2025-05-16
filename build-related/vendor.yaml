@@ -1,0 +1,80 @@
+libs:
+  Monaco Editor:
+    website: https://microsoft.github.io/monaco-editor
+    source: https://github.com/microsoft/monaco-editor
+    licenseName: MIT
+    licenseUrl: https://github.com/microsoft/monaco-editor/blob/main/LICENSE.txt
+    npmDir: monaco-editor
+    files: [ LICENSE ]
+
+  HeroIcons:
+    source: https://github.com/tailwindlabs/heroicons
+    licenseName: MIT
+    licenseUrl: https://github.com/tailwindlabs/heroicons/blob/master/LICENSE
+    npmDir: "@heroicons"
+    files: [ LICENSE ]
+
+  bowser:
+    source: https://github.com/ded/bowser
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/ded/bowser/master/LICENSE
+    npmDir: bowser
+    files: [ LICENSE ]
+
+  dateformat:
+    source: https://github.com/felixge/node-dateformat
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/felixge/node-dateformat/master/LICENSE
+    npmDir: dateformat
+    files: [ LICENSE ]
+
+  Dockview:
+    source: https://github.com/mathuo/dockview
+    licenseName: MIT
+    licenseUrl: https://github.com/mathuo/dockview/blob/master/LICENSE
+    npmDir: dockview-core
+    files: [ LICENSE ]
+
+
+  localForage:
+    source: https://github.com/localForage/localForage
+    licenseName: Apache-2.0
+    licenseUrl: https://raw.githubusercontent.com/localForage/localForage/master/LICENSE
+    npmDir: localforage
+    files: [ LICENSE ]
+
+  pako:
+    source: https://github.com/nodeca/pako
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/nodeca/pako/master/LICENSE
+    npmDir: pako
+    files: [ LICENSE ]
+
+  Vue.js:
+    source: https://github.com/vuejs/vue
+    licenseName: MIT
+    licenseUrl: https://raw.githubusercontent.com/vuejs/vue/dev/LICENSE
+    npmDir: vue
+    files: [ LICENSE ]
+
+  Kaitai Struct Compiler:
+    website: http://kaitai.io/
+    source: https://github.com/kaitai-io/kaitai_struct_compiler
+    licenseName: GPL-3.0
+    licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE
+    npmDir: kaitai-struct-compiler
+    files: [ LICENSE ]
+
+  Kaitai Struct JavaScript Runtime:
+    source: https://github.com/kaitai-io/kaitai_struct_javascript_runtime
+    licenseName: Apache-2.0
+    licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_javascript_runtime/master/LICENSE
+    npmDir: kaitai-struct
+    files: [ LICENSE ]
+
+  js-yaml:
+    source: https://github.com/nodeca/js-yaml
+    licenseName: MIT
+    licenseUrl: https://github.com/nodeca/js-yaml/blob/master/LICENSE
+    npmDir: js-yaml
+    files: [ LICENSE ]

@@ -1,61 +1,22 @@
-/*.lm_content>div { height: 100%; width: 100% }*/
-.lm_splitter.lm_horizontal .lm_drag_handle { left:-5px; width:15px }
-.lm_splitter.lm_vertical .lm_drag_handle { top:-5px; height:15px }
-.errorWindow { background: white; font-family: Courier,monospace; font-size: 12px; white-space: pre-wrap; overflow-y: scroll; }
-.errorWindow>div { margin: 5px; }
-#parsedDataTree { background: white; overflow: auto; font-size: 12px; font: 12px/normal "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace }
-#parsedDataTree .jstree-icon, #parsedDataTree .jstree-anchor { height: 16px; line-height: 16px }
-#parsedDataTree .jstree-node { min-height: 16px; line-height: 16px; min-width:18px; margin-left:14px }
-#parsedDataTree.jstree-default>.jstree-container-ul>.jstree-node { margin-left: 0 }
-#parsedDataTree.jstree-default .jstree-ocl { background-position-y: -8px; width:18px; }
-#parsedDataTree .missing { font-family: Arial; color: #c00000; }
-.alert-color { color: #FFC20A; }
-.fail-color { color: #FF4136; }
-.instance-fail-color { color: #0074D9; }
-#fileDrop { display:none; font-family: Arial; position: fixed; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0,0,0,0.8); z-index: 9999 }
-#fileDrop>div { border:2px dashed white; border-radius:25px; width:500px; margin-left:-250px; height:180px; margin-top:-100px; position:fixed; top:50%; left:50%; color:white; text-align:center; font-size:22px; padding-top:65px }
-#fileTree { font-family:Arial; font-size:12px }
-body { line-height:normal }
-#fileTree { position:absolute; top:0; bottom:28px; width:100%; /*height:100%;*/ overflow: auto; }
-#fileTree .jstree-node { margin-left: 14px }
-#fileTree .jstree-container-ul>.jstree-node { margin-left:0 }
-#fileTree .jstree-clicked { background:initial }
-#fileTree .glyphicon { font-size:12px; margin-top:-1px; color:#eee; margin-right:3px }
-#fileTree .jstree-icon { margin-left:3px; margin-right:5px }
-#fileTree .jstree-ocl { display:none }
-#fileTreeCont .footer { position:absolute; bottom:0; width:100%; padding-left:2px }
-#fileTreeCont .footer .btn { width:33.3%; border-radius:0; font-size:13px; padding:3px 10px }
-body { color:#333 }
-.dropdown { position: absolute; display:none; z-index:9999 }
-.dropdown-menu { z-index:9999 }
-.dropdown .dropdown-menu { font-size:13px; border-color:#375a7f; border-radius:0 }
-.dropdown .glyphicon { margin-right:5px; }
-.dropdown .glyphicon-folder-open { margin-left:-1px; margin-right:6px }
-.dropdown .dropdown-menu>li>a { padding:3px 15px }
-.btn { padding: 5px 10px; }
-.modal { color: white; }
-.control-label { margin-bottom:8px }
-.form-control { padding: 6px 12px; height:34px }
-.modal-footer, .modal-body { padding: 15px }
-.input-group-addon { padding: 8px 8px }
-#noscript, #unsupportedBrowser { background: #ffee00; z-index:10000; position:fixed; left:0; right:0; padding:10px; text-align:center }
-#noscript a, #unsupportedBrowser a { color: black; text-decoration: underline }
-#unsupportedBrowser .closeBtn { float:right; margin-top: 1px; cursor: pointer }
-.marker_solution { background:rgba(255, 80, 80, 0.3); }
-.marker_user { background:rgba(80, 255, 80, 0.30); }
-#parsedDataTree .intVal, #parsedDataTree .enumDesc { color:#bbb }
-#parsedDataTree .flags { color:#933; font-weight: bold }
-#parsedDataTree .propName { color: blue; }
-#parsedDataTree .className { color: green; }
-#parsedDataTree .primitiveValue { font-weight: bold }
-#infoPanel { background: #222222; }
-#infoPanel { color: #eee; display:none; padding: 10px }
-#aboutWebIde { position:absolute; bottom:10px; right:10px; font-size:12px }
-#disableLazyParsingDiv, #exportToJsonDiv, #unparsedDiv, #bytesDiv, #parsedPathDiv, #selectionLengthDiv { font-size:13px; margin-top:5px }
-#parsedPath { word-break: break-all; }
-#unparsedDiv { margin-top:0 }
-#disableLazyParsingDiv label { margin-left:2px; font-weight:normal; vertical-align:middle }
-#welcomeModalLabel { text-align:center }
-#welcomeModal .licenses { font-size:12px; margin-bottom:10px }
-#converterPanel { display:none }
-/*.marker_match { background:rgba(80, 255, 80, 0.30); }*/
+@import './../node_modules/dockview-core/dist/styles/dockview.css';
+@import './../node_modules/@imengyu/vue3-context-menu/lib/vue3-context-menu.css';
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url('./JetBrainsMono-VariableFont_wght.ttf');
+}
+
+html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #222;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}

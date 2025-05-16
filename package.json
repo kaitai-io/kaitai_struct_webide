@@ -4,38 +4,63 @@
   "directories": {
     "doc": "docs"
   },
+  "type": "module",
   "dependencies": {
-    "ace-builds": "^1.4.12",
-    "big-integer": "^1.6.25",
-    "bootstrap": "^3.4.1",
-    "bootswatch": "^3.3.7",
-    "bowser": "^1.7.3",
-    "dateformat": "^2.0.0",
-    "font-awesome": "^4.7.0",
-    "golden-layout": "^1.5.9",
-    "jquery": "^3.5.0",
+    "@heroicons/vue": "^2.1.5",
+    "@imengyu/vue3-context-menu": "^1.4.3",
+    "@vueuse/core": "^10.11.0",
+    "bowser": "^2.11.0",
+    "dateformat": "^5.0.3",
+    "dockview-core": "^4.2.1",
+    "dockview-vue": "^4.2.1",
+    "iconv-lite": "^0.6.3",
     "js-yaml": "^4.1.0",
-    "jstree": "^3.3.16",
+    "jszip": "^3.10.1",
     "kaitai-struct": "next",
     "kaitai-struct-compiler": "next",
-    "localforage": "^1.5.0",
+    "localforage": "^1.10.0",
+    "monaco-editor": "^0.52.0",
     "pako": "^1.0.6",
-    "require-from-string": "^1.2.1",
-    "requirejs": "^2.3.5",
-    "smooth-scrollbar": "^7.4.1",
-    "text-encoding": "^0.6.4",
-    "thenby": "^1.2.3",
-    "vue": "^2.4.4",
-    "yamljs": "^0.3.0"
+    "pinia": "^2.1.7",
+    "vue": "^3.4.29"
   },
   "devDependencies": {
-    "express": "^4.17.1",
-    "tslint": "^5.7.0",
-    "typescript": "^2.9.2"
+    "@eslint/js": "^9.13.0",
+    "@parcel/optimizer-data-url": "^2.12.0",
+    "@parcel/transformer-inline-string": "^2.12.0",
+    "@parcel/transformer-vue": "^2.12.0",
+    "@types/chai": "^5.0.0",
+    "@types/dateformat": "^5.0.2",
+    "@types/js-yaml": "^4.0.9",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "^22.7.7",
+    "assert": "^2.1.0",
+    "browserify-zlib": "^0.2.0",
+    "buffer": "^6.0.3",
+    "chai": "^5.1.1",
+    "eslint": "^9.13.0",
+    "eslint-plugin-vue": "^9.29.1",
+    "events": "^3.3.0",
+    "globals": "^15.11.0",
+    "mocha": "^10.7.3",
+    "parcel": "^2.12.0",
+    "parcel-reporter-static-files-copy": "^1.5.3",
+    "process": "^0.11.10",
+    "serve": "^14.2.4",
+    "stream-browserify": "^3.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.11.0",
+    "util": "^0.12.5"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "node vendor_build.js"
+    "test": "mocha 'test/**/*.mjs'",
+    "generate-formats": "node build-related/genKaitaiFsFiles.js",
+    "generate-license": "node build-related/vendor_license.js",
+    "build-workers": "sh build-related/build_language_workers.sh",
+    "serve": "serve dist",
+    "parcel-run": "npm run build-workers && parcel index.html --no-cache",
+    "parcel-build": "npm run build-workers && parcel build index.html --no-source-maps"
   },
   "repository": {
     "type": "git",
@@ -46,5 +71,13 @@
   "bugs": {
     "url": "https://github.com/kaitai-io/kaitai_struct_webide/issues"
   },
-  "homepage": "https://github.com/kaitai-io/kaitai_struct_webide#readme"
+  "homepage": "https://github.com/kaitai-io/kaitai_struct_webide#readme",
+  "staticFiles": [
+    {
+      "staticPath": "public"
+    },
+    {
+      "staticPath": "LICENSE.txt"
+    }
+  ]
 }
