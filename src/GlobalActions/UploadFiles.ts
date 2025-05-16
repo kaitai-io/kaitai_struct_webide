@@ -5,33 +5,38 @@ import {useFileSystems} from "../Components/FileTree/Store/FileSystemsStore";
 
 import {FILE_SYSTEM_TYPE_LOCAL} from "../Components/FileTree/FileSystems/LocalStorageFileSystem";
 
+interface FileToUpload {
+    path: string;
+    content: string | ArrayBuffer;
+}
 
 const isKsyFile = (fileName: string) => {
     return fileName.toLowerCase().endsWith(".ksy");
 };
 
-const processKsyFile = async (file: IFileProcessItem) => {
+const preparePathFromDirectoryUpload = (file: IFileProcessItem) => {
+    const filePath = file.file.webkitRelativePath.split("/");
+    filePath.splice(0, 1);
+    return filePath.join("/");
+};
+
+const prepareFileToBeUploaded = async (file: IFileProcessItem, isUploadingFolder: boolean) => {
+    const isKsy = isKsyFile(file.file.name);
+    return {
+        path: isUploadingFolder ? preparePathFromDirectoryUpload(file) : file.file.name,
+        content: isKsy ? await file.read("text") : await file.read("arrayBuffer")
+    };
+};
+
+
+const uploadFile = async (file: FileToUpload) => {
     const fileStore = useFileSystems();
-
-    const content = await file.read("text");
-    return fileStore.addFile(FILE_SYSTEM_TYPE_LOCAL, file.file.name, content);
+    return fileStore.addFile(FILE_SYSTEM_TYPE_LOCAL, file.path, file.content);
 };
 
-const processBinFile = async (file: IFileProcessItem) => {
-    const fileStore = useFileSystems();
-
-    const content = await file.read("arrayBuffer");
-    return fileStore.addFile(FILE_SYSTEM_TYPE_LOCAL, file.file.name, content);
-};
-const processSingleUploadedFile = (file: IFileProcessItem) => {
-    return isKsyFile(file.file.name)
-        ? processKsyFile(file)
-        : processBinFile(file);
-};
-
-
-export const processUploadedFileList = (fileList: FileList, source: string) => {
+export const processUploadedFileList = async (fileList: FileList, isDirectoryUpload: boolean, source: string) => {
     const files = FileActionsWrapper.mapToProcessItems(fileList);
-    console.log(`[UploadFiles][${source}] - uploading files: [${files.map(file => file.file.name)}]`);
-    return Promise.all(files.map(processSingleUploadedFile));
+    const filesToUpload = await Promise.all(files.map((file) => prepareFileToBeUploaded(file, isDirectoryUpload)));
+    console.log(`[UploadFiles][${source}] - uploading files: [${filesToUpload.map(file => file.path)}]`);
+    return Promise.all(filesToUpload.map(uploadFile));
 };

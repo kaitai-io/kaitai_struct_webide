@@ -2,6 +2,14 @@ import {IFileProcessItem} from "./Types";
 
 export class FileActionsWrapper {
     public static async fetchFileFromServer(url: string) {
+        // In local environment UNMATCHED files return 404 HTML instead of response with error code 404
+        const failsafeTextResponse = async (response: Response) => {
+            const text = await response.text();
+            if (text.startsWith("<!DOCTYPE html>")) {
+                throw new Error("file not found");
+            }
+            return text;
+        };
         const resp = await fetch(url)
             .then(response => {
                 if (!response.ok) {
@@ -22,7 +30,7 @@ export class FileActionsWrapper {
                 throw err;
             });
         return url.toLowerCase().endsWith(".ksy")
-            ? resp.text()
+            ? failsafeTextResponse(resp)
             : resp.arrayBuffer();
     }
 

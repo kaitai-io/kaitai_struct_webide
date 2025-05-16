@@ -1,7 +1,6 @@
 import {FileActionsWrapper} from "../Utils/Files/FileActionsWrapper";
-import {LocalForageForLocalStorageWrapper} from "../Components/FileTree/Utils/LocalForageForLocalStorageWrapper";
-import {FileSystemItem} from "../Components/FileTree/FileSystemsTypes";
-import {FileSystemFilesCollector} from "../Components/FileTree/FileSystemVisitors/FileSystemFilesCollector";
+import {FileSystemFilesCollectorV0} from "../Components/InitializeIDE/Updates/V1/FileSystemFilesCollectorV0";
+import {fileSystemLocalForageDAO} from "../Components/FileTree/Database/FileSystemLocalForageDAO";
 
 /**
  * THIS ACTION CLEANS AND REPLACES THE WHOLE LOCAL STORE!
@@ -22,24 +21,26 @@ import {FileSystemFilesCollector} from "../Components/FileTree/FileSystemVisitor
  */
 export const RestoreBackupConfigFromBackup = async () => {
     console.log("[RestoreBackupConfigFromBackup]: Restore action started.");
-    const backupConfig: FileSystemItem = await fetch("Backup/_backup.json").then(resp => resp.json());
+    const backupConfig = await fetch("Backup/_backup.json").then(resp => resp.json());
     if (!backupConfig) {
         console.log("[RestoreBackupConfigFromBackup]: Backup config not found, restore action stopped");
         return;
     }
-    const filesToRestore = FileSystemFilesCollector.collectFileNames(backupConfig);
+    const filesToRestore = FileSystemFilesCollectorV0.collectFileNames(backupConfig);
 
     console.log("[RestoreBackupConfigFromBackup]: Config found.", backupConfig);
     console.log(`[RestoreBackupConfigFromBackup]: Found ${filesToRestore.length} files to restore.`);
-    await LocalForageForLocalStorageWrapper.clear();
+    await fileSystemLocalForageDAO.clear();
     console.log("[RestoreBackupConfigFromBackup]: Old config erased.");
-    await LocalForageForLocalStorageWrapper.saveFsItem("fs_files", backupConfig);
+    await fileSystemLocalForageDAO.saveFileSystemHierarchyRoot("fs_files", backupConfig);
     console.log("[RestoreBackupConfigFromBackup]: Backup file tree saved under fs_files");
 
     for (const fileName of filesToRestore) {
         const fileContent = await FileActionsWrapper.fetchFileFromServer(`Backup/${fileName}`);
-        await LocalForageForLocalStorageWrapper.saveFile(`fs_file[${fileName}]`, fileContent);
+        await fileSystemLocalForageDAO.saveFile(`fs_file[${fileName}]`, fileContent);
         console.log(`[RestoreBackupConfigFromBackup]: File restored and saved: ${fileName}`);
     }
+    localStorage.removeItem("userLocalDataVersion");
     console.log("[RestoreBackupConfigFromBackup]: Restore action completed");
+    location.reload();
 };

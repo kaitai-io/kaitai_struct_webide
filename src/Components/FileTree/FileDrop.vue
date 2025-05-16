@@ -7,8 +7,12 @@ import {useFileDialog} from "@vueuse/core";
 const draggingOver = ref(false);
 const canDrop = ref(false);
 
-const {open, onChange} = useFileDialog();
-onChange((files) => processUploadedFileList(files, "UploadModal"));
+const {open: openFileUpload, onChange: onChangeFile} = useFileDialog();
+const {open: openDirectoryUpload, onChange: onChangeDirectory} = useFileDialog({
+  directory: true
+});
+onChangeFile((files) => processUploadedFileList(files, false, "UploadModal"));
+onChangeDirectory((files) => processUploadedFileList(files, true, "UploadModal"));
 
 
 const drop = (event: DragEvent) => {
@@ -16,7 +20,7 @@ const drop = (event: DragEvent) => {
   event.stopPropagation();
   if (canDrop) {
     const files = event.dataTransfer.files;
-    processUploadedFileList(files, "Drag&Drop");
+    processUploadedFileList(files, false, "Drag&Drop");
   }
   draggingOver.value = false;
   canDrop.value = false;
@@ -41,9 +45,13 @@ const dragLeave = (event: DragEvent) => {
 <template>
   <div class="file-drop-inner" :class="{'dragging-over': draggingOver && canDrop, 'active': !draggingOver}" @drop="drop"
        @dragover="dragOver"
-       @click="open()"
+       @click="openFileUpload()"
        @dragleave="dragLeave">
     <span>Drop a file here to upload or click to browse</span>
+  </div>
+  <div class="file-drop-inner active"
+       @click="openDirectoryUpload()">
+    <span>Click here to upload directory</span>
   </div>
 </template>
 

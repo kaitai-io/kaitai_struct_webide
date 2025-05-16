@@ -61,8 +61,6 @@ const about = () => {
                    :toggle="hexViewerConfigStore.setUseHexForAddresses" text="Use HEX for addresses"/>
     <EmojiCheckbox checked-emoji="✅" un-checked-emoji="❌" :state="ideSettingsStore.eagerMode"
                    :toggle="ideSettingsStore.setEagerMode" text="Eager parsing mode"/>
-    <EmojiCheckbox checked-emoji="✅" un-checked-emoji="❌" :state="ideSettingsStore.generateOnlyMainFile"
-                   :toggle="ideSettingsStore.setGenerateOnlyMainFile" text="Generate only main file"/>
     <TextButton :click="about" text="about webide"/>
     <TextButton :click="RestoreBackupConfigFromBackup" text="Restore old config" v-if="isLocalEnv"/>
   </div>

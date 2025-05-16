@@ -1,36 +1,37 @@
-import {FileSystemItem, ITEM_MODE_DIRECTORY} from "../FileSystemsTypes";
-import {LocalForageForLocalStorageWrapper} from "../Utils/LocalForageForLocalStorageWrapper";
+import {FileSystemDirectory, ITEM_MODE_ROOT} from "../FileSystemsTypes";
 import {FILE_SYSTEM_TYPE_DIST, FILE_SYSTEM_TYPE_LOCAL, LocalStorageFileSystem} from "./LocalStorageFileSystem";
+import {FileSystemDAO} from "../Database/FileSystemDAO";
+import {fileSystemLocalForageDAO} from "../Database/FileSystemLocalForageDAO";
 
 
-const defaultLocalStorage: FileSystemItem = {
-    fsType: FILE_SYSTEM_TYPE_LOCAL,
-    type: ITEM_MODE_DIRECTORY,
+const defaultLocalStorage: FileSystemDirectory = {
+    storeId: FILE_SYSTEM_TYPE_LOCAL,
+    type: ITEM_MODE_ROOT,
     children: {},
-    fn: "Local storage"
+    name: "Local storage"
 };
 
-const defaultDistStorage: FileSystemItem = {
-    fsType: FILE_SYSTEM_TYPE_DIST,
-    type: ITEM_MODE_DIRECTORY,
+const defaultDistStorage: FileSystemDirectory = {
+    storeId: FILE_SYSTEM_TYPE_DIST,
+    type: ITEM_MODE_ROOT,
     children: {},
-    fn: "dist"
+    name: "dist"
 };
 
-export const initLocalStorageRoot = async () => {
-    const storedItem = await LocalForageForLocalStorageWrapper.getFsItem("fs_files");
-    if (storedItem) {
-        storedItem.fn = "Local storage";
-    }
+
+export const initLocalStorageRoot = async (fileSystemDAO: FileSystemDAO) => {
+    const storedItem = await fileSystemDAO.getFileSystemHierarchyRoot(FILE_SYSTEM_TYPE_LOCAL);
     const localStorageRoot = storedItem || defaultLocalStorage;
-    return new LocalStorageFileSystem(localStorageRoot, FILE_SYSTEM_TYPE_LOCAL, "fs_files", "fs_file");
+    return new LocalStorageFileSystem(fileSystemDAO, localStorageRoot, FILE_SYSTEM_TYPE_LOCAL);
 };
 
-export const initDistStorageRoot = async () => {
-    const storedItem = await LocalForageForLocalStorageWrapper.getFsItem("fs_dist");
-    if (storedItem) {
-        storedItem.fn = "dist";
-    }
+export const initDistStorageRoot = async (fileSystemDAO: FileSystemDAO) => {
+    const storedItem = await fileSystemDAO.getFileSystemHierarchyRoot(FILE_SYSTEM_TYPE_DIST);
     const distRoot = storedItem || defaultDistStorage;
-    return new LocalStorageFileSystem(distRoot, FILE_SYSTEM_TYPE_DIST, "fs_dist", "fs_dist");
+    return new LocalStorageFileSystem(fileSystemDAO, distRoot, FILE_SYSTEM_TYPE_DIST);
+};
+
+
+export const initLocalStorages = async () => {
+    return [await initDistStorageRoot(fileSystemLocalForageDAO), await initLocalStorageRoot(fileSystemLocalForageDAO)];
 };

@@ -8,12 +8,12 @@ const store = useTextModalInputStore();
 
 const inputValue = computed({
   get() {
-    return store.inputValue
+    return store.inputValue;
   },
   set(val) {
-    store.inputValue = val
+    store.inputValue = val;
   }
-})
+});
 
 
 const onClose = (e: Event) => {
@@ -25,7 +25,7 @@ const onClose = (e: Event) => {
 const onSubmit = (e: Event) => {
   e.stopPropagation();
   store.close();
-  store.onAccept(inputValue.value)
+  store.onAccept(inputValue.value);
 };
 
 </script>
@@ -34,7 +34,7 @@ const onSubmit = (e: Event) => {
   <div class="backdrop-welcome" tabindex="-1" v-if="store.isOpen" @click="onClose">
     <div class="modal-wrapper-background" @click.stop>
       <div class="title">{{ store.title }}</div>
-      <input class="input" type="text" v-model="inputValue"/>
+      <input class="input" type="text" v-model="inputValue" autofocus/>
       <div class="buttons">
         <button class="modal-button submit" @click="onSubmit">OK</button>
         <button class="modal-button" @click="onClose">Cancel</button>

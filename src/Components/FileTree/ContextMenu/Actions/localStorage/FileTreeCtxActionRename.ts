@@ -16,7 +16,9 @@ export const FileTreeCtxActionRename = (item: TreeNodeDisplay): MenuItem => {
             title: "Rename",
             initValue: item.fileName,
             onAccept: async (newName) => {
-                const newFullPathString = item.fullPath.replace(item.fileName, newName);
+                const oldPathParts = item.fullPath.split("/");
+                oldPathParts[oldPathParts.length - 1] = newName;
+                const newFullPathString = oldPathParts.join("/");
                 const oldPath = FileSystemPath.fromFullPathWithStore(item.fullPathWithStore);
                 const newPath = FileSystemPath.of(item.storeId, newFullPathString);
 
@@ -28,7 +30,6 @@ export const FileTreeCtxActionRename = (item: TreeNodeDisplay): MenuItem => {
     return {
         label: "Rename",
         onClick: action,
-        // hidden: [TreeNodeDisplayType.KSY_FILE].indexOf(item.type) === -1,
         customClass: "context-menu-item",
         disabled: item.storeId === FILE_SYSTEM_TYPE_KAITAI || item.fullPath === "",
         icon: () => h(PencilIcon),

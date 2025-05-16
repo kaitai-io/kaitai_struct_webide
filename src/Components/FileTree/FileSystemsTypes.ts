@@ -1,14 +1,21 @@
 export const ITEM_MODE_FILE = "file";
 export const ITEM_MODE_DIRECTORY = "folder";
+export const ITEM_MODE_ROOT = "root";
 
-export type FsItemMode = typeof ITEM_MODE_FILE | typeof ITEM_MODE_DIRECTORY;
-
-export interface FileSystemItem {
-    fsType: string;
-    type: FsItemMode;
-    fn?: string;
-    children?: { [key: string]: FileSystemItem; };
+export interface FileSystemFile {
+    storeId: string;
+    type: typeof ITEM_MODE_FILE;
+    name: string;
 }
+
+export interface FileSystemDirectory {
+    storeId: string;
+    type: typeof ITEM_MODE_DIRECTORY | typeof ITEM_MODE_ROOT;
+    name: string;
+    children: { [key: string]: FileSystemFile | FileSystemDirectory; };
+}
+
+export type FileSystemItem = FileSystemFile | FileSystemDirectory;
 
 export class FileSystemPath {
 
@@ -84,7 +91,7 @@ export class FileSystemPath {
 export interface FileSystem {
     storeId: string;
 
-    getRootNode(): FileSystemItem | undefined;
+    getRootNode(): FileSystemDirectory | undefined;
 
     get(filePath: string): Promise<string | ArrayBuffer>;
 
@@ -94,7 +101,7 @@ export interface FileSystem {
 
     delete(filePath: string): Promise<void>;
 
-    listAllFilesInPath(path: string): Promise<string[]>;
+    listAllFilesInPath(path: string, returnRelativePaths: boolean): Promise<string[]>;
 
     move(oldPath: string, newPath: string): Promise<void>;
 }

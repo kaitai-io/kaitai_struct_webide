@@ -1,5 +1,6 @@
 import {defineStore} from "pinia";
-import {FileSystem, FileSystemPath} from "../FileSystemsTypes";
+import {FileSystem, FileSystemItem, FileSystemPath} from "../FileSystemsTypes";
+import {FileSystemNodeFinder} from "../FileSystemVisitors/FileSystemNodeFinder";
 
 export interface FileSystemsStore {
     fileSystems: FileSystem[];
@@ -25,7 +26,7 @@ const validateMoveInputs = (oldPath: FileSystemPath, newPath: FileSystemPath) =>
         throw new Error(`[FileSystemsStore][move] Moving the same directory!`);
     }
     if (!oldPath.isInTheSameStore(newPath)) {
-        throw new Error(`[FileSystemsStore][move] Changing paths between stores is not supported!`);
+        throw new Error(`[FileSystemsStore][move] Moving between stores is not supported!`);
     }
     if (oldPath.isNestedIn(newPath)) {
         throw new Error(`[FileSystemsStore][move] Trying to nest part of a path in it self! ${newPath.path} in ${oldPath.path}`);
@@ -42,11 +43,19 @@ export const useFileSystems = defineStore("FileSystemsStore", {
     },
     getters: {
         listAllItemsInPath: (state) => {
-            return async (path: FileSystemPath): Promise<string[]> => {
+            return async (path: FileSystemPath, returnRelativePaths: boolean = true): Promise<string[]> => {
                 const fileSystem: FileSystem = state.fileSystems.find((fs: FileSystem) => fs.storeId === path.storeId);
                 return !!fileSystem
-                    ? fileSystem.listAllFilesInPath(path.path)
+                    ? fileSystem.listAllFilesInPath(path.path, returnRelativePaths)
                     : [];
+            };
+        },
+        getNodeByPath: (state) => {
+            return async (path: FileSystemPath): Promise<FileSystemItem | undefined> => {
+                const fileSystem: FileSystem = state.fileSystems.find((fs: FileSystem) => fs.storeId === path.storeId);
+                return !!fileSystem
+                    ? FileSystemNodeFinder.findNode(fileSystem.getRootNode(), path.path)
+                    : undefined;
             };
         }
     },
@@ -104,7 +113,7 @@ export const useFileSystems = defineStore("FileSystemsStore", {
                     return path;
                 });
             } else {
-                console.error(`[FileSystemsStore][deletePath] Could not find file system! [${oldPath.storeId}]`);
+                console.error(`[FileSystemsStore][move] Could not find file system! [${oldPath.storeId}]`);
             }
         }
     }

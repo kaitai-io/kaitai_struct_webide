@@ -1,33 +1,43 @@
 <script setup lang="ts">
 import {useInitializeIDEStore} from "./Store/InitializeIDEStore";
-import {onMounted} from "vue";
+import {computed, onMounted} from "vue";
 import {KaitaiFileSystem} from "../FileTree/FileSystems/KaitaiFileSystem";
-import {initDistStorageRoot, initLocalStorageRoot} from "../FileTree/FileSystems/LocalStorageFileSystemsInit";
+import {initLocalStorages} from "../FileTree/FileSystems/LocalStorageFileSystemsInit";
 import {useFileSystems} from "../FileTree/Store/FileSystemsStore";
+import {UpdateUserLocalData} from "./Updates/UpdateUserLocalData";
+import {SleepFor} from "../../Utils/SleepFor";
 
 const initializeStore = useInitializeIDEStore();
 const fileSystemsStore = useFileSystems();
-
+const message = computed(() => {
+  return initializeStore.message;
+});
 const init = async () => {
-  const storages = [new KaitaiFileSystem(), await initDistStorageRoot(), await initLocalStorageRoot()];
+  await UpdateUserLocalData();
+  const storages = [new KaitaiFileSystem(), ...await initLocalStorages()];
   storages.forEach(fileSystemsStore.addFileSystem);
 };
 
-const wrapWithMinimumTimeout = async (fn: () => Promise<void>, timeout: number) => {
+const wrapFunctionWithMinimumExecutionTime = async (fn: () => Promise<void>, shouldRunForMinimumMs: number) => {
   const startTime = performance.now();
   await fn();
   const endTime = performance.now();
   const elapsed = endTime - startTime;
-  if (elapsed < timeout) {
-    await new Promise((resolve) => setTimeout(resolve, timeout - elapsed));
+  if (elapsed < shouldRunForMinimumMs) {
+    await SleepFor(shouldRunForMinimumMs - elapsed);
   }
 };
 
+const calculateInitMinimumTimeShowed = () => {
+  if (process.env.INIT_TIMEOUT === "0") return 0;
+  return typeof process.env.INIT_TIMEOUT !== "undefined"
+      ? parseInt(process.env.INIT_TIMEOUT) || 1000
+      : 1000;
+};
+
 onMounted(async () => {
-  const timeout = process.env.NODE_ENV !== "development"
-      ? 1000
-      : 0;
-  await wrapWithMinimumTimeout(init, timeout);
+  const shouldRunForMinimumMs = calculateInitMinimumTimeShowed();
+  await wrapFunctionWithMinimumExecutionTime(init, shouldRunForMinimumMs);
   initializeStore.initialize();
 });
 
@@ -36,22 +46,7 @@ onMounted(async () => {
 <template>
   <div class="container">
     <div class="container-inner">
-      <h1>Preparing IDE...</h1>
-
-
-      <!--      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"-->
-      <!--           class="size-6 icon">-->
-      <!--        <animateTransform-->
-      <!--            attributeName="transform"-->
-      <!--            attributeType="XML"-->
-      <!--            type="rotate"-->
-      <!--            from="0 0 0"-->
-      <!--            to="360 0 0"-->
-      <!--            dur="2"-->
-      <!--            repeatCount="indefinite"/>-->
-      <!--        <path stroke-linecap="round" stroke-linejoin="round"-->
-      <!--              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/>-->
-      <!--      </svg>-->
+      <h1>{{ message }}</h1>
 
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34" class="icon">
         <animateTransform

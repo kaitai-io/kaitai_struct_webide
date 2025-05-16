@@ -1,19 +1,18 @@
-import {FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../FileSystemsTypes";
-import {ArrayUtils} from "../../../Utils/ArrayUtils";
-import {FileSystemFilesCollector} from "../FileSystemVisitors/FileSystemFilesCollector";
+import {FileSystemDirectory, FileSystemFile, FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../FileSystemsTypes";
 
 export interface FileSystemItemPathInfo {
-    isRoot: boolean;
     nodeName: string;
     node: FileSystemItem;
-    parentNode?: FileSystemItem;
+    parentNode?: FileSystemDirectory;
     path: string;
 }
 
 export class FsItemHelper {
-    public static createFileOrDirectoryFromPathInRoot = (root: FileSystemItem, filePath: string, createDirectoryMode: boolean = false) => {
+
+
+    public static createFileOrDirectoryFromPathInRoot = (root: FileSystemDirectory, filePath: string, createDirectoryMode: boolean = false) => {
         const pathParts = filePath.split("/");
-        let currentNode = root;
+        let currentNode: FileSystemDirectory = root;
         let fullPathAccumulated = "";
         for (let currentPathPartIndex = 0; currentPathPartIndex < pathParts.length; currentPathPartIndex++) {
             const currentPathPart = pathParts[currentPathPartIndex];
@@ -24,68 +23,59 @@ export class FsItemHelper {
                 const isNotLastPart = currentPathPartIndex !== (pathParts.length - 1);
                 const shouldCreateDirectory = createDirectoryMode || isNotLastPart;
                 currentNode.children[currentPathPart] = shouldCreateDirectory
-                    ? {fsType: root.fsType, type: ITEM_MODE_DIRECTORY, children: {}}
-                    : {fsType: root.fsType, type: ITEM_MODE_FILE, fn: currentPathPart};
+                    ? FsItemHelper.directoryOf(root.storeId, currentPathPart, {})
+                    : FsItemHelper.fileOf(root.storeId, currentPathPart);
             }
 
-            currentNode = currentNode.children[currentPathPart];
+            currentNode = currentNode.children[currentPathPart] as FileSystemDirectory;
         }
     };
 
-    public static deletePathAndReturnFilesToDelete = (root: FileSystemItem, filePath: string): string[] => {
-        const isDeletingRoot = filePath.length === 0;
-
-        if (isDeletingRoot) {
-            const filesInRoot = FileSystemFilesCollector.collectFileNames(root);
-            Object.keys(root.children || {}).forEach(key => delete root.children[key]);
-            return filesInRoot;
-        } else {
-            const filePathParts = filePath.split("/");
-            let nodeToDelete = FsItemHelper.deleteNodeFromRoot(root, filePathParts);
-            return FileSystemFilesCollector.collectFileNames(nodeToDelete);
-        }
-    };
-
-    public static deleteNodeFromRoot = (root: FileSystemItem, filePathParts: string[]) => {
-        let currNode = root;
+    public static findParentDirectoryForPath = (root: FileSystemDirectory, filePathParts: string[]): FileSystemDirectory => {
+        let parentNode = root;
         for (let i = 0; i < filePathParts.length - 1; i++) {
             const fnPart = filePathParts[i];
-            currNode = currNode.children[fnPart];
+            const node = parentNode.children[fnPart];
+            if (!node || node.type === ITEM_MODE_FILE) {
+                const path = [...filePathParts].splice(0, i).join("/");
+                throw new Error(`Error file system structure, found file in middle of the path(${filePathParts.join("/")})!: ${path} is a file!`);
+            }
+            parentNode = node;
         }
-        const lastPart = ArrayUtils.last(filePathParts);
-        const nodeToDelete = currNode.children[lastPart];
-        delete currNode.children[lastPart];
-        return nodeToDelete;
+        return parentNode;
     };
 
-    public static findNodeInRoot = (root: FileSystemItem, filePathParts: string[]) => {
-        let currNode = root;
-        for (let i = 0; i < filePathParts.length; i++) {
-            const fnPart = filePathParts[i];
-            currNode = currNode.children[fnPart];
-        }
-        return currNode;
-    };
-
-    public static getInfoAboutPath(root: FileSystemItem, path: string): FileSystemItemPathInfo {
+    public static getInfoAboutPath(root: FileSystemDirectory, path: string): FileSystemItemPathInfo {
         if (path === "") return {
             nodeName: "",
-            isRoot: true,
             node: root,
-            path: path
+            path: path,
         };
         const pathParts = path.split("/");
-        const nodeName = pathParts[pathParts.length - 1];
-        const parentFolder = [...pathParts];
-        parentFolder.pop();
-        const parentNode = FsItemHelper.findNodeInRoot(root, parentFolder);
+        const parentNode = FsItemHelper.findParentDirectoryForPath(root, pathParts);
+        const nodeName = pathParts.pop();
         return {
-            isRoot: false,
             nodeName: nodeName,
             node: parentNode.children[nodeName],
             parentNode: parentNode,
             path: path
         };
     }
+
+    public static directoryOf = (storeId: string, name: string, children: { [key: string]: FileSystemItem }): FileSystemDirectory => {
+        return {
+            storeId: storeId,
+            type: ITEM_MODE_DIRECTORY,
+            name: name,
+            children: children
+        };
+    };
+    public static fileOf = (storeId: string, name: string): FileSystemFile => {
+        return {
+            storeId: storeId,
+            type: ITEM_MODE_FILE,
+            name: name
+        };
+    };
 
 }

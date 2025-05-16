@@ -1,4 +1,4 @@
-import {FileSystem, FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE} from "../FileSystemsTypes";
+import {FileSystem, FileSystemItem, ITEM_MODE_DIRECTORY, ITEM_MODE_FILE, ITEM_MODE_ROOT} from "../FileSystemsTypes";
 
 export enum TreeNodeDisplayType {
     OPEN_FOLDER,
@@ -55,7 +55,7 @@ export class FileSystemFileTreeMapper {
     }
 
     private visitRootNode(rootNode: FileSystemItem) {
-        const rootNodeDirectory = this.mapToTempTreeNodeDisplay(rootNode, rootNode.fn);
+        const rootNodeDirectory = this.mapToTempTreeNodeDisplay(rootNode, rootNode.name);
         this.rootDirectory = rootNodeDirectory;
         this.currentDirectory = rootNodeDirectory;
 
@@ -65,10 +65,12 @@ export class FileSystemFileTreeMapper {
     }
 
     private visitChildrenNodes(fsItem: FileSystemItem) {
+        if (ITEM_MODE_FILE === fsItem.type) return;
         Object.entries(fsItem.children || {})
             .forEach(([key, child]) => {
                 this.visitNode(key, child);
             });
+
     }
 
     private visitNode(nodeName: string, fsItem: FileSystemItem) {
@@ -79,6 +81,7 @@ export class FileSystemFileTreeMapper {
                 this.visitFileNode(fsItem, nodeName);
                 break;
             }
+            case ITEM_MODE_ROOT:
             case ITEM_MODE_DIRECTORY: {
                 this.visitDirectoryNode(fsItem, nodeName);
                 break;
@@ -127,14 +130,14 @@ export class FileSystemFileTreeMapper {
 
     private mapToTreeNodeDisplay(fsItem: FileSystemItem, name: string): TreeNodeDisplay {
         const fullPath = this.currentPathParts.join("/");
-        const fullPathWithStore = `${fsItem.fsType}:${fullPath}`;
+        const fullPathWithStore = `${fsItem.storeId}:${fullPath}`;
         const isOpen = this.isDirectoryOpen(fullPathWithStore);
         return {
             fileName: name,
             fullPath: fullPath,
             fullPathWithStore: fullPathWithStore,
             type: this.getNodeType(isOpen, fsItem),
-            storeId: fsItem.fsType,
+            storeId: fsItem.storeId,
             depth: this.currentPathParts.length
         };
     }
@@ -142,8 +145,9 @@ export class FileSystemFileTreeMapper {
     private getNodeType(isOpen: boolean, fsItem: FileSystemItem): TreeNodeDisplayType {
         switch (fsItem.type) {
             case ITEM_MODE_FILE: {
-                return fsItem.fn.endsWith(".ksy") ? TreeNodeDisplayType.KSY_FILE : TreeNodeDisplayType.BINARY_FILE;
+                return fsItem.name.endsWith(".ksy") ? TreeNodeDisplayType.KSY_FILE : TreeNodeDisplayType.BINARY_FILE;
             }
+            case ITEM_MODE_ROOT:
             case ITEM_MODE_DIRECTORY: {
                 if (Object.keys(fsItem.children).length === 0) return TreeNodeDisplayType.EMPTY_FOLDER;
                 return isOpen ? TreeNodeDisplayType.OPEN_FOLDER : TreeNodeDisplayType.CLOSED_FOLDER;

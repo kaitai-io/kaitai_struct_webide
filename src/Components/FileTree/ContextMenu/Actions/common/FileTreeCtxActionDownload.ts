@@ -8,17 +8,16 @@ import {FILE_SYSTEM_TYPE_KAITAI} from "../../../FileSystems/KaitaiFileSystem";
 import {FileSystemPath} from "../../../FileSystemsTypes";
 import {FileToPack, ZipUtil} from "../../../../../Utils/Files/ZipUtil";
 
-const mapFilesForPacking = async (getFile: (filePath: string) => Promise<string | ArrayBuffer>, rootPath: string, filePathsInNode: string[]): Promise<FileToPack[]> => {
-    const itemPathParts = rootPath.split("/");
-    const relativePath = itemPathParts[itemPathParts.length - 1];
-
+const mapFilesForPacking = async (getFile: (filePath: string) => Promise<string | ArrayBuffer>, basePath: string, filePathsInNode: string[]): Promise<FileToPack[]> => {
     const data: FileToPack[] = [];
     for (const filePath of filePathsInNode) {
         try {
-            const fullFilePath = `${relativePath}/${filePath}`;
+            let fullFilePath = basePath.length > 0
+                ? `${basePath}/${filePath}`
+                : filePath;
             const fileContent = await getFile(fullFilePath);
             data.push({
-                path: fullFilePath,
+                path: filePath,
                 data: fileContent
             });
         } catch (e) {
@@ -40,6 +39,7 @@ export const FileTreeCtxActionDownload = (item: TreeNodeDisplay): MenuItem => {
     const packAndDownloadDirectory = async () => {
         const store = useFileSystems();
         const filePathsInNode = await store.listAllItemsInPath(FileSystemPath.of(item.storeId, item.fullPath));
+        console.log(item.storeId, item.fullPath, filePathsInNode);
         const getFileFn = (filePath: string) => store.getFile(item.storeId, filePath);
 
         const filesToPack = await mapFilesForPacking(getFileFn, item.fullPath, filePathsInNode);
