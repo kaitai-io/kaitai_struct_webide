@@ -192,6 +192,8 @@ export function initFileTree() {
                         !!node_parent.data && node_parent.data.fsType === "local" && node_parent.data.type === "folder";
                 return result;
             },
+            dblclick_toggle: false,
+            allow_reselect: true,
             themes: { name: "default-dark", dots: false, icons: true, variant: "small" },
             data: [
                 {
@@ -363,6 +365,9 @@ export function initFileTree() {
 
     fileTreeCont.on("create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree", saveTree);
     fileTreeCont.on("move_node.jstree", (e, data) => app.ui.fileTree.open_node(app.ui.fileTree.get_node(data.parent)));
+    fileTreeCont.on("select_node.jstree", (e, selectNodeArgs) => {
+        app.ui.fileTree.toggle_node(selectNodeArgs.node);
+    });
     fileTreeCont.on("select_node.jstree", (e, selectNodeArgs) => {
         var fsItem = (<IJSTreeNode<IFsItem>>selectNodeArgs.node).data;
         [uiFiles.downloadFile, uiFiles.downloadItem].forEach(i => i.toggleClass("disabled", !(fsItem && fsItem.type === "file")));
