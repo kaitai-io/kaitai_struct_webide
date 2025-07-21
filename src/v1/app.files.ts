@@ -373,11 +373,6 @@ export function initFileTree() {
         [uiFiles.downloadFile, uiFiles.downloadItem].forEach(i => i.toggleClass("disabled", !(fsItem && fsItem.type === "file")));
     });
 
-    var lastMultiSelectReport = 0;
-    fileTreeCont.on("select_node.jstree", (e, args) => {
-        lastMultiSelectReport = e.timeStamp;
-    });
-
     var ksyParent: string|Element;
     let newKsyDialog: typeof A11yDialog;
     function showKsyModal(parent: string | Element) {
