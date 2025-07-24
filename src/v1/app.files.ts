@@ -255,33 +255,53 @@ export function initFileTree() {
         localFs.setRootNode(convertTreeNode(app.ui.fileTree.get_json()[1]));
     }
 
-    var contextMenuTarget: string|Element = null;
-
-    function getSelectedData() {
-        var selected = app.ui.fileTree.get_selected();
-        return selected.length >= 1 ? <IFsItem>app.ui.fileTree.get_node(selected[0]).data : null;
-    }
+    let contextMenuTarget: Element;
+    let fileTreeContextMenuDialog: any;
 
     fileTreeCont.on("contextmenu", ".jstree-node", e => {
-        contextMenuTarget = e.target;
+        contextMenuTarget = e.currentTarget;
+        const contextMenuTargetNode = app.ui.fileTree.get_node(contextMenuTarget);
 
-        var clickNodeId = app.ui.fileTree.get_node(contextMenuTarget).id;
-        var selectedNodeIds = app.ui.fileTree.get_selected();
-        if ($.inArray(clickNodeId, selectedNodeIds) === -1)
-            app.ui.fileTree.activate_node(contextMenuTarget, null);
+        const selectedNodeIds: string[] = app.ui.fileTree.get_selected();
+        if (selectedNodeIds.length !== 0 && selectedNodeIds.indexOf(contextMenuTargetNode.id) === -1) {
+            app.ui.fileTree.deselect_all();
+        }
 
-        var data = getSelectedData();
+        var data = contextMenuTargetNode.data;
         var isFolder = data && data.type === "folder";
         var isLocal = data && data.fsType === "local";
         var isKsy = data && data.fn && data.fn.endsWith(".ksy") && !isFolder;
 
-        function setEnabled(item: JQuery, isEnabled: boolean) { item.toggleClass("disabled", !isEnabled); }
+        function setEnabled(item: JQuery, isEnabled: boolean) {
+            item.toggleClass("disabled", !isEnabled);
+            item.children("a")
+                // Disable the link by unsetting the `href` attribute (it will no longer
+                // be focusable using the keyboard, as if it had `tabindex="-1"`)
+                .attr("href", isEnabled ? "#" : null)
+                .attr("aria-disabled", isEnabled ? null : "true");
+        }
 
         setEnabled(uiFiles.createFolder, isLocal && isFolder);
         setEnabled(uiFiles.createKsyFile, isLocal && isFolder);
         setEnabled(uiFiles.cloneKsyFile, isLocal && isKsy);
-        setEnabled(uiFiles.deleteItem, isLocal);
+        setEnabled(uiFiles.deleteItem, isLocal && contextMenuTargetNode.id !== "localStorage");
         setEnabled(uiFiles.generateParser, isKsy);
+        setEnabled(uiFiles.downloadItem, !uiFiles.downloadFile.hasClass("disabled") || (data && data.type === "file"));
+
+        if (!fileTreeContextMenuDialog) {
+            const modal = $("#fileTreeContextMenuModal")[0];
+            fileTreeContextMenuDialog = new A11yDialog(modal);
+            // Close all submenus when the context menu is closed. This is to
+            // ensure that the context menu is reset and behaves as if it were
+            // opened for the first time when reopened (meaning that all
+            // submenus are closed).
+            fileTreeContextMenuDialog.on("hide", () => {
+                uiFiles.dropdownSubmenus
+                    .children(".dropdown-menu")
+                    .css({ display: "none" });
+            });
+        }
+        fileTreeContextMenuDialog.show();
 
         uiFiles.fileTreeContextMenu.css({ display: "block" }); // necessary for obtaining width & height
         var x = Math.min(e.pageX, $(window).width() - uiFiles.fileTreeContextMenu.width());
@@ -291,7 +311,10 @@ export function initFileTree() {
         return false;
     });
 
-    uiFiles.dropdownSubmenus.mouseenter(e => {
+    // The `focusin` and `focusout` events provide a simple form of keyboard
+    // accessibility: the submenu is displayed as long as the item to which it
+    // belongs, or the submenu itself, has focus.
+    uiFiles.dropdownSubmenus.on("mouseenter focusin", e => {
         var el = $(e.currentTarget);
         if (!el.hasClass("disabled")) {
             var menu = el.find("> .dropdown-menu");
@@ -314,8 +337,7 @@ export function initFileTree() {
             y -= itemPos.top;
             menu.css({ left: x, top: y });
         }
-
-    }).mouseleave(e => {
+    }).on("mouseleave focusout", e => {
         var el = $(e.currentTarget);
         var menu = el.find("> .dropdown-menu");
         menu.data("hide-timeout", setTimeout(() => {
@@ -323,19 +345,22 @@ export function initFileTree() {
         }, 300));
     });
 
-    function ctxAction(obj: JQuery, callback: (e: JQueryEventObject) => void) {
+    function ctxAction(obj: JQuery, callback: (e: JQueryEventObject) => void | false) {
         obj.find("a").on("click", e => {
+            e.preventDefault();
             if (!obj.hasClass("disabled")) {
-                uiFiles.fileTreeContextMenu.hide();
-                callback(e);
+                if (callback(e) === false) {
+                    return;
+                }
+                fileTreeContextMenuDialog.hide();
             }
         });
     }
 
     ctxAction(uiFiles.createFolder, e => {
-        var parentData = getSelectedData();
-        app.ui.fileTree.create_node(app.ui.fileTree.get_node(contextMenuTarget), {
-            data: { fsType: parentData.fsType, type: "folder" },
+        const parentNode = app.ui.fileTree.get_node(contextMenuTarget);
+        app.ui.fileTree.create_node(parentNode, {
+            data: { fsType: parentNode.data.fsType, type: "folder" },
             icon: "glyphicon glyphicon-folder-open"
         }, "last", (node: any) => {
             app.ui.fileTree.activate_node(node, null);
@@ -343,21 +368,36 @@ export function initFileTree() {
         });
     });
 
-    ctxAction(uiFiles.deleteItem, () => app.ui.fileTree.delete_node(app.ui.fileTree.get_selected()));
-    ctxAction(uiFiles.openItem, () => $(contextMenuTarget).trigger("dblclick"));
+    ctxAction(uiFiles.deleteItem, () => {
+        let nodesToDelete: string[] = app.ui.fileTree.get_selected();
+        if (nodesToDelete.length === 0) {
+            nodesToDelete = [app.ui.fileTree.get_node(contextMenuTarget).id];
+        }
+        app.ui.fileTree.delete_node(nodesToDelete);
+    });
+    ctxAction(uiFiles.openItem, () => {
+        const contextMenuTargetNode = app.ui.fileTree.get_node(contextMenuTarget);
+        app.ui.fileTree.deselect_all();
+        app.ui.fileTree.select_node(contextMenuTargetNode);
+    });
 
     ctxAction(uiFiles.generateParser, e => {
-        var fsItem = getSelectedData();
-        var linkData = $(e.target).data();
-        //console.log(fsItem, linkData);
+        var fsItem = app.ui.fileTree.get_node(contextMenuTarget).data;
+        const link = $(e.target);
+        const dataKslang = link.attr("data-kslang");
+        const dataKsdebug = link.attr("data-ksdebug") === "true";
+        const dataAcelang = link.attr("data-acelang");
+        if (!dataKslang) {
+            return false;
+        }
 
         fss[fsItem.fsType].get(fsItem.fn).then((content: string) => {
-            return app.compilerService.compile(fsItem, content, linkData.kslang, !!linkData.ksdebug).then((compiled: any) => {
+            return app.compilerService.compile(fsItem, content, dataKslang, dataKsdebug).then((compiled: any) => {
                 Object.keys(compiled).forEach(fileName => {
                     //var title = fsItem.fn.split("/").last() + " [" + $(e.target).text() + "]" + (compiled.length == 1 ? "" : ` ${i + 1}/${compiled.length}`);
-                    //addEditorTab(title, compItem, linkData.acelang);
+                    //addEditorTab(title, compItem, dataAcelang);
 
-                    app.ui.layout.addEditorTab(fileName, compiled[fileName], linkData.acelang);
+                    app.ui.layout.addEditorTab(fileName, compiled[fileName], dataAcelang);
                 });
             });
         });
@@ -366,15 +406,25 @@ export function initFileTree() {
     fileTreeCont.on("create_node.jstree rename_node.jstree delete_node.jstree move_node.jstree paste.jstree", saveTree);
     fileTreeCont.on("move_node.jstree", (e, data) => app.ui.fileTree.open_node(app.ui.fileTree.get_node(data.parent)));
     fileTreeCont.on("select_node.jstree", (e, selectNodeArgs) => {
-        app.ui.fileTree.toggle_node(selectNodeArgs.node);
+        if (selectNodeArgs.selected.length === 1) {
+            app.ui.fileTree.toggle_node(selectNodeArgs.node);
+            const fsItem = (<IJSTreeNode<IFsItem>>selectNodeArgs.node).data;
+            app.loadFsItem(fsItem);
+        }
     });
-    fileTreeCont.on("select_node.jstree", (e, selectNodeArgs) => {
-        var fsItem = (<IJSTreeNode<IFsItem>>selectNodeArgs.node).data;
-        [uiFiles.downloadFile, uiFiles.downloadItem].forEach(i => i.toggleClass("disabled", !(fsItem && fsItem.type === "file")));
+    fileTreeCont.on("changed.jstree", (e, eventData) => {
+        const selectedNodeIds: string[] = eventData.selected;
+        const hasDownloadable = selectedNodeIds.some((id) => {
+            const fsItem = (<IJSTreeNode<IFsItem>>eventData.instance.get_node(id)).data;
+            return fsItem && fsItem.type === "file";
+        });
+        uiFiles.downloadFile
+            .toggleClass("disabled", !hasDownloadable)
+            .attr("aria-disabled", hasDownloadable ? null : "true");
     });
 
     var ksyParent: string|Element;
-    let newKsyDialog: typeof A11yDialog;
+    let newKsyDialog: any;
     function showKsyModal(parent: string | Element) {
         ksyParent = parent;
         if (!newKsyDialog) {
@@ -396,9 +446,15 @@ export function initFileTree() {
     uiFiles.createLocalKsyFile.on("click", () => showKsyModal("localStorage"));
 
     function downloadFiles() {
-        app.ui.fileTree.get_selected().forEach(nodeId => {
+        let targetNodes: string[] = app.ui.fileTree.get_selected();
+        if (targetNodes.length === 0) {
+            targetNodes = [app.ui.fileTree.get_node(contextMenuTarget).id];
+        }
+        targetNodes.forEach(nodeId => {
             var fsItem = <IFsItem>app.ui.fileTree.get_node(nodeId).data;
-            fss[fsItem.fsType].get(fsItem.fn).then(content => saveFile(content, fsItem.fn.split("/").last()));
+            if (fsItem.type === "file") {
+                fss[fsItem.fsType].get(fsItem.fn).then(content => saveFile(content, fsItem.fn.split("/").last()));
+            }
         });
     }
 
@@ -417,13 +473,9 @@ export function initFileTree() {
         addKsyFile(ksyParent, (parentData.fn ? `${parentData.fn}/` : "") + `${ksyName}.ksy`, `meta:\n  id: ${ksyName}\n  file-extension: ${ksyName}\n`);
     });
 
-    fileTreeCont.on("select_node.jstree", function (event, selectNodeArgs) {
-        const fsItem = (<IJSTreeNode<IFsItem>>selectNodeArgs.node).data;
-        app.loadFsItem(fsItem);
-    });
-
     ctxAction(uiFiles.cloneKsyFile, e => {
-        var fsItem = getSelectedData();
+        const contextMenuTargetNode = app.ui.fileTree.get_node(contextMenuTarget);
+        var fsItem: IFsItem = contextMenuTargetNode.data;
         var newFn = fsItem.fn.replace(".ksy", "_" + dateFormat(new Date(), "yyyymmdd_HHMMss") + ".ksy");
 
         fss[fsItem.fsType].get(fsItem.fn).then((content: string) => addKsyFile("localStorage", newFn, content));

@@ -1,3 +1,24 @@
+.dropdown-container,
+.dropdown-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.dropdown-container {
+    z-index: 1050;
+}
+
+/**
+ * 1. Make sure the dialog container and all its descendants are not
+ *    visible and not focusable when it is hidden.
+ */
+.dropdown-container[aria-hidden='true'] {
+    display: none; /* 1 */
+}
+
 .dropdown-submenu {
     position:relative;
 }

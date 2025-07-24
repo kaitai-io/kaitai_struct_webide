@@ -311,8 +311,17 @@ $(() => {
 
     var inputContextMenu = $("#inputContextMenu");
     var downloadInput = $("#inputContextMenu .downloadItem");
+
+    let inputContextMenuDialog: any;
+
     $("#hexViewer").on("contextmenu", e => {
         downloadInput.toggleClass("disabled", app.ui.hexViewer.selectionStart === -1);
+
+        if (!inputContextMenuDialog) {
+            const modal = $("#inputContextMenuModal")[0];
+            inputContextMenuDialog = new A11yDialog(modal);
+        }
+        inputContextMenuDialog.show();
 
         inputContextMenu.css({ display: "block" });
         var x = Math.min(e.pageX, $(window).width() - inputContextMenu.width());
@@ -327,14 +336,10 @@ $(() => {
             if (!obj.hasClass("disabled")) {
                 inputContextMenu.hide();
                 callback(e);
+                inputContextMenuDialog.hide();
             }
         });
     }
-
-    $(document).on("mousedown", e => {
-        if ($(e.target).parents(".dropdown-menu").length === 0)
-            $(".dropdown").hide();
-    });
 
     ctxAction(downloadInput, e => {
         var start = app.ui.hexViewer.selectionStart, end = app.ui.hexViewer.selectionEnd;
