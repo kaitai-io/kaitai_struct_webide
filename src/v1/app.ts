@@ -1,5 +1,6 @@
 import * as localforage from "localforage";
 import * as Vue from "vue";
+import * as A11yDialog from "a11y-dialog";
 
 import { UI } from "./app.layout";
 import { IFsItem, fss, addKsyFile, refreshFsNodes, initFileTree } from "./app.files";
@@ -32,6 +33,8 @@ class AppVM extends Vue {
     ui: UI;
     converterPanelModel = new ConverterPanelModel();
 
+    aboutDialog: typeof A11yDialog;
+
     selectionStart: number = -1;
     selectionEnd: number = -1;
 
@@ -43,7 +46,25 @@ class AppVM extends Vue {
     public selectInterval(interval: IInterval) { this.selectionChanged(interval.start, interval.end); }
     public selectionChanged(start: number, end: number) { this.ui.hexViewer.setSelection(start, end); }
     public exportToJson(hex: boolean) { exportToJson(hex).then(json => this.ui.layout.addEditorTab("json export", json, "json")); }
-    public about() { (<any>$("#welcomeModal")).modal(); }
+    public about() {
+        this.aboutDialog.show();
+    }
+
+    initAboutDialog() {
+        // FIXME: eliminate duplication with "#newKsyModal"
+        const modal = $("#welcomeModal")[0];
+        this.aboutDialog = new A11yDialog(modal);
+        modal.addEventListener('click', () => this.aboutDialog.hide());
+        modal.querySelector('.dialog-content').addEventListener('click', e => e.stopPropagation());
+        const overlay = document.querySelector("#welcomeModalOverlay");
+        this.aboutDialog
+            .on('show', () => overlay.classList.remove("hidden"))
+            .on('hide', () => overlay.classList.add("hidden"));
+
+        if (localStorage.getItem("doNotShowWelcome") !== "true") {
+            this.aboutDialog.show();
+        }
+    }
 }
 
 class AppController {
@@ -55,6 +76,7 @@ class AppController {
     init() {
         this.vm.ui = this.ui;
         this.ui.init();
+        this.vm.initAboutDialog();
         this.errors = new ErrorWindowHandler(this.ui.layout.getLayoutNodeById("mainArea"));
         initFileTree();
     }
@@ -249,8 +271,6 @@ $(() => {
     $("#compilerVersion").text(KaitaiStructCompiler.version + " (" + KaitaiStructCompiler.buildDate + ")");
 
     $("#welcomeDoNotShowAgain").click(() => localStorage.setItem("doNotShowWelcome", "true"));
-    if (localStorage.getItem("doNotShowWelcome") !== "true")
-        (<any>$("#welcomeModal")).modal();
 
     app.init();
     componentLoader.load(["Components/ConverterPanel", "Components/Stepper", "Components/SelectionInput"]).then(() => {
@@ -291,8 +311,17 @@ $(() => {
 
     var inputContextMenu = $("#inputContextMenu");
     var downloadInput = $("#inputContextMenu .downloadItem");
+
+    let inputContextMenuDialog: any;
+
     $("#hexViewer").on("contextmenu", e => {
         downloadInput.toggleClass("disabled", app.ui.hexViewer.selectionStart === -1);
+
+        if (!inputContextMenuDialog) {
+            const modal = $("#inputContextMenuModal")[0];
+            inputContextMenuDialog = new A11yDialog(modal);
+        }
+        inputContextMenuDialog.show();
 
         inputContextMenu.css({ display: "block" });
         var x = Math.min(e.pageX, $(window).width() - inputContextMenu.width());
@@ -307,14 +336,10 @@ $(() => {
             if (!obj.hasClass("disabled")) {
                 inputContextMenu.hide();
                 callback(e);
+                inputContextMenuDialog.hide();
             }
         });
     }
-
-    $(document).on("mousedown", e => {
-        if ($(e.target).parents(".dropdown-menu").length === 0)
-            $(".dropdown").hide();
-    });
 
     ctxAction(downloadInput, e => {
         var start = app.ui.hexViewer.selectionStart, end = app.ui.hexViewer.selectionEnd;

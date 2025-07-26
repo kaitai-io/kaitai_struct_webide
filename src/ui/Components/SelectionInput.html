@@ -20,9 +20,9 @@
     <div class="selectionInput">
         <span>{{ hasSelection ? "selection:" : "no selection" }}</span>
         <span class="input-group">
-            <selection-input-part ref="startPart" class="selStart"></selection-input-part><!--nobr-->
+            <selection-input-part ref="startPart" class="selStart" title="start offset" aria-label="start offset"></selection-input-part><!--nobr-->
             <span class="input-group-addon">-</span><!--nobr-->
-            <selection-input-part ref="endPart" class="selEnd"></selection-input-part>
+            <selection-input-part ref="endPart" class="selEnd" title="end offset" aria-label="end offset"></selection-input-part>
         </span>
     </div>
 </template>

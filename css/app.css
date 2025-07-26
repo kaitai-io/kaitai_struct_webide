@@ -1,3 +1,12 @@
+a {
+    text-decoration: underline;
+    text-underline-position: under;
+}
+a:hover,
+a:focus {
+    text-decoration: none;
+}
+
 /*.lm_content>div { height: 100%; width: 100% }*/
 .lm_splitter.lm_horizontal .lm_drag_handle { left:-5px; width:15px }
 .lm_splitter.lm_vertical .lm_drag_handle { top:-5px; height:15px }
@@ -25,8 +34,32 @@ body { line-height:normal }
 #fileTree .jstree-ocl { display:none }
 #fileTreeCont .footer { position:absolute; bottom:0; width:100%; padding-left:2px }
 #fileTreeCont .footer .btn { width:33.3%; border-radius:0; font-size:13px; padding:3px 10px }
+.jstree-default-dark .jstree-anchor {
+    color: #ccc;
+}
+.jstree-default-dark .jstree-clicked,
+.jstree-default-dark .jstree-checked,
+.jstree-default-dark .jstree-hovered {
+    color: white;
+}
+.ace-monokai .ace_entity.ace_name.ace_tag,
+.ace-monokai .ace_keyword,
+.ace-monokai .ace_meta.ace_tag,
+.ace-monokai .ace_storage {
+    color: #fc6f09;
+}
+.ace-monokai .ace_comment {
+    color: #9db44a;
+}
+.ace-monokai .ace_gutter {
+    background: #333;
+    color: #ccc;
+}
 body { color:#333 }
 .dropdown { position: absolute; display:none; z-index:9999 }
+.dropdown a {
+    text-decoration: none;
+}
 .dropdown-menu { z-index:9999 }
 .dropdown .dropdown-menu { font-size:13px; border-color:#375a7f; border-radius:0 }
 .dropdown .glyphicon { margin-right:5px; }
@@ -43,19 +76,18 @@ body { color:#333 }
 #unsupportedBrowser .closeBtn { float:right; margin-top: 1px; cursor: pointer }
 .marker_solution { background:rgba(255, 80, 80, 0.3); }
 .marker_user { background:rgba(80, 255, 80, 0.30); }
-#parsedDataTree .intVal, #parsedDataTree .enumDesc { color:#bbb }
+#parsedDataTree .intVal, #parsedDataTree .enumDesc { color:#b50000 }
 #parsedDataTree .flags { color:#933; font-weight: bold }
 #parsedDataTree .propName { color: blue; }
 #parsedDataTree .className { color: green; }
 #parsedDataTree .primitiveValue { font-weight: bold }
-#infoPanel { background: #222222; }
-#infoPanel { color: #eee; display:none; padding: 10px }
-#aboutWebIde { position:absolute; bottom:10px; right:10px; font-size:12px }
+#infoPanel { background: #222222; color: #eee; padding: 10px; height: 100%; overflow: auto }
+#aboutWebIde { float: right; margin-top: 5px; font-size:12px }
 #disableLazyParsingDiv, #exportToJsonDiv, #unparsedDiv, #bytesDiv, #parsedPathDiv, #selectionLengthDiv { font-size:13px; margin-top:5px }
 #parsedPath { word-break: break-all; }
 #unparsedDiv { margin-top:0 }
 #disableLazyParsingDiv label { margin-left:2px; font-weight:normal; vertical-align:middle }
 #welcomeModalLabel { text-align:center }
-#welcomeModal .licenses { font-size:12px; margin-bottom:10px }
-#converterPanel { display:none }
+.welcome-modal-licenses { font-size:12px; margin-bottom:10px }
+#converterPanel { height: 100%; overflow: auto }
 /*.marker_match { background:rgba(80, 255, 80, 0.30); }*/
