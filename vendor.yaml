@@ -31,6 +31,7 @@ libs:
         - src/mode-php.js
         - src/mode-python.js
         - src/mode-ruby.js
+        - src/mode-rust.js
         - src/mode-yaml.js
         - src/theme-monokai.js
         - src/theme-textmate.js
