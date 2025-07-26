@@ -311,6 +311,52 @@ export function initFileTree() {
         return false;
     });
 
+    (function() {
+        let timeout: number | null;
+        let startTouchPos: {clientX: number; clientY: number} | null;
+        // Inspired by https://github.com/vakata/jstree/blob/6256df013ebd98aea138402d8ac96db3efe0c0da/src/jstree.contextmenu.js#L201-L221
+        //
+        // TODO: investigate why this is necessary, because by default the
+        //   `contextmenu` event can apparently be triggered on touch devices as
+        //   well (but here it is probably prevented by one of the jsTree
+        //   component's event handlers). For example, note that a long touch
+        //   opens a context menu in the hex viewer, which proves that the
+        //   `contextmenu` event can be triggered natively.
+        fileTreeCont.on("touchstart", ".jstree-anchor", e => {
+            const originalEvent = <TouchEvent>e.originalEvent;
+            if (!originalEvent || !originalEvent.changedTouches || !originalEvent.changedTouches[0]) {
+                return;
+            }
+            clearTimeout(timeout);
+            const touch = originalEvent.changedTouches[0];
+            startTouchPos = { clientX: touch.clientX, clientY: touch.clientY };
+            const pageX = touch.pageX;
+            const pageY = touch.pageY;
+            timeout = setTimeout(
+                () => $(e.currentTarget).trigger($.Event("contextmenu", { pageX, pageY })),
+                750
+            );
+        });
+        fileTreeCont.on("touchmove", ".jstree-anchor", e => {
+            if (!startTouchPos) {
+                return;
+            }
+            const originalEvent = <TouchEvent>e.originalEvent;
+            if (!originalEvent || !originalEvent.changedTouches || !originalEvent.changedTouches[0]) {
+                return;
+            }
+            const touch = originalEvent.changedTouches[0];
+            if (Math.abs(touch.clientX - startTouchPos.clientX) > 10 || Math.abs(touch.clientY - startTouchPos.clientY) > 10) {
+                clearTimeout(timeout);
+            }
+        });
+        fileTreeCont.on("touchend", ".jstree-anchor", () => {
+            clearTimeout(timeout);
+            timeout = null;
+            startTouchPos = null;
+        });
+    })();
+
     // The `focusin` and `focusout` events provide a simple form of keyboard
     // accessibility: the submenu is displayed as long as the item to which it
     // belongs, or the submenu itself, has focus.
