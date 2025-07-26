@@ -51,7 +51,7 @@ libs:
     files: [LICENSE, BigInteger.js]
 
   Bootstrap:
-    website: http://getbootstrap.com/
+    website: https://getbootstrap.com/docs/3.4/
     source: https://github.com/twbs/bootstrap
     licenseName: MIT
     licenseUrl: https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE
@@ -59,7 +59,7 @@ libs:
     files: [LICENSE, dist/*]
 
   Bootswatch:
-    website: https://bootswatch.com/
+    website: https://bootswatch.com/3/
     source: https://github.com/thomaspark/bootswatch
     licenseName: MIT
     licenseUrl: https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE
@@ -83,9 +83,9 @@ libs:
     files: [LICENSE, lib/dateformat.js]
 
   Font Awesome:
-    website: http://fontawesome.io/
+    website: https://fontawesome.com/v4/
     source: https://github.com/FortAwesome/Font-Awesome
-    licenseUrl: http://fontawesome.io/license/
+    licenseUrl: https://fontawesome.com/v4/license/
     npmDir: font-awesome
     files: [css, fonts]
 
@@ -178,7 +178,7 @@ libs:
     distDir: ts-types
 
   Kaitai Struct Compiler:
-    website: http://kaitai.io/
+    website: https://kaitai.io/
     source: https://github.com/kaitai-io/kaitai_struct_compiler
     licenseName: GPL-3.0
     licenseUrl: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE

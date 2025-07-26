@@ -13,14 +13,14 @@ Source: https://github.com/peterolson/BigInteger.js
 License: Unlicense (https://raw.githubusercontent.com/peterolson/BigInteger.js/master/LICENSE)
 
 ## Bootstrap
-Website: http://getbootstrap.com/
+Website: https://getbootstrap.com/docs/3.4/
 
 Source: https://github.com/twbs/bootstrap
 
 License: MIT (https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE)
 
 ## Bootswatch
-Website: https://bootswatch.com/
+Website: https://bootswatch.com/3/
 
 Source: https://github.com/thomaspark/bootswatch
 
@@ -39,7 +39,7 @@ Source: https://github.com/deepstreamIO/golden-layout
 License: MIT (https://raw.githubusercontent.com/deepstreamIO/golden-layout/master/LICENSE)
 
 ## Kaitai Struct Compiler
-Website: http://kaitai.io/
+Website: https://kaitai.io/
 
 Source: https://github.com/kaitai-io/kaitai_struct_compiler
 

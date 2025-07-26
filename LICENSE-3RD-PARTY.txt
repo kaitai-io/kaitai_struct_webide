@@ -76,7 +76,7 @@ License name: MIT
   License URL: https://raw.githubusercontent.com/twbs/bootstrap/master/LICENSE
   License applies to files under the folder lib/_npm/bootstrap/
 
-Website: http://getbootstrap.com/
+Website: https://getbootstrap.com/docs/3.4/
 Source: https://github.com/twbs/bootstrap
 ================================================================================
 The MIT License (MIT)
@@ -109,7 +109,7 @@ License name: MIT
   License URL: https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE
   License applies to files under the folder lib/_npm/bootstrap/css//
 
-Website: https://bootswatch.com/
+Website: https://bootswatch.com/3/
 Source: https://github.com/thomaspark/bootswatch
 ================================================================================
 The MIT License (MIT)
@@ -194,7 +194,7 @@ License name: GPL-3.0
   License URL: https://raw.githubusercontent.com/kaitai-io/kaitai_struct_compiler/master/LICENSE
   License applies to files under the folder lib/_npm/kaitai-struct-compiler/
 
-Website: http://kaitai.io/
+Website: https://kaitai.io/
 Source: https://github.com/kaitai-io/kaitai_struct_compiler
 ================================================================================
 GNU GENERAL PUBLIC LICENSE
