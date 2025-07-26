@@ -16,13 +16,17 @@ const tsFormatHost = {
 const app = express();
 
 function reportDiagnostic(diagnostic) {
-    console.error(
-        `Error ${diagnostic.code}:`,
-        ts.flattenDiagnosticMessageText(
-            diagnostic.messageText,
-            tsFormatHost.getNewLine()
-        )
-    );
+    const messageText = ts.flattenDiagnosticMessageText(diagnostic.messageText, tsFormatHost.getNewLine());
+    const message = `Error ${diagnostic.code}: ${messageText}`;
+    if (diagnostic.file) {
+        // From https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API/968a685f278991c64bc59e61ca49ac345d4a2b48#a-minimal-compiler
+        const { line, character } = ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start);
+        // NOTE: the `file:` protocol makes the error location clickable in the
+        // integrated terminal of JetBrains IDEs (such as WebStorm)
+        console.error(`file:///${diagnostic.file.fileName}:${line + 1}:${character + 1} - ${message}`);
+    } else {
+        console.error(message);
+    }
 }
 
 function reportWatchStatusChanged(diagnostic) {
