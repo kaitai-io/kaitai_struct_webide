@@ -116,21 +116,18 @@ export class CompilerService {
 
         //console.log("ksySchema", ksySchema);
 
-        if (kslang === "json")
-            return Promise.resolve();
-        else {
-            var perfCompile = performanceHelper.measureAction("Compilation");
+        var perfCompile = performanceHelper.measureAction("Compilation");
 
-            var ks = KaitaiStructCompiler;
-            var rReleasePromise = (debug === false || debug === "both") ? ks.compile(kslang, compilerSchema, this.jsImporter, false) : Promise.resolve(null);
-            var rDebugPromise = (debug === true || debug === "both") ? ks.compile(kslang, compilerSchema, this.jsImporter, true) : Promise.resolve(null);
-            //console.log("rReleasePromise", rReleasePromise, "rDebugPromise", rDebugPromise);
-            return perfCompile.done(Promise.all([rReleasePromise, rDebugPromise]))
-                .then(([rRelease, rDebug]) => {
-                    //console.log("rRelease", rRelease, "rDebug", rDebug);
-                    return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
-                }).catch(compileErr => Promise.reject(new CompilationError("kaitai", compileErr)));
-        }
+        var ks = KaitaiStructCompiler;
+        var rReleasePromise = (debug === false || debug === "both") ? ks.compile(kslang, compilerSchema, this.jsImporter, false) : Promise.resolve(null);
+        var rDebugPromise = (debug === true || debug === "both") ? ks.compile(kslang, compilerSchema, this.jsImporter, true) : Promise.resolve(null);
+        //console.log("rReleasePromise", rReleasePromise, "rDebugPromise", rDebugPromise);
+        return perfCompile.done(Promise.all([rReleasePromise, rDebugPromise]))
+            .then(([rRelease, rDebug]) => {
+                //console.log("rRelease", rRelease, "rDebug", rDebug);
+                return rRelease && rDebug ? { debug: rDebug, release: rRelease } : rRelease ? rRelease : rDebug;
+            }).catch(compileErr => Promise.reject(new CompilationError("kaitai", compileErr)));
+
     }
 }
 
