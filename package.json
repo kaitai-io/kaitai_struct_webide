@@ -30,7 +30,7 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "express": "^4.17.1",
+    "express": "^5.1.0",
     "tslint": "^5.7.0",
     "typescript": "^2.9.2"
   },
