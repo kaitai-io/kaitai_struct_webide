@@ -12,6 +12,7 @@
 .hexViewer .header .hex .c8 { margin-left: 17px }
 
 .hexViewer .selected { background:#0076e0; color:white }
+.hexViewer .cursor { background: #00ccff; }
 .hexViewer .asciicell { padding: 2px 0 }
 
 .hexViewer .hexRow { height:21px; }
