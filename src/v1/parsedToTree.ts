@@ -400,7 +400,12 @@ export class ParsedTreeHandler {
             if (!valueExp.parent)
                 fillParents(valueExp, nodeData && nodeData.parent);
 
-            this.jstree.set_text(node, this.childItemToNode(valueExp, true).text);
+            if (isInstance) {
+                // For newly evaluated lazy instances, rewrite the node text to
+                // include the object type (if applicable), see
+                // https://github.com/kaitai-io/kaitai_struct_webide/issues/12
+                this.jstree.set_text(node, this.childItemToNode(valueExp, true).text);
+            }
 
             var nodes = this.exportedToNodes(valueExp, nodeData, true);
             nodes.forEach(x => x.id = x.id || this.getNodeId(x));
