@@ -7,9 +7,8 @@ export class ErrorWindowHandler {
 
     constructor(public parentContainer: GoldenLayout.ContentItem) { }
 
-    async show(...args: any[]) {
-        console.error.apply(window, args);
-        var errMsg = args.filter(x => typeof x !== 'object').join(" ");
+    async show(errMsg: string, errObj: any) {
+        console.error.call(window, errObj);
         if (!this.errorWnd) {
             var newPanel = app.ui.layout.addPanel();
             this.parentContainer.addChild({ type: "component", componentName: newPanel.componentName, title: "Errors" });
@@ -33,7 +32,7 @@ export class ErrorWindowHandler {
     handle(error: any) {
         if (error) {
             var msg;
-            if ('getMessage__T' in error && error.toString().startsWith('io.kaitai.struct')) {
+            if (typeof error === "object" && 'getMessage__T' in error && error.toString().startsWith('io.kaitai.struct')) {
                 msg = error.getMessage__T(); // compile error message
             } else if (error.toString !== Object.prototype.toString && error.toString !== Error.prototype.toString) {
                 msg = error.toString();
