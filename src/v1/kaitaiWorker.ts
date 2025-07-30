@@ -104,7 +104,7 @@ function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
         }
 
         const propNames = obj.constructor !== Object ?
-            Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor") : [];
+            Object.getOwnPropertyNames(obj.constructor.prototype).filter(x => x[0] !== "_" && x !== "constructor" && x !== "toString") : [];
 
         for (const propName of propNames) {
             const ksyInstanceData = ksyType && ksyType.instancesByJsName && ksyType.instancesByJsName[propName] || {};
