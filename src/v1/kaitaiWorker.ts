@@ -94,7 +94,7 @@ function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
         if (obj._debug) {
             Object.keys(obj._debug).forEach(k => fieldNames.add(k));
         }
-        const fieldNamesArr = Array.from(fieldNames).filter(x => x[0] !== "_");
+        const fieldNamesArr = Array.from(fieldNames).filter(x => x[0] !== "_" || x.startsWith("_unnamed"));
         fieldNamesArr
             .forEach(key => result.object.fields[key] = exportValue(obj[key], obj._debug && obj._debug[key], fieldNames.has(`_raw_${key}`), path.concat(key), noLazy));
 
