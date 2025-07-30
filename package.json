@@ -8,7 +8,7 @@
     "a11y-dialog": "^8.1.1",
     "ace-builds": "^1.17.0",
     "big-integer": "^1.6.25",
-    "bootstrap": "^3.4.1",
+    "bootstrap": "^5.0.0",
     "bootswatch": "^3.3.7",
     "bowser": "^1.7.3",
     "dateformat": "^2.0.0",
