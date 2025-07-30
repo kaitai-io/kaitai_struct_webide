@@ -67,19 +67,7 @@ function exportValue(obj: any, debug: IDebugInfo, hasRawAttr: boolean, path: str
             enumPath.unshift(enumPath[0]);
             enumPath.forEach(p => enumObj = enumObj[p]);
 
-            var flagCheck = 0, flagSuccess = true;
-            var flagStr = Object.keys(enumObj).filter(x => isNaN(<any>x)).filter(x => {
-                if (flagCheck & enumObj[x]) {
-                    flagSuccess = false;
-                    return false;
-                }
-
-                flagCheck |= enumObj[x];
-                return obj & enumObj[x];
-            }).join("|");
-
-            //console.log(debug.enumName, enumObj, enumObj[obj], flagSuccess, flagStr);
-            result.enumStringValue = enumObj[obj] || (flagSuccess && flagStr);
+            result.enumStringValue = enumObj[obj];
         }
     }
     else if (result.type === ObjectType.Array) {
