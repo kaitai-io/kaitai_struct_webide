@@ -111,11 +111,6 @@ Source: https://github.com/idiotWu/smooth-scrollbar
 
 License: MIT (https://raw.githubusercontent.com/idiotWu/smooth-scrollbar/develop/LICENSE)
 
-## text-encoding
-Source: https://github.com/inexorabletash/text-encoding
-
-License: Unlicense (https://raw.githubusercontent.com/inexorabletash/text-encoding/master/LICENSE.md)
-
 ## thenBy.js
 Source: https://github.com/Teun/thenBy.js
 

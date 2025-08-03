@@ -149,13 +149,6 @@ libs:
     npmDir: smooth-scrollbar
     files: [LICENSE, dist/*]
 
-  text-encoding:
-    source: https://github.com/inexorabletash/text-encoding
-    licenseName: Unlicense
-    licenseUrl: https://raw.githubusercontent.com/inexorabletash/text-encoding/master/LICENSE.md
-    npmDir: text-encoding
-    files: [LICENSE.md, index.js]
-
   thenBy.js:
     source: https://github.com/Teun/thenBy.js
     licenseName: Apache-2.0

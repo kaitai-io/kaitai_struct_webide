@@ -31,7 +31,6 @@
     <TypeScriptCompile Include="lib\ts-types\BigInteger.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\kaitai.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\knockout.d.ts" />
-    <TypeScriptCompile Include="lib\ts-types\text-encoding.d.ts" />
     <TypeScriptCompile Include="lib\ts-types\vue.d.ts" />
     <TypeScriptCompile Include="src\AppLayout.ts" />
     <TypeScriptCompile Include="src\autorefresh2.ts" />
