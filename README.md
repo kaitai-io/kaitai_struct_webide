@@ -31,6 +31,13 @@ Online editor / visualizer for Kaitai Struct .ksy files
 - `node serve.js --compile`
 - Go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
+## run locally with Docker
+
+- `git clone https://github.com/kaitai-io/kaitai_struct_webide`
+- `docker build -t kaitai_struct_webide .`
+- `docker run -i -d -p 8000:8000 kaitai_struct_webide`
+- Go to [http://localhost:8000/](http://localhost:8000/)
+
 ## screenshots
 
 ![Example screenshot of a .zip file](docs/zip_example.png)
