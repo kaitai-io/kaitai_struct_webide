@@ -25,6 +25,11 @@ on:
     types:
       - rebuild
 
+# Cancel in-progress runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions: {}
 
 jobs:
